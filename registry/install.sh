@@ -1,6 +1,6 @@
 #!/bin/bash
 
-yum -y install podman httpd httpd-tools
+yum -y install podman httpd httpd-tools firewalld skopeo
 
 mkdir -p /opt/registry/{auth,certs,data}
 
@@ -10,10 +10,22 @@ openssl req -newkey rsa:4096 -nodes -sha256 -keyout domain.key -x509 -days 365 -
 
 htpasswd -bBc /opt/registry/auth/htpasswd dummy dummy
 
+#Make sure to trust the self signed cert we just made
+cp /opt/registry/certs/domain.crt /etc/pki/ca-trust/source/anchors/
+update-ca-trust extract
+
 firewall-cmd --add-port=5000/tcp --zone=internal --permanent
 firewall-cmd --add-port=5000/tcp --zone=public   --permanent
 firewall-cmd --add-service=http  --permanent
 firewall-cmd --reload
+
+# Pull down the docker registry image from s3
+# and import it into the local container storage
+cd
+mkdir docker-registry
+aws s3 cp --recursive 's3://ocp-4.2.0/images/docker-registry/' docker-registry/
+skopeo copy dir://home/ec2-user/docker-registry/ containers-storage:docker.io/library/registry:2
+rm -rf docker-registry
 
 podman run --name registry_server -p 5000:5000 \
 -v /opt/registry/data:/var/lib/registry:z \
@@ -25,6 +37,7 @@ podman run --name registry_server -p 5000:5000 \
 -v /opt/registry/certs:/certs:z \
 -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
 -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
+--detach \
 docker.io/library/registry:2
 
 # Configure SELinux to allow containers in systemd services

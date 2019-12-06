@@ -1,0 +1,14 @@
+[
+  {
+    "ParameterKey": "AllowedRegistrySshCidr", 
+    "ParameterValue": "0.0.0.0/0"
+  },
+  {
+    "ParameterKey": "InfrastructureName", 
+    "ParameterValue": "ocp4-cluster"
+  },
+  {
+    "ParameterKey": "VpcId", 
+    "ParameterValue": "vpc-0ad34c12e902f0867" 
+  }
+]
