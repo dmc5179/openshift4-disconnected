@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Template for Container Registry (Security Groups)
+
+Parameters:
+  InfrastructureName:
+    AllowedPattern: ^([a-zA-Z][a-zA-Z0-9\-]{0,26})$
+    MaxLength: 27
+    MinLength: 1
+    ConstraintDescription: Infrastructure name must be alphanumeric, start with a letter, and have a maximum of 27 characters.
+    Description: A short, unique cluster ID used to tag cloud resources and identify items owned or used by the cluster.
+    Type: String
+  AllowedRegistrySshCidr:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|1[0-9]|2[0-9]|3[0-2]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/0-32.
+    Default: 0.0.0.0/0
+    Description: CIDR block to allow SSH access to the registry node.
+    Type: String
+  VpcId:
+    Description: The VPC-scoped resources will belong to this VPC.
+    Type: AWS::EC2::VPC::Id
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: "Cluster Information"
+      Parameters:
+      - InfrastructureName
+    - Label:
+        default: "Network Configuration"
+      Parameters:
+      - VpcId
+      - AllowedRegistrySshCidr
+    ParameterLabels:
+      InfrastructureName:
+        default: "Infrastructure Name"
+      VpcId:
+        default: "VPC ID"
+      AllowedRegistrySshCidr:
+        default: "Allowed SSH Source"
+
+Conditions:
+  DoRegistration: !Equals ["yes", !Ref AutoRegisterELB]
+
+Resources:
+
+  RegistrySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Cluster Registry Security Group
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: !Ref AllowedRegistrySshCidr
+      - IpProtocol: tcp
+        ToPort: 80
+        FromPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        ToPort: 443
+        FromPort: 443
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        ToPort: 8080
+        FromPort: 8080
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        ToPort: 5000
+        FromPort: 5000
+        CidrIp: 0.0.0.0/0
+      VpcId: !Ref VpcId
+
+Outputs:
+  RegistrySecurityGroupId:
+    Description: Registry Security Group ID
+    Value: !GetAtt RegistrySecurityGroup.GroupId
