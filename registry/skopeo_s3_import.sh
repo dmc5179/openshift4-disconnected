@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# This script will pull down images from an S3 bucket and use skopeo to push
+# them to another registry
+
 BUCKET=ocp-4.2.0
 REGISTRY=registry-ocp4.redhat.com:5000
 
