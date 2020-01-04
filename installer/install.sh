@@ -1,18 +1,57 @@
 #!/bin/bash
 
-INSTALL_DIR=/home/ec2-user/openshift4
-INSTALL_BUCKET='redhat-combine'
+# AWS CLI commands to launch instances
 
-openshift-install create manifests --dir=${INSTALL_DIR}
+# AWS CLI to launch bootstrap node
+aws ec2 run-instances --image-id 'ami-00d4375c5625a0988' --count 1 --instance-type 'i3.large' \
+--key-name 'Combine' --subnet-id 'subnet-092a00c216e3afdad' --security-group-ids 'sg-0b6c28f41aac7ce72' --ebs-optimized \
+--tag-specifications 'ResourceType=string,Tags=[{Key=Name,Value=caas-bootstrap}]' --private-ip-address '10.0.106.50' \
+--user-data '{"ignition":{"config":{"replace":{"source":"http://10.0.106.192/openshift4/bootstrap.ign","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
 
-sed -i 's/mastersSchedulable: true/mastersSchedulable: False/' manifests/cluster-scheduler-02-config.yml
 
-openshift-install create ignition-configs --dir=${INSTALL_DIR}
+# AWS CLI to launch master0
+aws ec2 run-instances --image-id 'ami-00d4375c5625a0988' --count 1 --instance-type 'm5.2xlarge' \
+--key-name 'Combine' --subnet-id 'subnet-092a00c216e3afdad' --security-group-ids 'sg-0b6c28f41aac7ce72' --ebs-optimized \
+--tag-specifications 'ResourceType=string,Tags=[{Key=Name,Value=caas-master0}]' --private-ip-address '10.0.106.51' \
+--user-data '{"ignition":{"config":{"replace":{"source":"http://10.0.106.192/openshift4/master0.ign","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
+
+# AWS CLI to launch master1
+aws ec2 run-instances --image-id 'ami-00d4375c5625a0988' --count 1 --instance-type 'm5.2xlarge' \
+--key-name 'Combine' --subnet-id 'subnet-092a00c216e3afdad' --security-group-ids 'sg-0b6c28f41aac7ce72' --ebs-optimized \
+--tag-specifications 'ResourceType=string,Tags=[{Key=Name,Value=caas-master1}]' --private-ip-address '10.0.106.52' \
+--user-data '{"ignition":{"config":{"replace":{"source":"http://10.0.106.192/openshift4/master1.ign","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
+
+# AWS CLI to launch master2
+aws ec2 run-instances --image-id 'ami-00d4375c5625a0988' --count 1 --instance-type 'm5.2xlarge' \
+--key-name 'Combine' --subnet-id 'subnet-092a00c216e3afdad' --security-group-ids 'sg-0b6c28f41aac7ce72' --ebs-optimized \
+--tag-specifications 'ResourceType=string,Tags=[{Key=Name,Value=caas-master2}]' --private-ip-address '10.0.106.53' \
+--user-data '{"ignition":{"config":{"replace":{"source":"http://10.0.106.192/openshift4/master2.ign","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
 
 
-aws s3 cp bootstrap.ign "s3://${INSTALL_BUCKET}/"
-aws s3 cp master.ign "s3://${INSTALL_BUCKET}/"
-aws s3 cp metadata.ign "s3://${INSTALL_BUCKET}/"
-aws s3 cp metadata.json "s3://${INSTALL_BUCKET}/"
-aws s3 cp worker.ign "s3://${INSTALL_BUCKET}/"
+# Notes on adding workers -----
+# When the manifests were generated the worker count was set to 0 because the installer will not create them for us
+# When you launch the instances below they will all spin around saying they don't know who they are
+# This is because their CSRs have to be approved. After launching the instances start running 'oc get csr'
+# and look for Pending CSRs to appear. You can approve them with 'oc adm certificate approve <first column of 'oc get csr'>
+
+
+# AWS CLI to launch worker0
+aws ec2 run-instances --image-id 'ami-00d4375c5625a0988' --count 1 --instance-type 'm5.2xlarge' \
+--key-name 'Combine' --subnet-id 'subnet-092a00c216e3afdad' --security-group-ids 'sg-0b6c28f41aac7ce72' --ebs-optimized \
+--tag-specifications 'ResourceType=string,Tags=[{Key=Name,Value=caas-worker0}]' --private-ip-address '10.0.106.61' \
+--user-data '{"ignition":{"config":{"replace":{"source":"http://10.0.106.192/openshift4/worker0.ign","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
+
+# AWS CLI to launch worker1
+aws ec2 run-instances --image-id 'ami-00d4375c5625a0988' --count 1 --instance-type 'm5.2xlarge' \
+--key-name 'Combine' --subnet-id 'subnet-092a00c216e3afdad' --security-group-ids 'sg-0b6c28f41aac7ce72' --ebs-optimized \
+--tag-specifications 'ResourceType=string,Tags=[{Key=Name,Value=caas-worker1}]' --private-ip-address '10.0.106.62' \
+--user-data '{"ignition":{"config":{"replace":{"source":"http://10.0.106.192/openshift4/worker1.ign","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
+
+# AWS CLI to launch worker2
+aws ec2 run-instances --image-id 'ami-00d4375c5625a0988' --count 1 --instance-type 'm5.2xlarge' \
+--key-name 'Combine' --subnet-id 'subnet-092a00c216e3afdad' --security-group-ids 'sg-0b6c28f41aac7ce72' --ebs-optimized \
+--tag-specifications 'ResourceType=string,Tags=[{Key=Name,Value=caas-worker2}]' --private-ip-address '10.0.106.63' \
+--user-data '{"ignition":{"config":{"replace":{"source":"http://10.0.106.192/openshift4/worker2.ign","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
+
+
 
