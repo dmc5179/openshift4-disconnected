@@ -3,7 +3,7 @@
 # Create Ignition files for each node based on the base ignition file and the fake root for each host
 
 # WARNING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# If you create ignition configs today and install the cluster tomorrow you 24 hour
+# If you create ignition configs today and install the cluster tomorrow your 24 hour
 # initial certs might be expired so you really have to regenerate the ignition files on
 # every install attempt. The certs are generated when you create the ignition files. 
 # Not when you start to install the cluster

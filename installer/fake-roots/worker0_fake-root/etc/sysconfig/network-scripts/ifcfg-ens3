@@ -1,10 +1,10 @@
 TYPE=Ethernet
 DEVICE=ens3
 BOOTPROTO=none
-IPADDR=10.0.106.61
+IPADDR=
 PREFIX=24
-GATEWAY=10.0.106.1
-DNS1=10.0.106.35
-DOMAIN="redhatgovsa.io caas.redhatgovsa.io"
+GATEWAY=
+DNS1=
+DOMAIN=""
 ONBOOT=yes
 

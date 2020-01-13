@@ -1,31 +1,32 @@
 #!/bin/bash
 
 # AWS CLI commands to launch instances
+HTTPD_IP=""
 
 # AWS CLI to launch bootstrap node
 aws ec2 run-instances --image-id 'ami-00d4375c5625a0988' --count 1 --instance-type 'i3.large' \
 --key-name 'Combine' --subnet-id 'subnet-092a00c216e3afdad' --security-group-ids 'sg-0b6c28f41aac7ce72' --ebs-optimized \
---tag-specifications 'ResourceType=string,Tags=[{Key=Name,Value=caas-bootstrap}]' --private-ip-address '10.0.106.50' \
---user-data '{"ignition":{"config":{"replace":{"source":"http://10.0.106.192/openshift4/bootstrap.ign","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
+--tag-specifications 'ResourceType=string,Tags=[{Key=Name,Value=caas-bootstrap}]' --private-ip-address '<PRIVATE_IP>' \
+--user-data '{"ignition":{"config":{"replace":{"source":"http://${HTTPD_IP}/openshift4/bootstrap.ign","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
 
 
 # AWS CLI to launch master0
 aws ec2 run-instances --image-id 'ami-00d4375c5625a0988' --count 1 --instance-type 'm5.2xlarge' \
 --key-name 'Combine' --subnet-id 'subnet-092a00c216e3afdad' --security-group-ids 'sg-0b6c28f41aac7ce72' --ebs-optimized \
---tag-specifications 'ResourceType=string,Tags=[{Key=Name,Value=caas-master0}]' --private-ip-address '10.0.106.51' \
---user-data '{"ignition":{"config":{"replace":{"source":"http://10.0.106.192/openshift4/master0.ign","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
+--tag-specifications 'ResourceType=string,Tags=[{Key=Name,Value=caas-master0}]' --private-ip-address '<PRIVATE_IP>' \
+--user-data '{"ignition":{"config":{"replace":{"source":"http://${HTTPD_IP}/openshift4/master0.ign","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
 
 # AWS CLI to launch master1
 aws ec2 run-instances --image-id 'ami-00d4375c5625a0988' --count 1 --instance-type 'm5.2xlarge' \
 --key-name 'Combine' --subnet-id 'subnet-092a00c216e3afdad' --security-group-ids 'sg-0b6c28f41aac7ce72' --ebs-optimized \
---tag-specifications 'ResourceType=string,Tags=[{Key=Name,Value=caas-master1}]' --private-ip-address '10.0.106.52' \
---user-data '{"ignition":{"config":{"replace":{"source":"http://10.0.106.192/openshift4/master1.ign","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
+--tag-specifications 'ResourceType=string,Tags=[{Key=Name,Value=caas-master1}]' --private-ip-address '<PRIVATE_IP>' \
+--user-data '{"ignition":{"config":{"replace":{"source":"http://${HTTPD_IP}/openshift4/master1.ign","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
 
 # AWS CLI to launch master2
 aws ec2 run-instances --image-id 'ami-00d4375c5625a0988' --count 1 --instance-type 'm5.2xlarge' \
 --key-name 'Combine' --subnet-id 'subnet-092a00c216e3afdad' --security-group-ids 'sg-0b6c28f41aac7ce72' --ebs-optimized \
---tag-specifications 'ResourceType=string,Tags=[{Key=Name,Value=caas-master2}]' --private-ip-address '10.0.106.53' \
---user-data '{"ignition":{"config":{"replace":{"source":"http://10.0.106.192/openshift4/master2.ign","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
+--tag-specifications 'ResourceType=string,Tags=[{Key=Name,Value=caas-master2}]' --private-ip-address '<PRIVATE_IP>' \
+--user-data '{"ignition":{"config":{"replace":{"source":"http://${HTTPD_IP}/openshift4/master2.ign","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
 
 
 # Notes on adding workers -----
@@ -38,20 +39,20 @@ aws ec2 run-instances --image-id 'ami-00d4375c5625a0988' --count 1 --instance-ty
 # AWS CLI to launch worker0
 aws ec2 run-instances --image-id 'ami-00d4375c5625a0988' --count 1 --instance-type 'm5.2xlarge' \
 --key-name 'Combine' --subnet-id 'subnet-092a00c216e3afdad' --security-group-ids 'sg-0b6c28f41aac7ce72' --ebs-optimized \
---tag-specifications 'ResourceType=string,Tags=[{Key=Name,Value=caas-worker0}]' --private-ip-address '10.0.106.61' \
---user-data '{"ignition":{"config":{"replace":{"source":"http://10.0.106.192/openshift4/worker0.ign","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
+--tag-specifications 'ResourceType=string,Tags=[{Key=Name,Value=caas-worker0}]' --private-ip-address '<PRIVATE_IP>' \
+--user-data '{"ignition":{"config":{"replace":{"source":"http://${HTTPD_IP}/openshift4/worker0.ign","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
 
 # AWS CLI to launch worker1
 aws ec2 run-instances --image-id 'ami-00d4375c5625a0988' --count 1 --instance-type 'm5.2xlarge' \
 --key-name 'Combine' --subnet-id 'subnet-092a00c216e3afdad' --security-group-ids 'sg-0b6c28f41aac7ce72' --ebs-optimized \
---tag-specifications 'ResourceType=string,Tags=[{Key=Name,Value=caas-worker1}]' --private-ip-address '10.0.106.62' \
---user-data '{"ignition":{"config":{"replace":{"source":"http://10.0.106.192/openshift4/worker1.ign","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
+--tag-specifications 'ResourceType=string,Tags=[{Key=Name,Value=caas-worker1}]' --private-ip-address '<PRIVATE_IP>' \
+--user-data '{"ignition":{"config":{"replace":{"source":"http://${HTTPD_IP}/openshift4/worker1.ign","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
 
 # AWS CLI to launch worker2
 aws ec2 run-instances --image-id 'ami-00d4375c5625a0988' --count 1 --instance-type 'm5.2xlarge' \
 --key-name 'Combine' --subnet-id 'subnet-092a00c216e3afdad' --security-group-ids 'sg-0b6c28f41aac7ce72' --ebs-optimized \
---tag-specifications 'ResourceType=string,Tags=[{Key=Name,Value=caas-worker2}]' --private-ip-address '10.0.106.63' \
---user-data '{"ignition":{"config":{"replace":{"source":"http://10.0.106.192/openshift4/worker2.ign","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
+--tag-specifications 'ResourceType=string,Tags=[{Key=Name,Value=caas-worker2}]' --private-ip-address '<PRIVATE_IP>' \
+--user-data '{"ignition":{"config":{"replace":{"source":"http://${HTTPD_IP}/openshift4/worker2.ign","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
 
 
 
