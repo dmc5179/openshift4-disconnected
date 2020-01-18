@@ -2,6 +2,7 @@
 
 REGISTRY_DIR=""
 REGISTRY_HOSTNAME=""
+REGISTRY_PORT=5000
 
 yum -y install podman httpd httpd-tools firewalld skopeo
 
@@ -15,8 +16,8 @@ htpasswd -bBc ${REGISTRY_DIR}/auth/htpasswd dummy dummy
 cp -f ${REGISTRY_DIR}/certs/domain.crt /etc/pki/ca-trust/source/anchors/
 update-ca-trust extract
 
-firewall-cmd --add-port=5000/tcp --zone=internal --permanent
-firewall-cmd --add-port=5000/tcp --zone=public   --permanent
+firewall-cmd --add-port=${REGISTRY_PORT}/tcp --zone=internal --permanent
+firewall-cmd --add-port=${REGISTRY_PORT}/tcp --zone=public   --permanent
 firewall-cmd --add-service=http  --permanent
 firewall-cmd --reload
 
@@ -28,7 +29,7 @@ firewall-cmd --reload
 #skopeo copy dir://home/ec2-user/docker-registry/ containers-storage:docker.io/library/registry:2
 #rm -rf docker-registry
 
-podman run --name registry_server -p 5000:5000 \
+podman run --name registry_server -p ${REGISTRY_PORT}:5000 \
 -v ${REGISTRY_DIR}/data:/var/lib/registry:z \
 -v ${REGISTRY_DIR}/auth:/auth:z \
 -e "REGISTRY_AUTH=htpasswd" \
@@ -62,3 +63,5 @@ EOF
 
 systemctl enable registry-container.service
 
+# Test the connection
+curl -u dummy:dummy https://${REGISTRY_HOSTNAME}:${REGISTRY_PORT}/v2/_catalog
