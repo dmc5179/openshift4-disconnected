@@ -7,9 +7,7 @@ yum -y install podman httpd httpd-tools firewalld skopeo
 
 mkdir -p ${REGISTRY_DIR}/{auth,certs,data}
 
-pushd ${REGISTRY_DIR}/certs
-
-openssl req -newkey rsa:4096 -nodes -sha256 -keyout domain.key -x509 -days 365 -out domain.crt
+openssl req -newkey rsa:4096 -nodes -sha256 -keyout ${REGISTRY_DIR}/certs/domain.key -x509 -days 365 -out ${REGISTRY_DIR}/certs/domain.crt
 
 htpasswd -bBc ${REGISTRY_DIR}/auth/htpasswd dummy dummy
 
