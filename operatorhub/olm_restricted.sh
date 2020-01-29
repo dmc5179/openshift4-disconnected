@@ -21,7 +21,7 @@ do
     echo "Release: ${RELEASE}"
     DIGEST=$(curl -s "https://quay.io/cnr/api/v1/packages/${NAME}/${RELEASE}" | jq '.[0].content.digest' | tr -d '"')
     echo "Digest: ${DIGEST}"
-    curl -s -XGET "https://quay.io/cnr/api/v1/packages/community-operators/etcd/blobs/sha256/${DIGEST}" -o "${SHORT_NAME}.tar.gz"
+    curl -s -XGET "https://quay.io/cnr/api/v1/packages/${NAME}/blobs/sha256/${DIGEST}" -o "${SHORT_NAME}.tar.gz"
 
     mkdir -p "manifests/${SHORT_NAME}"
     tar xzf "${SHORT_NAME}.tar.gz" -C "manifests/${SHORT_NAME}" --strip-components 1
