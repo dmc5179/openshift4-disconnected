@@ -1,0 +1,19 @@
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  name: localstoragerepo
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - <registry_host:port>/<catalog>/origin-local-storage-operator
+    source: quay.io/openshift/origin-local-storage-operator
+  - mirrors:
+    - <registry_host:port>/<catalog>/local-registry
+    source: quay.io/gnufied/local-registry
+  - mirrors:
+    - <registry_host:port>/<catalog>/origin-local-storage-static-provisioner
+    source: quay.io/openshift/origin-local-storage-static-provisioner
+  - mirrors:
+    - <registry_host:port>/<catalog>/origin-local-storage-diskmaker
+    source: quay.io/openshift/origin-local-storage-diskmaker
+

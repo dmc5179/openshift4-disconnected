@@ -1,0 +1,13 @@
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  name: nfdoprepo
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - <registry_host:port>/<catalog>/openshift-nfd-operator
+    source: quay.io/danclark/openshift-nfd-operator
+  - mirrors:
+    - <registry_host:port>/<catalog>/cluster-nfd-operator
+    source: quay.io/danclark/cluster-nfd-operator
+
