@@ -5,15 +5,12 @@ metadata:
 spec:
   repositoryDigestMirrors:
   - mirrors:
-    - <registry_host:port>/<catalog>/origin-local-storage-operator
-    source: quay.io/openshift/origin-local-storage-operator
+    - <registry_host:port>/<catalog>/ose-local-storage-diskmaker
+    source: registry.redhat.io/openshift4/ose-local-storage-diskmaker
   - mirrors:
-    - <registry_host:port>/<catalog>/local-registry
-    source: quay.io/gnufied/local-registry
+    - <registry_host:port>/<catalog>/ocp4/ose-local-storage-operator
+    source: registry.redhat.io/openshift4/ose-local-storage-operator
   - mirrors:
-    - <registry_host:port>/<catalog>/origin-local-storage-static-provisioner
-    source: quay.io/openshift/origin-local-storage-static-provisioner
-  - mirrors:
-    - <registry_host:port>/<catalog>/origin-local-storage-diskmaker
-    source: quay.io/openshift/origin-local-storage-diskmaker
+    - <registry_host:port>/<catalog>/ose-local-storage-static-provisioner
+    source: registry.redhat.io/openshift4/ose-local-storage-static-provisioner
 
