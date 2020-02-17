@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export OCP_RELEASE="4.2.0-0.nightly-2019-08-29-062233"
+export OCP_RELEASE="4.3.1-x86_64"
 export LOCAL_REG='registry.ocp4.example.com:5000'
 export LOCAL_REPO='ocp4/openshift4'
 export UPSTREAM_REPO='openshift-release-dev'
@@ -11,10 +11,14 @@ export UPSTREAM_REPO='openshift-release-dev'
 export LOCAL_SECRET_JSON="${HOME}/pull-secret-2.json"
 export RELEASE_NAME="ocp-release-nightly"
 
-
-
 oc adm release mirror -a ${LOCAL_SECRET_JSON} \
 --from=quay.io/${UPSTREAM_REPO}/${RELEASE_NAME}:${OCP_RELEASE} \
 --to-release-image=${LOCAL_REG}/${LOCAL_REPO}:${OCP_RELEASE} \
 --to=${LOCAL_REG}/${LOCAL_REPO}
+
+
+# Example to use a dir instead of a registry
+# https://github.com/openshift/oc/pull/126
+#oc adm release mirror quay.io/openshift-release-dev/ocp-release:4.3.1-x86_64 --to-dir=/tmp/release
+#oc image mirror --from-dir=/tmp/release file://openshift/release myregistry.com/my/repository
 
