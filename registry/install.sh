@@ -4,7 +4,7 @@ REGISTRY_DIR=""
 REGISTRY_HOSTNAME=""
 REGISTRY_PORT=5000
 
-yum -y install podman httpd httpd-tools firewalld skopeo
+sudo yum -y install podman httpd httpd-tools firewalld skopeo
 
 mkdir -p ${REGISTRY_DIR}/{auth,certs,data}
 
