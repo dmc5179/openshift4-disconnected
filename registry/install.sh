@@ -13,13 +13,13 @@ openssl req -newkey rsa:4096 -nodes -sha256 -keyout ${REGISTRY_DIR}/certs/domain
 htpasswd -bBc ${REGISTRY_DIR}/auth/htpasswd dummy dummy
 
 #Make sure to trust the self signed cert we just made
-cp -f ${REGISTRY_DIR}/certs/domain.crt /etc/pki/ca-trust/source/anchors/
-update-ca-trust extract
+sudo cp -f ${REGISTRY_DIR}/certs/domain.crt /etc/pki/ca-trust/source/anchors/
+sudo update-ca-trust extract
 
-firewall-cmd --add-port=${REGISTRY_PORT}/tcp --zone=internal --permanent
-firewall-cmd --add-port=${REGISTRY_PORT}/tcp --zone=public   --permanent
-firewall-cmd --add-service=http  --permanent
-firewall-cmd --reload
+sudo firewall-cmd --add-port=${REGISTRY_PORT}/tcp --zone=internal --permanent
+sudo firewall-cmd --add-port=${REGISTRY_PORT}/tcp --zone=public   --permanent
+sudo firewall-cmd --add-service=http  --permanent
+sudo firewall-cmd --reload
 
 # Pull down the docker registry image from s3
 # and import it into the local container storage
