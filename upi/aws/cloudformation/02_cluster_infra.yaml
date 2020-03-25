@@ -32,6 +32,14 @@ Parameters:
   VpcId:
     Description: The VPC-scoped resources will belong to this VPC.
     Type: AWS::EC2::VPC::Id
+  UseRoute53:
+    Default: "yes"
+    AllowedValues:
+    - "yes"
+    - "no"
+    Description: Do you want to use Route53, which requires Hosted Zone information?
+    Type: String
+
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -68,6 +76,9 @@ Metadata:
       HostedZoneId:
         default: "Public Hosted Zone ID"
 
+Conditions:
+  DoRoute53: !Equals ["yes", !Ref UseRoute53]
+
 Resources:
   ExtApiElb:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
@@ -87,6 +98,7 @@ Resources:
       Type: network
 
   IntDns:
+    Condition: DoRoute53
     Type: "AWS::Route53::HostedZone"
     Properties:
       HostedZoneConfig:
@@ -102,6 +114,7 @@ Resources:
         VPCRegion: !Ref "AWS::Region"
 
   ExternalApiServerRecord:
+    Condition: DoRoute53
     Type: AWS::Route53::RecordSetGroup
     Properties:
       Comment: Alias record for the API server
@@ -118,6 +131,7 @@ Resources:
           DNSName: !GetAtt ExtApiElb.DNSName
 
   InternalApiServerRecord:
+    Condition: DoRoute53
     Type: AWS::Route53::RecordSetGroup
     Properties:
       Comment: Alias record for the API server
@@ -214,130 +228,130 @@ Resources:
       - Key: deregistration_delay.timeout_seconds
         Value: 60
 
-  RegisterTargetLambdaIamRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: !Join ["-", [!Ref InfrastructureName, "nlb", "lambda", "role"]]
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-        - Effect: "Allow"
-          Principal:
-            Service:
-            - "lambda.amazonaws.com"
-          Action:
-          - "sts:AssumeRole"
-      Path: "/"
-      Policies:
-      - PolicyName: !Join ["-", [!Ref InfrastructureName, "master", "policy"]]
-        PolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-          - Effect: "Allow"
-            Action:
-              [
-                "elasticloadbalancing:RegisterTargets",
-                "elasticloadbalancing:DeregisterTargets",
-              ]
-            Resource: !Ref InternalApiTargetGroup
-          - Effect: "Allow"
-            Action:
-              [
-                "elasticloadbalancing:RegisterTargets",
-                "elasticloadbalancing:DeregisterTargets",
-              ]
-            Resource: !Ref InternalServiceTargetGroup
-          - Effect: "Allow"
-            Action:
-              [
-                "elasticloadbalancing:RegisterTargets",
-                "elasticloadbalancing:DeregisterTargets",
-              ]
-            Resource: !Ref ExternalApiTargetGroup
+#  RegisterTargetLambdaIamRole:
+#    Type: AWS::IAM::Role
+#    Properties:
+#      RoleName: !Join ["-", [!Ref InfrastructureName, "nlb", "lambda", "role"]]
+#      AssumeRolePolicyDocument:
+#        Version: "2012-10-17"
+#        Statement:
+#        - Effect: "Allow"
+#          Principal:
+#            Service:
+#            - "lambda.amazonaws.com"
+#          Action:
+#          - "sts:AssumeRole"
+#      Path: "/"
+#      Policies:
+#      - PolicyName: !Join ["-", [!Ref InfrastructureName, "master", "policy"]]
+#        PolicyDocument:
+#          Version: "2012-10-17"
+#          Statement:
+#          - Effect: "Allow"
+#            Action:
+#              [
+#                "elasticloadbalancing:RegisterTargets",
+#                "elasticloadbalancing:DeregisterTargets",
+#              ]
+#            Resource: !Ref InternalApiTargetGroup
+#          - Effect: "Allow"
+#            Action:
+#              [
+#                "elasticloadbalancing:RegisterTargets",
+#                "elasticloadbalancing:DeregisterTargets",
+#              ]
+#            Resource: !Ref InternalServiceTargetGroup
+#          - Effect: "Allow"
+#            Action:
+#              [
+#                "elasticloadbalancing:RegisterTargets",
+#                "elasticloadbalancing:DeregisterTargets",
+#              ]
+#            Resource: !Ref ExternalApiTargetGroup
 
-  RegisterNlbIpTargets:
-    Type: "AWS::Lambda::Function"
-    Properties:
-      Handler: "index.handler"
-      Role:
-        Fn::GetAtt:
-        - "RegisterTargetLambdaIamRole"
-        - "Arn"
-      Code:
-        ZipFile: |
-          import json
-          import boto3
-          import cfnresponse
-          def handler(event, context):
-            elb = boto3.client('elbv2')
-            if event['RequestType'] == 'Delete':
-              elb.deregister_targets(TargetGroupArn=event['ResourceProperties']['TargetArn'],Targets=[{'Id': event['ResourceProperties']['TargetIp']}])
-            elif event['RequestType'] == 'Create':
-              elb.register_targets(TargetGroupArn=event['ResourceProperties']['TargetArn'],Targets=[{'Id': event['ResourceProperties']['TargetIp']}])
-            responseData = {}
-            cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, event['ResourceProperties']['TargetArn']+event['ResourceProperties']['TargetIp'])
-      Runtime: "python3.7"
-      Timeout: 120
+#  RegisterNlbIpTargets:
+#    Type: "AWS::Lambda::Function"
+#    Properties:
+#      Handler: "index.handler"
+#      Role:
+#        Fn::GetAtt:
+#        - "RegisterTargetLambdaIamRole"
+#        - "Arn"
+#      Code:
+#        ZipFile: |
+#          import json
+#          import boto3
+#          import cfnresponse
+#          def handler(event, context):
+#            elb = boto3.client('elbv2')
+#            if event['RequestType'] == 'Delete':
+#              elb.deregister_targets(TargetGroupArn=event['ResourceProperties']['TargetArn'],Targets=[{'Id': event['ResourceProperties']['TargetIp']}])
+#            elif event['RequestType'] == 'Create':
+#              elb.register_targets(TargetGroupArn=event['ResourceProperties']['TargetArn'],Targets=[{'Id': event['ResourceProperties']['TargetIp']}])
+#            responseData = {}
+#            cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, event['ResourceProperties']['TargetArn']+event['ResourceProperties']['TargetIp'])
+#      Runtime: "python3.7"
+#      Timeout: 120
 
-  RegisterSubnetTagsLambdaIamRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: !Join ["-", [!Ref InfrastructureName, "subnet-tags-lambda-role"]]
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-        - Effect: "Allow"
-          Principal:
-            Service:
-            - "lambda.amazonaws.com"
-          Action:
-          - "sts:AssumeRole"
-      Path: "/"
-      Policies:
-      - PolicyName: !Join ["-", [!Ref InfrastructureName, "subnet-tagging-policy"]]
-        PolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-          - Effect: "Allow"
-            Action:
-              [
-                "ec2:DeleteTags",
-                "ec2:CreateTags"
-              ]
-            Resource: "arn:aws:ec2:*:*:subnet/*"
-          - Effect: "Allow"
-            Action:
-              [
-                "ec2:DescribeSubnets",
-                "ec2:DescribeTags"
-              ]
-            Resource: "*"
+#  RegisterSubnetTagsLambdaIamRole:
+#    Type: AWS::IAM::Role
+#    Properties:
+#      RoleName: !Join ["-", [!Ref InfrastructureName, "subnet-tags-lambda-role"]]
+#      AssumeRolePolicyDocument:
+#        Version: "2012-10-17"
+#        Statement:
+#        - Effect: "Allow"
+#          Principal:
+#            Service:
+#            - "lambda.amazonaws.com"
+#          Action:
+#          - "sts:AssumeRole"
+#      Path: "/"
+#      Policies:
+#      - PolicyName: !Join ["-", [!Ref InfrastructureName, "subnet-tagging-policy"]]
+#        PolicyDocument:
+#          Version: "2012-10-17"
+#          Statement:
+#          - Effect: "Allow"
+#            Action:
+#              [
+#                "ec2:DeleteTags",
+#                "ec2:CreateTags"
+#              ]
+#            Resource: "arn:aws:ec2:*:*:subnet/*"
+#          - Effect: "Allow"
+#            Action:
+#              [
+#                "ec2:DescribeSubnets",
+#                "ec2:DescribeTags"
+#              ]
+#            Resource: "*"
 
-  RegisterSubnetTags:
-    Type: "AWS::Lambda::Function"
-    Properties:
-      Handler: "index.handler"
-      Role:
-        Fn::GetAtt:
-        - "RegisterSubnetTagsLambdaIamRole"
-        - "Arn"
-      Code:
-        ZipFile: |
-          import json
-          import boto3
-          import cfnresponse
-          def handler(event, context):
-            ec2_client = boto3.client('ec2')
-            if event['RequestType'] == 'Delete':
-              for subnet_id in event['ResourceProperties']['Subnets']:
-                ec2_client.delete_tags(Resources=[subnet_id], Tags=[{'Key': 'kubernetes.io/cluster/' + event['ResourceProperties']['InfrastructureName']}]);
-            elif event['RequestType'] == 'Create':
-              for subnet_id in event['ResourceProperties']['Subnets']:
-                ec2_client.create_tags(Resources=[subnet_id], Tags=[{'Key': 'kubernetes.io/cluster/' + event['ResourceProperties']['InfrastructureName'], 'Value': 'shared'}]);
-            responseData = {}
-            cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, event['ResourceProperties']['InfrastructureName']+event['ResourceProperties']['Subnets'][0])
-      Runtime: "python3.7"
-      Timeout: 120
+#  RegisterSubnetTags:
+#    Type: "AWS::Lambda::Function"
+#    Properties:
+#      Handler: "index.handler"
+#      Role:
+#        Fn::GetAtt:
+#        - "RegisterSubnetTagsLambdaIamRole"
+#        - "Arn"
+#      Code:
+#        ZipFile: |
+#          import json
+#          import boto3
+#          import cfnresponse
+#          def handler(event, context):
+#            ec2_client = boto3.client('ec2')
+#            if event['RequestType'] == 'Delete':
+#              for subnet_id in event['ResourceProperties']['Subnets']:
+#                ec2_client.delete_tags(Resources=[subnet_id], Tags=[{'Key': 'kubernetes.io/cluster/' + event['ResourceProperties']['InfrastructureName']}]);
+#            elif event['RequestType'] == 'Create':
+#              for subnet_id in event['ResourceProperties']['Subnets']:
+#                ec2_client.create_tags(Resources=[subnet_id], Tags=[{'Key': 'kubernetes.io/cluster/' + event['ResourceProperties']['InfrastructureName'], 'Value': 'shared'}]);
+#            responseData = {}
+#            cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, event['ResourceProperties']['InfrastructureName']+event['ResourceProperties']['Subnets'][0])
+#      Runtime: "python3.7"
+#      Timeout: 120
 
   RegisterPublicSubnetTags:
     Type: Custom::SubnetRegister

@@ -374,6 +374,8 @@ Resources:
       ToPort: 32767
       IpProtocol: udp
 
+# TODO: We won't be able to have all of these permissions.
+#       Need to look at trimming them down
   MasterIamRole:
     Type: AWS::IAM::Role
     Properties:
@@ -410,6 +412,8 @@ Resources:
       Roles:
       - Ref: "MasterIamRole"
 
+# TODO: We won't be able to have all of these permissions.
+#       Need to look at trimming them down
   WorkerIamRole:
     Type: AWS::IAM::Role
     Properties:

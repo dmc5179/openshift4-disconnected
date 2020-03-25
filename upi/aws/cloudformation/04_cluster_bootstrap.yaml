@@ -100,6 +100,8 @@ Conditions:
   DoRegistration: !Equals ["yes", !Ref AutoRegisterELB]
 
 Resources:
+# TODO: We won't be able to have all of these permissions.
+#       Need to look at trimming them down
   BootstrapIamRole:
     Type: AWS::IAM::Role
     Properties:
@@ -153,6 +155,8 @@ Resources:
         CidrIp: 0.0.0.0/0
       VpcId: !Ref VpcId
 
+# TODO: We might need to use an http(s) source on the registry for ignition
+#       instead of s3 which requires an IAMRole
   BootstrapInstance:
     Type: AWS::EC2::Instance
     Properties:
