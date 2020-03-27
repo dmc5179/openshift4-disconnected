@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: <NAME>
+  labels:
+    app: <APP>
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: <SIZE>
+  volumeName: "nfs-pv0001"
+
