@@ -1,6 +1,9 @@
 #!/bin/bash
 #set -x
 
+# This script was used for 4.2 and before when the mirroring of the operatorhub was not
+# as automated as in 4.3. This no longer needs to be used for 4.3+
+
 curl -s 'https://quay.io/cnr/api/v1/packages?namespace=redhat-operators' > redhat-operators.json
 curl -s 'https://quay.io/cnr/api/v1/packages?namespace=community-operators' >> community-operators.json
 curl -s 'https://quay.io/cnr/api/v1/packages?namespace=certified-operators' >> certified-operators.json
