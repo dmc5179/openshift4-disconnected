@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Creates IAM Role for OpenShift Bootstrap Docker Registry
+
+Parameters:
+
+  S3RegistryArtifactsPath:
+    Description: Path to Registry Artifacts
+    Type: String
+    Default: 
+
+  PartitionName:
+    Description: Amazon in which partition the resouce exists
+    Type: String
+    Default: aws
+
+  Ec2ServiceName:
+    Description: Address of EC2 service
+    Type: String
+    Default: ec2.amazonaws.com
+
+Resources:
+
+  OpenShiftRegistryRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - !Ref Ec2ServiceName
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: bootstrap-registry-policy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action: 's3:GetObject'
+                Effect: Allow
+                Resource: !Sub arn:${PartitionName}:s3:::${S3RegistryArtifactsPath}/*
+              - Action: 's3:ListBucket'
+                Effect: Allow
+                Resource: !Select [0, !Split ['/', !Sub 'arn:${PartitionName}:s3:::${S3RegistryArtifactsPath}']]
+              - Action:
+                - 'ec2:CreateTags'
+                Effect: Allow
+                Resource: '*'
+
+  RegistryInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - Ref: OpenShiftRegistryRole
+
+Outputs:
+  OpenShiftRegistryInstanceProfile:
+    Description: Instance Profile of the OpenShift Registry Server
+    Value: !Ref RegistryInstanceProfile
