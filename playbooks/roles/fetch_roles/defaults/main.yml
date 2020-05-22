@@ -1,0 +1,10 @@
+---
+# defaults file for fetch_roles
+
+staging_dir: '/tmp/ansible_roles'
+
+ansible_roles:
+  - bertvv.bind
+  - bertvv.dhcp
+  - bertvv.tftp
+  - mariuszczyz.centos_pxe
