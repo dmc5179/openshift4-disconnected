@@ -45,18 +45,6 @@
     mode: 0555
   with_items: "{{ workers | lower }}"
 
-- name: Installing TFTP Systemd helper
-  copy:
-    src: ../files/start-tftp.sh
-    dest: /usr/local/bin/start-tftp.sh
-    mode: '0555'
-
-- name: Installing TFTP Systemd unit file
-  copy:
-    src: ../files/helper-tftp.service
-    dest: /etc/systemd/system/helper-tftp.service
-    mode: '0655'
-
 - name: Start and enable tftp server
   systemd:
     name: tftp-server
