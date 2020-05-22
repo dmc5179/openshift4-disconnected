@@ -1,0 +1,130 @@
+---
+# tasks file for httpd
+- name: install requirements
+  pip:
+    name: "{{ httpd_requirements }}"
+    state: present
+    executable: "{{ pip_exec }}"
+  register: httpd_install_requirements
+  until: httpd_install_requirements is succeeded
+  retries: 3
+
+- name: install apache httpd
+  package:
+    name: "{{ httpd_packages }}"
+    state: present
+  register: httpd_install_apache_httpd
+  until: httpd_install_apache_httpd is succeeded
+  retries: 3
+
+- name: modify selinux settings
+  seboolean:
+    name: "{{ item }}"
+    state: true
+    persistent: true
+  when:
+    - ansible_selinux.status is defined
+    - ansible_selinux.status == "enabled"
+  loop: "{{ httpd_sebooleans }}"
+
+- name: allow connections to custom port
+  seport:
+    ports: "{{ item }}"
+    proto: tcp
+    setype: http_port_t
+    state: present
+  when:
+    - ansible_selinux.status is defined
+    - ansible_selinux.status == "enabled"
+  loop:
+    - "{{ httpd_port }}"
+    - "{{ httpd_ssl_port }}"
+
+- name: create ssl directory
+  file:
+    path: "{{ httpd_config_directory }}/ssl"
+    state: directory
+
+- name: create ssl key
+  openssl_privatekey:
+    path: "{{ httpd_config_directory }}/ssl/{{ httpd_ssl_servername }}.key"
+  register: httpd_key
+
+- name: create ssl csr
+  openssl_csr:
+    path: "{{ httpd_config_directory }}/ssl/{{ httpd_ssl_servername }}.csr"
+    privatekey_path: "{{ httpd_key.filename }}"
+    common_name: "{{ httpd_ssl_servername }}"
+  register: httpd_csr
+
+- name: create ssl certificates
+  openssl_certificate:
+    path: "{{ httpd_config_directory }}/ssl/{{ httpd_ssl_servername }}.crt"
+    privatekey_path: "{{ httpd_csr.privatekey }}"
+    csr_path: "{{ httpd_csr.filename }}"
+    provider: selfsigned
+
+- name: configure ssl
+  template:
+    src: ssl.conf.j2
+    dest: "{{ httpd_config_directory }}/ssl.conf"
+  notify:
+    - test httpd configuration validity
+    - restart httpd
+
+- name: configure locations
+  template:
+    src: location.conf.j2
+    dest: "{{ httpd_config_directory }}/{{ item.name }}.conf"
+  loop: "{{ httpd_locations }}"
+  notify:
+    - test httpd configuration validity
+    - restart httpd
+  when:
+    - httpd_locations is defined
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: configure vhosts
+  template:
+    src: vhost.conf.j2
+    dest: "{{ httpd_config_directory }}/{{ item.name }}.conf"
+  loop: "{{ httpd_vhosts }}"
+  notify:
+    - test httpd configuration validity
+    - restart httpd
+  when:
+    - httpd_vhosts is defined
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: configure httpd
+  template:
+    src: "{{ httpd_config_src }}"
+    dest: "{{ httpd_config_dest }}"
+  notify:
+    - test httpd configuration validity
+    - restart httpd
+
+- name: configure redirect from http to https
+  template:
+    src: default_vhost.conf.j2
+    dest: "{{ httpd_config_directory }}/default_vhost.conf"
+  notify:
+    - test httpd configuration validity
+    - restart httpd
+
+- name: create docroot
+  file:
+    path: "{{ item.documentroot }}"
+    state: directory
+  loop: "{{ httpd_vhosts }}"
+  when:
+    - httpd_vhosts is defined
+    - item.documentroot is defined
+
+- name: start and enable httpd
+  service:
+    name: "{{ httpd_service }}"
+    state: started
+    enabled: true
