@@ -1,0 +1,21 @@
+---
+# defaults file for generate_ignition
+
+openshift_install: 'openshift-install'
+openshift_client: 'oc'
+kubectl: 'kubectl'
+kubeauth: "~/.kube/auth"
+
+install_config: ''
+ignition_configs: ''
+
+master_schedulable: false
+cluster_channel: 'fast'
+
+fips: true
+pullSecret: ''
+sshKey: ''
+
+base_domain: 'redhatgov.io'
+
+num_workers: 3

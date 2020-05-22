@@ -1,0 +1,45 @@
+---
+# tasks file for generate_ignition
+
+- name: Create ignition configs directory
+  file:
+    name: "{{ ignition_configs }}"
+    state: directory
+
+- name: Copy template install-config.yaml
+  template:
+    src: install-config.yaml.j2
+    dest: "~"
+    mode: 0664
+
+- name: Create manifests
+  shell: "{{ openshift_install }} create manifests --dir={{ ignition_configs }}"
+  creates: "{{ ignition_configs }}/manifests/cluster-config.yaml"
+
+- name: Set masters to unschedulable
+  lineinfile:
+    path: "{{ ignition_configs }}/manifests/cluster-scheduler-02-config.yml"
+    regexp: 'mastersSchedulable: true'
+    line: 'mastersSchedulable: {{ master_schedulable }}'
+
+- name: Set cluster upgrade channel
+  lineinfile:
+    path: "{{ ignition_configs }}/manifests/cvo-overrides.yaml"
+    regexp: 'channel:.*'
+    line: 'channel: {{ cluster_channel }}'
+
+# Prevent the cluster from trying to reach the Cincinnati for update graphs
+- name: Set dummy Cincinnati server
+  lineinfile:
+    path: "{{ ignition_configs }}/manifests/cvo-overrides.yaml"
+    regexp: 'upstream:.*'
+    line: 'upstream: http://localhost:8080/graph'
+
+- name: Create ignition configs
+  shell: "{{ openshift_install }} create ignition-configs --dir={{ ignition_configs }}"
+  creates: "{{ ignition_configs }}/master.ign"
+
+- name: Set kube config
+  copy:
+    src: "{{ ignition_configs }}/auth/kubeconfig"
+    dest: "~/.kube/config"
