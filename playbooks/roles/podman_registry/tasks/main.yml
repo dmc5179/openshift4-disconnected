@@ -1,0 +1,132 @@
+---
+# tasks file for podman-registry
+- name: Install Dependencies
+  yum:
+    name:
+      - podman
+      - httpd
+      - httpd-tools
+      - mod_ssl
+      - firewalld
+      - skopeo
+      - libselinux-python3
+    state: present
+
+- name: make directories
+  with_items:
+    - '{{docker_registry_conf_dir}}'
+    - '{{docker_registry_conf_dir}}/auth'
+    - '{{docker_registry_conf_dir}}/pki'
+    - '{{docker_registry_letsencrypt_dir_on_host}}'
+    - '{{docker_registry_storage_fs_root_directory_on_host}}'
+  file:
+    state: directory
+    dest: '{{item}}'
+    owner: root
+    group: root
+    mode: 0700
+
+- name: Upgrade pip
+  pip:
+    name: pip
+    executable: "{{ pip_executable }}"
+    state: present
+    version: '20.0.2'
+
+- name: Install passlib for htpassword
+  pip:
+    name: passlib
+    executable: "{{ pip_executable }}"
+    state: present
+    version: '1.7.2'
+
+- name: Install bcrypt for htpassword
+  pip:
+    name: bcrypt
+    executable: "{{ pip_executable }}"
+    state: present
+    version: '3.1.7'
+
+- name: Install cryptography for htpassword
+  pip:
+    name: cryptography
+    executable: "{{ pip_executable }}"
+    state: present
+    version: '2.9.2'
+
+- name: add passwds to /etc/docker-registry/auth/registry.htpasswd
+  with_items: '{{docker_registry_users}}'
+  htpasswd:
+    path: '{{docker_registry_conf_dir}}/auth/registry.htpasswd'
+    mode: 0600
+    name: '{{item.uid}}'
+    password: '{{item.pwd}}'
+    crypt_scheme: bcrypt
+
+- name: templatize...
+  template:
+    src: 'config.yml.j2'
+    dest: '{{docker_registry_conf_dir}}/config.yml'
+    mode: '0644'
+
+# Generate Certificates
+- include: certs.yml
+
+# Configure Firewall Settings
+- include: firewall.yml
+
+- name: Pull docker registry image
+  podman_image:
+    name: docker.io/library/registry
+    tag: 2
+    state: present
+  when: (not disconnected | bool)
+
+- name: Load docker registry image into local container storage
+  command: |
+    skopeo copy "docker-archive://{{ docker_registry_image_archive }}"
+    "container-storage://{{ docker_registry_container }}"
+  when: (disconnected | bool)
+
+# Configure SELinux to allow containers in systemd services
+- name: Set container_manage_cgroup SELinux Boolean
+  seboolean:
+    name: container_manage_cgroup
+    state: true
+    persistent: true
+  when:
+    (ansible_distribution == 'RedHat' or ansible_distribution == 'CentOS') and
+    (ansible_distribution_major_version == '7')
+
+- name: launching registry container...
+  command: >
+    podman run --name '{{docker_registry_container_name}}'
+    -p '{{docker_registry_https_port}}:5000'
+    -v '{{docker_registry_conf_dir}}/config.yml:/etc/docker/registry/config.yml:ro,Z'
+    -v '{{docker_registry_conf_dir}}/auth:/auth:ro,Z'
+    -v '{{docker_registry_conf_dir}}/pki:/pki:ro,Z'
+    -v '{{docker_registry_storage_fs_root_directory_on_host}}:{{docker_registry_storage_fs_root_directory}}:rw,Z'
+    -v '{{docker_registry_letsencrypt_dir_on_host}}:{{docker_registry_letsencrypt_dir}}:rw,Z'
+    --detach
+    '{{docker_registry_container}}'
+  when: docker_registry_activate
+
+- name: Install service file for podman registry
+  template:
+    src: 'podman-registry.service.j2'
+    dest: '/usr/lib/systemd/system/podman-registry.service'
+    mode: '0644'
+
+- name: Enable podman registry systemd service
+  systemd:
+    name: podman-registry
+    daemon-reload: true
+    enabled: true
+    state: started
+
+- name: Test the registry connection
+  uri:
+    url: "{{docker_registry_https_port}}:5000/v2/_catalog"
+    user: 'dummy'
+    password: 'dummy'
+    method: 'GET'

@@ -1,0 +1,9 @@
+---
+# vars file for podman-registry
+docker_registry_pki_key_file: '{{inventory_hostname}}{{docker_registry_pki_key_suffix}}'
+docker_registry_pki_key_src: '{{docker_registry_pki_dir}}/{{docker_registry_pki_key_file}}'
+
+docker_registry_pki_cert_file: '{{inventory_hostname}}{{docker_registry_pki_cert_suffix}}'
+docker_registry_pki_cert_src: '{{docker_registry_pki_dir}}/{{docker_registry_pki_cert_file}}'
+
+pip_executable: pip3

@@ -1,0 +1,43 @@
+---
+- name: Populate service facts
+  service_facts:
+
+- name: Start firewalld
+  service:
+    name: firewalld
+    state: started
+  when: "'firewalld.service' in services"
+
+- name: Enable registry port zone internal
+  firewalld:
+    port: "{{ docker_registry_https_port }}/tcp"
+    zone: internal
+    permanent: true
+    immediate: true
+    state: enabled
+  when: "'firewalld.service' in services"
+
+- name: Enable registry port zone public
+  firewalld:
+    port: "{{ docker_registry_https_port }}/tcp"
+    zone: public
+    permanent: true
+    immediate: true
+    state: enabled
+  when: "'firewalld.service' in services"
+
+- name: Enable https service
+  firewalld:
+    service: https
+    permanent: true
+    immediate: true
+    state: enabled
+  when: "'firewalld.service' in services"
+
+- name: Enable http service
+  firewalld:
+    service: http
+    permanent: true
+    immediate: true
+    state: enabled
+  when: "'firewalld.service' in services"
