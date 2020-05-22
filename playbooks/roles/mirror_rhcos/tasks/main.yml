@@ -1,2 +1,40 @@
 ---
 # tasks file for mirror_rhcos
+
+- name: Delete OCP4 files, if requested, to download again
+  file:
+    state: absent
+    path: "{{ item }}"
+  with_items:
+    - "/usr/local/src/openshift-client-linux.tar.gz"
+    - "/usr/local/src/openshift-install-linux.tar.gz"
+    - "/var/www/html/install/bios.raw.gz"
+    - "/var/lib/tftpboot/rhcos/initramfs.img"
+    - "/var/lib/tftpboot/rhcos/kernel"
+  when: 
+    - (mirror | bool)
+    - (force_ocp_download | bool)
+
+- name: Downloading OCP4 installer Bios
+  get_url:
+    url: "{{ ocp_bios }}"
+    dest: /var/www/html/install/bios.raw.gz
+    mode: 0555
+
+  - name: Downloading OCP4 installer initramfs
+    get_url:
+      url: "{{ ocp_initramfs }}"
+      dest: /var/lib/tftpboot/rhcos/initramfs.img
+      mode: 0555
+    when: not staticips
+    tags: download
+
+  - name: Downloading OCP4 installer kernel
+    get_url:
+      url: "{{ ocp_install_kernel }}"
+      dest: /var/lib/tftpboot/rhcos/kernel
+      mode: 0555
+    when: not staticips
+    tags: download
+
+

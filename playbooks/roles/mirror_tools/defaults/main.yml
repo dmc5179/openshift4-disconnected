@@ -1,2 +1,5 @@
 ---
 # defaults file for mirror_tools
+
+mirror: true
+force_ocp_download: true
