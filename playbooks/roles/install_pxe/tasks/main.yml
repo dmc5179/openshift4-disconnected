@@ -19,6 +19,10 @@
     state: directory
     mode: 0755
 
+- name: Copy over files needed for TFTP
+  shell: "cp -a /usr/share/syslinux/* /var/lib/tftpboot"
+  creates: "/var/lib/tftpboot/vesa.c32"
+
 - name: Set the default tftp file
   template:
     src: ../templates/default.j2
