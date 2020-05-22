@@ -1,0 +1,14 @@
+---
+# defaults file for configure_repos
+repo_server: 'http://localhost:5000'
+repo_path: 'repos'
+
+
+# Repos to enable
+rhel_7_server_ansible_28_rpms: true
+rhel_7_server_extras_rpms: true
+rhel_7_server_ose_43_rpms: true
+rhel_7_server_rpms: true
+ansible_29_for_rhel_8_x86_64_rpms: true
+rhel_8_for_x86_64_appstream_rpms: true
+rhel_8_for_x86_64_baseos_rpms: true
