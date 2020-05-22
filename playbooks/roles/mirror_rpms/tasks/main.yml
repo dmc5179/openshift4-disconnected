@@ -1,2 +1,42 @@
 ---
 # tasks file for mirror_rpms
+
+- name: Ensure reposync installed (DNF)
+  dnf:
+    name: dnf-utils
+    state: present
+  when:
+    - (ansible_distribution == 'RedHat') and
+    - (ansible_distribution_major_version == '8')
+
+- name: Ensure reposync installed (YUM)
+  yum:
+    name: yum-utils
+    state: present
+  when:
+    - (ansible_distribution == 'RedHat') and
+    - (ansible_distribution_major_version == '7')
+
+- name: Mirror RHEL 7 Repos
+  shell: "reposync -p {{ mirror_dir }} --download-metadata --arch={{ arch }} {{ item }}"
+  with_items:
+    - "{{ rhel7_repositories }}"
+  when: ( rhel7_enabled | bool )
+
+- name: Mirror RHEL 7 EPEL Repo
+  shell: "reposync -p {{ mirror_dir }} --download-metadata --arch={{ arch }} {{ item }}"
+  with_items:
+    - "{{ epel7_repository }}"
+  when: ( epel7_enabled | bool )
+
+- name: Mirror RHEL 8 Repos
+  shell: "reposync -p {{ mirror_dir }} --download-metadata --arch={{ arch }} {{ item }}"
+  with_items:
+    - "{{ rhel8_repositories}}"
+  when: ( rhel8_enabled | bool )
+
+- name: Mirror RHEL 8 EPEL
+  shell: "reposync -p {{ mirror_dir }} --download-metadata --arch={{ arch }} {{ item }}"
+  with_items:
+    - "{{ epel8_repository }}"
+  when: ( epel8_enabled | bool )

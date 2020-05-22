@@ -1,2 +1,25 @@
 ---
 # defaults file for mirror_rpms
+
+rhel7_enabled: false
+rhel7_repositories:
+  - rhel-7-server-ansible-2.8-rpms
+  - rhel-7-server-extras-rpms
+  - rhel-7-server-ose-4.3-rpms
+  - rhel-7-server-rpms
+
+epel7_enabled: false
+epel7_repository:
+
+rhel8_enabled: true
+rhel8_repositories:
+  - ansible-2.9-for-rhel-8-x86_64-rpms
+  - rhel-8-for-x86_64-appstream-rpms
+  - rhel-8-for-x86_64-baseos-rpms
+
+epel8_enabled: false
+epel8_repository:
+
+# Directory to mirror the RPMs into
+mirror_dir: '/tmp/repos/'
+arch: 'x86_64'
