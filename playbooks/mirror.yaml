@@ -1,0 +1,34 @@
+---
+- hosts: mirror_server
+  become: false
+  tasks:
+
+    - name: Mirror OpenShift Cluster Images
+    - import_role:
+        name: mirror_ocp_images
+      when: (mirror_ocp_images | bool)
+
+    - name: Mirror Operator Hub Images
+    - import_role:
+        name: mirror_operatorhub_images
+      when: (mirror_operatorhub_images | bool)
+
+    - name: Mirror Additional Images
+    - import_role:
+        name: mirror_images
+      when: (mirror_images | bool)
+
+    - name: Mirror RPM Repositories
+    - import_role:
+        name: mirror_rpms
+      when: (mirror_rpms | bool)
+
+    - name: Mirror RHCOS
+    - import_role:
+        name: mirror_rhcos
+      when: (mirror_rhcos | bool)
+
+    - name: Mirror Additional Tools
+    - import_role:
+        name: mirror_tools
+      when: (mirror_tools | bool)
