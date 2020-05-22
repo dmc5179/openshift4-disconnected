@@ -10,7 +10,7 @@ controlPlane:
   name: master
   replicas: {{num_workers}}
 metadata:
-  name: caas
+  name: {{ cluster_name }}
 networking:
   clusterNetwork:
   - cidr: 10.128.0.0/14
