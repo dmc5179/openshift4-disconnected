@@ -1,0 +1,31 @@
+---
+# vars file for httpd
+httpd_requirements:
+  - pyopenssl
+
+httpd_sebooleans:
+  - httpd_can_network_connect
+
+httpd_packages:
+  - httpd
+  - mod_ssl
+  - openssl
+
+httpd_service: httpd
+
+httpd_server_root: /etc/httpd
+
+httpd_config_directory: "{{ httpd_server_root }}/conf.d"
+
+# Every distribution has it's own configuration.
+httpd_config_src: httpd.conf-RedHat.j2
+
+httpd_config_dest: "{{ httpd_server_root }}/conf/httpd.conf"
+
+# This variable is used in `default_vhost.conf`.
+httpd_data_directory: /var/www/html
+
+httpd_modules_path: modules
+
+# This variable is used in handlers to test the configuration.
+httpd_binary: httpd
