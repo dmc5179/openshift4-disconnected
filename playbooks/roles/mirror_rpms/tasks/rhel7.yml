@@ -1,0 +1,33 @@
+---
+# tasks file for mirror_rpms
+
+# TODO: This is just hanging for some unknown reason
+# - name: Enable RHEL 7 Repos
+#  shell: "subscription-manager repos --enable={{ item }}"
+#  with_items:
+#    - "{{ rhel7_repositories }}"
+#  when: ( rhel7_enabled | bool )
+
+- name: Mirror RHEL 7 Repos
+  shell: "reposync -p {{ mirror_dir }} --download-metadata --arch={{ arch }} --repoid={{ item }}"
+  with_items:
+    - "{{ rhel7_repositories }}"
+  when: ( rhel7_enabled | bool )
+
+- name: Prune RHEL 7 Repos
+  shell: "repomanage --old --keep {{ repo_depth }} {{ mirror_dir }}/{{ item }} | xargs rm -f"
+  with_items:
+    - "{{ rhel7_repositories }}"
+  when: ( rhel7_enabled | bool )
+
+- name: Mirror EPEL 7 Repo
+  shell: "reposync -p {{ mirror_dir }} --download-metadata --arch={{ arch }} --repoid={{ item }}"
+  with_items:
+    - "{{ epel7_repository }}"
+  when: ( epel7_enabled | bool )
+
+- name: Prune EPEL 7 Repos
+  shell: "repomanage --old --keep {{ repo_depth }} {{ mirror_dir }}/{{ item }} | xargs rm -f"
+  with_items:
+    - "{{ epel7_repositories }}"
+  when: ( epel7_enabled | bool )
