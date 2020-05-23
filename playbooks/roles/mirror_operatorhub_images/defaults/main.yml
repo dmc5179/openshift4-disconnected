@@ -1,2 +1,13 @@
 ---
 # defaults file for mirror_operatorhub_images
+redhat_operators: true
+supported_operators: true
+community_operators: true
+
+rh_op_repo: 'quay.io/danclark/redhat-operators:v1'
+supp_op_repo: 'quay.io/danclark/supported-operators:v1'
+comm_op_repo: 'quay.io/danclark/community-operators:v1'
+
+pull_secret_file: ''
+
+mirror_registry: 'localhost:5000'

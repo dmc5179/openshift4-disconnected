@@ -1,2 +1,26 @@
 ---
 # tasks file for mirror_operatorhub_images
+
+- name: Create redhat-operators catalog image
+  shell: "oc adm catalog build --appregistry-org redhat-operators --to={{ rh_op_repo }} --registry-config={{ pull_secret_file }}"
+  when: (redhat_operators | bool)
+
+- name: Mirror redhat-operators images
+  shell: "oc adm catalog mirror {{ rh_op_repo }} {{ mirror_registry }}"
+  when: (redhat_operators | bool)
+
+- name: Create supported-operators catalog image
+  shell: "oc adm catalog build --appregistry-org supported-operators --to={{ supp_repo }} --registry-config={{ pull_secret_file }}"
+  when: (supported_operators | bool)
+
+- name: Mirror supported-operators images
+  shell: "oc adm catalog mirror {{ supp_repo }} {{ mirror_registry }}"
+  when: (supported_operators | bool)
+
+- name: Create community-operators catalog image
+  shell: "oc adm catalog build --appregistry-org community-operators --to={{ comm_repo }} --registry-config={{ pull_secret_file }}"
+  when: (community_operators | bool)
+
+- name: Mirror community-operators images
+  shell: "oc adm catalog mirror {{ comm_repo }} {{ mirror_registry }}"
+  when: (community_operators | bool)
