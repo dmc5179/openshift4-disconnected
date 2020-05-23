@@ -1,1 +1,7 @@
 ---
+mirror_ocp_images: true
+mirror_operatorhub_images: true
+mirror_images: true
+mirror_rpms: true
+mirror_rhcos: true
+mirror_tools: true
