@@ -1,5 +1,15 @@
 ---
 # tasks file for mirror_images
 
-# TODO: Mirror the support and must gather images
-#       needed for oc debug node and oc must gather
+- name: Install skopeo
+  package:
+    name: skopeo
+    state: present
+
+- name: Mirror image for oc debug node
+  shell: skopeo copy "docker://registry.redhat.io/rhel7/support-tools:latest" "docker-archive://{{ mirror_base }}/images/support-tools_latest.tar"
+  creates: "{{ mirror_base }}/images/support-tools_latest.tar"
+
+- name: Mirror image for oc must-gather
+  shell: skopeo copy "docker://quay.io/openshift/origin-must-gather:latest" "docker-archive://{{ mirror_base }}/images/origin-must-gather_latest.tar"
+  creates: "{{ mirror_base }}/images/origin-must-gather_latest.tar"
