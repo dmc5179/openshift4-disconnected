@@ -22,10 +22,10 @@
 #        name: mirror_ocp_images
 #      when: (mirror_ocp_images | bool)
 
-#    - name: Mirror Operator Hub Images
-#      import_role:
-#        name: mirror_operatorhub_images
-#      when: (mirror_operatorhub_images | bool)
+    - name: Mirror Operator Hub Images
+      import_role:
+        name: mirror_operatorhub_images
+      when: (mirror_operatorhub_images | bool)
 
 #    - name: Mirror Additional Images
 #      import_role:
