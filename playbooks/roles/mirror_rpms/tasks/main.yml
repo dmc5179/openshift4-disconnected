@@ -2,41 +2,51 @@
 # tasks file for mirror_rpms
 
 - name: Ensure reposync installed (DNF)
+  become: true
   dnf:
     name: dnf-utils
     state: present
-  when:
-    - (ansible_distribution == 'RedHat') and
-    - (ansible_distribution_major_version == '8')
+  when: ansible_distribution == 'RedHat' and ansible_distribution_major_version == '8'
 
 - name: Ensure reposync installed (YUM)
+  become: true
   yum:
     name: yum-utils
     state: present
-  when:
-    - (ansible_distribution == 'RedHat') and
-    - (ansible_distribution_major_version == '7')
+  when: ansible_distribution == 'RedHat' and ansible_distribution_major_version == '7'
 
 - name: Mirror RHEL 7 Repos
-  shell: "reposync -p {{ mirror_dir }} --download-metadata --arch={{ arch }} {{ item }}"
+  shell: "reposync -p {{ mirror_dir }} --download-metadata --arch={{ arch }} --repoid={{ item }}"
   with_items:
     - "{{ rhel7_repositories }}"
   when: ( rhel7_enabled | bool )
 
 - name: Mirror RHEL 7 EPEL Repo
-  shell: "reposync -p {{ mirror_dir }} --download-metadata --arch={{ arch }} {{ item }}"
+  shell: "reposync -p {{ mirror_dir }} --download-metadata --arch={{ arch }} --repoid={{ item }}"
   with_items:
     - "{{ epel7_repository }}"
   when: ( epel7_enabled | bool )
 
+# TODO: This is just hanging for some unknown reason
+#- name: Enable RHEL 8 Repos
+#  shell: "subscription-manager repos --enable={{ item }}"
+#  with_items:
+#    - "{{ rhel8_repositories }}"
+#  when: ( rhel8_enabled | bool )
+
+- name: Create mirror directory
+  file:
+    name: "{{ mirror_dir }}"
+    state: directory
+
 - name: Mirror RHEL 8 Repos
-  shell: "reposync -p {{ mirror_dir }} --download-metadata --arch={{ arch }} {{ item }}"
+  shell: "reposync -p {{ mirror_dir }} --download-metadata --arch={{ arch }} --repoid={{ item }}"
   with_items:
-    - "{{ rhel8_repositories}}"
+    - "{{ rhel8_repositories }}"
   when: ( rhel8_enabled | bool )
 
 - name: Mirror RHEL 8 EPEL
-  shell: "reposync -p {{ mirror_dir }} --download-metadata --arch={{ arch }} {{ item }}"
+  shell: "reposync -p {{ mirror_dir }} --download-metadata --arch={{ arch }} --repoid={{ item }}"
   with_items:
     - "{{ epel8_repository }}"
   when: ( epel8_enabled | bool )
