@@ -8,6 +8,8 @@
 
 [helper_node]
 
+[mirror_server]
+
 [registry_server]
 
 [bootstrap]
