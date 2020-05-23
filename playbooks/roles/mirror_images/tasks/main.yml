@@ -1,2 +1,5 @@
 ---
 # tasks file for mirror_images
+
+# TODO: Mirror the support and must gather images
+#       needed for oc debug node and oc must gather

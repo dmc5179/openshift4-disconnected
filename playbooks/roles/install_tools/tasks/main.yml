@@ -2,29 +2,50 @@
 # tasks file for install_tools
 
 - name: Unarchiving OCP4 client
+  become: true
   unarchive:
     src: /usr/local/src/openshift-client-linux.tar.gz
     dest: /usr/local/bin
-    remote_src: yes
+    remote_src: true
+  tags:
+    - client
 
 - name: Unarchiving OCP4 Installer
+  become: true
   unarchive:
     src: /usr/local/src/openshift-install-linux.tar.gz
     dest: /usr/local/bin
-    remote_src: yes
+    remote_src: true
+  tags:
+    - installer
 
 - name: Removing files that are not needed
+  become: true
   file:
     path: /usr/local/bin/README.md
     state: absent
+  tags: 
+    - client
+    - installer
+
+- name: Make sure podman is installed
+  become: true
+  package:
+    name: podman
+    state: present
+  tags:
+    - transpiler
 
 - name: Building filetranspiler
   shell: "podman build /usr/local/src/filetranspiler -t filetranspiler:latest"
   when: install_filetranspiler
+  tags:
+    - transpiler
 
 - name: Installing filetranspiler
   copy:
     src: ../files/filetranspiler
     dest: /usr/local/bin/filetranspiler
     mode: '0555'
-  when: install_filetranspiler
+  tags:
+    - transpiler
