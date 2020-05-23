@@ -2,11 +2,20 @@
 # tasks file for mirror_tools
 
 - name: Downloading OCP4 client
+  become: "{{ run_as_root }}"
   get_url:
     url: "{{ ocp_client }}"
-    dest: /usr/local/src/openshift-client-linux.tar.gz
+    dest: "{{ mirror_dir }}/openshift-client-linux.tar.gz"
 
 - name: Downloading OCP4 Installer
+  become: "{{ run_as_root }}"
   get_url:
     url: "{{ ocp_installer }}"
-    dest: /usr/local/src/openshift-install-linux.tar.gz
+    dest: "{{ mirror_dir }}/openshift-install-linux.tar.gz"
+
+- name: Downloading filetranspiler source
+  become: "{{ run_as_root }}"
+  git:
+    repo: https://github.com/ashcrow/filetranspiler
+    dest: /usr/local/src/filetranspiler
+  tags: transpiler
