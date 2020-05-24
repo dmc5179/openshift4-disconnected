@@ -18,3 +18,6 @@ ignition_configs: ''
 
 master_count: 3
 worker_count: 3
+
+# Base directory for all other mirror tasks
+mirror_base: '/opt/openshift'
