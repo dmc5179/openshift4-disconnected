@@ -2,6 +2,7 @@
 - name: Populate service facts
   service_facts:
 
+# Firewall needs to be running to configure it
 - name: Start firewalld
   service:
     name: firewalld
