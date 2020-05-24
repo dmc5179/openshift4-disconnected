@@ -41,3 +41,10 @@
 #      import_role:
 #        name: mirror_rhcos
 #      when: (mirror_rhcos | bool)
+
+    - name: Mirror helm binary and charts
+      include_role:
+        name: helm
+        apply:
+          tags:
+            - mirror
