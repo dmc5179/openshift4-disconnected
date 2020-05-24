@@ -1,5 +1,5 @@
 ---
-# vars file for mirror_tools
+# vars file for tools
 maj_ver: '4.3'
 ocp_ver: '4.3.8'
 rhcos_ver: '4.3.8'

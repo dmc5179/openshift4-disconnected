@@ -1,7 +1,0 @@
----
-# defaults file for mirror_tools
-
-mirror: true
-force_ocp_download: true
-mirror_dir: '/usr/local/src/'
-run_as_root: true

@@ -1,5 +1,0 @@
----
-# defaults file for install_tools
-
-mirror: true
-force_ocp_download: true

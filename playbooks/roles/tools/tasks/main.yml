@@ -1,5 +1,31 @@
 ---
-# tasks file for install_tools
+# tasks file for tools
+- name: Downloading OCP4 client
+  become: "{{ run_as_root }}"
+  get_url:
+    url: "{{ ocp_client }}"
+    dest: "{{ mirror_dir }}/openshift-client-linux.tar.gz"
+  tags:
+    - ocp_client
+    - mirror
+
+- name: Downloading OCP4 Installer
+  become: "{{ run_as_root }}"
+  get_url:
+    url: "{{ ocp_installer }}"
+    dest: "{{ mirror_dir }}/openshift-install-linux.tar.gz"
+  tags:
+    - ocp_installer
+    - mirror
+
+- name: Downloading filetranspiler source
+  become: "{{ run_as_root }}"
+  git:
+    repo: https://github.com/ashcrow/filetranspiler
+    dest: /usr/local/src/filetranspiler
+  tags:
+    - transpiler
+    - mirror
 
 - name: Unarchiving OCP4 client
   become: true
@@ -8,7 +34,8 @@
     dest: /usr/local/bin
     remote_src: true
   tags:
-    - client
+    - ocp_client
+    - install
 
 - name: Unarchiving OCP4 Installer
   become: true
@@ -17,7 +44,8 @@
     dest: /usr/local/bin
     remote_src: true
   tags:
-    - installer
+    - ocp_installer
+    - install
 
 - name: Removing files that are not needed
   become: true
@@ -25,8 +53,9 @@
     path: /usr/local/bin/README.md
     state: absent
   tags: 
-    - client
-    - installer
+    - ocp_client
+    - ocp_installer
+    - install
 
 - name: Make sure podman is installed
   become: true
@@ -35,12 +64,14 @@
     state: present
   tags:
     - transpiler
+    - install
 
 - name: Building filetranspiler
   shell: "podman build /usr/local/src/filetranspiler -t filetranspiler:latest"
   when: install_filetranspiler
   tags:
     - transpiler
+    - install
 
 - name: Installing filetranspiler
   copy:
@@ -49,3 +80,4 @@
     mode: '0555'
   tags:
     - transpiler
+    - install
