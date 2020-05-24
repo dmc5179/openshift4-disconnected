@@ -1,2 +1,49 @@
 ---
 # tasks file for mirror_helm
+
+- name: Create mirror directory for helm
+  file:
+    path: "{{ mirror_base }}/helm"
+    state: directory
+  tags:
+    - mirror
+
+- name: Mirror helm binary
+  get_url:
+    url: "https://get.helm.sh/helm-v{{ helm_version }}-linux-{{ arch }}.tar.gz"
+    dest: "{{ mirror_base }}/helm/helm-v{{ helm_version }}-linux-{{ arch }}.tar.gz"
+    mode: '0444'
+  tags:
+    - mirror
+
+- name: Create temp directory to extract helm
+  file:
+    path: '/tmp/helm'
+    state: directory
+  tags:
+    - install
+
+- name: Install helm
+  unarchive:
+    src: "{{ mirror_base }}/helm/helm-v{{ helm_version }}-linux-{{ arch }}.tar.gz"
+    dest: '/tmp/helm'
+  tags:
+    - install
+
+- name: Move helm binary
+  copy:
+    src: '/tmp/helm/linux-amd64/helm'
+    dest: '/usr/local/bin/helm'
+    owner: root
+    group: root
+    mode: '0755'
+    remote_src: true
+  tags:
+    - install
+
+- name: Cleanup temp helm directory
+  file:
+    path: '/tmp/helm'
+    state: absent
+  tags:
+    - install
