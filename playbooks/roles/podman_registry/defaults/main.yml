@@ -11,7 +11,8 @@ docker_registry_users:
     pwd: 'dummy'
 
 docker_registry_hostname: ''
-docker_registry_container: 'docker.io/library/registry:2'
+docker_registry_container: 'docker.io/library/registry'
+docker_registry_container_tag: '2'
 docker_registry_http_secret: d61605d6-63eb-11e6-a138-989096e41e7c
 docker_registry_container_name: registry-srv
 
