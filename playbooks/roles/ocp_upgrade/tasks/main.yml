@@ -1,0 +1,14 @@
+---
+# tasks file for ocp_upgrade
+
+# TODO: Convert to use k8s/openshift/openshift_raw ansible modules
+
+- name: Upgrade OCP Cluster
+  shell: |
+    oc adm upgrade --allow-explicit-upgrade=true --allow-upgrade-with-warnings=true \
+      --to-image='quay.io/openshift-release-dev/ocp-release@sha256:e1ebc7295248a8394afb8d8d918060a7cc3de12c491283b317b80b26deedfe61' \
+      --force=true
+
+- name: Monitor OCP Cluster Upgrade
+  shell:
+    cmd: oc get clusterversion -o json|jq ".items[0].status.history"
