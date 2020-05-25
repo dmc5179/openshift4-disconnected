@@ -1,0 +1,37 @@
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: master
+  name: 51-master-rh-registry-trust
+spec:
+  config:
+    ignition:
+      config: {}
+      security:
+        tls: {}
+      timeouts: {}
+      version: 2.2.0
+    networkd: {}
+    passwd: {}
+    storage:
+      files:
+      - contents:
+          source: data:text/plain;charset=utf-8;base64,{{ arc_reg }}
+          verification: {}
+        filesystem: root
+        mode: 420
+        path: /etc/containers/registries.d/registry.access.redhat.com.yaml
+      - contents:
+          source: data:text/plain;charset=utf-8;base64,{{ rio_reg }}
+          verification: {}
+        filesystem: root
+        mode: 420
+        path: /etc/containers/registries.d/registry.redhat.io.yaml
+      - contents:
+          source: data:text/plain;charset=utf-8;base64,{{ policy_config }}
+          verification: {}
+        filesystem: root
+        mode: 420
+        path: /etc/containers/policy.json
+  osImageURL: ""
