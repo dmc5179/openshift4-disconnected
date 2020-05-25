@@ -1,0 +1,16 @@
+---
+
+# Tasks to mirror images needed for a disconnected Ansible Tower
+# Install on OpenShift
+
+skopeo copy "docker-archive://${DOCKER_EXPORTS}/postgresql-10-rhel7_latest.tar" 'docker://openshift4-registry.redhatgovsa.io:5000/rhscl/postgresql-10-rhel7:latest'
+
+#skopeo copy "docker-archive://${DOCKER_EXPORTS}/keycloak_latest.tar" 'docker://openshift4-registry.redhatgovsa.io:5000/keycloak/keycloak:latest'
+
+skopeo copy "docker-archive://${DOCKER_EXPORTS}/ansible-tower_3.6.4.tar" 'docker://openshift4-registry.redhatgovsa.io:5000/ansible-tower/ansible-tower:3.6.4'
+
+skopeo copy "docker-archive://${DOCKER_EXPORTS}/ansible-tower-messaging_3.7.15.tar" 'docker://openshift4-registry.redhatgovsa.io:5000/ansible-tower/ansible-tower-messaging:3.7.15'
+
+skopeo copy "docker-archive://${DOCKER_EXPORTS}/ansible-tower-memcached_latest.tar" 'docker://openshift4-registry.redhatgovsa.io:5000/ansible-tower/ansible-tower-memcached:latest'
+
+skopeo copy "docker-archive://${DOCKER_EXPORTS}/ansible-runner_1.4.4.tar" 'docker://openshift4-registry.redhatgovsa.io:5000/ansible-tower/ansible-runner:1.4.4

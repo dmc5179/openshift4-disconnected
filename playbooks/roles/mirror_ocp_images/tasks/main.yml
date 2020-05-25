@@ -2,12 +2,15 @@
 # tasks file for mirror_ocp_images
 
 - name: Mirror OpenShift 4 Cluster Images to Registry
-  shell: |
+  shell:
+    cmd: |
 
-  oc adm release mirror -a "{{ local_secret_json }}" \
-     "--from=quay.io/{{ upstream_repo }}/{{ release_name }}:{{ ocp_release }}-{{ arch }}" \
-     "--to-release-image={{ local_reg }}/{{ local_repo }}:{{ ocp_release }}-{{ arch }}" \
-     "--to={{ local_reg }}/{{ local_repo }}" 
+        oc adm release mirror -a "{{ local_secret_json }}" \
+           "--from=quay.io/{{ upstream_repo }}/{{ release_name }}:{{ ocp_release }}-{{ arch }}" \
+           "--to-release-image={{ local_reg }}/{{ local_repo }}:{{ ocp_release }}-{{ arch }}" \
+           "--to={{ local_reg }}/{{ local_repo }}" 
+
+    shell: /bin/bash
   when: (mirror_to_reg | bool)
 
 # Example to use a dir instead of a registry
@@ -17,9 +20,10 @@
 
 # Note: This model creates symbolic links on disk
 #       which do not survive through guards well
-- name: Mirror OpenShift 4 Cluster Images to Disk
-  shell: |
-
-  oc adm release mirror quay.io/openshift-release-dev/ocp-release:{{ ocp_release }}-{{ arch }} \
-  --to-dir=/tmp/release
-  when: (mirror_to_dir | bool)
+#- name: Mirror OpenShift 4 Cluster Images to Disk
+#  shell: |
+#
+#    oc adm release mirror "quay.io/openshift-release-dev/ocp-release:{{ ocp_release }}-{{ arch }}" \
+#    '--to-dir=/tmp/release'
+#
+#  when: (mirror_to_dir | bool)
