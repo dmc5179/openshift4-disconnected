@@ -1,10 +1,18 @@
 ---
 # tasks file for tools
+- name: Create mirror_base dir
+  become: true
+  file:
+    path: "{{ mirror_base }}"
+    state: directory
+  tags:
+    - mirror
+
 - name: Downloading OCP4 client
   become: "{{ run_as_root }}"
   get_url:
     url: "{{ ocp_client }}"
-    dest: "{{ mirror_dir }}/openshift-client-linux.tar.gz"
+    dest: "{{ mirror_base }}/openshift-client-linux.tar.gz"
   tags:
     - ocp_client
     - mirror
@@ -13,7 +21,7 @@
   become: "{{ run_as_root }}"
   get_url:
     url: "{{ ocp_installer }}"
-    dest: "{{ mirror_dir }}/openshift-install-linux.tar.gz"
+    dest: "{{ mirror_base }}/openshift-install-linux.tar.gz"
   tags:
     - ocp_installer
     - mirror
@@ -22,7 +30,7 @@
   become: "{{ run_as_root }}"
   git:
     repo: https://github.com/ashcrow/filetranspiler
-    dest: /usr/local/src/filetranspiler
+    dest: "{{ mirror_base }}/filetranspiler"
   tags:
     - transpiler
     - mirror
@@ -30,7 +38,7 @@
 - name: Unarchiving OCP4 client
   become: true
   unarchive:
-    src: /usr/local/src/openshift-client-linux.tar.gz
+    src: "{{ mirror_base }}/openshift-client-linux.tar.gz"
     dest: /usr/local/bin
     remote_src: true
   tags:
@@ -40,7 +48,7 @@
 - name: Unarchiving OCP4 Installer
   become: true
   unarchive:
-    src: /usr/local/src/openshift-install-linux.tar.gz
+    src: "{{ mirror_base }}/openshift-install-linux.tar.gz"
     dest: /usr/local/bin
     remote_src: true
   tags:
@@ -67,17 +75,19 @@
     - install
 
 - name: Building filetranspiler
-  shell: "podman build /usr/local/src/filetranspiler -t filetranspiler:latest"
+  shell: "podman build {{ mirror_base }}/filetranspiler -t filetranspiler:latest"
   when: install_filetranspiler
   tags:
     - transpiler
     - install
 
 - name: Installing filetranspiler
+  become: true
   copy:
-    src: ../files/filetranspiler
+    src: "{{ mirror_base }}/filetranspiler/filetranspile"
     dest: /usr/local/bin/filetranspiler
     mode: '0555'
+    remote_src: true
   tags:
     - transpiler
     - install
