@@ -39,24 +39,24 @@
         name: mirror_ocp_images
       when: (mirror_ocp_images | bool)
 
-    #- name: Mirror Operator Hub Images
-    #  import_role:
-    #    name: mirror_operatorhub_images
-    #  when: (mirror_operatorhub_images | bool)
+    - name: Mirror Operator Hub Images
+      import_role:
+        name: mirror_operatorhub_images
+      when: (mirror_operatorhub_images | bool)
 
-    #- name: Mirror RPM Repositories
-    #  import_role:
-    #    name: mirror_rpms
-    #  when: (mirror_rpms | bool)
+    - name: Mirror RPM Repositories
+      import_role:
+        name: mirror_rpms
+      when: (mirror_rpms | bool)
 
-#    - name: Mirror RHCOS
-#      import_role:
-#        name: mirror_rhcos
-#      when: (mirror_rhcos | bool)
+    - name: Mirror RHCOS
+      import_role:
+        name: mirror_rhcos
+      when: (mirror_rhcos | bool)
 
-    #- name: Mirror helm binary and charts
-    #  include_role:
-    #    name: helm
-    #    apply:
-    #      tags:
-    #        - mirror
+    - name: Mirror helm binary and charts
+      include_role:
+        name: helm
+        apply:
+          tags:
+            - mirror
