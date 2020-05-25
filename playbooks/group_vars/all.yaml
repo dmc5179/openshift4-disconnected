@@ -23,5 +23,10 @@ worker_count: 3
 
 # Base directory for all other mirror tasks
 mirror_base: '/opt/openshift'
-
+mirror_registry: 'localhost:5000'
+mirror_transport: 'https'
 pull_secret: '~/Downloads/pull-secret.txt'
+
+oc_cmd: '/usr/local/bin/oc'
+kubectl_cmd: '/usr/local/bin/kubectl'
+openshift_install_cmd: '/usr/local/bin/openshift-install'
