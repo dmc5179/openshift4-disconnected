@@ -15,4 +15,18 @@
     src: "{{ lookup('file', 'registry.redhat.io.yaml') }}"
   register: rio_reg
 
+- name: Apply Machine Config to worker nodes
+  k8s:
+    state: present
+    validate_certs: "{{ kube_ssl }}"
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    definition: "{{ lookup('template', '51-worker-rh-registry-trust.yaml.j2') }}"
 
+- name: Apply Machine Config to master nodes
+  k8s:
+    state: present
+    validate_certs: "{{ kube_ssl }}"
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    definition: "{{ lookup('template', '51-master-rh-registry-trust.yaml.j2') }}"
