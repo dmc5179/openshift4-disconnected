@@ -1,8 +1,12 @@
 ---
 # defaults file for mirror_helm
 
+run_as_root: true
+
 # Note for x86_64 us arch == amd64
 # For Z use s390x
 arch: 'amd64'
 
 helm_version: '3.2.1'
+
+mirror_base: '/tmp'
