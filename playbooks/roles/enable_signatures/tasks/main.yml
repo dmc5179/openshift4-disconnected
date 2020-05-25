@@ -1,0 +1,18 @@
+---
+# tasks file for enable_signatures
+- name: Base64 encode policy.json
+  slurp:
+    src: "{{ lookup('file', 'policy.json') }}"
+  register: policy_config
+
+- name: Base64 encode registry.access.redhat.com.yaml
+  slurp:
+    src: "{{ lookup('file', 'registry.access.redhat.com.yaml') }}"
+  register: arc_reg
+
+- name: Base64 encode registry.redhat.io.yaml
+  slurp:
+    src: "{{ lookup('file', 'registry.redhat.io.yaml') }}"
+  register: rio_reg
+
+
