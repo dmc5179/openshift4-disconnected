@@ -23,3 +23,5 @@ worker_count: 3
 
 # Base directory for all other mirror tasks
 mirror_base: '/opt/openshift'
+
+pull_secret: '~/Downloads/pull-secret.txt'

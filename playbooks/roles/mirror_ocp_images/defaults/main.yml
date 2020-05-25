@@ -1,16 +1,20 @@
 ---
 # defaults file for mirror_ocp_images
-ocp_release: '4.3.1'
+ocp_release: '4.3.19'
 arch: 'x86_64'
-local_reg: 'registry.ocp4.example.com:5000'
+local_reg: 'localhost:5000'
 local_repo: 'ocp4/openshift4'
-upstream_repo: 'openshift-release-dev'
+product_repo: 'openshift-release-dev'
+
+mirror_base: '/tmp/'
 
 # This needs to be a pull secret that combines the pull secret from Red Hat
 # to pull all the images down and a pull secret from your local registry so we
 # can push to it
-local_secret_json: 'pull-secret-2.json'
-release_name: 'ocp-release-nightly'
+local_secret_json: "{{ mirror_base }}/pull-secret.txt"
+release_name: 'ocp-release'
 
 mirror_to_reg: true
 mirror_to_dir: false
+
+pull_secret: "/tmp/pull-secret.txt"

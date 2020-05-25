@@ -1,16 +1,28 @@
 ---
 # tasks file for mirror_ocp_images
 
+# Must contain tokens for both OCP image registry
+# and the mirror registry
+- name: Stage pull secret
+  become: true
+  copy:
+    src: "{{ pull_secret }}"
+    dest: "{{ local_secret_json }}"
+    owner: root
+    group: root
+    mode: '0755'
+
 - name: Mirror OpenShift 4 Cluster Images to Registry
   shell:
     cmd: |
 
-        oc adm release mirror -a "{{ local_secret_json }}" \
-           "--from=quay.io/{{ upstream_repo }}/{{ release_name }}:{{ ocp_release }}-{{ arch }}" \
+        /usr/local/bin/oc adm release mirror -a "{{ local_secret_json }}" \
+           "--from=quay.io/{{ product_repo }}/{{ release_name }}:{{ ocp_release }}-{{ arch }}" \
+           "--insecure=true" \
            "--to-release-image={{ local_reg }}/{{ local_repo }}:{{ ocp_release }}-{{ arch }}" \
            "--to={{ local_reg }}/{{ local_repo }}" 
 
-    shell: /bin/bash
+    executable: /bin/bash
   when: (mirror_to_reg | bool)
 
 # Example to use a dir instead of a registry
