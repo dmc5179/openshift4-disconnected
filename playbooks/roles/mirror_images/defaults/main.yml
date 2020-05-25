@@ -1,2 +1,9 @@
 ---
 # defaults file for mirror_images
+
+images:
+  - 'docker.io/library/registry:2'
+
+
+#  - 'registry.redhat.io/rhel7/support-tools:latest'
+#  - 'quay.io/openshift/origin-must-gather:latest'

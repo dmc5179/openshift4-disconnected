@@ -12,6 +12,8 @@ ec2_endpoint: 'https://ec2.us-iso-east-1.c2s.ic.gov'
 s3_endpoint: 'https://s3.us-iso-east-1.c2s.ic.gov'
 aws_ssl: true
 
+kube_ssl: true
+kubeconfig: "~/.kube/config"
 
 install_config: ''
 ignition_configs: ''

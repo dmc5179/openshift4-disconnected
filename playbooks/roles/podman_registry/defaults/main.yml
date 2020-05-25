@@ -2,8 +2,12 @@
 # defaults file for podman-registry
 disconnected: true
 
+run_as_root: true
+
+mirror_base: '/'
+
 docker_registry_https_port: 5000
-docker_registry_conf_dir: /etc/docker-registry
+docker_registry_conf_dir: "{{ mirror_base }}/etc/docker-registry"
 
 # for basic auth -- boo!
 docker_registry_users:
@@ -17,7 +21,7 @@ docker_registry_http_secret: d61605d6-63eb-11e6-a138-989096e41e7c
 docker_registry_container_name: registry-srv
 
 # Location of the docker archive tar ball of the registry image
-docker_registry_image_archive: ''
+docker_registry_image_archive: "{{ mirror_base }}/additional_images/docker.io-library-registry_2.tar"
 
 docker_registry_storage_s3_enabled: false
 docker_registry_storage_s3_access_key: ''
@@ -32,7 +36,8 @@ docker_registry_storage_s3_root_directory: '/'
 
 docker_registry_storage_fs_enabled: true
 docker_registry_storage_fs_root_directory: /var/lib/registry
-docker_registry_storage_fs_root_directory_on_host: /opt/registry
+
+docker_registry_storage_fs_root_directory_on_host: "{{ mirror_base }}/opt/registry"
 
 docker_registry_readonly_mode: false
 docker_registry_delete_mode: false
@@ -45,11 +50,11 @@ docker_registry_pki_dir: ~/pki
 
 docker_registry_letsencrypt_enabled: false
 docker_registry_letsencrypt_dir: /etc/docker/registry
-docker_registry_letsencrypt_dir_on_host: /etc/docker/registry
+docker_registry_letsencrypt_dir_on_host: "{{ mirror_base }}/etc/docker/registry"
 docker_registry_letsencrypt_email: 'fake@fake.com'
 
 docker_registry_ssl_local_standalone_enabled: true
 docker_registry_ssl_standalone_enabled: true
-docker_registry_ssl_standalone_path: ~/certs
+docker_registry_ssl_standalone_path: "~/certs"
 docker_registry_ssl_standalone_cert: "{{docker_registry_ssl_standalone_path}}/{{ansible_fqdn}}.crt"
 docker_registry_ssl_standalone_key: "{{docker_registry_ssl_standalone_path}}/{{ansible_fqdn}}.key"
