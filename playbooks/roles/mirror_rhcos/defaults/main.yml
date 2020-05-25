@@ -1,2 +1,5 @@
 ---
 # defaults file for mirror_rhcos
+
+run_as_root: true
+mirror_base: '/tmp'
