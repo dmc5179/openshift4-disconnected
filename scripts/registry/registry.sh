@@ -1,8 +1,9 @@
 #!/bin/bash
 
-REGISTRY_DIR=""
-REGISTRY_HOSTNAME=""
+REGISTRY_DIR="/home/danclark/registry/"
+REGISTRY_HOSTNAME="localhost"
 REGISTRY_PORT=5000
+REGISTRY_IMG="docker.io/library/registry:2"
 
 sudo yum -y install podman httpd httpd-tools firewalld skopeo
 
@@ -41,10 +42,10 @@ podman run --name registry_server -p ${REGISTRY_PORT}:5000 \
 -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
 --hostname=${REGISTRY_HOSTNAME} \
 --detach \
-docker.io/library/registry:2
+#{REGISTRY_IMG}
 
 # Configure SELinux to allow containers in systemd services
-setsebool -P container_manage_cgroup on
+sudo setsebool -P container_manage_cgroup on
 
 cat <<EOF >> /etc/systemd/system/registry-container.service
 
@@ -61,7 +62,8 @@ WantedBy=local.target
 
 EOF
 
-systemctl enable registry-container.service
+sudo systemctl daemon-reload
+sudo systemctl enable registry-container.service
 
 # Test the connection
 curl -u dummy:dummy https://${REGISTRY_HOSTNAME}:${REGISTRY_PORT}/v2/_catalog
