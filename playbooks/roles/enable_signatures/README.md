@@ -3,6 +3,8 @@ Role Name
 
 Role to enable image signatures in OpenShift 4
 
+https://access.redhat.com/verify-images-ocp4
+
 Requirements
 ------------
 
