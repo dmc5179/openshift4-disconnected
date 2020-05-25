@@ -3,3 +3,9 @@
 
 run_as_root: true
 mirror_base: '/tmp'
+
+mirror_vmdk: true
+mirror_azure: false
+mirror_gcp: false
+mirror_iso: false
+mirror_raw: false
