@@ -13,4 +13,9 @@ ocp_initramfs: "{{base_url}}/dependencies/rhcos/{{maj_ver}}/{{rhcos_ver}}/rhcos-
 ocp_install_kernel: "{{base_url}}/dependencies/rhcos/{{maj_ver}}/{{rhcos_ver}}/rhcos-{{rhcos_ver}}-x86_64-installer-kernel-x86_64"
 ocp_client: "{{base_url}}/clients/ocp/{{ocp_ver}}/openshift-client-linux-{{ocp_ver}}.tar.gz"
 ocp_installer: "{{base_url}}/clients/ocp/{{ocp_ver}}/openshift-install-linux-{{ocp_ver}}.tar.gz"
+ocp_vmdk: "{{base_url}}/dependencies/rhcos/{{ maj_ver }}/{{ ocp_ver }}/rhcos-{{ ocp_ver }}-x86_64-aws.x86_64.vmdk.gz"
+ocp_azure: "{{base_url}}/dependencies/rhcos/{{ maj_ver }}/{{ ocp_ver }}/rhcos-{{ ocp_ver }}-x86_64-azure.x86_64.vhd.gz"
+ocp_gcp: "{{base_url}}/dependencies/rhcos/{{ maj_ver }}/{{ ocp_ver }}/rhcos-{{ ocp-ver }}-x86_64-gcp.x86_64.tar.gz"
+ocp_iso: "{{base_url}}/dependencies/rhcos/{{ maj_ver }}/{{ ocp_ver }}/rhcos-{{ ocp-ver }}-x86_64-installer.x86_64.iso"
+ocp_raw: "{{base_url}}/dependencies/rhcos/{{ maj_ver }}/{{ ocp_ver }}/rhcos-{{ ocp-ver }}-x86_64-metal.x86_64.raw.gz"
 chars: (\\_|\\$|\\\|\\/|\\=|\\)|\\(|\\&|\\^|\\%|\\$|\\#|\\@|\\!|\\*)
