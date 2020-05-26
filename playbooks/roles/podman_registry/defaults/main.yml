@@ -60,3 +60,6 @@ docker_registry_ssl_standalone_cert: "{{docker_registry_ssl_standalone_path}}/{{
 docker_registry_ssl_standalone_key: "{{docker_registry_ssl_standalone_path}}/{{ansible_fqdn}}.key"
 
 air_gapped: true
+
+mirror_registry: 'localhost:5000'
+mirror_transport: 'https'

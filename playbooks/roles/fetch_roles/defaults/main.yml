@@ -10,3 +10,6 @@ ansible_roles:
   - mariuszczyz.centos_pxe
 
 air_gapped: true
+
+mirror_registry: 'localhost:5000'
+mirror_transport: 'https'

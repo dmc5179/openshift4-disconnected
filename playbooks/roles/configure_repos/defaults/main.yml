@@ -14,3 +14,6 @@ rhel_8_for_x86_64_appstream_rpms: true
 rhel_8_for_x86_64_baseos_rpms: true
 
 air_gapped: true
+
+mirror_registry: 'localhost:5000'
+mirror_transport: 'https'

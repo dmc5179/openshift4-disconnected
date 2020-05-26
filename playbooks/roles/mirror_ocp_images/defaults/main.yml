@@ -20,3 +20,6 @@ mirror_to_dir: false
 pull_secret: "/tmp/pull-secret.txt"
 
 air_gapped: true
+
+mirror_registry: 'localhost:5000'
+mirror_transport: 'https'

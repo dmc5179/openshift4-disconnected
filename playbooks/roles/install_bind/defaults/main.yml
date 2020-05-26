@@ -70,3 +70,6 @@ bind_zone_minimum_ttl: "1D"
 bind_zone_file_mode: "0640"
 
 air_gapped: true
+
+mirror_registry: 'localhost:5000'
+mirror_transport: 'https'

@@ -11,3 +11,6 @@ mirror_iso: false
 mirror_raw: false
 
 air_gapped: true
+
+mirror_registry: 'localhost:5000'
+mirror_transport: 'https'

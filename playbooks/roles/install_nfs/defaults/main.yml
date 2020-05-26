@@ -6,3 +6,6 @@ nfs_rpcbind_state: started
 nfs_rpcbind_enabled: true
 
 air_gapped: true
+
+mirror_registry: 'localhost:5000'
+mirror_transport: 'https'
