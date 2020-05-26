@@ -17,3 +17,5 @@ httpd_ssl_port: 443
 httpd_proxy_preserve_host: true
 
 pip_exec: 'pip3'
+
+air_gapped: true

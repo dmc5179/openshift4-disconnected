@@ -89,14 +89,14 @@
     name: "{{ docker_registry_container }}"
     tag: "{{ docker_registry_container_tag }}"
     state: present
-  when: (not disconnected | bool)
+  when: (not air_gapped | bool)
 
 - name: Load docker registry image into local container storage
   become: "{{ run_as_root }}"
   command: |
     skopeo copy "docker-archive://{{ docker_registry_image_archive }}"
     "containers-storage:{{ docker_registry_container }}:{{ docker_registry_container_tag }}"
-  when: (disconnected | bool)
+  when: (air_gapped | bool)
 
 # Configure SELinux to allow containers in systemd services
 - name: Set container_manage_cgroup SELinux Boolean

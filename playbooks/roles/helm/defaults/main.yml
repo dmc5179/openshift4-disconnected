@@ -10,3 +10,5 @@ arch: 'amd64'
 helm_version: '3.2.1'
 
 mirror_base: '/tmp'
+
+air_gapped: true

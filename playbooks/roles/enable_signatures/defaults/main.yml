@@ -1,2 +1,4 @@
 ---
 # defaults file for enable_signatures
+
+air_gapped: true

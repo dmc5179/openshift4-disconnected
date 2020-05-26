@@ -1,4 +1,5 @@
 ---
+air_gapped: true
 openshift_install: 'openshift-install'
 openshift_client: 'oc'
 kubectl: 'kubectl'

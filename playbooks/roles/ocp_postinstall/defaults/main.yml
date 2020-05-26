@@ -3,3 +3,5 @@
 
 kube_config: "~/.kube/config"
 ssl_enabled: true
+
+air_gapped: true

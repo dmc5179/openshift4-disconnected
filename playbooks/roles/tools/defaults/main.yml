@@ -6,3 +6,5 @@ force_ocp_download: true
 mirror_base: '/usr/local/src/'
 run_as_root: true
 
+
+air_gapped: true

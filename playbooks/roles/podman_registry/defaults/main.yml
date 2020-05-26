@@ -1,6 +1,6 @@
 ---
 # defaults file for podman-registry
-disconnected: true
+air_gapped: true
 
 run_as_root: true
 
@@ -58,3 +58,5 @@ docker_registry_ssl_standalone_enabled: true
 docker_registry_ssl_standalone_path: "~/certs"
 docker_registry_ssl_standalone_cert: "{{docker_registry_ssl_standalone_path}}/{{ansible_fqdn}}.crt"
 docker_registry_ssl_standalone_key: "{{docker_registry_ssl_standalone_path}}/{{ansible_fqdn}}.key"
+
+air_gapped: true

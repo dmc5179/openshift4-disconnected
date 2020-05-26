@@ -8,3 +8,5 @@ ansible_roles:
   - bertvv.dhcp
   - bertvv.tftp
   - mariuszczyz.centos_pxe
+
+air_gapped: true

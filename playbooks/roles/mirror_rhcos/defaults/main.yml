@@ -9,3 +9,5 @@ mirror_azure: false
 mirror_gcp: false
 mirror_iso: false
 mirror_raw: false
+
+air_gapped: true
