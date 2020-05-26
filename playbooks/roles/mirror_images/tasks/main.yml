@@ -24,3 +24,41 @@
     executable: /bin/bash
   with_items:
     - "{{ images }}"
+
+- name: Include list of Ansible Tower Images
+  include_vars: tower.yml
+  when:
+    - (mirror_tower | bool)
+
+- name: Mirror Ansible Tower images
+  become: true
+  shell:
+    cmd: |
+
+        rm -f "{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
+        skopeo copy "docker://{{ item }}" "docker-archive://{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
+
+    executable: /bin/bash
+  with_items:
+    - "{{ tower_images }}"
+  when:
+    - (mirror_tower | bool)
+
+- name: Include list of Compliance Operator Images
+  include_vars: compliance_operator.yml
+  when:
+    - (mirror_compliance_operator | bool)
+
+- name: Mirror Compliance Operator images
+  become: true
+  shell:
+    cmd: |
+
+        rm -f "{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
+        skopeo copy "docker://{{ item }}" "docker-archive://{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
+
+    executable: /bin/bash
+  with_items:
+    - "{{ compliance_operator_images }}"
+  when:
+    - (mirror_compliance_operator | bool)
