@@ -1,2 +1,41 @@
 ---
 # tasks file for compliance-operator
+
+- name: Mirror the compliance operator code base
+  become: "{{ run_as_root }}"
+  git:
+    repo: https://github.com/openshift/compliance-operator.git
+    dest: "{{ mirror_base }}/compliance-operator"
+  tags:
+    - compliance
+    - mirror
+
+- name: Create openshift-compliance namespace
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    definition: "{{ lookup('file', '{{ mirror_base }}/compliance-operator/deploy/ns.yaml') }}"
+
+- name: Apply compliance CRDs
+  k8s:
+    namespace: 'openshift-compliance'
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    definition: "{{ lookup('file', '{{ item }}') }}"
+  with_fileglob:
+    - "{{ mirror_base }}/compliance-operator/deploy/crds/*crd.yaml"
+
+- name: Apply Operator YAML
+  k8s:
+    namespace: 'openshift-compliance'
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    definition: "{{ lookup('file', '{{ mirror_base }}/compliance-operator/deploy/{{ item }}') }}"
+  with_items:
+    - "service_account.yaml"
+    - "role.yaml"
+    - "role_binding.yaml"
+    - "operator.yaml"

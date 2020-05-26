@@ -1,2 +1,5 @@
 ---
 # defaults file for compliance-operator
+
+run_as_root: true
+mirror_base: '/tmp'
