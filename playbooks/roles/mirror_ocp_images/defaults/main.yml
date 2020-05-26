@@ -18,3 +18,5 @@ mirror_to_reg: true
 mirror_to_dir: false
 
 pull_secret: "/tmp/pull-secret.txt"
+
+air_gapped: true

@@ -1,2 +1,4 @@
 ---
 # defaults file for install_dhcp
+
+air_gapped: true

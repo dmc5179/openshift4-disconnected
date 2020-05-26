@@ -12,3 +12,5 @@ rhel_7_server_rpms: true
 ansible_29_for_rhel_8_x86_64_rpms: true
 rhel_8_for_x86_64_appstream_rpms: true
 rhel_8_for_x86_64_baseos_rpms: true
+
+air_gapped: true

@@ -26,3 +26,5 @@ mirror_base: '/tmp/'
 # can push to it
 local_secret_json: "{{ mirror_base }}/pull-secret.txt"
 
+
+air_gapped: true

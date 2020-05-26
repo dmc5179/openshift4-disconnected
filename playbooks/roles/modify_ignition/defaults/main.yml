@@ -1,3 +1,5 @@
 ---
 # defaults file for modify_ignition
 filetranspile: 'filetranspile'
+
+air_gapped: true

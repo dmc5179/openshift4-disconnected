@@ -20,3 +20,5 @@ base_domain: 'redhatgov.io'
 cluster_name: 'caas'
 
 num_workers: 3
+
+air_gapped: true

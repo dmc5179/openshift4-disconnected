@@ -1,2 +1,4 @@
 ---
 # defaults file for install_roles
+
+air_gapped: true

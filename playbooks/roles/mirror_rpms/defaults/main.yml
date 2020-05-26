@@ -23,3 +23,5 @@ epel8_repository:
 # Directory to mirror the RPMs into
 mirror_dir: '/tmp/repos/'
 arch: 'x86_64'
+
+air_gapped: true
