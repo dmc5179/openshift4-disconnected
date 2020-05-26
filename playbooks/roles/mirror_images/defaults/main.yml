@@ -3,7 +3,6 @@
 
 images:
   - 'docker.io/library/registry:2'
-
-
-#  - 'registry.redhat.io/rhel7/support-tools:latest'
-#  - 'quay.io/openshift/origin-must-gather:latest'
+  - 'quay.io/complianceascode/ocp4:latest'
+  - 'registry.redhat.io/rhel7/support-tools:latest'
+  - 'quay.io/openshift/origin-must-gather:latest'
