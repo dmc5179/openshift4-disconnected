@@ -15,14 +15,14 @@
     executable: /bin/bash
   when: (redhat_operators | bool)
 
-- name: Create supported-operators catalog image
+- name: Create certified-operators catalog image
   become: "{{ run_as_root }}"
   shell:
-    cmd: "{{ oc_cmd }} adm catalog build --appregistry-org supported-operators --to={{ supp_op_repo }} --registry-config={{ local_secret_json }}"
+    cmd: "{{ oc_cmd }} adm catalog build --appregistry-org certified-operators --to={{ supp_op_repo }} --registry-config={{ local_secret_json }}"
     executable: /bin/bash
   when: (supported_operators | bool)
 
-- name: Mirror supported-operators images
+- name: Mirror certified-operators images
   become: "{{ run_as_root }}"
   shell:
     cmd: "{{ oc_cmd }} adm catalog mirror {{ supp_op_repo }} {{ mirror_transport }}://{{ mirror_registry }} -a {{ local_secret_json }} --insecure"
