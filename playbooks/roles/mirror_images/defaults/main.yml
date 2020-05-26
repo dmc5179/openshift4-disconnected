@@ -8,3 +8,6 @@ images:
   - 'quay.io/openshift/origin-must-gather:latest'
 
 air_gapped: true
+
+mirror_registry: 'localhost:5000'
+mirror_transport: 'https'

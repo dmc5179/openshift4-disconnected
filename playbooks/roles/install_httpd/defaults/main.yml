@@ -19,3 +19,6 @@ httpd_proxy_preserve_host: true
 pip_exec: 'pip3'
 
 air_gapped: true
+
+mirror_registry: 'localhost:5000'
+mirror_transport: 'https'

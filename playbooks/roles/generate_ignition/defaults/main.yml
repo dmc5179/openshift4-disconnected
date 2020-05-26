@@ -22,3 +22,6 @@ cluster_name: 'caas'
 num_workers: 3
 
 air_gapped: true
+
+mirror_registry: 'localhost:5000'
+mirror_transport: 'https'

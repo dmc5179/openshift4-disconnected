@@ -5,3 +5,8 @@ run_as_root: true
 mirror_base: '/tmp'
 
 air_gapped: true
+
+mirror
+
+mirror_registry: 'localhost:5000'
+mirror_transport: 'https'

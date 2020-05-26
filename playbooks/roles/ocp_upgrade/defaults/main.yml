@@ -5,3 +5,6 @@
 ocp_upgrade_image: 'quay.io/openshift-release-dev/ocp-release@sha256:e1ebc7295248a8394afb8d8d918060a7cc3de12c491283b317b80b26deedfe61'
 
 air_gapped: true
+
+mirror_registry: 'localhost:5000'
+mirror_transport: 'https'
