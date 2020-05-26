@@ -1,0 +1,12 @@
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  name: complianceoperator
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - {{ mirror_registry }}/complianceascode/ocp4
+    source: quay.io/complianceascode/ocp4
+  - mirrors:
+    - {{ mirror_registry }}/complianceascode/ocp4
+    source: quay.io/compliance-operator/compliance-operator
