@@ -4,7 +4,7 @@
 - name: Create redhat-operators catalog image
   become: "{{ run_as_root }}"
   shell:
-    cmd: "{{ oc_cmd }} adm catalog build --insecure --appregistry-org redhat-operators --to={{ rh_op_repo }} --registry-config={{ local_secret_json }}"
+    cmd: "{{ oc_cmd }} adm catalog build --insecure --appregistry-org redhat-operators --to={{ rh_op_repo }} --from={{ operator_registry }} --registry-config={{ local_secret_json }}"
     executable: /bin/bash
   when: (redhat_operators | bool)
 
@@ -18,7 +18,7 @@
 - name: Create certified-operators catalog image
   become: "{{ run_as_root }}"
   shell:
-    cmd: "{{ oc_cmd }} adm catalog build --appregistry-org certified-operators --to={{ supp_op_repo }} --registry-config={{ local_secret_json }}"
+    cmd: "{{ oc_cmd }} adm catalog build --appregistry-org certified-operators --to={{ supp_op_repo }} --from={{ operator_registry }} --registry-config={{ local_secret_json }}"
     executable: /bin/bash
   when: (supported_operators | bool)
 
@@ -32,7 +32,7 @@
 - name: Create community-operators catalog image
   become: "{{ run_as_root }}"
   shell:
-    cmd: "{{ oc_cmd }} adm catalog build --appregistry-org community-operators --to={{ comm_op_repo }} --registry-config={{ local_secret_json }}"
+    cmd: "{{ oc_cmd }} adm catalog build --appregistry-org community-operators --to={{ comm_op_repo }} --from={{ operator_registry }} --registry-config={{ local_secret_json }}"
     executable: /bin/bash
   when: (community_operators | bool)
 

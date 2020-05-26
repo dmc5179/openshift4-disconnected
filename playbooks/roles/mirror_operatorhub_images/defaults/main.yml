@@ -14,8 +14,9 @@ rh_op_repo: "{{ mirror_registry }}/olm/redhat-operators:v1"
 supp_op_repo: "{{ mirror_registry }}/olm/certified-operators:v1"
 comm_op_repo: "{{ mirror_registry }}/olm/community-operators:v1"
 
-pull_secret_file: ''
+operator_registry: 'quay.io/operator-framework/operator-registry-server:v1.6.1'
 
+pull_secret_file: ''
 
 oc_cmd: 'oc'
 
