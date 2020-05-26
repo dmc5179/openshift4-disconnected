@@ -16,6 +16,8 @@
 
 [nfs_server]
 
+[ntp_server]
+
 [bootstrap]
 
 [masters]
