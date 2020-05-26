@@ -14,6 +14,8 @@
 
 [registry_server]
 
+[nfs_server]
+
 [bootstrap]
 
 [masters]
