@@ -1,2 +1,74 @@
 ---
 # tasks file for install_bind
+# Initialise distribution-specific variables
+- name: Source specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+  tags:
+    - bind
+    - pretask
+
+- name: Check whether `bind_zone_master_server_ip` was set
+  assert:
+    that: bind_zone_master_server_ip is defined
+
+- name: Install BIND
+  package:
+    pkg: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ bind_packages }}"
+  tags:
+    - bind
+
+- name: Ensure runtime directories referenced in config exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: "{{ bind_group }}"
+    mode: 0770
+  with_items:
+    - "{{ bind_dir }}/dynamic"
+    - "{{ bind_dir }}/data"
+    - "{{ bind_zone_dir }}"
+  tags:
+    - bind
+
+- name: Create serial, based on UTC UNIX time
+  command: date -u +%s
+  register: timestamp
+  changed_when: false
+  run_once: true
+  check_mode: false
+  tags:
+    - bind
+
+# file to set keys for XFR authentication
+- name: create extra config file for authenticated XFR request
+  tags: pretask
+  template:
+    src: auth_transfer.j2
+    dest: "{{ bind_conf_dir }}/{{ auth_file }}"
+    mode: 0640
+    owner: root
+    group: "{{ bind_group }}"
+  when: bind_dns_keys is defined and bind_dns_keys|length > 0
+
+- name: Set up the machine as a master DNS server
+  include_tasks: master.yml
+  when: bind_zone_master_server_ip in ansible_all_ipv4_addresses
+
+- name: Set up the machine as a slave DNS server
+  include_tasks: slave.yml
+  when: bind_zone_master_server_ip not in ansible_all_ipv4_addresses
+
+- name: Start BIND service
+  service:
+    name: "{{ bind_service }}"
+    state: started
+    enabled: true
+  tags:
+    - bind
