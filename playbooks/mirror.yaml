@@ -31,7 +31,7 @@
         name: podman_registry
       when:
         (mirror_ocp_images | bool) or
-        (mirror_operatorhub_images | bool)
+        (mirror_operatorhub_images | bool) or
         (mirror_images | bool)
 
     - name: Mirror OpenShift Cluster Images
