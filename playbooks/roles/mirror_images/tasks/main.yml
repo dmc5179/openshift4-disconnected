@@ -19,7 +19,7 @@
     cmd: |
 
         rm -f "{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
-        skopeo copy "docker://{{ item }}" "docker-archive://{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
+        skopeo copy --authfile "{{ pull_secret }}" "docker://{{ item }}" "docker-archive://{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
 
     executable: /bin/bash
   with_items:
@@ -36,7 +36,7 @@
     cmd: |
 
         rm -f "{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
-        skopeo copy "docker://{{ item }}" "docker-archive://{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
+        skopeo copy --authfile "{{ pull_secret }}" "docker://{{ item }}" "docker-archive://{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
 
     executable: /bin/bash
   with_items:
@@ -55,7 +55,7 @@
     cmd: |
 
         rm -f "{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
-        skopeo copy "docker://{{ item }}" "docker-archive://{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
+        skopeo copy --authfile "{{ pull_secret }}" "docker://{{ item }}" "docker-archive://{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
 
     executable: /bin/bash
   with_items:
