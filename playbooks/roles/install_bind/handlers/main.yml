@@ -1,2 +1,7 @@
 ---
 # handlers file for install_bind
+
+- name: reload bind
+  service:
+    name: "{{ bind_service }}"
+    state: reloaded
