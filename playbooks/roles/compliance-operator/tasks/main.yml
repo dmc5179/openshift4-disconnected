@@ -11,13 +11,28 @@
     - mirror
 
 - name: Create openshift-compliance namespace
+  delegate_to: localhost
   k8s:
     state: present
     wait: true
     kubeconfig: "{{ kubeconfig  }}"
     definition: "{{ lookup('file', '{{ mirror_base }}/compliance-operator/deploy/ns.yaml') }}"
+  tags:
+    - install
+
+- name: Apply compliance operator Image Content Source Policy
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    definition: "{{ lookup('template', 'templates/compliance_operators_icsp.yaml.j2') }}"
+  tags:
+    - install
+    - icsp
 
 - name: Apply compliance CRDs
+  delegate_to: localhost
   k8s:
     namespace: 'openshift-compliance'
     state: present
@@ -26,8 +41,11 @@
     definition: "{{ lookup('file', '{{ item }}') }}"
   with_fileglob:
     - "{{ mirror_base }}/compliance-operator/deploy/crds/*crd.yaml"
+  tags:
+    - install
 
 - name: Apply Operator YAML
+  delegate_to: localhost
   k8s:
     namespace: 'openshift-compliance'
     state: present
@@ -39,3 +57,17 @@
     - "role.yaml"
     - "role_binding.yaml"
     - "operator.yaml"
+  tags:
+    - install
+
+- name: Create Compliance Suite
+  delegate_to: localhost
+  k8s:
+    namespace: 'openshift-compliance'
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    definition: "{{ lookup('template', 'templates/compliance_operators_icsp.yaml.j2') }}"
+  tags:
+    - install
+
