@@ -6,7 +6,7 @@
 - name: Upgrade OCP Cluster
   shell: |
     oc adm upgrade --allow-explicit-upgrade=true --allow-upgrade-with-warnings=true \
-      "--to-image={{ ocp_upgrade_image }}" \
+      "--to-image={{ (release_image_digest[ arch ])[ocp_upgrade_version:] }}" \
       --force=true
 
 - name: Monitor OCP Cluster Upgrade
