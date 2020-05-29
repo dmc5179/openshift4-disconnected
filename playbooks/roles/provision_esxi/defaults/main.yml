@@ -1,2 +1,6 @@
 ---
 # defaults file for provision_esxi
+
+esxi_username: ''
+esxi_password: ''
+esxi_hostname: ''
