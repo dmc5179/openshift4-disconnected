@@ -13,13 +13,27 @@
     path: "{{ mirror_base }}/additional_images"
     state: directory
 
+# Must contain tokens for both OCP image registry
+# and the mirror registry
+- name: Stage pull secret
+  become: true
+  copy:
+    src: "{{ local_pull_secret }}"
+    dest: "{{ pull_secret }}"
+    owner: root
+    group: root
+    mode: '0755'
+
 - name: Mirror additional container images
   become: true
   shell:
     cmd: |
 
-        rm -f "{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
-        skopeo copy --authfile "{{ pull_secret }}" "docker://{{ item }}" "docker-archive://{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
+        if ! test -e "{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
+        then
+          skopeo copy --authfile "{{ pull_secret }}" \
+            "docker://{{ item }}" "docker-archive://{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
+        fi
 
     executable: /bin/bash
   with_items:
@@ -35,8 +49,11 @@
   shell:
     cmd: |
 
-        rm -f "{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
-        skopeo copy --authfile "{{ pull_secret }}" "docker://{{ item }}" "docker-archive://{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
+        if ! test -e  "{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
+        then
+          skopeo copy --authfile "{{ pull_secret }}" \
+            "docker://{{ item }}" "docker-archive://{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
+        fi
 
     executable: /bin/bash
   with_items:
@@ -54,8 +71,11 @@
   shell:
     cmd: |
 
-        rm -f "{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
-        skopeo copy --authfile "{{ pull_secret }}" "docker://{{ item }}" "docker-archive://{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
+        if ! test -e  "{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
+        then 
+          skopeo copy --authfile "{{ pull_secret }}" \
+            "docker://{{ item }}" "docker-archive://{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
+        fi
 
     executable: /bin/bash
   with_items:
