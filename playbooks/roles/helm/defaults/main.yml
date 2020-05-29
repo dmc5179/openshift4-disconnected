@@ -15,3 +15,5 @@ air_gapped: true
 
 mirror_registry: 'localhost:5000'
 mirror_transport: 'https'
+
+chart_repo_root: '/var/www/html'
