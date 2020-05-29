@@ -1,31 +1,30 @@
 ---
 # tasks file for mirror_rpms
 
-- name: Create mirror directory
-  file:
-    name: "{{ mirror_dir }}"
-    state: directory
-
 - name: Mirror RHEL 8 Repos
-  shell: "reposync -p {{ mirror_dir }} --download-metadata --arch={{ arch }} --repoid={{ item }}"
+  become: "{{ run_as_root }}"
+  shell: "reposync -p {{ repo_mirror_base }} --download-metadata --arch={{ arch }} --repoid={{ item }}"
   with_items:
     - "{{ rhel8_repositories }}"
   when: ( rhel8_enabled | bool )
 
 - name: Prune RHEL 8 Repos
-  shell: "repomanage --old --keep {{ repo_depth }} {{ mirror_dir }}/{{ item }} | xargs rm -f"
+  become: "{{ run_as_root }}"
+  shell: "repomanage --old --keep {{ repo_depth }} {{ repo_mirror_base }}/{{ item }} | xargs rm -f"
   with_items:
     - "{{ rhel8_repositories }}"
   when: ( rhel8_enabled | bool )
 
 - name: Mirror RHEL 8 EPEL
-  shell: "reposync -p {{ mirror_dir }} --download-metadata --arch={{ arch }} --repoid={{ item }}"
+  become: "{{ run_as_root }}"
+  shell: "reposync -p {{ repo_mirror_base }} --download-metadata --arch={{ arch }} --repoid={{ item }}"
   with_items:
     - "{{ epel8_repository }}"
   when: ( epel8_enabled | bool )
 
 - name: Prune EPEL 8 Repos
-  shell: "repomanage --old --keep {{ repo_depth }} {{ mirror_dir }}/{{ item }} | xargs rm -f"
+  become: "{{ run_as_root }}"
+  shell: "repomanage --old --keep {{ repo_depth }} {{ repo_mirror_base }}/{{ item }} | xargs rm -f"
   with_items:
     - "{{ epel8_repositories }}"
   when: ( epel8_enabled | bool )

@@ -1,6 +1,8 @@
 ---
 # defaults file for mirror_rpms
 
+run_as_root: true
+
 rhel7_enabled: false
 rhel7_repositories:
   - rhel-7-server-ansible-2.8-rpms
@@ -21,7 +23,8 @@ epel8_enabled: false
 epel8_repository:
 
 # Directory to mirror the RPMs into
-mirror_dir: '/tmp/repos/'
+mirror_base: '/tmp/'
+repo_mirror_base: "{{ mirror_base }}/repos"
 arch: 'x86_64'
 
 air_gapped: true
