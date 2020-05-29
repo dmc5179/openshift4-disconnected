@@ -1,6 +1,5 @@
 ---
 # defaults file for podman-registry
-air_gapped: true
 
 run_as_root: true
 
