@@ -1,0 +1,10 @@
+---
+- name: Add a VMware vSwitch without any physical NIC attached
+  vmware_vswitch:
+    hostname: '{{ esxi_hostname }}'
+    username: '{{ esxi_username }}'
+    password: '{{ esxi_password }}'
+    switch: vswitch_0001
+    mtu: 9000
+  delegate_to: localhost
+
