@@ -3,6 +3,8 @@
 
 run_as_root: true
 
+repo_depth: 3
+
 rhel7_enabled: false
 rhel7_repositories:
   - rhel-7-server-ansible-2.8-rpms
