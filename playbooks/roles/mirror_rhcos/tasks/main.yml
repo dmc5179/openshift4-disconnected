@@ -57,7 +57,7 @@
   become: "{{ run_as_root }}"
   get_url:
     url: "{{ ocp_vmdk }}"
-    dest: "{{ mirror_base }}/rhocs/"
+    dest: "{{ mirror_base }}/rhcos/"
     mode: '0444'
   when: (mirror_vmdk | bool)
   tags:
@@ -67,7 +67,7 @@
   become: "{{ run_as_root }}"
   get_url:
     url: "{{ ocp_azure }}"
-    dest: "{{ mirror_base }}/rhocs/"
+    dest: "{{ mirror_base }}/rhcos/"
     mode: '0444'
   when: (mirror_azure | bool)
   tags:
@@ -77,7 +77,7 @@
   become: "{{ run_as_root }}"
   get_url:
     url: "{{ ocp_gcp }}"
-    dest: "{{ mirror_base }}/rhocs/"
+    dest: "{{ mirror_base }}/rhcos/"
     mode: '0444'
   when: (mirror_gcp | bool)
   tags:
@@ -87,7 +87,7 @@
   become: "{{ run_as_root }}"
   get_url:
     url: "{{ ocp_iso }}"
-    dest: "{{ mirror_base }}/rhocs/"
+    dest: "{{ mirror_base }}/rhcos/"
     mode: '0444'
   when: (mirror_iso | bool)
   tags:
@@ -97,7 +97,7 @@
   become: "{{ run_as_root }}"
   get_url:
     url: "{{ ocp_raw }}"
-    dest: "{{ mirror_base }}/rhocs/"
+    dest: "{{ mirror_base }}/rhcos/"
     mode: '0444'
   when: (mirror_raw | bool)
   tags:
