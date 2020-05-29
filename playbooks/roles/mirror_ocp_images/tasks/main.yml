@@ -6,8 +6,8 @@
 - name: Stage pull secret
   become: true
   copy:
-    src: "{{ pull_secret }}"
-    dest: "{{ local_secret_json }}"
+    src: "{{ local_pull_secret }}"
+    dest: "{{ pull_secret }}"
     owner: root
     group: root
     mode: '0755'
@@ -16,7 +16,7 @@
   shell:
     cmd: |
 
-        /usr/local/bin/oc adm release mirror -a "{{ local_secret_json }}" \
+        /usr/local/bin/oc adm release mirror -a "{{ pull_secret }}" \
            "--from=quay.io/{{ product_repo }}/{{ release_name }}:{{ ocp_release }}-{{ arch }}" \
            "--insecure=true" \
            "--to-release-image={{ local_reg }}/{{ local_repo }}:{{ ocp_release }}-{{ arch }}" \
