@@ -140,7 +140,7 @@
 
 - name: Test the registry connection
   uri:
-    url: "localhost:{{docker_registry_https_port}}/v2/_catalog"
+    url: "{{ mirror_transport }}://{{ mirror_registry }}/v2/_catalog"
     user: 'dummy'
     password: 'dummy'
     method: 'GET'
