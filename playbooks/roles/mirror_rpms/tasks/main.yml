@@ -1,0 +1,11 @@
+---
+# tasks file for mirror_rpms
+
+- name: Install Dependencies
+  import_tasks: dependencies.yml
+
+- name: Mirror RHEL 7 Repos
+  import_tasks: rhel7.yml
+
+- name: Mirror RHEL 8 Repos
+  import_tasks: rhel8.yml

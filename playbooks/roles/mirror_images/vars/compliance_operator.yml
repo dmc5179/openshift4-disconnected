@@ -1,0 +1,10 @@
+---
+compliance_operator_images:
+  - "quay.io/complianceascode/ocp4:latest"
+  - "quay.io/compliance-operator/openscap-ocp:1.3.3"
+  - "quay.io/compliance-operator/resultscollector:latest"
+  - "quay.io/compliance-operator/resultserver:latest"
+  - "quay.io/compliance-operator/remediation-aggregator:latest"
+  - "quay.io/compliance-operator/api-resource-collector:latest"
+  - "quay.io/compliance-operator/compliance-operator:latest"
+

@@ -1,0 +1,30 @@
+---
+# tasks file for modify_ignition
+
+- name: Customize bootstrap ignition
+  shell: python3 "{{ filetranspile }}" -i "${IGNITION_CONFIGS}/bootstrap.ign" -f "${FAKEROOTS}/bootstrap_fake-root"  --format json > "${IGNITION_CONFIGS}/bootstrap_static.ign"
+
+- name: Replace original ignition
+  copy:
+    src: "{{ ignition_configs }}/bootstrap_static.ign"
+    dest: "{{ ignition_configs }}/bootstrap.ign"
+    remote_src: true
+    
+
+
+# Customize master node ignition files. Need 1 for each due to static IPs
+for i in $(seq 0 $(expr ${MASTERS} - 1))
+do
+
+  python3 "${FILETRANSPILE}" -i "${IGNITION_CONFIGS}/master.ign" -f "${FAKEROOTS}/master${i}_fake-root" --format json > "${IGNITION_CONFIGS}/master${i}.ign"
+
+done
+
+# Customize worker node ignition files. Need 1 for each due to static IPs
+for i in $(seq 0 $(expr ${WORKERS} - 1))
+do
+
+  python3 "${FILETRANSPILE}" -i "${IGNITION_CONFIGS}/worker.ign" -f "${FAKEROOTS}/worker${i}_fake-root" --format json > "${IGNITION_CONFIGS}/worker${i}.ign"
+
+done
+

@@ -1,0 +1,8 @@
+---
+# defaults file for modify_ignition
+filetranspile: 'filetranspile'
+
+air_gapped: true
+
+mirror_registry: 'localhost:5000'
+mirror_transport: 'https'

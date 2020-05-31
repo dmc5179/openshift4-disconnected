@@ -1,0 +1,149 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Deploys an EC2 instance running a docker registry
+
+Parameters:
+
+  AmiId: # Change this for your own account
+    Default: ami-00936483548a6d57f
+    Description: Red Hat Enterprise Linux 7.7 Cloud Access
+    Type: AWS::EC2::Image::Id
+
+  InstanceType:
+    Default: t3.large
+    Description: Instance type of the EC2 Instance
+    Type: String
+
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access
+    Type: AWS::EC2::KeyPair::KeyName
+
+  RootVolumeSize:
+    Default: '50'
+    Description: Volume Size of the Root EBS
+    Type: Number
+
+  AdditionalVolumeSize:
+    Default: '200'
+    Description: Volume Size of Additional EBSs
+    Type: Number
+
+  S3RegistryArtifactsPath:
+    Description: Path to the Build Artifacts for this Bootstrap Registry
+    Type: String
+    Default: redhat-dan
+
+  S3RegistryImageArtifactsPath:
+    Description: Path to the Docker Image Artifacts for this Bootstrap Registry
+    Type: String
+    Default: redhat-dan
+
+  OpenShiftVersion:
+    Description: 'OpenShift Version'
+    Type: String
+    Default: "4.3.3"
+
+  SubnetId:
+    Description: SubnetId of an existing subnet in a VPC
+    Type: AWS::EC2::Subnet::Id
+
+  Owner:
+    Description: Name of the user instantiating the CloudFormation
+    Type: String
+    AllowedPattern: '.+'
+
+  YumRepoURL:
+    Description: Address of the Yum Repo
+    Type: String
+    AllowedPattern: '.+'
+    Default: "https://s3.amazonaws.com/"
+
+  Ec2ServiceName:
+    Description: Address of EC2 service
+    Type: String
+    Default: ec2.amazonaws.com
+
+  PartitionName:
+    Description: Amazon in which partition the resouce exists
+    Type: String
+    Default: aws
+
+  S3ServiceName: #EC2
+    Description: Address of S3 service
+    Type: String
+    Default: s3.amazonaws.com
+
+  VpcId:
+    Description: 'Vpc Id'
+    Type: AWS::EC2::VPC::Id
+
+  VpcCIDR:
+    Description: 'Vpc CIDR'
+    Type: String
+
+Resources:
+
+  SecurityGroupStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub 'https://${S3ServiceName}/${S3RegistryArtifactsPath}/openshift4-disconnected/cloudformation/registry/01_registry_security_groups.yaml'
+      Parameters:
+        StackName: !Ref AWS::StackName
+        VpcId: !Sub '${VpcId}'
+        AllowedRegistrySshCidr: !Sub '${VpcCIDR}'
+
+  IAMStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub 'https://${S3ServiceName}/${S3RegistryArtifactsPath}/openshift4-disconnected/cloudformation/registry/02_cluster_registry_iam_role.yaml'
+      Parameters:
+        S3RegistryArtifactsPath: !Sub '${S3RegistryArtifactsPath}'
+        PartitionName: !Sub '${PartitionName}'
+
+  EC2Stack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub 'https://${S3ServiceName}/${S3RegistryArtifactsPath}/openshift4-disconnected/cloudformation/registry/03_cluster_registry_node.yaml'
+      Parameters:
+        AmiId: !Sub '${AmiId}'
+        InstanceType: !Sub '${InstanceType}'
+        KeyName: !Sub '${KeyName}'
+        RootVolumeSize: !Sub '${RootVolumeSize}'
+        AdditionalVolumeSize: !Sub '${AdditionalVolumeSize}'
+        S3RegistryArtifactsPath: !Sub '${S3RegistryArtifactsPath}'
+        S3RegistryImageArtifactsPath: !Sub '${S3RegistryImageArtifactsPath}'
+        SecurityGroupId: !Sub '${SecurityGroupStack.Outputs.OpenShiftRegistrySecurityGroup}'
+        SubnetId: !Sub '${SubnetId}'
+        Owner: !Sub '${Owner}'
+        YumRepoURL: !Sub '${YumRepoURL}'
+        InstanceProfile: !Sub '${IAMStack.Outputs.OpenShiftRegistryInstanceProfile}'
+        StackName: !Ref AWS::StackName
+
+
+  InfrastructureName:
+  AmiId:
+  Subnet:
+  RegistrySecurityGroupId:
+  RegistryInstanceProfileName:
+  RegistryInstanceType:
+
+
+
+
+
+
+
+
+Outputs:
+
+  InstanceId:
+    Description: InstanceId of the Registry Instance
+    Value: !GetAtt 'EC2Stack.Outputs.InstanceId'
+
+  InternalDNS:
+    Description: Internal DNSName of the Registry Instance
+    Value: !GetAtt 'EC2Stack.Outputs.InternalDNS'
+
+  PrivateIP:
+    Description: Private IP address of the Registry Instance
+    Value: !GetAtt 'EC2Stack.Outputs.PrivateIP'

@@ -1,0 +1,73 @@
+---
+# tasks file for provision_esxi
+
+- name: Install required pip packages
+  delegate_to: localhost
+  pip:
+    name:
+      - PyVmomi
+      - pyVim
+    extra_args: --user
+    executable: pip3
+
+- name: Gather info from standalone ESXi server
+  vmware_datastore_info:
+    hostname: '{{ vcenter_hostname }}'
+    username: '{{ vcenter_username }}'
+    password: '{{ vcenter_password }}'
+    datacenter_name: '{{ datacenter_name }}'
+    validate_certs: "{{ ssl_enabled }}"
+  delegate_to: localhost
+  register: datastore_info
+
+- name: Show datastore info
+  debug:
+    var: datastore_info
+
+# TODO: Cannot use these without vCenter
+#- name: Create a VM folder on given datacenter
+#  vcenter_folder:
+#    hostname: '{{ vcenter_hostname }}'
+#    username: '{{ vcenter_username }}'
+#    password: '{{ vcenter_password }}'
+#    datacenter_name: '{{ datacenter_name }}'
+#    folder_name: 'openshift_vms'
+#    folder_type: vm
+#    state: present
+#    validate_certs: "{{ ssl_enabled }}"
+#  register: vm_folder_creation_result
+#  delegate_to: localhost
+
+# TODO: Cannot use these without vCenter
+#- name: Create a sub folder under VM folder on given datacenter
+#  vcenter_folder:
+#    hostname: '{{ vcenter_hostname }}'
+#    username: '{{ vcenter_username }}'
+#    password: '{{ vcenter_password }}'
+#    datacenter_name: '{{ datacenter_name }}'
+#    folder_name: 'helper_node'
+#    parent_folder: 'openshift_vms'
+#    state: present
+#    validate_certs: "{{ ssl_enabled }}"
+#  register: sub_folder_creation_result
+#  delegate_to: localhost
+
+
+#- name: Gather info from datacenter about specific cluster
+#  vmware_cluster_info:
+#    hostname: '{{ vcenter_hostname }}'
+#    username: '{{ vcenter_username }}'
+#    password: '{{ vcenter_password }}'
+#    cluster_name: "{{ cluster_name }}"
+#    validate_certs: "{{ ssl_enabled }}"
+#  delegate_to: localhost
+#  register: cluster_info
+
+#- name: Include Tasks to create template
+#  include_tasks: create_template.yml
+
+- name: Include tasks to create networks
+  include_tasks: create_network.yml
+
+- name: Include tasks to create nodes
+  include_tasks: create_nodes.yml

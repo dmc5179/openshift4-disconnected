@@ -1,0 +1,12 @@
+---
+# defaults file for provision_esxi
+
+ssl_enabled: false
+
+vcenter_username: ''
+vcenter_password: ''
+vcenter_hostname: ''
+datacenter_name: 'ha-datacenter'
+vswitch_name: ''
+portgroup_name: ''
+cluster_name: ''

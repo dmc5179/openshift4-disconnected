@@ -1,0 +1,58 @@
+---
+
+#- name: Gather vswitch info about all ESXi Host in given Cluster
+#  vmware_vswitch_info:
+#    esxi_hostname: '{{ vcenter_hostname }}'
+#    hostname: '{{ vcenter_hostname }}'
+#    username: '{{ vcenter_username }}'
+#    password: '{{ vcenter_password }}'
+##    cluster_name: '{{ cluster_name }}'
+#    validate_certs: "{{ ssl_enabled }}"
+#  delegate_to: localhost
+#  register: all_hosts_vswitch_info
+
+#- name: Show vswitch info
+#  debug:
+#    var: all_hosts_vswitch_info
+
+- name: Add a VMware vSwitch without any physical NIC attached
+  vmware_vswitch:
+    hostname: '{{ vcenter_hostname }}'
+    esxi_hostname: '{{ vcenter_hostname }}'
+    username: '{{ vcenter_username }}'
+    password: '{{ vcenter_password }}'
+    switch: '{{ vswitch_name }}'
+    mtu: 1500
+    validate_certs: "{{ ssl_enabled }}"
+  delegate_to: localhost
+
+- name: Add Portgroup with all settings defined
+  vmware_portgroup:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    esxi_hostname: "{{ inventory_hostname }}"
+    switch: "{{ vswitch_name }}"
+    portgroup: "{{ portgroup_name }}"
+    validate_certs: "{{ ssl_enabled }}"
+    vlan_id: 10
+#    security:
+#        promiscuous_mode: False
+#        mac_changes: False
+#        forged_transmits: False
+#    traffic_shaping:
+#        enabled: True
+#        average_bandwidth: 100000
+#        peak_bandwidth: 100000
+#        burst_size: 102400
+#    teaming:
+#        load_balancing: failover_explicit
+#        network_failure_detection: link_status_only
+#        notify_switches: true
+#        failback: true
+#        active_adapters:
+#            - vmnic0
+#        standby_adapters:
+#            - vmnic1
+  delegate_to: localhost
+  register: teaming_result

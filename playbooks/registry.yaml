@@ -1,0 +1,9 @@
+---
+- hosts: registry_server
+  gather_facts: true
+  become: "{{ run_as_root }}"
+  tasks:
+
+    - name: Install and Start Docker Registry with Podman
+      import_role:
+        name: podman_registry

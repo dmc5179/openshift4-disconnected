@@ -1,0 +1,10 @@
+---
+# defaults file for ocp_postinstall
+
+kube_config: "~/.kube/config"
+ssl_enabled: true
+
+air_gapped: true
+
+mirror_registry: 'localhost:5000'
+mirror_transport: 'https'

@@ -1,0 +1,9 @@
+---
+- hosts: nfs_server
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Install and Configure NFS Server
+      include_role:
+        name: install_nfs

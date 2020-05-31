@@ -1,0 +1,32 @@
+---
+# tasks file for enable_signatures
+- name: Base64 encode policy.json
+  slurp:
+    src: "{{ lookup('file', 'policy.json') }}"
+  register: policy_config
+
+- name: Base64 encode registry.access.redhat.com.yaml
+  slurp:
+    src: "{{ lookup('file', 'registry.access.redhat.com.yaml') }}"
+  register: arc_reg
+
+- name: Base64 encode registry.redhat.io.yaml
+  slurp:
+    src: "{{ lookup('file', 'registry.redhat.io.yaml') }}"
+  register: rio_reg
+
+- name: Apply Machine Config to worker nodes
+  k8s:
+    state: present
+    validate_certs: "{{ kube_ssl }}"
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    definition: "{{ lookup('template', '51-worker-rh-registry-trust.yaml.j2') }}"
+
+- name: Apply Machine Config to master nodes
+  k8s:
+    state: present
+    validate_certs: "{{ kube_ssl }}"
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    definition: "{{ lookup('template', '51-master-rh-registry-trust.yaml.j2') }}"

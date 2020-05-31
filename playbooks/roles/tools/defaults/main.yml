@@ -1,0 +1,13 @@
+---
+# defaults file for tools
+
+mirror: true
+force_ocp_download: true
+mirror_base: '/usr/local/src/'
+run_as_root: true
+
+
+air_gapped: true
+
+mirror_registry: 'localhost:5000'
+mirror_transport: 'https'

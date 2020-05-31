@@ -1,0 +1,7 @@
+---
+tower_images:
+  - 'registry.access.redhat.com/rhscl/postgresql-10-rhel7:latest'
+  - 'quay.io/ansible-tower/ansible-tower:3.6.4'
+  - 'quay.io/ansible-tower/ansible-tower-messaging:3.7.15'
+  - 'quay.io/ansible-tower/ansible-tower-memcached:latest'
+  - 'quay.io/ansible-tower/ansible-runner:1.4.4'

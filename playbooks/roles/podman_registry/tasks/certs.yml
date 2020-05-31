@@ -1,0 +1,31 @@
+---
+- name: Generate an OpenSSL private key with a different size (4096 bits)
+  become: "{{ run_as_root }}"
+  openssl_privatekey:
+    path: "{{docker_registry_conf_dir}}/pki/registry.key"
+    size: 2048
+
+- name: Generate an OpenSSL CSR
+  become: "{{ run_as_root }}"
+  openssl_csr:
+    path: "{{docker_registry_conf_dir}}/pki/registry.csr"
+    privatekey_path: "{{docker_registry_conf_dir}}/pki/registry.key"
+    common_name: "{{ docker_registry_hostname }}"
+
+- name: Generate a Self Signed OpenSSL Certificate
+  become: "{{ run_as_root }}"
+  openssl_certificate:
+    path: "{{docker_registry_conf_dir}}/pki/registry.crt"
+    privatekey_path: "{{docker_registry_conf_dir}}/pki/registry.key"
+    csr_path: "{{docker_registry_conf_dir}}/pki/registry.csr"
+    provider: selfsigned
+
+# Make sure to trust the self signed cert we just made
+- name: Copy self signed cert to local PKI trust
+  become: "{{ run_as_root }}"
+  copy:
+    src: "{{docker_registry_conf_dir}}/pki/registry.crt"
+    dest: '/etc/pki/ca-trust/source/anchors/'
+    remote_src: true
+  notify:
+    - update trusted ca

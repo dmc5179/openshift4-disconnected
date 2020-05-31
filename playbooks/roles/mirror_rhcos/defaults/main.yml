@@ -1,0 +1,17 @@
+---
+# defaults file for mirror_rhcos
+
+run_as_root: true
+mirror_base: '/tmp'
+
+mirror_vmdk: true
+mirror_azure: false
+mirror_gcp: false
+mirror_iso: false
+mirror_raw: false
+mirror_ova: false
+
+air_gapped: true
+
+mirror_registry: 'localhost:5000'
+mirror_transport: 'https'
