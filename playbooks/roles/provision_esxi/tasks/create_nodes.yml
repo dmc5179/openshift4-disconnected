@@ -1,0 +1,36 @@
+---
+- name: Create helper node
+  vmware_guest:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    validate_certs: "{{ ssl_enabled }}"
+#    folder: '/openshift_vms/helper_node'
+    folder: '/'
+    name: ocp_helper_node
+    state: poweredon
+    guest_id: rhel8_64Guest
+    # This is hostname of particular ESXi server on which user wants VM to be deployed
+    esxi_hostname: "{{ vcenter_hostname }}"
+    cdrom:
+      type: iso
+      iso_path: '[USB-Datastore] ISOs/rhel-8.2-x86_64-dvd.iso'
+    disk:
+    - size_gb: 20
+      type: thin
+      datastore: 'NVMe-Datastore'
+    hardware:
+      memory_mb: 2048
+      num_cpus: 2
+      scsi: paravirtual
+      version: 14
+      boot_fireware: "efi"
+    networks:
+    - name: '{{ portgroup_name }}'
+      mac: aa:bb:dd:aa:00:14
+      ip: 10.10.106.12
+      netmask: 255.255.255.0
+      device_type: vmxnet3
+    wait_for_ip_address: false
+  delegate_to: localhost
+  register: deploy_vm
