@@ -1,0 +1,93 @@
+---
+# tasks file for tools
+- name: Create mirror_base dir
+  become: true
+  file:
+    path: "{{ mirror_base }}"
+    state: directory
+  tags:
+    - mirror
+
+- name: Downloading OCP4 client
+  become: "{{ run_as_root }}"
+  get_url:
+    url: "{{ ocp_client }}"
+    dest: "{{ mirror_base }}/openshift-client-linux.tar.gz"
+  tags:
+    - ocp_client
+    - mirror
+
+- name: Downloading OCP4 Installer
+  become: "{{ run_as_root }}"
+  get_url:
+    url: "{{ ocp_installer }}"
+    dest: "{{ mirror_base }}/openshift-install-linux.tar.gz"
+  tags:
+    - ocp_installer
+    - mirror
+
+- name: Downloading filetranspiler source
+  become: "{{ run_as_root }}"
+  git:
+    repo: https://github.com/ashcrow/filetranspiler
+    dest: "{{ mirror_base }}/filetranspiler"
+  tags:
+    - transpiler
+    - mirror
+
+- name: Unarchiving OCP4 client
+  become: true
+  unarchive:
+    src: "{{ mirror_base }}/openshift-client-linux.tar.gz"
+    dest: /usr/local/bin
+    remote_src: true
+  tags:
+    - ocp_client
+    - install
+
+- name: Unarchiving OCP4 Installer
+  become: true
+  unarchive:
+    src: "{{ mirror_base }}/openshift-install-linux.tar.gz"
+    dest: /usr/local/bin
+    remote_src: true
+  tags:
+    - ocp_installer
+    - install
+
+- name: Removing files that are not needed
+  become: true
+  file:
+    path: /usr/local/bin/README.md
+    state: absent
+  tags: 
+    - ocp_client
+    - ocp_installer
+    - install
+
+- name: Make sure podman is installed
+  become: true
+  package:
+    name: podman
+    state: present
+  tags:
+    - transpiler
+    - install
+
+- name: Building filetranspiler
+  shell: "podman build {{ mirror_base }}/filetranspiler -t filetranspiler:latest"
+  when: install_filetranspiler
+  tags:
+    - transpiler
+    - install
+
+- name: Installing filetranspiler
+  become: true
+  copy:
+    src: "{{ mirror_base }}/filetranspiler/filetranspile"
+    dest: /usr/local/bin/filetranspiler
+    mode: '0555'
+    remote_src: true
+  tags:
+    - transpiler
+    - install

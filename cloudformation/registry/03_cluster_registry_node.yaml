@@ -1,0 +1,145 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Runs Docker Registry on an EC2 instance
+
+Parameters:
+
+  AmiId:
+    Default: ami-0f5b949fc532d2ca1
+    Description: Custom Redhat Linux AMI with AWS
+    Type: AWS::EC2::Image::Id
+
+  InstanceType:
+    Default: t2.large
+    Description: Instance type of the EC2 Instance
+    Type: String
+
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access
+    Type: AWS::EC2::KeyPair::KeyName
+
+  RootVolumeSize:
+    Default: '50'
+    Description: Volume Size of the Root EBS
+    Type: Number
+
+  AdditionalVolumeSize:
+    Default: '200'
+    Description: Volume Size of Additional EBSs
+    Type: Number
+
+  S3RegistryArtifactsPath:
+    Description: Path to Registry Artifacts
+    Type: String
+    Default: redhat-dan
+
+  S3RegistryImageArtifactsPath:
+    Description: Path to S3 Registry Docker Image Artifacts
+    Type: String
+    Default: redhat-dan
+
+  OpenShiftVersion:
+    Description: 'OpenShift Version'
+    Type: String
+    Default: "4.3.3"
+
+  SecurityGroupId:
+    Description: Security Group to be applied to instance
+    Type: List<AWS::EC2::SecurityGroup::Id>
+
+  SubnetId:
+    Description: SubnetId of an existing subnet in a VPC
+    Type: AWS::EC2::Subnet::Id
+    Default: subnet-
+
+  Owner:
+    Description: Name of the user instantiating the CloudFormation
+    Type: String
+    AllowedPattern: '.+'
+
+  YumRepoURL:
+    Description: Address of the Yum Repo
+    Type: String
+    AllowedPattern: '.+'
+    Default: "https://s3.amazonaws.com/"
+
+  InstanceProfile:
+    Description: Name of the Instance Profile
+    Type: String
+    AllowedPattern: '.+'
+
+  StackName:
+    Description: Name of the Master Stack
+    Type: String
+    AllowedPattern: '.+'
+
+Resources:
+
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      IamInstanceProfile: !Ref InstanceProfile
+      ImageId: !Ref AmiId
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      SecurityGroupIds: !Ref SecurityGroupId
+      SubnetId: !Ref SubnetId
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeSize: !Ref RootVolumeSize
+            VolumeType: gp2
+        - DeviceName: /dev/xvdb
+          Ebs:
+            VolumeSize: !Ref AdditionalVolumeSize
+            VolumeType: gp2
+        - DeviceName: /dev/xvdc
+          Ebs:
+            VolumeSize: !Ref AdditionalVolumeSize
+            VolumeType: gp2
+      Tags:
+        - Key: Name
+          Value: !Sub ${StackName} Registry Instance
+        - Key: Owner
+          Value: !Sub ${Owner}
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          mkdir -p /opt/ocp
+          cd /opt/ocp
+          aws s3 cp s3://${S3RegistryImageArtifactsPath}/ . --exclude "*" --include "*docker-image-registry/ose-${OpenShiftVersion}/*.tar.gz" --include "*docker-image-registry/ose-optional-${OpenShiftVersion}/*.tar.gz" --include "*docker-images-apps*.tar.gz" --include "*docker-image-registry/builder*.tar.gz" --recursive
+          aws s3 cp s3://${S3RegistryArtifactsPath}/open-shift/shell-scripts/bootstrap-registry/bootstrap-registry-instance.sh .
+          chmod +x bootstrap-registry-instance.sh
+          aws s3 cp s3://${S3RegistryArtifactsPath}/open-shift/shell-scripts/sub-bootstrap-functions.sh .
+          chmod +x ./sub-bootstrap-functions.sh
+          aws s3 cp s3://${S3RegistryArtifactsPath}/open-shift/shell-scripts/sub-setup-yum-repo-file.sh .
+          chmod +x sub-setup-yum-repo-file.sh
+          aws s3 cp s3://${S3RegistryArtifactsPath}/open-shift/shell-scripts/sub-setup-docker.sh .
+          chmod +x sub-setup-docker.sh
+          aws s3 cp s3://${S3RegistryArtifactsPath}/open-shift/shell-scripts/sub-setup-storage.sh .
+          chmod +x sub-setup-storage.sh
+          aws s3 cp s3://${S3RegistryArtifactsPath}/open-shift/shell-scripts/bootstrap-registry/sub-setup-docker-registry.sh .
+          chmod +x sub-setup-docker-registry.sh
+          aws s3 cp s3://${S3RegistryArtifactsPath}/open-shift/shell-scripts/bootstrap-registry/sub-setup-registry-post-reboot.sh .
+          chmod +x sub-setup-registry-post-reboot.sh
+
+          export OCP_STACK_NAME=${StackName}
+          export OCP_YUM_REPO_URL=${YumRepoURL}
+          export OCP_AWS_REGION=${AWS::Region}
+          export OCP_INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
+          
+          sh /opt/ocp/bootstrap-registry-instance.sh | tee -a bootstrap-output.txt
+
+Outputs:
+
+  InstanceId:
+    Description: InstanceId of the Registry Instance
+    Value: !Sub ${EC2Instance}
+
+  InternalDNS:
+    Description: Internal DNSName of the Registry Instance
+    Value: !Sub ${EC2Instance.PrivateDnsName}
+
+  PrivateIP:
+    Description: Private IP address of the Registry Instance
+    Value: !Sub ${EC2Instance.PrivateIp}

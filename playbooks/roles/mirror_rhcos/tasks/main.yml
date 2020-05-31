@@ -1,0 +1,104 @@
+---
+# tasks file for mirror_rhcos
+
+- name: Create mirror base directory
+  become: "{{ run_as_root }}"
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ mirror_base }}"
+    - "{{ mirror_base }}/var/www/html/install"
+    - "{{ mirror_base }}/var/lib/tftpboot/rhcos"
+    - "{{ mirror_base }}/rhcos"
+  tags:
+    - mirror
+
+- name: Delete OCP4 files, if requested, to download again
+  become: "{{ run_as_root }}"
+  file:
+    state: absent
+    path: "{{ item }}"
+  with_items:
+    - "{{ mirror_base }}/var/www/html/install/bios.raw.gz"
+    - "{{ mirror_base }}/var/lib/tftpboot/rhcos/initramfs.img"
+    - "{{ mirror_base }}/var/lib/tftpboot/rhcos/kernel"
+  tags:
+    - mirror
+
+- name: Downloading OCP4 installer Bios
+  become: "{{ run_as_root }}"
+  get_url:
+    url: "{{ ocp_bios }}"
+    dest: "{{ mirror_base }}/var/www/html/install/bios.raw.gz"
+    mode: 0555
+  tags:
+    - mirror
+
+- name: Downloading OCP4 installer initramfs
+  become: "{{ run_as_root }}"
+  get_url:
+    url: "{{ ocp_initramfs }}"
+    dest: "{{ mirror_base }}/var/lib/tftpboot/rhcos/initramfs.img"
+    mode: 0555
+  tags:
+    - mirror
+
+- name: Downloading OCP4 installer kernel
+  become: "{{ run_as_root }}"
+  get_url:
+    url: "{{ ocp_install_kernel }}"
+    dest: "{{ mirror_base }}/var/lib/tftpboot/rhcos/kernel"
+    mode: 0555
+  tags:
+    - mirror
+
+- name: Download RHCOS VMDK
+  become: "{{ run_as_root }}"
+  get_url:
+    url: "{{ ocp_vmdk }}"
+    dest: "{{ mirror_base }}/rhcos/"
+    mode: '0444'
+  when: (mirror_vmdk | bool)
+  tags:
+    - mirror
+
+- name: Download RHCOS Azure
+  become: "{{ run_as_root }}"
+  get_url:
+    url: "{{ ocp_azure }}"
+    dest: "{{ mirror_base }}/rhcos/"
+    mode: '0444'
+  when: (mirror_azure | bool)
+  tags:
+    - mirror
+
+- name: Download RHCOS GCP
+  become: "{{ run_as_root }}"
+  get_url:
+    url: "{{ ocp_gcp }}"
+    dest: "{{ mirror_base }}/rhcos/"
+    mode: '0444'
+  when: (mirror_gcp | bool)
+  tags:
+    - mirror
+
+- name: Download RHCOS ISO
+  become: "{{ run_as_root }}"
+  get_url:
+    url: "{{ ocp_iso }}"
+    dest: "{{ mirror_base }}/rhcos/"
+    mode: '0444'
+  when: (mirror_iso | bool)
+  tags:
+    - mirror
+
+- name: Download RHCOS RAW
+  become: "{{ run_as_root }}"
+  get_url:
+    url: "{{ ocp_raw }}"
+    dest: "{{ mirror_base }}/rhcos/"
+    mode: '0444'
+  when: (mirror_raw | bool)
+  tags:
+    - mirror

@@ -1,0 +1,27 @@
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  name: complianceoperator
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - {{ mirror_registry }}/compliance-operator/ocp4
+    source: quay.io/compliance-operator/ocp4
+  - mirrors:
+    - {{ mirror_registry }}/compliance-operator/compliance-operator
+    source: quay.io/compliance-operator/compliance-operator
+  - mirrors:
+    - {{ mirror_registry }}/compliance-operator/openscap-ocp
+    source: quay.io/compliance-operator/openscap-ocp
+  - mirrors:
+    - {{ mirror_registry }}/compliance-operator/resultscollector
+    source: quay.io/compliance-operator/resultscollector
+  - mirrors:
+    - {{ mirror_registry }}/compliance-operator/resultserver
+    source: quay.io/compliance-operator/resultserverresultserver
+  - mirrors:
+    - {{ mirror_registry }}/compliance-operator/remediation-aggregator
+    source: quay.io/compliance-operator/remediation-aggregator
+  - mirrors:
+    - {{ mirror_registry }}/compliance-operator/api-resource-collector
+    source: quay.io/compliance-operator/api-resource-collector

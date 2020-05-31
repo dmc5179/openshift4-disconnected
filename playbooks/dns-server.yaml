@@ -1,0 +1,9 @@
+---
+- hosts: dns_server
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Install and Configure BIND DNS
+      include_role:
+        name: install_bind

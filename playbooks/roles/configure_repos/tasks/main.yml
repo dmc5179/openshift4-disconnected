@@ -1,0 +1,10 @@
+---
+# tasks file for configure_repos
+
+- name: Install openshift repo file
+  template:
+    src: openshift.repo.j2
+    dest: /etc/yum.repos.d/openshift.repo
+    owner: root
+    user: root
+    mode: 0644

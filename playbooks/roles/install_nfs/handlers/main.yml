@@ -1,0 +1,5 @@
+---
+# handlers file for install_nfs
+- name: reload nfs
+  become: true
+  command: 'exportfs -ra'

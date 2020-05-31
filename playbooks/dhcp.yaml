@@ -1,0 +1,6 @@
+---
+- hosts: dhcp_server
+  gather_facts: true
+  become: false
+  tasks:
+

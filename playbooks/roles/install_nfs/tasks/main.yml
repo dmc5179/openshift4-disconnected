@@ -1,0 +1,43 @@
+---
+# tasks file for install_nfs
+- name: Include OS-specific variables.
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Include overrides specific to RHEL 7.
+  include_vars: RedHat-7.yml
+  when:
+    - ansible_os_family == 'RedHat'
+    - ansible_distribution_major_version == "7"
+
+- name: Ensure NFS utilities are installed.
+  become: true
+  package:
+    name: nfs-utils
+    state: present
+
+- name: Ensure rpcbind is running as configured.
+  become: true
+  service:
+    name: rpcbind
+    state: "{{ nfs_rpcbind_state }}"
+    enabled: "{{ nfs_rpcbind_enabled }}"
+
+- name: Ensure directories to export exist
+  become: true
+  file: 'path="{{ item.strip().split()[0] }}" state=directory'
+  with_items: "{{ nfs_exports }}"
+
+- name: Copy exports file.
+  become: true
+  template:
+    src: exports.j2
+    dest: /etc/exports
+    owner: root
+    group: root
+    mode: 0644
+  notify: reload nfs
+
+- name: Ensure nfs is running.
+  become: true
+  service: "name={{ nfs_server_daemon }} state=started enabled=yes"
+  when: nfs_exports|length

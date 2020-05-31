@@ -1,0 +1,45 @@
+---
+version: 0.1
+auth:
+  htpasswd:
+    realm: Registry Realm
+    path: /auth/registry.htpasswd
+log:
+  level: debug
+http:
+  addr: 0.0.0.0:5000
+  hostname: https://{{docker_registry_hostname}}
+  tls:
+{% if docker_registry_pki_enabled or docker_registry_ssl_standalone_enabled or docker_registry_ssl_local_standalone_enabled %}
+    certificate: /pki/registry.crt
+    key: /pki/registry.key
+{% endif %}
+{% if docker_registry_letsencrypt_enabled %}
+    letsencrypt:
+      cachefile: {{docker_registry_letsencrypt_dir}}/letsencrypt.json
+      email: {{docker_registry_letsencrypt_email}}
+{% endif %}
+  secret: {{docker_registry_http_secret|to_json}}
+storage:
+  cache:
+    blobdescriptor: inmemory
+  delete:
+    enabled: {{docker_registry_delete_mode|bool}}
+{% if docker_registry_storage_s3_enabled %}
+  s3:
+    accesskey: {{docker_registry_storage_s3_access_key|to_json}}
+    secretkey: {{docker_registry_storage_s3_secret_key|to_json}}
+    region: {{docker_registry_storage_s3_region|to_json}}
+    regionendpoint: {{docker_registry_storage_s3_regionendpoint|to_json}}
+    bucket: {{docker_registry_storage_s3_bucket|to_json}}
+    secure: {{docker_registry_storage_s3_secure|to_json}}
+    v4auth: {{docker_registry_storage_s3_v4auth|to_json}}
+{% endif %}
+{% if docker_registry_storage_fs_enabled %}
+  filesystem:
+    rootdirectory: {{docker_registry_storage_fs_root_directory|to_json}}
+    maxthreads: 100
+{% endif %}
+  maintenance:
+    readonly:
+      enabled: {{docker_registry_readonly_mode|bool}}

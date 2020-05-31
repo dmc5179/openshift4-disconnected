@@ -1,0 +1,181 @@
+---
+# defaults file for install_bind
+
+bind_log: "data/named.run"
+
+# List of acls.
+bind_acls: []
+
+# Key binding for slaves
+bind_dns_keys: []
+#  - name: master_key
+#    algorithm: hmac-sha256
+#    secret: "azertyAZERTY123456"
+
+# List of IPv4 address of the network interface(s) to listen on. Set to "any"
+# to listen on all interfaces
+bind_listen_ipv4:
+  - "any"
+
+# List of IPv6 address of the network interface(s) to listen on.
+bind_listen_ipv6:
+  - "::1"
+
+# List of hosts that are allowed to query this DNS server.
+bind_allow_query:
+  - "any"
+
+bind_check_names: 'master ignore'
+
+# Determines whether recursion should be allowed. Typically, an authoritative
+# name server should have recursion turned OFF.
+bind_recursion: false
+bind_allow_recursion:
+  - "any"
+
+# Allows BIND to be set up as a caching name server
+bind_forward_only: false
+
+# List of name servers to forward DNS requests to.
+bind_forwarders:
+  - '192.168.3.1'
+  - '8.8.8.8'
+
+# DNS round robin order (random or cyclic)
+bind_rrset_order: "random"
+
+# statistics channels configuration
+bind_statistics_channels: false
+bind_statistics_port: 8053
+bind_statistics_host: '127.0.0.1'
+bind_statistics_allow:
+  - "127.0.0.1"
+
+# DNSSEC configuration
+bind_dnssec_enable: false
+bind_dnssec_validation: false
+
+bind_extra_include_files: []
+
+# SOA information
+bind_zone_ttl: "1W"
+bind_zone_time_to_refresh: "1D"
+bind_zone_time_to_retry: "1H"
+bind_zone_time_to_expire: "1W"
+bind_zone_minimum_ttl: "1D"
+bind_zone_master_server_ip: '192.168.3.42'
+
+# File mode for master zone files (needs to be something like 0660 for dynamic updates)
+bind_zone_file_mode: "0640"
+
+air_gapped: true
+
+mirror_registry: 'localhost:5000'
+mirror_transport: 'https'
+
+bind_zone_domains:
+  - name: "example.com"
+    create_reverse_zones: true
+    create_forward_zones: true
+    name_servers:
+      - 'bastion'
+    hosts:
+      - name: bastion
+        ip: "192.168.3.42"
+#      - name: vcenter
+#        ip: "192.168.3.47"
+#        aliases:
+#          - name: 'vcenter'
+#            type: 'A'
+    networks:
+      - '192.168.3'
+#  - name: 'redhatgovic.io'           # Domain name
+#    create_reverse_zones: true
+#    create_forward_zones: true
+#    name_servers:
+#      - 'bastion'
+#    hosts:
+#      - name: bastion
+#        ip: "10.0.106.42"
+#      - name: api
+#        ip: '10.0.106.43'
+#        aliases:
+#          - name: 'api.caas'
+#            type: 'A'
+#      - name: apiint
+#        ip: '10.0.106.43'
+#        aliases:
+#          - name: 'api-int.caas'
+#            type: 'A'
+#      - name: apiwildcard
+#        ip: '10.0.106.44'
+#        aliases:
+#          - name: '*.apps.caas'
+#            type: 'CNAME'
+#      - name: bootstrap
+#        ip: '10.0.106.50'
+#        aliases:
+#          - name: 'bootstrap.caas'
+#            type: 'A'
+#      - name: master0
+#        ip: '10.0.106.51'
+#        aliases:
+#          - name: 'master0.caas'
+#            type: 'A'
+#      - name: master1
+#        ip: '10.0.106.52'
+#        aliases:
+#          - name: 'master1.caas'
+#            type: 'A'
+#      - name: master2
+#        ip: '10.0.106.53'
+#        aliases:
+#          - name: 'master2.caas'
+#            type: 'A'
+#      - name: worker0
+#        ip: '10.0.106.61'
+#        aliases:
+#          - 'worker0.caas'
+#      - name: worker1
+#        ip: '10.0.106.62'
+#        aliases:
+#          - name: 'worker1.caas'
+#            type: 'A'
+#      - name: worker2
+#        ip: '10.0.106.63'
+#        aliases:
+#          - name: 'worker2.caas'
+#            type: 'A'
+#      - name: etcd0
+#        ip: '10.0.106.51'
+#        aliases:
+#          - name: 'etcd-0.caas'
+#            type: 'A'
+#      - name: etcd1
+#        ip: '10.0.106.52'
+#        aliases:
+#          - name: 'etcd-1.caas'
+#            type: 'A'
+#      - name: etcd2
+#        ip: '10.0.106.53'
+#        aliases:
+#          - name: 'etcd-2.caas'
+#            type: 'A'
+#    networks:
+#      - '10.0'
+#    services:
+#      - name: '_etcd-server-ssl._tcp.caas'
+#        priority: 0
+#        weight: 10
+#        port: 2380
+#        target: 'etcd-0.caas.redhatgovic.io.'
+#      - name: '_etcd-server-ssl._tcp.caas'
+#        priority: 0
+#        weight: 10
+#        port: 2380
+#        target: 'etcd-1.caas.redhatgovic.io.'
+#      - name: '_etcd-server-ssl._tcp.caas'
+#        priority: 0
+#        weight: 10
+#        port: 2380
+#        target: 'etcd-2.caas.redhatgovic.io.'

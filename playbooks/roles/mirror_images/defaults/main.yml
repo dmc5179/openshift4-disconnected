@@ -1,0 +1,17 @@
+---
+# defaults file for mirror_images
+
+images:
+  - 'docker.io/library/registry:2'
+  - 'registry.redhat.io/rhel7/support-tools:latest'
+  - 'quay.io/openshift/origin-must-gather:latest'
+
+air_gapped: true
+
+mirror_registry: 'localhost:5000'
+mirror_transport: 'https'
+
+mirror_tower: true
+mirror_compliance_operator: true
+
+pull_secret: '/opt/openshift/pull-secret.txt'

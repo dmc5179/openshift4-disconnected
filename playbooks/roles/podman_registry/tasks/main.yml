@@ -1,0 +1,147 @@
+---
+# tasks file for podman-registry
+- name: Install Dependencies
+  become: "{{ run_as_root }}"
+  yum:
+    name:
+      - podman
+      - httpd
+      - httpd-tools
+      - mod_ssl
+      - firewalld
+      - skopeo
+      - libselinux-python3
+    state: present
+
+- name: make directories
+  become: "{{ run_as_root }}"
+  with_items:
+    - '{{docker_registry_conf_dir}}'
+    - '{{docker_registry_conf_dir}}/auth'
+    - '{{docker_registry_conf_dir}}/pki'
+    - '{{docker_registry_letsencrypt_dir_on_host}}'
+    - '{{docker_registry_storage_fs_root_directory_on_host}}'
+  file:
+    state: directory
+    dest: '{{item}}'
+    owner: root
+    group: root
+    mode: 0700
+
+- name: Upgrade pip
+  become: "{{ run_as_root }}"
+  pip:
+    name: pip
+    executable: "{{ pip_executable }}"
+    state: present
+#    version: '20.0.2'
+
+- name: Install passlib for htpassword
+  become: "{{ run_as_root }}"
+  pip:
+    name: passlib
+    executable: "{{ pip_executable }}"
+    state: present
+#    version: '1.7.2'
+
+- name: Install bcrypt for htpassword
+  become: "{{ run_as_root }}"
+  pip:
+    name: bcrypt
+    executable: "{{ pip_executable }}"
+    state: present
+#    version: '3.1.7'
+
+- name: Install cryptography for htpassword
+  become: "{{ run_as_root }}"
+  pip:
+    name: cryptography
+    executable: "{{ pip_executable }}"
+    state: present
+#    version: '2.9.2'
+
+- name: add passwds to auth/registry.htpasswd
+  become: "{{ run_as_root }}"
+  with_items: '{{docker_registry_users}}'
+  htpasswd:
+    path: '{{docker_registry_conf_dir}}/auth/registry.htpasswd'
+    mode: 0600
+    name: '{{item.uid}}'
+    password: '{{item.pwd}}'
+    crypt_scheme: bcrypt
+
+- name: templatize...
+  become: "{{ run_as_root }}"
+  template:
+    src: 'config.yml.j2'
+    dest: '{{docker_registry_conf_dir}}/config.yml'
+    mode: '0644'
+
+# Generate Certificates
+- include: certs.yml
+
+# Configure Firewall Settings
+- include: firewall.yml
+
+- name: Pull docker registry image
+  become: "{{ run_as_root }}"
+  podman_image:
+    name: "{{ docker_registry_container }}"
+    tag: "{{ docker_registry_container_tag }}"
+    state: present
+  when: (not air_gapped | bool)
+
+- name: Load docker registry image into local container storage
+  become: "{{ run_as_root }}"
+  command: |
+    skopeo copy "docker-archive://{{ docker_registry_image_archive }}"
+    "containers-storage:{{ docker_registry_container }}:{{ docker_registry_container_tag }}"
+  when: (air_gapped | bool)
+
+# Configure SELinux to allow containers in systemd services
+- name: Set container_manage_cgroup SELinux Boolean
+  become: "{{ run_as_root }}"
+  seboolean:
+    name: container_manage_cgroup
+    state: true
+    persistent: true
+  when:
+    (ansible_distribution == 'RedHat' or ansible_distribution == 'CentOS') and
+    (ansible_distribution_major_version == '7')
+
+- name: launching registry container...
+  become: "{{ run_as_root }}"
+  command: >
+    podman run --name '{{docker_registry_container_name}}'
+    -p '{{docker_registry_https_port}}:5000'
+    -v '{{docker_registry_conf_dir}}/config.yml:/etc/docker/registry/config.yml:ro,Z'
+    -v '{{docker_registry_conf_dir}}/auth:/auth:ro,Z'
+    -v '{{docker_registry_conf_dir}}/pki:/pki:ro,Z'
+    -v '{{docker_registry_storage_fs_root_directory_on_host}}:{{docker_registry_storage_fs_root_directory}}:rw,Z'
+    -v '{{docker_registry_letsencrypt_dir_on_host}}:{{docker_registry_letsencrypt_dir}}:rw,Z'
+    --detach
+    '{{docker_registry_container}}:{{ docker_registry_container_tag }}'
+  when: docker_registry_activate
+
+- name: Install service file for podman registry
+  become: "{{ run_as_root }}"
+  template:
+    src: 'podman-registry.service.j2'
+    dest: '/usr/lib/systemd/system/podman-registry.service'
+    mode: '0644'
+
+- name: Enable podman registry systemd service
+  become: "{{ run_as_root }}"
+  systemd:
+    name: podman-registry
+    daemon-reload: true
+    enabled: true
+    state: started
+
+# TODO: This test is not working
+#- name: Test the registry connection
+#  uri:
+#    url: "{{ mirror_transport }}://{{ mirror_registry }}/v2/_catalog"
+#    user: 'dummy'
+#    password: 'dummy'
+#    method: 'GET'

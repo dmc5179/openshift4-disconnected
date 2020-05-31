@@ -1,0 +1,22 @@
+---
+# tasks file for mirror_rpms
+
+- name: Ensure reposync installed (DNF)
+  become: true
+  dnf:
+    name: dnf-utils
+    state: present
+  when: ansible_distribution == 'RedHat' and ansible_distribution_major_version == '8'
+
+- name: Ensure reposync installed (YUM)
+  become: true
+  yum:
+    name: yum-utils
+    state: present
+  when: ansible_distribution == 'RedHat' and ansible_distribution_major_version == '7'
+
+- name: Create mirror directory
+  become: "{{ run_as_root }}"
+  file:
+    name: "{{ repo_mirror_base }}"
+    state: directory

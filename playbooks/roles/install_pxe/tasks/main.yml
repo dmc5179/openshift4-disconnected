@@ -1,0 +1,57 @@
+---
+# tasks file for install_pxe
+
+- name: Install the tftp packages
+  package:
+    name:
+      - tftp
+      - tftp-server
+
+- name: Create TFTP config
+  file:
+    path: /var/lib/tftpboot/pxelinux.cfg
+    state: directory
+    mode: 0755
+
+- name: Create TFTP RHCOS dir
+  file:
+    path: /var/lib/tftpboot/rhcos
+    state: directory
+    mode: 0755
+
+- name: Copy over files needed for TFTP
+  shell: "cp -a /usr/share/syslinux/* /var/lib/tftpboot"
+  creates: "/var/lib/tftpboot/vesa.c32"
+
+- name: Set the default tftp file
+  template:
+    src: ../templates/default.j2
+    dest: /var/lib/tftpboot/pxelinux.cfg/default
+    mode: 0555
+
+- name: Set the bootstrap specific tftp file
+  template:
+    src: ../templates/pxe-bootstrap.j2
+    dest: "/var/lib/tftpboot/pxelinux.cfg/01-{{ bootstrap.macaddr | regex_replace (':', '-')}}"
+    mode: 0555
+
+- name: Set the master specific tftp files
+  template:
+    src: ../templates/pxe-master.j2
+    dest: "/var/lib/tftpboot/pxelinux.cfg/01-{{ item.macaddr | regex_replace (':', '-')}}"
+    mode: 0555
+  with_items: "{{ masters | lower }}"
+
+- name: Set the worker specific tftp files
+  template:
+    src: ../templates/pxe-worker.j2
+    dest: "/var/lib/tftpboot/pxelinux.cfg/01-{{ item.macaddr | regex_replace (':', '-')}}"
+    mode: 0555
+  with_items: "{{ workers | lower }}"
+
+- name: Start and enable tftp server
+  systemd:
+    name: tftp-server
+    state: started
+    enabled: true
+    daemon_reload: true

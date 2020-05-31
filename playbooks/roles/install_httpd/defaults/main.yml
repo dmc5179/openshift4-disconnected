@@ -1,0 +1,24 @@
+---
+# defaults file for httpd
+
+# The servername to use.
+httpd_servername: "{{ ansible_fqdn }}"
+
+# The non-SSL port to use.
+httpd_port: 80
+
+# To configure https, set the hostname to listen to.
+httpd_ssl_servername: "{{ ansible_fqdn }}"
+
+# For SSL a TCP port is required.
+httpd_ssl_port: 443
+
+# Set ProxyPreserveHost
+httpd_proxy_preserve_host: true
+
+pip_exec: 'pip3'
+
+air_gapped: true
+
+mirror_registry: 'localhost:5000'
+mirror_transport: 'https'
