@@ -1,0 +1,317 @@
+# ISC DHCPD configuration -- don't edit manually!
+#
+# {{ ansible_managed }}
+
+#
+# Global options
+#
+{% if dhcp_global_omapi_port is defined %}
+omapi-port {{ dhcp_global_omapi_port }};
+{% endif %}
+{% if dhcp_global_omapi_secret is defined %}
+key omapi_key {
+    algorithm HMAC-MD5;
+    secret "{{ dhcp_global_omapi_secret }}";
+};
+{% endif %}
+{% if dhcp_global_authoritative is defined %}
+{{ dhcp_global_authoritative }};
+{% endif %}
+{% if dhcp_global_log_facility is defined %}
+log-facility {{ dhcp_global_log_facility }};
+{% endif %}
+{% if dhcp_global_bootp is defined %}
+{{ dhcp_global_bootp }} bootp;
+{% endif %}
+{% if dhcp_global_booting is defined %}
+{{ dhcp_global_booting }} booting;
+{% endif %}
+{% if dhcp_global_next_server is defined %}
+next-server {{ dhcp_global_next_server}};
+{% endif %}
+{% if dhcp_global_filename is defined %}
+filename "{{ dhcp_global_filename }}";
+{% endif %}
+{% if dhcp_global_default_lease_time is defined %}
+default-lease-time {{ dhcp_global_default_lease_time }};
+{% endif %}
+{% if dhcp_global_max_lease_time is defined %}
+max-lease-time {{ dhcp_global_max_lease_time }};
+{% endif %}
+{% if dhcp_global_subnet_mask is defined %}
+option subnet-mask {{ dhcp_global_subnet_mask }};
+{% endif %}
+{% if dhcp_global_broadcast_address is defined %}
+option broadcast-address {{ dhcp_global_broadcast_address }};
+{% endif %}
+{% if dhcp_global_routers is defined %}
+option routers {{ dhcp_global_routers }};
+{% endif %}
+{% if dhcp_global_domain_name is defined %}
+option domain-name "{{ dhcp_global_domain_name }}";
+{% endif %}
+{% if dhcp_global_ntp_servers is defined %}
+{% if dhcp_global_ntp_servers is string %}
+option ntp-servers {{ dhcp_global_ntp_servers }};
+{% else %}
+option ntp-servers {{ dhcp_global_ntp_servers|join(', ') }};
+{% endif %}
+{% endif %}
+{% if dhcp_global_domain_name_servers is defined %}
+{% if dhcp_global_domain_name_servers is string %}
+option domain-name-servers {{ dhcp_global_domain_name_servers }};
+{% else %}
+option domain-name-servers {{ dhcp_global_domain_name_servers|join(', ') }};
+{% endif %}
+{% endif %}
+{% if dhcp_global_domain_search is defined %}
+{% if dhcp_global_domain_search is string %}
+option domain-search "{{ dhcp_global_domain_search }}";
+{% else %}
+option domain-search "{{ dhcp_global_domain_search|join('", "') }}";
+{% endif %}
+{% endif %}
+{% if dhcp_global_server_name is defined %}
+option server-name "{{ dhcp_global_server_name }}";
+{% endif %}
+{% if dhcp_global_other_options is defined %}
+{% for option in dhcp_global_other_options %}
+option {{ option }};
+{% endfor %}
+{% endif %}
+{% if dhcp_global_failover_peer is defined %}
+
+#
+# DHCP Failover config
+#
+# Notes: In the past couple years, TCP ports 647 (primary) and 847 (peer) have
+# emerged as the standard bindings for DHCP dhcp_global_failover It is worth noting that as
+# recently as 2005, the dhcpd.conf(5) man page used ports 519 and 520 in its
+# failover example, but 647 and 847 look like good choices as of 2008. However,
+# the dhcpd.conf(5) man page says that the primary port and the peer port may be
+# the same number.
+
+failover peer "{{ dhcp_global_failover_peer }}" {
+{% if dhcp_global_failover.role is defined %}
+   # [ primary | secondary ];
+   {{ dhcp_global_failover.role }};
+{% endif %}
+{% if dhcp_global_failover.address is defined %}
+  address {{ dhcp_global_failover.address }};
+{% endif %}
+{% if dhcp_global_failover.port is defined %}
+  port {{ dhcp_global_failover.port }};
+{% endif %}
+{% if dhcp_global_failover.peer_address is defined %}
+  peer address {{ dhcp_global_failover.peer_address }};
+{% endif %}
+{% if dhcp_global_failover.peer_port is defined %}
+  peer port {{ dhcp_global_failover.peer_port }};
+{% endif %}
+{% if dhcp_global_failover.max_response_delay is defined %}
+  max-response-delay {{ dhcp_global_failover.max_response_delay }};
+{% endif %}
+{% if dhcp_global_failover.max_unacked_updates is defined %}
+  max-unacked-updates {{ dhcp_global_failover.max_unacked_updates }};
+{% endif %}
+{% if dhcp_global_failover.split is defined %}
+  split {{ dhcp_global_failover.split }};
+{% endif %}
+{% if dhcp_global_failover.hba is defined %}
+  hba {{ dhcp_global_failover.hba }};
+{% endif %}
+{% if dhcp_global_failover.mclt is defined %}
+  mclt {{ dhcp_global_failover.mclt }};
+{% endif %}
+{% if dhcp_global_failover.load_balance_max_seconds is defined %}
+  load balance max seconds {{ dhcp_global_failover.load_balance_max_seconds }};
+{% endif %}
+{% if dhcp_global_failover.max_lease_misbalance is defined %}
+  max-lease-misbalance {{ dhcp_global_failover.max_lease_misbalance }};
+{% endif %}
+{% if dhcp_global_failover.max_lease_ownership is defined %}
+  max-lease-ownership {{ dhcp_global_failover.max_lease_ownership }};
+{% endif %}
+{% if dhcp_global_failover.min_balance is defined %}
+  min-balance {{ dhcp_global_failover.min_balance }};
+{% endif %}
+{% if dhcp_global_failover.max_balance is defined %}
+  max-balance {{ dhcp_global_failover.max_balance }};
+{% endif %}
+}
+{% endif %}
+{% if dhcp_global_includes is defined %}
+#
+# Includes
+#
+{% for include in dhcp_global_includes %}
+include "{{ dhcp_config_dir }}/{{ include | basename }}";
+{% endfor %}
+{% endif %}
+
+{% if dhcp_custom_includes is defined%}
+#
+# Custom Includes
+#
+{% for include in dhcp_custom_includes %}
+include "{{ dhcp_config_dir }}/{{ ( include | basename ).split('.j2')[0] }}";
+{% endfor %}
+{% endif %}
+
+{% if dhcp_global_classes is defined %}
+#
+# Classes
+#
+{% for class in dhcp_global_classes %}
+class "{{ class.name }}" {
+{% if class.match is defined %}
+  {{ class.match }};
+{% endif %}
+}
+{% endfor %}
+{% endif %}
+#
+# Subnet declarations
+#
+{% for subnet in dhcp_subnets %}
+subnet {{ subnet.ip }} netmask {{ subnet.netmask }} {
+{% if subnet.default_lease_time is defined %}
+  default-lease-time {{ subnet.default_lease_time }};
+{% endif %}
+{% if subnet.max_lease_time is defined %}
+  max-lease-time {{ subnet.max_lease_time }};
+{% endif %}
+{% if subnet.routers is defined %}
+  option routers {{ subnet.routers }};
+{% endif %}
+{% if subnet.subnet_mask is defined %}
+  option subnet-mask {{ subnet.subnet_mask }};
+{% endif %}
+{% if subnet.domain_search is defined %}
+{% if subnet.domain_search is string %}
+  option domain-search "{{ subnet.domain_search }}";
+{% else %}
+  option domain-search "{{ subnet.domain_search|join('", "') }}";
+{% endif %}
+{% endif %}
+{% if subnet.domain_name_servers is defined %}
+{% if subnet.domain_name_servers is string %}
+  option domain-name-servers {{ subnet.domain_name_servers }};
+{% else %}
+  option domain-name-servers {{ subnet.domain_name_servers|join(', ') }};
+{% endif %}
+{% endif %}
+{% if subnet.ntp_servers is defined %}
+{% if subnet.ntp_servers is string %}
+option ntp-servers {{ subnet.ntp_servers }};
+{% else %}
+option ntp-servers {{ subnet.ntp_servers|join(', ') }};
+{% endif %}
+{% endif %}
+{% if subnet.range_begin is defined and subnet.range_end is defined %}
+  range {{ subnet.range_begin }} {{ subnet.range_end }};
+{% endif %}
+{% if subnet.ranges is defined %}
+{% for range in subnet.ranges %}
+  range {{ range.begin }} {{ range.end }};
+{% endfor %}
+{% endif %}
+{% if subnet.server_name is defined %}
+  server-name {{ subnet.server_name }};
+{% endif %}
+{% if subnet.next_server is defined %}
+  next-server {{ subnet.next_server }};
+{% endif %}
+{% if subnet.filename is defined %}
+  filename "{{ subnet.filename }}";
+{% endif %}
+{% if subnet.bootp is defined %}
+{{ subnet.bootp }} bootp;
+{% endif %}
+{% if subnet.booting is defined %}
+{{ subnet.booting }} booting;
+{% endif %}
+{% if subnet.hosts is defined %}
+{% for host in subnet.hosts %}
+  host {{ host.name }} {
+    hardware ethernet {{ host.mac }};
+    fixed-address {{ host.ip }};
+  }
+{% endfor %}
+{% endif %}
+{% if subnet.pools is defined %}
+  # Address pool(s)
+{% for pool in subnet.pools %}
+  pool {
+{% if pool.failover_peer is defined %}
+# This pool has failover, see above for server details
+    failover peer "{{ pool.failover_peer }}";
+{% endif %}
+{% if pool.domain_name_servers is defined %}
+{% if pool.domain_name_servers is string %}
+    option domain-name-servers {{ pool.domain_name_servers }};
+{% else %}
+    option domain-name-servers {{ pool.domain_name_servers|join(', ') }};
+{% endif %}
+{% endif %}
+{% if pool.default_lease_time is defined %}
+    default-lease-time {{ pool.default_lease_time }};
+{% endif %}
+{% if pool.min_lease_time is defined %}
+    min-lease-time {{ pool.min_lease_time }};
+{% endif %}
+{% if pool.max_lease_time is defined %}
+    max-lease-time {{ pool.max_lease_time }};
+{% endif %}
+{% if pool.range_begin is defined and pool.range_end is defined %}
+    range {{ pool.range_begin }} {{ pool.range_end }};
+{% endif %}
+{% if pool.ranges is defined %}
+{% for range in pool.ranges %}
+    range {{ range.begin }} {{ range.end }};
+{% endfor %}
+{% endif %}
+{% if pool.allow is defined %}
+    allow {{ pool.allow }};
+{% endif %}
+{% if pool.deny is defined %}
+    deny {{ pool.deny }};
+{% endif %}
+  }
+{% endfor %}
+{% endif %}
+}
+{% endfor %}
+{% if dhcp_hosts is defined %}
+
+#
+# Host declarations
+#
+{% for host in dhcp_hosts %}
+host {{ host.name | replace (" ","_") | replace ("'","_") | replace (":","_") }} {
+  hardware ethernet {{ host.mac }};
+{% if host.ip is defined %}
+  fixed-address {{ host.ip }};
+{% endif %}
+}
+{% endfor %}
+{% endif %}
+{% if dhcp_pxeboot_server is defined %}
+
+#
+# PXEBoot server settings
+#
+option arch code 93 = unsigned integer 16; # RFC4578
+
+class "pxeclients" {
+  match if substring (option vendor-class-identifier, 0, 9) = "PXEClient";
+  next-server {{ dhcp_pxeboot_server }};
+
+  if option arch = 00:07 {
+    filename "pxelinux/bootx64.efi";
+  } else {
+    filename "pxelinux/pxelinux.0";
+  }
+}
+
+{% endif %}

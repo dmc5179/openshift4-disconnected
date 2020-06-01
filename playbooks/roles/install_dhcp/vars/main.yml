@@ -1,2 +1,14 @@
 ---
 # vars file for install_dhcp
+dhcp_packages:
+  - "{{ ( ansible_distribution_major_version == '8' ) | ternary( 'dhcp-server', 'dhcp' ) }}"
+
+dhcp_config_dir: /etc/dhcp
+
+dhcp_config: /etc/dhcp/dhcpd.conf
+
+dhcp_service: dhcpd
+
+dhcp_global_server_state: started
+
+dhcp_pxeboot_server: '10.0.106.42'
