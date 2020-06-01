@@ -7,6 +7,8 @@
   with_items:
     - "{{ rhel8_repositories }}"
   when: ( rhel8_enabled | bool )
+  tags:
+    - mirror
 
 - name: Prune RHEL 8 Repos
   become: "{{ run_as_root }}"
@@ -14,6 +16,8 @@
   with_items:
     - "{{ rhel8_repositories }}"
   when: ( rhel8_enabled | bool )
+  tags:
+    - mirror
 
 - name: Mirror RHEL 8 EPEL
   become: "{{ run_as_root }}"
@@ -21,6 +25,8 @@
   with_items:
     - "{{ epel8_repository }}"
   when: ( epel8_enabled | bool )
+  tags:
+    - mirror
 
 - name: Prune EPEL 8 Repos
   become: "{{ run_as_root }}"
@@ -28,3 +34,5 @@
   with_items:
     - "{{ epel8_repositories }}"
   when: ( epel8_enabled | bool )
+  tags:
+    - mirror

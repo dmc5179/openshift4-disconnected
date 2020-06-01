@@ -14,6 +14,8 @@
   with_items:
     - "{{ rhel7_repositories }}"
   when: ( rhel7_enabled | bool )
+  tags:
+    - mirror
 
 - name: Prune RHEL 7 Repos
   become: "{{ run_as_root }}"
@@ -21,6 +23,8 @@
   with_items:
     - "{{ rhel7_repositories }}"
   when: ( rhel7_enabled | bool )
+  tags:
+    - mirror
 
 - name: Mirror EPEL 7 Repo
   become: "{{ run_as_root }}"
@@ -28,6 +32,8 @@
   with_items:
     - "{{ epel7_repository }}"
   when: ( epel7_enabled | bool )
+  tags:
+    - mirror
 
 - name: Prune EPEL 7 Repos
   become: "{{ run_as_root }}"
@@ -35,3 +41,5 @@
   with_items:
     - "{{ epel7_repositories }}"
   when: ( epel7_enabled | bool )
+  tags:
+    - mirror
