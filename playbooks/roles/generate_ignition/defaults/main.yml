@@ -6,17 +6,16 @@ openshift_client: 'oc'
 kubectl: 'kubectl'
 kubeauth: "~/.kube/auth"
 
-install_config: ''
-ignition_configs: ''
+ignition_configs: '/opt/openshift/cluster'
 
 master_schedulable: false
 cluster_channel: 'fast'
 
 fips: true
 pullSecret: ''
-sshKey: ''
+ssh_public_key_file: 'id_rsa.pub'
 
-base_domain: 'redhatgov.io'
+base_domain: 'example.com'
 cluster_name: 'caas'
 
 num_workers: 3
@@ -25,3 +24,5 @@ air_gapped: true
 
 mirror_registry: 'localhost:5000'
 mirror_transport: 'https'
+
+fips_enabled: false
