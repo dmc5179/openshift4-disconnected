@@ -6,5 +6,5 @@
     src: openshift.repo.j2
     dest: /etc/yum.repos.d/openshift.repo
     owner: root
-    user: root
+    group: root
     mode: 0644
