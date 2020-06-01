@@ -110,7 +110,7 @@ bind_zone_domains:
           - name: 'api-int.caas'
 #            type: 'A'
       - name: apiwildcard
-        ip: '10.0.106.44'
+        ip: '10.0.106.43'
         aliases:
           - name: '*.apps.caas'
 #            type: 'CNAME'
