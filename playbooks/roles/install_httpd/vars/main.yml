@@ -1,7 +1,7 @@
 ---
 # vars file for httpd
 httpd_requirements:
-  - pyopenssl
+  - pyOpenSSL
 
 httpd_sebooleans:
   - httpd_can_network_connect
