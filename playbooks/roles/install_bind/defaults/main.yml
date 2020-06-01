@@ -29,7 +29,7 @@ bind_check_names: 'master ignore'
 
 # Determines whether recursion should be allowed. Typically, an authoritative
 # name server should have recursion turned OFF.
-bind_recursion: false
+bind_recursion: true
 bind_allow_recursion:
   - "any"
 
@@ -82,100 +82,100 @@ bind_zone_domains:
     hosts:
       - name: bastion
         ip: "192.168.3.42"
-#      - name: vcenter
-#        ip: "192.168.3.47"
+      - name: vcenter
+        ip: "192.168.3.47"
 #        aliases:
 #          - name: 'vcenter'
 #            type: 'A'
     networks:
       - '192.168.3'
-#  - name: 'redhatgovic.io'           # Domain name
-#    create_reverse_zones: true
-#    create_forward_zones: true
-#    name_servers:
-#      - 'bastion'
-#    hosts:
-#      - name: bastion
-#        ip: "10.0.106.42"
-#      - name: api
-#        ip: '10.0.106.43'
-#        aliases:
-#          - name: 'api.caas'
+  - name: 'example.io'           # Domain name
+    create_reverse_zones: true
+    create_forward_zones: true
+    networks:
+      - '10.0'
+    name_servers:
+      - 'bastion'
+    hosts:
+      - name: bastion
+        ip: "10.0.106.42"
+      - name: api
+        ip: '10.0.106.43'
+        aliases:
+          - name: 'api.caas'
 #            type: 'A'
-#      - name: apiint
-#        ip: '10.0.106.43'
-#        aliases:
-#          - name: 'api-int.caas'
+      - name: apiint
+        ip: '10.0.106.43'
+        aliases:
+          - name: 'api-int.caas'
 #            type: 'A'
-#      - name: apiwildcard
-#        ip: '10.0.106.44'
-#        aliases:
-#          - name: '*.apps.caas'
+      - name: apiwildcard
+        ip: '10.0.106.44'
+        aliases:
+          - name: '*.apps.caas'
 #            type: 'CNAME'
-#      - name: bootstrap
-#        ip: '10.0.106.50'
-#        aliases:
-#          - name: 'bootstrap.caas'
+      - name: bootstrap
+        ip: '10.0.106.50'
+        aliases:
+          - name: 'bootstrap.caas'
 #            type: 'A'
-#      - name: master0
-#        ip: '10.0.106.51'
-#        aliases:
-#          - name: 'master0.caas'
+      - name: master0
+        ip: '10.0.106.51'
+        aliases:
+          - name: 'master0.caas'
 #            type: 'A'
-#      - name: master1
-#        ip: '10.0.106.52'
-#        aliases:
-#          - name: 'master1.caas'
+      - name: master1
+        ip: '10.0.106.52'
+        aliases:
+          - name: 'master1.caas'
 #            type: 'A'
-#      - name: master2
-#        ip: '10.0.106.53'
-#        aliases:
-#          - name: 'master2.caas'
+      - name: master2
+        ip: '10.0.106.53'
+        aliases:
+          - name: 'master2.caas'
 #            type: 'A'
-#      - name: worker0
-#        ip: '10.0.106.61'
-#        aliases:
-#          - 'worker0.caas'
-#      - name: worker1
-#        ip: '10.0.106.62'
-#        aliases:
-#          - name: 'worker1.caas'
+      - name: worker0
+        ip: '10.0.106.61'
+        aliases:
+          - 'worker0.caas'
+      - name: worker1
+        ip: '10.0.106.62'
+        aliases:
+          - name: 'worker1.caas'
 #            type: 'A'
-#      - name: worker2
-#        ip: '10.0.106.63'
-#        aliases:
-#          - name: 'worker2.caas'
+      - name: worker2
+        ip: '10.0.106.63'
+        aliases:
+          - name: 'worker2.caas'
 #            type: 'A'
-#      - name: etcd0
-#        ip: '10.0.106.51'
-#        aliases:
-#          - name: 'etcd-0.caas'
+      - name: etcd0
+        ip: '10.0.106.51'
+        aliases:
+          - name: 'etcd-0.caas'
 #            type: 'A'
-#      - name: etcd1
-#        ip: '10.0.106.52'
-#        aliases:
-#          - name: 'etcd-1.caas'
+      - name: etcd1
+        ip: '10.0.106.52'
+        aliases:
+          - name: 'etcd-1.caas'
 #            type: 'A'
-#      - name: etcd2
-#        ip: '10.0.106.53'
-#        aliases:
-#          - name: 'etcd-2.caas'
+      - name: etcd2
+        ip: '10.0.106.53'
+        aliases:
+          - name: 'etcd-2.caas'
 #            type: 'A'
-#    networks:
-#      - '10.0'
-#    services:
-#      - name: '_etcd-server-ssl._tcp.caas'
-#        priority: 0
-#        weight: 10
-#        port: 2380
-#        target: 'etcd-0.caas.redhatgovic.io.'
-#      - name: '_etcd-server-ssl._tcp.caas'
-#        priority: 0
-#        weight: 10
-#        port: 2380
-#        target: 'etcd-1.caas.redhatgovic.io.'
-#      - name: '_etcd-server-ssl._tcp.caas'
-#        priority: 0
-#        weight: 10
-#        port: 2380
-#        target: 'etcd-2.caas.redhatgovic.io.'
+    services:
+      - name: '_etcd-server-ssl._tcp.caas'
+        priority: 0
+        weight: 10
+        port: 2380
+        target: 'etcd-0.caas.redhatgovic.io.'
+      - name: '_etcd-server-ssl._tcp.caas'
+        priority: 0
+        weight: 10
+        port: 2380
+        target: 'etcd-1.caas.redhatgovic.io.'
+      - name: '_etcd-server-ssl._tcp.caas'
+        priority: 0
+        weight: 10
+        port: 2380
+        target: 'etcd-2.caas.redhatgovic.io.'
