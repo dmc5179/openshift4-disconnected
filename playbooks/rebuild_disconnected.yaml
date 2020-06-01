@@ -32,7 +32,7 @@
     - name: Install and configure BIND DNS
       include_role:
         name: install_bind
-#      when: (install_bind | bool)
+      when: (install_bind | bool)
 
 - hosts: dhcp_server
   gather_facts: true
@@ -42,7 +42,7 @@
     - name: Install and configure DHCP server
       include_role:
         name: install_dhcp
-#      when: (install_dhcp | bool)
+      when: (install_dhcp | bool)
 
 - hosts: httpd_server
   gather_facts: true
@@ -52,22 +52,27 @@
     - name: Install and configure HTTPD server
       include_role:
         name: install_httpd
-#      when: (install_httpd | bool)
+      when: (install_httpd | bool)
 
-#- hosts: pxe_server
-#  gather_facts: true
-#  become: true
-#  tasks:
-#
-#    - name: Install and configure PXE server
-#      include_role:
-#        name: install_pxe
-#      when: (install_pxe | bool)
+- hosts: pxe_server
+  gather_facts: true
+  become: true
+  tasks:
 
-#    - name: 
-#      include_role:
-#        name: 
-#      when: ( | bool)
+    - name: Install and configure PXE server
+      include_role:
+        name: install_pxe
+      when: (install_pxe | bool)
+
+- hosts: nfs_server
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Install and configure NFS server
+      include_role:
+        name: install_nfs
+      when: (install_nfs | bool)
 
 #    - name: 
 #      include_role:
@@ -99,13 +104,10 @@
 
 # TODO: Below are roles that may need to be added
 #       to rebuild a disconnected infrastructure
-#configure_repos
 #generate_ignition
 #haproxy
 #helm
-#install_nfs
 #install_ntp
-#install_pxe
 #install_roles
 #mirror_images
 #mirror_ocp_images
