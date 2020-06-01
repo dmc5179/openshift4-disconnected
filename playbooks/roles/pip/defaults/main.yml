@@ -1,2 +1,12 @@
 ---
 # defaults file for pip
+
+pip_modules:
+  - kubernetes
+  - openshift
+  - openshift_raw
+  - pyvim
+  - pyvmomi
+  - PyYAML 
+  - pyOpenSSL
+  - yamllint
