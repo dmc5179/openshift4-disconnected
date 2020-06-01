@@ -4,14 +4,14 @@
 
 # Firewall needs to be running to configure it
 - name: Start firewalld
-  become: "{{ run_as_root }}"
+  become: true
   service:
     name: firewalld
     state: started
   when: "'firewalld.service' in services"
 
 - name: Enable registry port zone internal
-  become: "{{ run_as_root }}"
+  become: true
   firewalld:
     port: "{{ docker_registry_https_port }}/tcp"
     zone: internal
@@ -21,7 +21,7 @@
   when: "'firewalld.service' in services"
 
 - name: Enable registry port zone public
-  become: "{{ run_as_root }}"
+  become: true
   firewalld:
     port: "{{ docker_registry_https_port }}/tcp"
     zone: public
@@ -31,7 +31,7 @@
   when: "'firewalld.service' in services"
 
 - name: Enable https service
-  become: "{{ run_as_root }}"
+  become: true
   firewalld:
     service: https
     permanent: true
@@ -40,7 +40,7 @@
   when: "'firewalld.service' in services"
 
 - name: Enable http service
-  become: "{{ run_as_root }}"
+  become: true
   firewalld:
     service: http
     permanent: true
