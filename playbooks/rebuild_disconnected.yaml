@@ -10,6 +10,14 @@
         name: install_roles
       when: (install_roles | bool)
 
+
+    - name: Install tools like openshift-install and oc
+      include_role:
+        name: tools
+        apply:
+          tags:
+            - install
+
 # TODO: Role not complete
     - name: Install and configure NTP server
       include_role:
@@ -35,8 +43,6 @@
 #      include_role:
 #        name: pip
 #      when: (pip | bool)
-
-
 
 - hosts: dns_server
   gather_facts: true
