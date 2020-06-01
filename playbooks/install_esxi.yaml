@@ -1,0 +1,23 @@
+---
+- hosts: helper_node
+  gather_facts: true
+  become: false
+  tasks:
+
+    - name: Generate Ignition Files
+      include_role:
+        name: generate_ignition
+
+#    - name: Modify Ignition Files
+#      include_role:
+#        name: modify_ignition
+
+#    - name: Stage Ignition
+#      include_role:
+#        name: stage_ignition
+
+
+
+
+# haproxy for load balancers?
+# Power on/create bootstrap node with kernel args for ignition

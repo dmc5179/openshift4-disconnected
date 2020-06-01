@@ -12,10 +12,15 @@
     state: directory
     mode: '0755'
 
-- name: Fetch authorized key from alternate location
+- name: Fetch public key
   slurp:
     src: "{{ ssh_public_key_file }}"
   register: slurped_key_b64
+
+- name: Fetch pull secret
+  slurp:
+    src: "{{ pull_secret }}"
+  register: slurped_pull_secret_b64
 
 - name: Copy template install-config.yaml
   template:
@@ -49,6 +54,12 @@
 - name: Create ignition configs
   shell: "{{ openshift_install }} create ignition-configs --dir={{ ignition_configs }}"
 #  creates: "{{ ignition_configs }}/master.ign"
+
+- name: Create kube config location
+  file:
+    path: "~/.kube"
+    state: directory
+    mode: '0755'
 
 - name: Set kube config
   copy:
