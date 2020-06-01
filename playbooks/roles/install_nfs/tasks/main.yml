@@ -39,5 +39,8 @@
 
 - name: Ensure nfs is running.
   become: true
-  service: "name={{ nfs_server_daemon }} state=started enabled=yes"
+  service: 
+    name: "{{ nfs_server_daemon }}"
+    state: started
+    enabled: true
   when: nfs_exports|length

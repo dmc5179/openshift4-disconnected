@@ -1,6 +1,7 @@
 ---
 # defaults file for install_nfs
-nfs_exports: []
+nfs_exports:
+  - '/mnt/nfs'
 
 nfs_rpcbind_state: started
 nfs_rpcbind_enabled: true
