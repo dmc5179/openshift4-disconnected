@@ -16,8 +16,7 @@ aws_ssl: true
 kube_ssl: true
 kubeconfig: "~/.kube/config"
 
-install_config: ''
-ignition_configs: ''
+#install_config: ''
 
 master_count: 3
 worker_count: 3
@@ -26,6 +25,7 @@ worker_count: 3
 mirror_base: '/opt/openshift'
 mirror_registry: 'localhost:5000'
 mirror_transport: 'https'
+ignition_configs: "{{ mirror_base }}/cluster"
 # This is the secret that will be uploaded to the mirror server
 # for use in mirroring images
 local_pull_secret: '~/Downloads/pull-secret.txt'
@@ -35,3 +35,12 @@ pull_secret: '/opt/openshift/pull-secret.txt'
 oc_cmd: '/usr/local/bin/oc'
 kubectl_cmd: '/usr/local/bin/kubectl'
 openshift_install_cmd: '/usr/local/bin/openshift-install'
+
+fips_enabled: false
+
+base_domain: 'example.io'
+cluster_name: 'caas'
+
+docker_registry_hostname: 'localhost'
+
+ssh_public_key_file: '~/.ssh/id_rsa.pub'

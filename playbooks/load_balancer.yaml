@@ -1,0 +1,9 @@
+---
+- hosts: load_balancer
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Install and Configure HAProxy for Load Balancing
+      include_role:
+        name: haproxy

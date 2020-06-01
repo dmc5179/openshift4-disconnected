@@ -1,2 +1,30 @@
 ---
-# tasks file for haproxy
+- name: Ensure HAProxy is installed.
+  become: true
+  package:
+    name: haproxy
+    state: present
+
+- name: SEBool allow haproxy connect any port
+  seboolean:
+    name: haproxy_connect_any
+    state: yes
+    persistent: yes
+  notify:
+    - restart haproxy
+
+- name: Copy HAProxy configuration in place.
+  become: true
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    mode: 0644
+    validate: haproxy -f %s -c -q
+  notify: restart haproxy
+
+- name: Ensure HAProxy is started and enabled on boot.
+  become: true
+  service:
+    name: haproxy
+    state: started
+    enabled: true
