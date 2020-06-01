@@ -1,34 +1,34 @@
 [rhel-7-server-ansible-2.8-rpms]
 name=rhel-7-server-ansible-2.8-rpms
 baseurl={{ repo_server }}/{{ repo_path }}/rhel-7-server-ansible-2.8-rpms
-enabled={{ rhel_7_server_ansible_28_rpms }}
+enabled={{ rhel_7_server_ansible_28_rpms | int }}
 
 [rhel-7-server-extras-rpms]
 name=rhel-7-server-extras-rpms
 baseurl={{ repo_server }}/{{ repo_path }}/rhel-7-server-extras-rpms
-enabled={{ rhel_7_server_extras_rpms }}
+enabled={{ rhel_7_server_extras_rpms | int }}
 
 [rhel-7-server-ose-4.3-rpms]
 name=rhel-7-server-ose-4.3-rpms
 baseurl={{ repo_server }}/{{ repo_path }}/rhel-7-server-ose-4.3-rpms
-enabled={{ rhel_7_server_ose_43_rpms }}
+enabled={{ rhel_7_server_ose_43_rpms | int }}
 
 [rhel-7-server-rpms]
 name=rhel-7-server-rpms
 baseurl={{ repo_server }}/{{ repo_path }}/rhel-7-server-rpms
-enabled={{ rhel_7_server_rpms }}
+enabled={{ rhel_7_server_rpms | int }}
 
 [ansible-2.9-for-rhel-8-x86_64-rpms]
 name=ansible-2.9-for-rhel-8-x86_64-rpms
 baseurl={{ repo_server }}/{{ repo_path }}/ansible-2.9-for-rhel-8-x86_64-rpms
-enabled={{ ansible_29_for_rhel_8_x86_64_rpms }}
+enabled={{ ansible_29_for_rhel_8_x86_64_rpms | int }}
 
 [rhel-8-for-x86_64-appstream-rpms]
 name=rhel-8-for-x86_64-appstream-rpms
 baseurl={{ repo_server }}/{{ repo_path }}/rhel-8-for-x86_64-appstream-rpms
-enabled={{ rhel_8_for_x86_64_appstream_rpms }}
+enabled={{ rhel_8_for_x86_64_appstream_rpms | int }}
 
 [rhel-8-for-x86_64-baseos-rpms]
 name=rhel-8-for-x86_64-baseos-rpms
 baseurl={{ repo_server }}/{{ repo_path }}/rhel-8-for-x86_64-baseos-rpms
-enabled={{ rhel_8_for_x86_64_baseos_rpms }}
+enabled={{ rhel_8_for_x86_64_baseos_rpms | int }}
