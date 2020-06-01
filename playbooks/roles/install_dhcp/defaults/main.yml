@@ -1,7 +1,19 @@
 ---
 # defaults file for install_dhcp
 
-air_gapped: true
+dhcp_subnets:
+  - ip: 10.0.106.0
+    netmask: 255.255.255.0
+    domain_name_servers:
+      - 10.0.106.42
+    range_begin: 10.0.106.200
+    range_end: 10.0.106.250
 
-mirror_registry: 'localhost:5000'
-mirror_transport: 'https'
+# Example IP assignment
+#dhcp_hosts:
+#  - name: cl1
+#    mac: '00:11:22:33:44:55'
+#    ip: 192.168.222.150
+#  - name: cl2
+#    mac: '00:de:ad:be:ef:00'
+#    ip: 192.168.222.151
