@@ -4,25 +4,39 @@
   become: true
   tasks:
 
-    - name: Configure repos locally
+# TODO: Role not complete
+    - name: Install mirrored Ansible Roles
       include_role:
-        name: configure_repos
-      vars:
-        - rhel_7_server_ansible_28_rpms: false
-        - rhel_7_server_extras_rpms: false
-        - rhel_7_server_ose_43_rpms: false
-        - rhel_7_server_rpms: false
-        - ansible_29_for_rhel_8_x86_64_rpms: true
-        - rhel_8_for_x86_64_appstream_rpms: true
-        - rhel_8_for_x86_64_baseos_rpms: true
-        - repo_server: 'file://'
-        - repo_path: '/opt/openshift/repos'
+        name: install_roles
+      when: (install_roles | bool)
+
+# TODO: Role not complete
+    - name: Install and configure NTP server
+      include_role:
+        name: install_ntp
+      when: (install_ntp | bool)
+
+#    - name: Configure repos locally
+#      include_role:
+#        name: configure_repos
+#      vars:
+#        - rhel_7_server_ansible_28_rpms: false
+#        - rhel_7_server_extras_rpms: false
+#        - rhel_7_server_ose_43_rpms: false
+#        - rhel_7_server_rpms: false
+#        - ansible_29_for_rhel_8_x86_64_rpms: true
+#        - rhel_8_for_x86_64_appstream_rpms: true
+#        - rhel_8_for_x86_64_baseos_rpms: true
+#        - repo_server: 'file://'
+#        - repo_path: '/opt/openshift/repos'
 
 # TODO: Role not complete. For mirroring pip modules. All hosts will need this?
 #    - name: Install and configure pip modules
 #      include_role:
 #        name: pip
 #      when: (pip | bool)
+
+
 
 - hosts: dns_server
   gather_facts: true
@@ -54,6 +68,12 @@
         name: install_httpd
       when: (install_httpd | bool)
 
+# TODO: Role not complete
+#    - name: Install and configure helm repo
+#      include_role:
+#        name: helm
+#      when: (install_helm | bool)
+
 - hosts: pxe_server
   gather_facts: true
   become: true
@@ -74,10 +94,20 @@
         name: install_nfs
       when: (install_nfs | bool)
 
-#    - name: 
-#      include_role:
-#        name: 
-#      when: ( | bool)
+- hosts: registry_server
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Install podman registry
+      include_role:
+        name: podman_registry
+      when: (podman_registry | bool)
+
+    - name: Push mirrored images to repo
+      include_role:
+        name: mirror_images
+      when: (additional_images | bool)
 
 #    - name: 
 #      include_role:
@@ -94,25 +124,3 @@
 #        name: 
 #      when: ( | bool)
 
-#    - name: 
-#      include_role:
-#        name: 
-#      when: ( | bool)
-
-
-
-
-# TODO: Below are roles that may need to be added
-#       to rebuild a disconnected infrastructure
-#generate_ignition
-#haproxy
-#helm
-#install_ntp
-#install_roles
-#mirror_images
-#mirror_ocp_images
-#mirror_operatorhub_images
-#mirror_rhcos
-#modify_ignition
-#podman_registry
-#tools
