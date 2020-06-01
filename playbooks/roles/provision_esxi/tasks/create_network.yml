@@ -18,7 +18,7 @@
 - name: Add a VMware vSwitch without any physical NIC attached
   vmware_vswitch:
     hostname: '{{ vcenter_hostname }}'
-    esxi_hostname: '{{ vcenter_hostname }}'
+    esxi_hostname: '{{ esxi_hostname }}'
     username: '{{ vcenter_username }}'
     password: '{{ vcenter_password }}'
     switch: '{{ vswitch_name }}'
@@ -56,3 +56,19 @@
 #            - vmnic1
   delegate_to: localhost
   register: teaming_result
+
+- name: Add Management vmkernel port using static network type
+  vmware_vmkernel:
+     hostname: '{{ vcenter_hostname }}'
+     username: '{{ vcenter_username }}'
+     password: '{{ vcenter_password }}'
+     esxi_hostname: '{{ esxi_hostname }}'
+     vswitch_name: "{{ vswitch_name }}"
+     portgroup_name: "{{ portgroup_name }}"
+     network:
+       type: 'static'
+       ip_address: 10.0.106.1
+       subnet_mask: 255.255.255.0
+     state: present
+     enable_mgmt: false
+  delegate_to: localhost
