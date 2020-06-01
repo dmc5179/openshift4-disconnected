@@ -16,6 +16,8 @@
 
 [nfs_server]
 
+[load_balancer]
+
 [ntp_server]
 
 [bootstrap]
@@ -23,8 +25,6 @@
 [masters]
 
 [workers]
-
-
 
 [all:vars]
 
@@ -38,4 +38,13 @@
 #ansible_become_user=root
 
 
-
+install_bind=false
+install_dhcp=false
+install_httpd=true
+install_pxe=false
+install_nfs=true
+install_roles=false
+install_ntp=false
+install_helm=false
+podman_registry=true
+additional_images=false
