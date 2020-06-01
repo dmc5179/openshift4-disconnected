@@ -1,0 +1,64 @@
+# Apache TLS configuration
+#
+# {{ ansible_managed }}
+
+# Listen on port
+Listen {{ httpd_listen_ssl }} https
+
+## SSL Global Context
+SSLPassPhraseDialog exec:/usr/libexec/httpd-ssl-pass-dialog
+SSLSessionCache         shmcb:/run/httpd/sslcache(512000)
+SSLSessionCacheTimeout  300
+SSLRandomSeed startup file:/dev/urandom  256
+SSLRandomSeed connect builtin
+SSLCryptoDevice builtin
+
+## SSL Virtual Host Context
+<VirtualHost _default_:{{ httpd_listen_ssl }}>
+
+SSLEngine on
+
+ErrorLog {{ httpd_error_log_ssl }}
+TransferLog {{ httpd_access_log }}
+LogLevel {{ httpd_log_level_ssl }}
+
+# Certificate files
+SSLCertificateFile {{ httpd_cert_dir }}/{{ httpd_ssl_certificate_file }}
+SSLCertificateKeyFile {{ httpd_key_dir }}/{{ httpd_ssl_certificate_key_file }}
+{% if httpd_ssl_certificate_chain_file is defined %}
+SSLCertificateChainFile {{ httpd_cert_dir }}/{{ httpd_ssl_certificate_chain_file }}
+{% endif %}
+{% if httpd_ssl_ca_certificate_file is defined %}
+SSLCACertificateFile {{ httpd_cert_dir }}/{{ httpd_ssl_ca_certificate_file }}
+{% endif %}
+
+<Files ~ "\.(cgi|shtml|phtml|php3?)$">
+    SSLOptions +StdEnvVars
+</Files>
+<Directory "/var/www/cgi-bin">
+    SSLOptions +StdEnvVars
+</Directory>
+
+BrowserMatch "MSIE [2-5]" \
+         nokeepalive ssl-unclean-shutdown \
+         downgrade-1.0 force-response-1.0
+
+CustomLog logs/ssl_request_log \
+          "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+
+</VirtualHost>
+
+# SSL Configuration
+# see https://mozilla.github.io/server-side-tls/ssl-config-generator/
+SSLProtocol {{ httpd_ssl_protocol }}
+SSLCipherSuite {{ httpd_ssl_cipher_suite }}
+SSLHonorCipherOrder {{ httpd_ssl_honor_cipher_order }}
+SSLCompression {{ httpd_ssl_compression }}
+SSLSessionTickets {{ httpd_ssl_session_tickets }}
+
+# OCSP Stapling, only in httpd 2.3.3 and later
+SSLUseStapling {{ httpd_ssl_use_stapling }}
+SSLStaplingResponderTimeout {{ httpd_ssl_stapling_responder_timeout }}
+SSLStaplingReturnResponderErrors {{ httpd_ssl_stapling_return_responder_errors }}
+SSLStaplingCache {{ httpd_ssl_stapling_cache }}
+
