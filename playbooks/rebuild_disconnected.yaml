@@ -1,0 +1,116 @@
+---
+- hosts: helper_node
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Configure repos locally
+      include_role:
+        name: configure_repos
+      vars:
+        - rhel_7_server_ansible_28_rpms: false
+        - rhel_7_server_extras_rpms: false
+        - rhel_7_server_ose_43_rpms: false
+        - rhel_7_server_rpms: false
+        - ansible_29_for_rhel_8_x86_64_rpms: true
+        - rhel_8_for_x86_64_appstream_rpms: true
+        - rhel_8_for_x86_64_baseos_rpms: true
+        - repo_server: 'file://'
+        - repo_path: '/opt/openshift/repos'
+
+# TODO: Role not complete. For mirroring pip modules. All hosts will need this?
+#    - name: Install and configure pip modules
+#      include_role:
+#        name: pip
+#      when: (pip | bool)
+
+- hosts: dns_server
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Install and configure BIND DNS
+      include_role:
+        name: install_bind
+#      when: (install_bind | bool)
+
+- hosts: dhcp_server
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Install and configure DHCP server
+      include_role:
+        name: install_dhcp
+#      when: (install_dhcp | bool)
+
+- hosts: httpd_server
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Install and configure HTTPD server
+      include_role:
+        name: install_httpd
+#      when: (install_httpd | bool)
+
+#- hosts: pxe_server
+#  gather_facts: true
+#  become: true
+#  tasks:
+#
+#    - name: Install and configure PXE server
+#      include_role:
+#        name: install_pxe
+#      when: (install_pxe | bool)
+
+#    - name: 
+#      include_role:
+#        name: 
+#      when: ( | bool)
+
+#    - name: 
+#      include_role:
+#        name: 
+#      when: ( | bool)
+
+#    - name: 
+#      include_role:
+#        name: 
+#      when: ( | bool)
+
+#    - name: 
+#      include_role:
+#        name: 
+#      when: ( | bool)
+
+#    - name: 
+#      include_role:
+#        name: 
+#      when: ( | bool)
+
+#    - name: 
+#      include_role:
+#        name: 
+#      when: ( | bool)
+
+
+
+
+# TODO: Below are roles that may need to be added
+#       to rebuild a disconnected infrastructure
+#configure_repos
+#generate_ignition
+#haproxy
+#helm
+#install_nfs
+#install_ntp
+#install_pxe
+#install_roles
+#mirror_images
+#mirror_ocp_images
+#mirror_operatorhub_images
+#mirror_rhcos
+#modify_ignition
+#podman_registry
+#tools
