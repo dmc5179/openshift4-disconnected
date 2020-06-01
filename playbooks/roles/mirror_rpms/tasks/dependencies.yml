@@ -7,6 +7,8 @@
     name: dnf-utils
     state: present
   when: ansible_distribution == 'RedHat' and ansible_distribution_major_version == '8'
+  tags:
+    - mirror
 
 - name: Ensure reposync installed (YUM)
   become: true
@@ -14,6 +16,8 @@
     name: yum-utils
     state: present
   when: ansible_distribution == 'RedHat' and ansible_distribution_major_version == '7'
+  tags:
+    - mirror
 
 - name: Create mirror directory
   become: "{{ run_as_root }}"
