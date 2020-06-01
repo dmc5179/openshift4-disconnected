@@ -5,17 +5,11 @@
     name: "{{ httpd_requirements }}"
     state: present
     executable: "{{ pip_exec }}"
-  register: httpd_install_requirements
-  until: httpd_install_requirements is succeeded
-  retries: 3
 
 - name: install apache httpd
   package:
     name: "{{ httpd_packages }}"
     state: present
-  register: httpd_install_apache_httpd
-  until: httpd_install_apache_httpd is succeeded
-  retries: 3
 
 - name: modify selinux settings
   seboolean:
