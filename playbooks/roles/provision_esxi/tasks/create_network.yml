@@ -59,16 +59,17 @@
 
 - name: Add Management vmkernel port using static network type
   vmware_vmkernel:
-     hostname: '{{ vcenter_hostname }}'
-     username: '{{ vcenter_username }}'
-     password: '{{ vcenter_password }}'
-     esxi_hostname: '{{ esxi_hostname }}'
-     vswitch_name: "{{ vswitch_name }}"
-     portgroup_name: "{{ portgroup_name }}"
-     network:
-       type: 'static'
-       ip_address: 10.0.106.1
-       subnet_mask: 255.255.255.0
-     state: present
-     enable_mgmt: false
+    hostname: '{{ vcenter_hostname }}'
+    username: '{{ vcenter_username }}'
+    password: '{{ vcenter_password }}'
+    esxi_hostname: '{{ esxi_hostname }}'
+    vswitch_name: "{{ vswitch_name }}"
+    portgroup_name: "{{ portgroup_name }}"
+    network:
+      type: 'static'
+      ip_address: 10.0.106.1
+      subnet_mask: 255.255.255.0
+    state: present
+    enable_mgmt: false
+    validate_certs: "{{ ssl_enabled }}"
   delegate_to: localhost
