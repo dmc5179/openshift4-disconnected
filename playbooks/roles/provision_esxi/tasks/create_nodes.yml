@@ -14,9 +14,9 @@
     name: 'caas-bootstrap'
     disk_provisioning: thin
 #    folder: '{{ datacenter_name }}'
-#    networks: "{u'ocp_pg':u'{{ ProvisioningNetworkLabel }}'}"
-    networks:
-      "Network 1": "ocp_pg"
+#    networks: {"OCP Network":"ocp_pg"}
+#    networks:
+#      "Network 1": "ocp_pg"
 #      - name: '{{ portgroup_name }}'
 #        ip: '10.0.106.50'
 #        netmask: '255.255.255.0'
