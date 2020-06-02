@@ -4,20 +4,58 @@
   become: false
   tasks:
 
+    - name: Remove old ignition configs
+      become: true
+      file:
+        path: '/var/www/html/ignition'
+        state: absent
+
     - name: Generate Ignition Files
       include_role:
         name: generate_ignition
 
+# TODO: Role not complete. Not sure if needed
 #    - name: Modify Ignition Files
 #      include_role:
 #        name: modify_ignition
 
-#    - name: Stage Ignition
-#      include_role:
-#        name: stage_ignition
+    - name: Create Ignition staging location
+      become: true
+      file:
+        path: '/var/www/html/ignition'
+        state: directory
+        mode: '0755'
+        setype: 'httpd_sys_content_t'
 
+    - name: Stage Ignition configs
+      become: true
+      copy:
+        src: "{{ item }}"
+        dest: "/var/www/html/ignition/"
+        mode: '0755'
+        setype: 'httpd_sys_content_t'
+      with_items:
+        - '/opt/openshift/cluster/bootstrap.ign'
+        - '/opt/openshift/cluster/master.ign'
+        - '/opt/openshift/cluster/worker.ign'
 
+    - name: Copy append-bootstrap ignition
+      become: true
+      copy:
+        src: "files/append-bootstrap.ign"
+        dest: "/var/www/html/ignition/"
+        mode: '0755'
+        setype: 'httpd_sys_content_t'
 
+# TODO: Jinja doesn't seem to link a json file
+#    - name: Create append-bootstrap ignition
+#      template:
+#        src: "{{ lookup('template', 'templates/append-bootstrap.ign.j2') }}"
+#        dest: '/var/www/html/ignition/append-bootstrap.ign'
+#        mode: '0755'
+#        setype: 'httpd_sys_content_t'        
 
-# haproxy for load balancers?
-# Power on/create bootstrap node with kernel args for ignition
+    - name: Provision ESXi Infrastructure
+      include_role:
+        name: provision_esxi
+

@@ -1,36 +1,40 @@
 ---
-- name: Create helper node
-  vmware_guest:
-    hostname: "{{ vcenter_hostname }}"
-    username: "{{ vcenter_username }}"
-    password: "{{ vcenter_password }}"
-    validate_certs: "{{ ssl_enabled }}"
-#    folder: '/openshift_vms/helper_node'
-    folder: '/'
-    name: ocp_helper_node
-    state: poweredon
-    guest_id: rhel8_64Guest
-    # This is hostname of particular ESXi server on which user wants VM to be deployed
-    esxi_hostname: "{{ vcenter_hostname }}"
-    cdrom:
-      type: iso
-      iso_path: '[USB-Datastore] ISOs/rhel-8.2-x86_64-dvd.iso'
-    disk:
-    - size_gb: 20
-      type: thin
-      datastore: 'NVMe-Datastore'
-    hardware:
-      memory_mb: 2048
-      num_cpus: 2
-      scsi: paravirtual
-      version: 14
-      boot_fireware: "efi"
+- name: Base64 encode append-bootstrap
+  slurp:
+    src: "/var/www/html/ignition/append-bootstrap.ign"
+  register: append_bootstrap
+
+- vmware_deploy_ovf:
+    hostname: '{{ vcenter_hostname }}'
+    username: '{{ vcenter_username }}'
+    password: '{{ vcenter_password }}'
+    datacenter: '{{ datacenter_name }}'
+#    cluster: Cluster1
+    datastore: '{{ datastore_name }}'
+    name: 'caas-bootstrap'
+    disk_provisioning: thin
+#    folder: '{{ datacenter_name }}'
+#    networks: "{u'ocp_pg':u'{{ ProvisioningNetworkLabel }}'}"
     networks:
-    - name: '{{ portgroup_name }}'
-      mac: aa:bb:dd:aa:00:14
-      ip: 10.10.106.12
-      netmask: 255.255.255.0
-      device_type: vmxnet3
-    wait_for_ip_address: false
+      "Network 1": "ocp_pg"
+#      - name: '{{ portgroup_name }}'
+#        ip: '10.0.106.50'
+#        netmask: '255.255.255.0'
+#        device_type: vmxnet3
+    validate_certs: "{{ ssl_enabled }}"
+    power_on: false
+#    ovf: '/caas/rhcos-4.3.8-x86_64-vmware.x86_64.ova'
+    ovf: '/opt/openshift/rhcos/rhcos-4.3.8-x86_64-vmware.x86_64.ova'
+    properties:
+      guestinfo.ignition.config.data: '{{ append_bootstrap.content }}'
+      guestinfo.ignition.config.data.encoding: 'base64'
+      guestinfo.hostname: 'bootstrap.caas.redhatgovic.io'
+      guestinfo.interface.0.name: 'ens192'
+      guestinfo.interface.0.dhcp: 'no'
+      guestinfo.interface.0.role: 'public'
+      guestinfo.interface.0.ip.0.address: '10.0.106.50/24'
+      guestinfo.interface.0.route.0.gateway: '10.0.106.1'
+      guestinfo.interface.0.route.0.destination: '0.0.0.0/0'
+      guestinfo.dns.server.0: '10.0.106.42'
+      disk.EnableUUID: true
   delegate_to: localhost
-  register: deploy_vm

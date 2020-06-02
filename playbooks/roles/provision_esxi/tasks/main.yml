@@ -20,9 +20,9 @@
   delegate_to: localhost
   register: datastore_info
 
-- name: Show datastore info
-  debug:
-    var: datastore_info
+#- name: Show datastore info
+#  debug:
+#    var: datastore_info
 
 # TODO: Cannot use these without vCenter
 #- name: Create a VM folder on given datacenter
@@ -74,6 +74,7 @@
     path: 'caas/rhcos-4.3.8-x86_64-vmware.x86_64.ova'
     validate_certs: "{{ ssl_enabled }}"
   delegate_to: localhost
+  when: (upload_ova | bool)
 
 #- name: Include Tasks to create template
 #  include_tasks: create_template.yml
@@ -81,5 +82,5 @@
 - name: Include tasks to create networks
   include_tasks: create_network.yml
 
-#- name: Include tasks to create nodes
-#  include_tasks: create_nodes.yml
+- name: Include tasks to create nodes
+  include_tasks: create_nodes.yml
