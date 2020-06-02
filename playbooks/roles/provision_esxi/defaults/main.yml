@@ -11,3 +11,4 @@ datastore_name: 'NVMe-Datastore'
 vswitch_name: ''
 portgroup_name: ''
 cluster_name: ''
+upload_ova: false
