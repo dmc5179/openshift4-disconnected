@@ -1,2 +1,6 @@
 ---
 # defaults file for custom_iso
+
+tmp_dir: '/tmp/rhcos'
+
+ocp_nodes: {}

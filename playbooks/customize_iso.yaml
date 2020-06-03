@@ -1,0 +1,9 @@
+---
+- hosts: helper_node
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Customize ISO
+      include_role:
+        name: custom_iso

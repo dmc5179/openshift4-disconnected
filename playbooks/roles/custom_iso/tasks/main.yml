@@ -3,16 +3,10 @@
 
 - name: Create directory for ISO extraction
   file:
-    path: '/tmp/rhcos/{{ item }}'
+    path: '/tmp/rhcos/{{ item.name }}'
     state: directory
   with_items:
-    - bootstrap
-    - master0
-    - master1
-    - master2
-    - worker0
-    - worker1
-    - worker2
+    - '{{ ocp_nodes }}'
 
 #- name: Extract kernel and ramdisk from a LiveCD
 #  iso_extract:
@@ -21,7 +15,7 @@
 #    files:
 #    - '*'
 
-- name: Mount DVD read-only
+- name: Mount RHCOS ISO ReadOnly
   mount:
     path: /mnt/rhcos
     src: /opt/openshift/rhcos/rhcos-4.3.8-x86_64-installer.x86_64.iso
@@ -31,22 +25,40 @@
 
 - name: Copy files from ISO
   shell:
-    cmd: 'rsync -a /mnt/rhcos/* /tmp/rhcos/{{ item }}'
-    creates: '/tmp/rhcos/{{ item }}/README.md'
+    cmd: 'rsync -a /mnt/rhcos/* /tmp/rhcos/{{ item.name }}'
+    creates: '/tmp/rhcos/{{ item.name }}/README.md'
   with_items:
-    - bootstrap
-    - master0
-    - master1
-    - master2
-    - worker0
-    - worker1
-    - worker2
+    - '{{ ocp_nodes }}'
 
-- name: Mount DVD read-only
+- name: Umount RHCOS ISO and cleanup
   mount:
     path: /mnt/rhcos
     src: /opt/openshift/rhcos/rhcos-4.3.8-x86_64-installer.x86_64.iso
     fstype: iso9660
     opts: ro,noauto
     state: absent
+
+- name: Set default to linux
+  lineinfile:
+    path: '{{ tmp_dir }}/{{ item.name }}/isolinux/isolinux.cfg'
+    regexp: '^default vesamenu.c32'
+    line: 'default linux'
+  with_items:
+    - '{{ ocp_nodes }}'
+
+- name: Set timeout to 0
+  lineinfile:
+    path: '{{ tmp_dir }}/{{ item.name }}/isolinux/isolinux.cfg'
+    regexp: '^timeout 600'
+    line: 'timeout 0'
+  with_items:
+    - '{{ ocp_nodes }}'
+
+- name: Append kernel options
+  replace:
+    path: '{{ tmp_dir }}/{{ item.name }}/isolinux/isolinux.cfg'
+    regexp: 'coreos.inst=yes'
+    replace: 'coreos.inst=yes ip={{ item.ip }}::{{ item.gateway }}:{{ item.netmask }}:{{ item.hostname }}:ens192:none nameserver={{ item.nameserver }} coreos.inst.install_dev=sda coreos.inst.image_url={{ item.ignserver }}/{{ item.bios_path }} coreos.inst.ignition_url={{ item.ignserver }}/{{ item.ign_path }}'
+  with_items:
+    - '{{ ocp_nodes }}'
 
