@@ -1,0 +1,52 @@
+---
+# tasks file for custom_iso
+
+- name: Create directory for ISO extraction
+  file:
+    path: '/tmp/rhcos/{{ item }}'
+    state: directory
+  with_items:
+    - bootstrap
+    - master0
+    - master1
+    - master2
+    - worker0
+    - worker1
+    - worker2
+
+#- name: Extract kernel and ramdisk from a LiveCD
+#  iso_extract:
+#    image: /opt/openshift/rhcos/rhcos-4.3.8-x86_64-installer.x86_64.iso
+#    dest: /tmp/rhcos
+#    files:
+#    - '*'
+
+- name: Mount DVD read-only
+  mount:
+    path: /mnt/rhcos
+    src: /opt/openshift/rhcos/rhcos-4.3.8-x86_64-installer.x86_64.iso
+    fstype: iso9660
+    opts: ro,noauto
+    state: mounted
+
+- name: Copy files from ISO
+  shell:
+    cmd: 'rsync -a /mnt/rhcos/* /tmp/rhcos/{{ item }}'
+    creates: '/tmp/rhcos/{{ item }}/README.md'
+  with_items:
+    - bootstrap
+    - master0
+    - master1
+    - master2
+    - worker0
+    - worker1
+    - worker2
+
+- name: Mount DVD read-only
+  mount:
+    path: /mnt/rhcos
+    src: /opt/openshift/rhcos/rhcos-4.3.8-x86_64-installer.x86_64.iso
+    fstype: iso9660
+    opts: ro,noauto
+    state: absent
+
