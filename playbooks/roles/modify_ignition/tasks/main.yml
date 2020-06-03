@@ -2,29 +2,29 @@
 # tasks file for modify_ignition
 
 - name: Customize bootstrap ignition
-  shell: python3 "{{ filetranspile }}" -i "${IGNITION_CONFIGS}/bootstrap.ign" -f "${FAKEROOTS}/bootstrap_fake-root"  --format json > "${IGNITION_CONFIGS}/bootstrap_static.ign"
+  shell: 
+    cmd: '{{filetranspiler}} -i {{ ignition_configs }}/bootstrap.ign -f {{ fake_root_base }}/bootstrap --format json > {{ ignition_configs }}/bootstrap_static.ign'
+#    executable: python3
+  register: bootstrap_static
 
 - name: Replace original ignition
   copy:
     src: "{{ ignition_configs }}/bootstrap_static.ign"
     dest: "{{ ignition_configs }}/bootstrap.ign"
     remote_src: true
-    
+   
+- name: Customize master ignition
+  shell:
+    cmd: '{{filetranspiler}} -i {{ ignition_configs }}/master.ign -f {{ fake_root_base }}/{{ item }} --format json > {{ ignition_configs }}/{{ item }}.ign'
+  with_items:
+    - 'master0'
+    - 'master1'
+    - 'master2'
 
-
-# Customize master node ignition files. Need 1 for each due to static IPs
-for i in $(seq 0 $(expr ${MASTERS} - 1))
-do
-
-  python3 "${FILETRANSPILE}" -i "${IGNITION_CONFIGS}/master.ign" -f "${FAKEROOTS}/master${i}_fake-root" --format json > "${IGNITION_CONFIGS}/master${i}.ign"
-
-done
-
-# Customize worker node ignition files. Need 1 for each due to static IPs
-for i in $(seq 0 $(expr ${WORKERS} - 1))
-do
-
-  python3 "${FILETRANSPILE}" -i "${IGNITION_CONFIGS}/worker.ign" -f "${FAKEROOTS}/worker${i}_fake-root" --format json > "${IGNITION_CONFIGS}/worker${i}.ign"
-
-done
-
+- name: Customize worker ignition
+  shell:
+    cmd: '{{filetranspiler}} -i {{ ignition_configs }}/worker.ign -f {{ fake_root_base }}/{{ item }} --format json > {{ ignition_configs }}/{{ item }}.ign'
+  with_items:
+    - 'worker0'
+    - 'worker1'
+    - 'worker2'
