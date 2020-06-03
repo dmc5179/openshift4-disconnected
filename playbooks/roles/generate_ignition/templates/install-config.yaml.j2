@@ -1,6 +1,6 @@
 ---
 apiVersion: v1
-baseDomain: {{base_domain}}
+baseDomain: {{ base_domain }}
 compute:
 - hyperthreading: Enabled
   name: worker
@@ -8,7 +8,7 @@ compute:
 controlPlane:
   hyperthreading: Enabled
   name: master
-  replicas: {{num_workers}}
+  replicas: {{ num_workers }}
 metadata:
   name: {{ cluster_name }}
 networking:
@@ -19,9 +19,50 @@ networking:
   serviceNetwork:
   - 172.30.0.0/16
 platform:
-  none: {}
+  vsphere:
+    vcenter: {{ vcenter_hostname }}
+    username: {{ vcenter_username }}
+    password: {{ vcenter_password }}
+    datacenter: {{ datacenter_name }}
+    defaultDatastore: {{ datastore_name }}
 pullSecret: '{{ slurped_pull_secret_b64.content | b64decode }}'
 sshKey: '{{ slurped_key_b64.content | b64decode }}'
+additionalTrustBundle: |
+  -----BEGIN CERTIFICATE-----
+  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
+  -----END CERTIFICATE-----
 imageContentSources:
 - mirrors:
   - {{ mirror_registry }}/ocp4/openshift4
