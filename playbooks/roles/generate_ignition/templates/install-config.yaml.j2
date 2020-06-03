@@ -1,6 +1,6 @@
 ---
 apiVersion: v1
-baseDomain: {{ base_domain }}
+baseDomain: {{ ocp_base_domain }}
 compute:
 - hyperthreading: Enabled
   name: worker
@@ -10,7 +10,7 @@ controlPlane:
   name: master
   replicas: {{ num_workers }}
 metadata:
-  name: {{ cluster_name }}
+  name: {{ ocp_cluster_name }}
 networking:
   clusterNetwork:
   - cidr: 10.128.0.0/14
