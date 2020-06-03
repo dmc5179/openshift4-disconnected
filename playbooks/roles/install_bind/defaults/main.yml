@@ -87,6 +87,8 @@ bind_zone_domains:
 #        aliases:
 #          - name: 'vcenter'
 #            type: 'A'
+      - name: lunchbox
+        ip: "192.168.3.22"
     networks:
       - '192.168.3'
   - name: 'example.io'           # Domain name
@@ -99,6 +101,8 @@ bind_zone_domains:
     hosts:
       - name: bastion
         ip: "10.0.106.42"
+        aliases:
+          - name: registry
       - name: api
         ip: '10.0.106.43'
         aliases:
