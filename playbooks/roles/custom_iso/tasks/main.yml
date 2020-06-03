@@ -62,3 +62,9 @@
   with_items:
     - '{{ ocp_nodes }}'
 
+- name: Create custom ISO for each host
+  shell:
+    cmd: 'mkisofs -o "{{ tmp_dir }}/{{ item.name }}.iso" -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -J -r "{{ tmp_dir }}/{{ item.name }}"'
+    creates: '{{ tmp_dir }}/{{ item.name }}.iso'
+  with_items:
+    - '{{ ocp_nodes }}'
