@@ -15,8 +15,8 @@ fips: true
 pullSecret: ''
 ssh_public_key_file: 'id_rsa.pub'
 
-base_domain: 'example.com'
-cluster_name: 'caas'
+ocp_base_domain: 'example.com'
+ocp_cluster_name: 'caas'
 
 num_workers: 3
 
