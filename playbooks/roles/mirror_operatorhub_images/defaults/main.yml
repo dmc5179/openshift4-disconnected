@@ -18,7 +18,7 @@ operator_registry: 'quay.io/operator-framework/operator-registry-server:v1.6.1'
 
 pull_secret_file: ''
 
-oc_cmd: 'oc'
+oc: 'oc'
 
 mirror_base: '/tmp/'
 
