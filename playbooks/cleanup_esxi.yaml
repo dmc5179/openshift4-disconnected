@@ -1,0 +1,62 @@
+---
+- hosts: helper_node
+  gather_facts: true
+  become: false
+  tasks:
+
+    - name: Set the state of a virtual machine to poweroff
+      vmware_guest_powerstate:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: '{{ vcenter_port }}'
+        validate_certs: '{{ ssl_enabled }}'
+        name: "{{ item }}"
+        state: powered-off
+      delegate_to: localhost
+      ignore_errors: true
+      with_items:
+        - 'bootstrap'
+        - 'master0'
+        - 'master1'
+        - 'master2'
+        - 'worker0'
+        - 'worker1'
+        - 'worker2'
+
+    - name: Cleanup Nodes
+      vmware_guest:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: '{{ vcenter_port }}'
+        validate_certs: '{{ ssl_enabled }}'
+        datacenter: '{{ datacenter_name }}'
+        name: '{{ item }}'
+        state: absent
+      delegate_to: localhost
+      ignore_errors: true
+      with_items:
+        - 'bootstrap'
+        - 'master0'
+        - 'master1'
+        - 'master2'
+        - 'worker0'
+        - 'worker1'
+        - 'worker2'
+
+#    - name: Delete existing ISO files
+#      vsphere_file:
+#        host: '{{ hostname }}'
+#        username: '{{ vcenter_username }}'
+#        password: '{{ vcenter_password }}'
+#        #port: '{{ vcenter_port }}'
+#        validate_certs: "{{ ssl_enabled }}"
+#        datacenter: '{{ datacenter_name }}'
+#        datastore: 'USB-Datastore'
+#        path: 'ISOs/{{ item.name }}.iso'
+#        state: absent
+#      delegate_to: localhost
+#      with_items:
+#        - '{{ ocp_nodes }}'
+
