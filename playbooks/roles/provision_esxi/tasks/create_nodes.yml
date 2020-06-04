@@ -1,40 +1,281 @@
 ---
-- name: Base64 encode append-bootstrap
-  slurp:
-    src: "/var/www/html/ignition/append-bootstrap.ign"
-  register: append_bootstrap
+#- name: Base64 encode append-bootstrap
+#  slurp:
+#    src: "/var/www/html/ignition/append-bootstrap.ign"
+#  register: append_bootstrap
 
-- vmware_deploy_ovf:
-    hostname: '{{ vcenter_hostname }}'
-    username: '{{ vcenter_username }}'
-    password: '{{ vcenter_password }}'
+#- name: Deploy Virtual Machine from template in content library
+#  vmware_content_deploy_template:
+#    hostname: '{{ vcenter_hostname }}'
+#    username: '{{ vcenter_username }}'
+#    password: '{{ vcenter_password }}'
+#    validate_certs: "{{ ssl_enabled }}"
+#    port: "{{ vcenter_port }}"
+#    template: '{{ rhcos_template_name }}'
+#    datastore: '{{ datastore_name }}'
+#    folder: caas
+#    datacenter: '{{ datacenter_name }}'
+#    name: bootstrap
+#    resource_pool: test_rp
+#    state: present
+#  delegate_to: localhost
+
+#- name: Deploy bootstrap node
+#  vmware_deploy_ovf:
+#    hostname: '{{ vcenter_hostname }}'
+#    username: '{{ vcenter_username }}'
+#    password: '{{ vcenter_password }}'
+#    datacenter: '{{ datacenter_name }}'
+#    datastore: '{{ datastore_name }}'
+#    port: "{{ vcenter_port }}"
+#    name: bootstrap
+#    folder: '/42Pandas Main Datacenter/vm/caas'
+#    disk_provisioning: thin
+#    networks: "{u'VM Network':u'openshift'}"
+#    validate_certs: "{{ ssl_enabled }}"
+#    power_on: false
+#    ovf: '/opt/openshift/rhcos/rhcos-4.3.8-x86_64-vmware.x86_64.ova'
+#    properties:
+#      guestinfo.ignition.config.data: '{{ append_bootstrap.content }}'
+#      guestinfo.ignition.config.data.encoding: 'base64'
+#      guestinfo.coreos.config.data: '{{ append_bootstrap.content }}'
+#      guestinfo.coreos.config.data.encoding: 'base64'
+#      guestinfo.hostname: 'bootstrap.caas.redhatgovic.io'
+#      guestinfo.interface.0.name: 'ens192'
+#      guestinfo.interface.0.dhcp: 'no'
+#      guestinfo.interface.0.role: 'public'
+#      guestinfo.interface.0.ip.0.address: '10.0.106.50/24'
+#      guestinfo.interface.0.route.0.gateway: '10.0.106.1'
+#      guestinfo.interface.0.route.0.destination: '0.0.0.0/0'
+#      guestinfo.dns.server.0: '10.0.106.42'
+#      disk.EnableUUID: true
+#  delegate_to: localhost
+
+#- name: Change virtual machine's boot order and related parameters
+#  vmware_guest_boot_manager:
+#    hostname: "{{ vcenter_hostname }}"
+#    username: "{{ vcenter_username }}"
+#    password: "{{ vcenter_password }}"
+#    port: "{{ vcenter_port }}"
+#    name: bootstrap
+#    boot_delay: 5000
+#    enter_bios_setup: false
+#    boot_retry_enabled: false
+#    boot_firmware: efi
+#    secure_boot_enabled: False
+#    validate_certs: "{{ ssl_enabled }}"
+#  delegate_to: localhost
+
+- name: Create bootstrap
+  vmware_guest:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    port: '{{ vcenter_port }}'
+    validate_certs: '{{ ssl_enabled }}'
     datacenter: '{{ datacenter_name }}'
-#    cluster: Cluster1
-    datastore: '{{ datastore_name }}'
-    name: 'caas-bootstrap'
-    disk_provisioning: thin
-#    folder: '{{ datacenter_name }}'
-#    networks: {"OCP Network":"ocp_pg"}
-#    networks:
-#      "Network 1": "ocp_pg"
-#      - name: '{{ portgroup_name }}'
-#        ip: '10.0.106.50'
-#        netmask: '255.255.255.0'
-#        device_type: vmxnet3
-    validate_certs: "{{ ssl_enabled }}"
-    power_on: false
-#    ovf: '/caas/rhcos-4.3.8-x86_64-vmware.x86_64.ova'
-    ovf: '/opt/openshift/rhcos/rhcos-4.3.8-x86_64-vmware.x86_64.ova'
-    properties:
-      guestinfo.ignition.config.data: '{{ append_bootstrap.content }}'
-      guestinfo.ignition.config.data.encoding: 'base64'
-      guestinfo.hostname: 'bootstrap.caas.redhatgovic.io'
-      guestinfo.interface.0.name: 'ens192'
-      guestinfo.interface.0.dhcp: 'no'
-      guestinfo.interface.0.role: 'public'
-      guestinfo.interface.0.ip.0.address: '10.0.106.50/24'
-      guestinfo.interface.0.route.0.gateway: '10.0.106.1'
-      guestinfo.interface.0.route.0.destination: '0.0.0.0/0'
-      guestinfo.dns.server.0: '10.0.106.42'
-      disk.EnableUUID: true
+    folder: '{{ datacenter_name }}/vm/caas/'
+    guest_id: coreos64Guest
+    name: bootstrap
+    state: poweredon
+    disk:
+    - size_gb: 50
+      type: thin
+      datastore: '{{ datastore_name }}'
+    hardware:
+      memory_mb: 16384
+      num_cpus: 8
+      num_cpu_cores_per_socket: 2
+      scsi: paravirtual
+#      memory_reservation_lock: false
+#      mem_limit: 8192
+#      mem_reservation: 4096
+#      cpu_limit: 8192
+#      cpu_reservation: 4096
+#      max_connections: 5
+      hotadd_cpu: true
+      hotremove_cpu: true
+      hotadd_memory: false
+      version: 14 # Hardware version of virtual machine
+      boot_firmware: "efi"
+    cdrom:
+      type: iso
+      iso_path: "[USB-Datastore] /ISOs/bootstrap.iso"
+      state: present
+    networks:
+    - name: 'openshift'
+    wait_for_ip_address: no
   delegate_to: localhost
+  register: deploy_bootstrap
+
+- name: Pause to wait for bootstrap to initialized
+  pause:
+    minutes: 1
+
+# Change the boot order or we'll be in a boot to ISO loop
+- name: Change virtual machine's boot order and related parameters
+  vmware_guest_boot_manager:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    port: "{{ vcenter_port }}"
+    name: bootstrap
+    boot_delay: 5000
+    enter_bios_setup: false
+    boot_retry_enabled: false
+    boot_firmware: efi
+    boot_order:
+      - disk
+    secure_boot_enabled: False
+    validate_certs: "{{ ssl_enabled }}"
+  delegate_to: localhost
+
+- name: Pause to wait for bootstrap to initialized
+  pause:
+    minutes: 1
+
+- name: Create master nodes
+  vmware_guest:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    port: '{{ vcenter_port }}'
+    validate_certs: '{{ ssl_enabled }}'
+    datacenter: '{{ datacenter_name }}'
+    folder: '{{ datacenter_name }}/vm/caas/'
+    guest_id: coreos64Guest
+    name: '{{ item }}'
+    state: poweredon
+    disk:
+    - size_gb: 50
+      type: thin
+      datastore: '{{ datastore_name }}'
+    hardware:
+      memory_mb: 8192
+      num_cpus: 4
+      num_cpu_cores_per_socket: 2
+      scsi: paravirtual
+#      memory_reservation_lock: false
+#      mem_limit: 8192
+#      mem_reservation: 4096
+#      cpu_limit: 8192
+#      cpu_reservation: 4096
+#      max_connections: 5
+      hotadd_cpu: true
+      hotremove_cpu: true
+      hotadd_memory: false
+      version: 14 # Hardware version of virtual machine
+      boot_firmware: "efi"
+    cdrom:
+      type: iso
+      iso_path: "[USB-Datastore] /ISOs/{{ item }}.iso"
+    networks:
+    - name: 'openshift'
+    wait_for_ip_address: no
+  delegate_to: localhost
+  register: deploy
+  with_items:
+    - 'master0'
+    - 'master1'
+    - 'master2'
+
+- name: Pause to wait for masters to initialize
+  pause:
+    minutes: 1
+
+# Change the boot order or we'll be in a boot to ISO loop
+- name: Change virtual machine's boot order and related parameters
+  vmware_guest_boot_manager:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    port: "{{ vcenter_port }}"
+    name: '{{ item }}'
+    boot_delay: 5000
+    enter_bios_setup: false
+    boot_retry_enabled: false
+    boot_firmware: efi
+    boot_order:
+      - disk
+    secure_boot_enabled: False
+    validate_certs: "{{ ssl_enabled }}"
+  delegate_to: localhost
+  with_items:
+    - 'master0'
+    - 'master1'
+    - 'master2'
+
+- name: Pause to wait for masters
+  pause:
+    minutes: 1
+
+- name: Create worker nodes
+  vmware_guest:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    port: '{{ vcenter_port }}'
+    validate_certs: '{{ ssl_enabled }}'
+    datacenter: '{{ datacenter_name }}'
+    folder: '{{ datacenter_name }}/vm/caas/'
+    guest_id: coreos64Guest
+    name: '{{ item }}'
+    state: poweredon
+    disk:
+    - size_gb: 50
+      type: thin
+      datastore: '{{ datastore_name }}'
+    hardware:
+      memory_mb: 8192
+      num_cpus: 4
+      num_cpu_cores_per_socket: 2
+      scsi: paravirtual
+#      memory_reservation_lock: false
+#      mem_limit: 8192
+#      mem_reservation: 4096
+#      cpu_limit: 8192
+#      cpu_reservation: 4096
+#      max_connections: 5
+      hotadd_cpu: true
+      hotremove_cpu: true
+      hotadd_memory: false
+      version: 14 # Hardware version of virtual machine
+      boot_firmware: "efi"
+    cdrom:
+      type: iso
+      iso_path: "[USB-Datastore] /ISOs/{{ item }}.iso"
+    networks:
+    - name: 'openshift'
+    wait_for_ip_address: no
+  delegate_to: localhost
+  register: deploy
+  with_items:
+    - 'worker0'
+    - 'worker1'
+    - 'worker2'
+
+- name: Pause to wait for worker nodes to initialize
+  pause:
+    minutes: 1
+
+# Change the boot order or we'll be in a boot to ISO loop
+- name: Change virtual machine's boot order and related parameters
+  vmware_guest_boot_manager:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    port: "{{ vcenter_port }}"
+    name: '{{ item }}'
+    boot_delay: 5000
+    enter_bios_setup: false
+    boot_retry_enabled: false
+    boot_firmware: efi
+    boot_order:
+      - disk
+    secure_boot_enabled: False
+    validate_certs: "{{ ssl_enabled }}"
+  delegate_to: localhost
+  with_items:
+    - 'worker0'
+    - 'worker1'
+    - 'worker2'
