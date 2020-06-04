@@ -91,7 +91,7 @@ bind_zone_domains:
         ip: "192.168.3.22"
     networks:
       - '192.168.3'
-  - name: 'example.io'           # Domain name
+  - name: 'example.io'
     create_reverse_zones: true
     create_forward_zones: true
     networks:
@@ -104,17 +104,17 @@ bind_zone_domains:
         aliases:
           - name: registry
       - name: api
-        ip: '10.0.106.43'
+        ip: '10.0.106.42'
         aliases:
           - name: 'api.caas'
 #            type: 'A'
       - name: apiint
-        ip: '10.0.106.43'
+        ip: '10.0.106.42'
         aliases:
           - name: 'api-int.caas'
 #            type: 'A'
       - name: apiwildcard
-        ip: '10.0.106.43'
+        ip: '10.0.106.42'
         aliases:
           - name: '*.apps.caas'
 #            type: 'CNAME'
