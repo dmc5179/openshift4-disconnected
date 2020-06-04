@@ -16,7 +16,7 @@
 
 - name: Taint Worker Nodes
   shell:
-    cmd: 'oc adm taint node {{item}.{{ocp_cluster_name}}.{{ocp_base_domain}} node.cloudprovider.kubernetes.io/uninitialized=true:NoSchedule'
+    cmd: 'oc adm taint node --overwrite=true {{item}}.{{ocp_base_domain}} node.cloudprovider.kubernetes.io/uninitialized=true:NoSchedule'
   with_items:
     - worker0
     - worker1
@@ -25,6 +25,8 @@
 - name: Create cloud control config map
   k8s:
     state: present
+    name: cloud-config
+    namespace: '{{ vsphere_namespace }}'
     wait: true
     kubeconfig: "{{ kubeconfig  }}"
     validate_certs: '{{ ssl_enabled }}'
@@ -57,6 +59,8 @@
 - name: Create role bindings for non kube-system namespace
   k8s:
     state: present
+    name:
+    namespace: kube-system
     wait: true
     kubeconfig: "{{ kubeconfig  }}"
     validate_certs: '{{ ssl_enabled }}'
@@ -66,6 +70,8 @@
   k8s:
     state: present
     wait: true
+    name:
+    namespace: kube-system
     kubeconfig: "{{ kubeconfig  }}"
     validate_certs: '{{ ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/service_account.yaml.j2') }}"
@@ -78,6 +84,8 @@
   k8s:
     state: present
     wait: true
+    name:
+    namespace: kube-system
     kubeconfig: "{{ kubeconfig  }}"
     validate_certs: '{{ ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/vsphere_cloud_controller_manager_daemonset.yaml.j2') }}"
@@ -85,6 +93,8 @@
 - name: Create Service Account
   k8s:
     state: present
+    name:
+    namespace: kube-system
     wait: true
     kubeconfig: "{{ kubeconfig  }}"
     validate_certs: '{{ ssl_enabled }}'
