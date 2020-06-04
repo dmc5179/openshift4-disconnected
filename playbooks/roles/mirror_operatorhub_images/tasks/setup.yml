@@ -2,5 +2,58 @@
 
 - name: Disable connected version of OperatorHub
   shell:
-    cmd: '{{ oc }}'
+    cmd: "{{ oc }} patch OperatorHub cluster --type json -p '{{ patch_json }}'"
 
+- name: Deploy redhat-operators catalog source
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    definition:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      metadata:
+        name: my-operator-catalog
+        namespace: openshift-marketplace
+      spec:
+        sourceType: grpc
+        image: '{{ mirror_registry }}/olm/redhat-operators:v1'
+        displayName: RedHat Operators Catalog
+        publisher: grpc
+
+- name: Deploy certified-operators catalog source
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    definition:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      metadata:
+        name: my-operator-catalog
+        namespace: openshift-marketplace
+      spec:
+        sourceType: grpc
+        image: '{{ mirror_registry }}/olm/certified-operators:v1'
+        displayName: Certified Operators Catalog
+        publisher: grpc
+
+- name: Deploy community-operators catalog source
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    definition:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      metadata:
+        name: my-operator-catalog
+        namespace: openshift-marketplace
+      spec:
+        sourceType: grpc
+        image: '{{ mirror_registry }}/olm/community-operators:v1'
+        displayName: Community Operators Catalog
+        publisher: grpc
