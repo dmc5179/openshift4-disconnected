@@ -1,6 +1,9 @@
 ---
 # tasks file for vsphere_csi_driver
 
+# TODO: Need to mirror the images for this CSI driver
+#       As well as create the Image Content Source Policy Mapping
+
 - name: Create vsphere namespace for CSI Drivers
   k8s:
     name: vsphere
@@ -27,7 +30,7 @@
     validate_certs: '{{ ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/vsphere_configmap.yaml.j2') }}"
 
-- name: Create cloud control config map
+- name: Create CPI Global Secret
   k8s:
     state: present
     wait: true
@@ -51,5 +54,38 @@
     validate_certs: '{{ ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/cloud-controller-manager-role-bindings.yaml.j2') }}"
 
-#oc create rolebinding -n kube-system vsphere-cpi-kubesystem --role=extension-apiserver-authentication-reader --serviceaccount=vsphere:cloud-controller-manager
+- name: Create role bindings for non kube-system namespace
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/vsphere_cpi_kubesystem_rolebinding.yaml.j2') }}"
 
+- name: Create Service Account
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/service_account.yaml.j2') }}"
+
+- name: Set SCC Policy
+  shell:
+    cmd: oc adm policy add-scc-to-user privileged -z cloud-controller-manager
+
+- name: Create Service Account
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/vsphere_cloud_controller_manager_daemonset.yaml.j2') }}"
+
+- name: Create Service Account
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/vsphere_cloud_controller_manager_service.yaml.j2') }}"
