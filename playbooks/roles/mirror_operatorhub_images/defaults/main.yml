@@ -27,5 +27,6 @@ mirror_base: '/tmp/'
 # can push to it
 pull_secret: "{{ mirror_base }}/pull-secret.txt"
 
-
 air_gapped: true
+
+kubeconfig: "~/.kube/config"

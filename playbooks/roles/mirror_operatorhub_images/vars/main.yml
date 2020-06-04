@@ -1,2 +1,4 @@
 ---
 # vars file for mirror_operatorhub_images
+
+patch_json: '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'
