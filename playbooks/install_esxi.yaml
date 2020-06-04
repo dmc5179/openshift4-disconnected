@@ -4,20 +4,54 @@
   become: false
   tasks:
 
+    - name: Customize ISO
+      import_role:
+        name: custom_iso
+      tags:
+        - iso
+
+    - name: Copy RHCOS Customer ISOs to Datastore
+      vsphere_copy:
+        hostname: '{{ esxi_hostname }}'
+        username: '{{ vcenter_username }}'
+        password: '{{ vcenter_password }}'
+        src: '/tmp/rhcos/{{ item.name }}.iso'
+        datastore: 'USB-Datastore'
+        path: 'ISOs/{{ item.name }}.iso'
+        validate_certs: "{{ ssl_enabled }}"
+      delegate_to: localhost
+      with_items:
+        - '{{ ocp_nodes }}'
+      loop_control:
+        pause: 5
+      tags:
+        - iso
+
+    - name: Cleanup Custom ISO working area
+      become: true
+      file:
+        path: '/tmp/rhcos'
+        state: absent
+      tags:
+        - iso
+
     - name: Remove old ignition configs
       become: true
       file:
         path: '/var/www/html/ignition'
         state: absent
+      tags:
+        - ignition
 
     - name: Generate Ignition Files
-      include_role:
+      import_role:
         name: generate_ignition
+      tags:
+        - ignition
 
-# TODO: Role not complete. Not sure if needed
-#    - name: Modify Ignition Files
-#      include_role:
-#        name: modify_ignition
+    - name: Modify Ignition Files
+      include_role:
+        name: modify_ignition
 
     - name: Create Ignition staging location
       become: true
@@ -26,6 +60,8 @@
         state: directory
         mode: '0755'
         setype: 'httpd_sys_content_t'
+      tags:
+        - ignition
 
     - name: Stage Ignition configs
       become: true
@@ -36,18 +72,26 @@
         setype: 'httpd_sys_content_t'
       with_items:
         - '/opt/openshift/cluster/bootstrap.ign'
-        - '/opt/openshift/cluster/master.ign'
-        - '/opt/openshift/cluster/worker.ign'
+        - '/opt/openshift/cluster/master0.ign'
+        - '/opt/openshift/cluster/master1.ign'
+        - '/opt/openshift/cluster/master2.ign'
+        - '/opt/openshift/cluster/worker0.ign'
+        - '/opt/openshift/cluster/worker1.ign'
+        - '/opt/openshift/cluster/worker2.ign'
+      tags:
+        - ignition
 
     - name: Copy append-bootstrap ignition
       become: true
       copy:
         src: "files/append-bootstrap.ign"
-        dest: "/var/www/html/ignition/"
+        dest: "/var/www/html/ignition/append-bootstrap.ign"
         mode: '0755'
         setype: 'httpd_sys_content_t'
+      tags:
+        - ignition
 
-# TODO: Jinja doesn't seem to link a json file
+# TODO: Jinja doesn't seem to like a json file
 #    - name: Create append-bootstrap ignition
 #      template:
 #        src: "{{ lookup('template', 'templates/append-bootstrap.ign.j2') }}"
@@ -56,6 +100,7 @@
 #        setype: 'httpd_sys_content_t'        
 
     - name: Provision ESXi Infrastructure
-      include_role:
+      import_role:
         name: provision_esxi
-
+      tags:
+        - esxi
