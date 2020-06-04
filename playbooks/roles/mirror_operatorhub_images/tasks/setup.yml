@@ -1,0 +1,6 @@
+---
+
+- name: Disable connected version of OperatorHub
+  shell:
+    cmd: '{{ oc }}'
+
