@@ -33,27 +33,26 @@
 #  creates: "{{ ignition_configs }}/manifests/cluster-config.yaml"
 
 - name: Set masters to unschedulable
-  lineinfile:
+  replace:
     path: "{{ ignition_configs }}/manifests/cluster-scheduler-02-config.yml"
     regexp: 'mastersSchedulable: true'
-    line: 'mastersSchedulable: {{ master_schedulable }}'
+    replace: 'mastersSchedulable: false'
 
 - name: Set cluster upgrade channel
-  lineinfile:
+  replace:
     path: "{{ ignition_configs }}/manifests/cvo-overrides.yaml"
     regexp: 'channel:.*'
-    line: 'channel: {{ cluster_channel }}'
+    replace: 'channel: {{ cluster_channel }}'
 
 # Prevent the cluster from trying to reach the Cincinnati for update graphs
 - name: Set dummy Cincinnati server
-  lineinfile:
+  replace:
     path: "{{ ignition_configs }}/manifests/cvo-overrides.yaml"
     regexp: 'upstream:.*'
-    line: 'upstream: http://localhost:8080/graph'
+    replace: 'upstream: http://localhost:8080/graph'
 
 - name: Create ignition configs
   shell: "{{ openshift_install }} create ignition-configs --dir={{ ignition_configs }}"
-#  creates: "{{ ignition_configs }}/master.ign"
 
 - name: Create kube config location
   file:
