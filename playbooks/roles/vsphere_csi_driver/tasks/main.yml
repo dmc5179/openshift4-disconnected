@@ -1,2 +1,55 @@
 ---
 # tasks file for vsphere_csi_driver
+
+- name: Create vsphere namespace for CSI Drivers
+  k8s:
+    name: vsphere
+    api_version: v1
+    kind: Namespace
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ ssl_enabled }}'
+
+- name: Taint Worker Nodes
+  shell:
+    cmd: 'oc adm taint node {{item}.{{ocp_cluster_name}}.{{ocp_base_domain}} node.cloudprovider.kubernetes.io/uninitialized=true:NoSchedule'
+  with_items:
+    - worker0
+    - worker1
+    - worker2
+
+- name: Create cloud control config map
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/vsphere_configmap.yaml.j2') }}"
+
+- name: Create cloud control config map
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/cpi-global-secret.yaml.j2') }}"
+
+- name: Create cloud control manager roles
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/cloud-controller-manager-roles.yaml.j2') }}"
+
+- name: Create cloud control manager role bindings
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/cloud-controller-manager-role-bindings.yaml.j2') }}"
+
+#oc create rolebinding -n kube-system vsphere-cpi-kubesystem --role=extension-apiserver-authentication-reader --serviceaccount=vsphere:cloud-controller-manager
+
