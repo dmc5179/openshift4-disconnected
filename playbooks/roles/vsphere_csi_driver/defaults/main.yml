@@ -1,2 +1,11 @@
 ---
 # defaults file for vsphere_csi_driver
+
+kubeconfig: "~/.kube/config"
+
+ocp_base_domain: 'example.com'
+ocp_cluster_name: 'caas'
+
+vsphere_namespace: 'vsphere'
+
+ssl_enabled: false
