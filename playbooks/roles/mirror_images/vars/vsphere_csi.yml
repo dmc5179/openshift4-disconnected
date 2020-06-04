@@ -1,0 +1,3 @@
+---
+vsphere_csi_images:
+  - gcr.io/cloud-provider-vsphere/cpi/release/manager:latest
