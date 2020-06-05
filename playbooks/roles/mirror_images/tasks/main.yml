@@ -1,11 +1,17 @@
 ---
 # tasks file for mirror_images
 
-- name: Include all .json and .jsn files in vars and all nested directories (2.3)
+- name: Include all .yml var files
   include_vars:
     dir: vars
     extensions:
         - yml
+
+- name: Push images to mirror repo
+  include_tasks: push.yml
+  tags:
+    - never
+    - push
 
 - name: Install skopeo
   become: true
