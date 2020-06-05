@@ -1,0 +1,28 @@
+---
+
+- name: Include all .yml var files
+  include_vars:
+    dir: vars
+    extensions:
+        - yml
+  tags:
+    - never
+    - push
+
+- name: Push vSphere CSI Driver Images to mirror registry
+  become: false
+  shell:
+    cmd: |
+
+        if test -e "{{ mirror_base }}/additional_images/{{ ( item.repo | replace('.','_') ) }}-{{ ( item.image | replace(':','_') | replace('/','-') ) }}-{{ ( item.tag | replace(':','_') | replace('/','-') ) }}.tar"
+        then
+          skopeo copy --authfile "{{ pull_secret }}" \
+           "docker-archive://{{ mirror_base }}/additional_images/{{ ( item.repo | replace('.','_') ) }}-{{ ( item.image | replace(':','_') | replace('/','-') ) }}-{{ ( item.tag | replace(':','_') | replace('/','-') ) }}.tar" "docker://{{mirror_registry}}/{{item.image}}:{{item.tag}}"
+        fi
+
+    executable: /bin/bash
+  with_items:
+    - '{{ vsphere_csi_images }}'
+  tags:
+    - never
+    - push
