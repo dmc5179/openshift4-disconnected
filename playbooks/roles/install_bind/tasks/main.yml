@@ -23,6 +23,21 @@
   tags:
     - bind
 
+- name: Populate service facts
+  service_facts:
+
+- name: Configure firewall for BIND DNS
+  firewalld:
+    permanent: yes
+    immediate: yes
+    state: enabled
+    port: "{{ item }}"
+  with_items:
+    - 53/tcp
+    - 53/udp
+  tags:
+    - bind
+
 - name: Ensure runtime directories referenced in config exist
   file:
     path: "{{ item }}"
