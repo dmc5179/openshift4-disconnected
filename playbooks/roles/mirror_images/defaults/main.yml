@@ -15,3 +15,6 @@ mirror_tower: true
 mirror_compliance_operator: true
 
 pull_secret: '/opt/openshift/pull-secret.txt'
+
+mirror_base: '/opt/openshift'
+
