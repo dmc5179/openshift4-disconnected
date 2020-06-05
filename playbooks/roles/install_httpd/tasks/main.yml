@@ -34,6 +34,20 @@
     - "{{ httpd_port }}"
     - "{{ httpd_ssl_port }}"
 
+- name: Populate service facts
+  service_facts:
+
+- name: Allow http server ports in firewall
+  firewalld:
+    permanent: true
+    immediate: true
+    state: enabled
+    port: "{{ item }}"
+  with_items:
+    - "{{ httpd_port }}"
+    - "{{ httpd_ssl_port }}"
+  when: "'firewalld.service' in services"
+
 - name: create ssl directory
   file:
     path: "{{ httpd_config_directory }}/ssl"
