@@ -1,0 +1,10 @@
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  name: vspherecsi
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - {{ mirror_registry }}/cloud-provider-vsphere/cpi/release/manager
+    source: gcr.io/cloud-provider-vsphere/cpi/release/manager
