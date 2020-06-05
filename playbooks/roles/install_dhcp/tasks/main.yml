@@ -46,6 +46,20 @@
   notify: restart dhcp
   tags: dhcp
 
+- name: Populate service facts
+  service_facts:
+
+- name: Configure firewall for DHCP Server
+  firewalld:
+    permanent: yes
+    immediate: yes
+    state: enabled
+    port: "{{ item }}"
+  with_items:
+    - 67/udp
+    - 68/udp
+  when: "'firewalld.service' in services"
+
 - name: "Ensure service is {{ dhcp_global_server_state | default('started') }}"
   service:
     name: "{{ dhcp_service }}"
