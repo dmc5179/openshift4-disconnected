@@ -74,6 +74,8 @@
     validate_certs: '{{ ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/vsphere_cpi_kubesystem_rolebinding.yaml.j2') }}"
 
+# TODO oc create rolebinding -n kube-system vsphere-csi-kubesystem --role=extension-apiserver-authentication-reader --serviceaccount=vsphere:vsphere-csi-controller
+
 - name: Create Cloud Controlelr Manager Service Account
   k8s:
     state: present
@@ -107,6 +109,16 @@
     kubeconfig: "{{ kubeconfig  }}"
     validate_certs: '{{ ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/vsphere_cloud_controller_manager_daemonset.yaml.j2') }}"
+
+- name: Create vsphere-csi-controller Service Account
+  k8s:
+    state: present
+    wait: true
+#    name:
+    namespace: '{{ vsphere_namespace }}'
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/vsphere-csi-controller-rbac.yaml.j2') }}"
 
 - name: Create CSI Controller Stateful Set
   k8s:
