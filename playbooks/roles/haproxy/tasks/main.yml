@@ -22,6 +22,25 @@
     validate: haproxy -f %s -c -q
   notify: restart haproxy
 
+- name: Populate service facts
+  service_facts:
+
+- name: Configure firewall for haproxy
+  firewalld:
+    permanent: yes
+    immediate: yes
+    state: enabled
+    port: "{{ item }}"
+  with_items:
+    - 6443/tcp
+    - 6443/udp
+    - 22623/tcp
+    - 22623/udp
+    - 443/tcp
+    - 80/tcp
+    - 8080/tcp
+  when: "'firewalld.service' in services"
+
 - name: Ensure HAProxy is started and enabled on boot.
   become: true
   service:
