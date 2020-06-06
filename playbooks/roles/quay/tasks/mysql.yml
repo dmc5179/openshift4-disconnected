@@ -1,0 +1,24 @@
+---
+- name: Create mysql directory
+  become: true
+  file:
+    path: '{{ mysql_dir }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0777'
+
+- name: launching mysql container
+  become: true
+  command: >
+    podman run --detach \
+    --restart=always \
+    --env MYSQL_ROOT_PASSWORD={{mysql_root_password}} \
+    --env MYSQL_USER={{mysql_user}} \
+    --env MYSQL_PASSWORD={{mysql_password}} \
+    --env MYSQL_DATABASE={{mysql_database}} \
+    --name {{mysql_container_name}} \
+    --privileged=true \
+    --publish 3306:3306 \
+    -v /var/lib/mysql:/var/lib/mysql/data:Z \
+    registry.access.redhat.com/rhscl/mysql-57-rhel7

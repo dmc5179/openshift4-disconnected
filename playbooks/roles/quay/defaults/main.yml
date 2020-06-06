@@ -1,0 +1,9 @@
+---
+# defaults file for quay
+
+mysql_dir: '/var/lib/mysql'
+mysql_container_name: mysql
+mysql_database: enterpriseregistrydb
+mysql_password: JzxCTamgFBmHRhcGFtoPHFkrx1BH2vwQ
+mysql_user: quayuser
+mysql_root_password: L36PrivxRB02bqOB9jtZtWiCcMsApOGn
