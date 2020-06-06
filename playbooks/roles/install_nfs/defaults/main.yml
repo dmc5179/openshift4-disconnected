@@ -22,3 +22,5 @@ ssl_enabled: false
 
 nfs_server: '10.0.106.42'
 nfs_path: '/export'
+
+nfs_sc_default: false
