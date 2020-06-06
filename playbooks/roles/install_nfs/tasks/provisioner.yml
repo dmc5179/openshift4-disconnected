@@ -49,8 +49,9 @@
     validate_certs: '{{ ssl_enabled }}'
     definition: "{{ lookup('file', 'files/nfs-provisioner-sc.yaml') }}"
 
-
-#
-# Might not want to make this default in cases like VMware
-#oc annotate storageclass nfs-storage-provisioner storageclass.kubernetes.io/is-default-class="true"
-
+# Not all clusters will have NFS or set it as the default
+- name: Set NFS Storage class as default
+  shell:
+    cmd: oc annotate storageclass nfs-storage-provisioner storageclass.kubernetes.io/is-default-class="true"
+  when:
+    - (nfs_sc_default | bool)
