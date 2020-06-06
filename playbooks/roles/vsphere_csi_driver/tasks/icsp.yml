@@ -1,6 +1,7 @@
 ---
 
-- name: Apply ICSP
+- name: Apply vSphere CSI ICSP
+  delegate_to: localhost
   k8s:
     state: present
 #    name: cloud-config

@@ -11,6 +11,7 @@
     - icsp
 
 - name: Create vsphere namespace for CSI Drivers
+  delegate_to: localhost
   k8s:
     name: vsphere
     api_version: v1
@@ -21,6 +22,7 @@
     validate_certs: '{{ ssl_enabled }}'
 
 - name: Taint Worker Nodes
+  delegate_to: localhost
   shell:
     cmd: 'oc adm taint node --overwrite=true {{item}}.{{ocp_base_domain}} node.cloudprovider.kubernetes.io/uninitialized=true:NoSchedule'
   with_items:
@@ -29,6 +31,7 @@
     - worker2
 
 - name: Create cloud control config map
+  delegate_to: localhost
   k8s:
     state: present
     name: cloud-config
@@ -39,6 +42,7 @@
     definition: "{{ lookup('template', 'templates/vsphere_configmap.yaml.j2') }}"
 
 - name: Create CPI Global Secret
+  delegate_to: localhost
   k8s:
     state: present
     wait: true
@@ -47,6 +51,7 @@
     definition: "{{ lookup('template', 'templates/cpi-global-secret.yaml.j2') }}"
 
 - name: Create cloud control manager roles
+  delegate_to: localhost
   k8s:
     state: present
     wait: true
@@ -56,6 +61,7 @@
     definition: "{{ lookup('template', 'templates/cloud-controller-manager-roles.yaml.j2') }}"
 
 - name: Create cloud control manager role bindings
+  delegate_to: localhost
   k8s:
     state: present
     wait: true
@@ -65,6 +71,7 @@
     definition: "{{ lookup('template', 'templates/cloud-controller-manager-role-bindings.yaml.j2') }}"
 
 - name: Create role bindings for non kube-system namespace
+  delegate_to: localhost
   k8s:
     state: present
     name: vsphere-cpi-kubesystem
@@ -77,6 +84,7 @@
 # TODO oc create rolebinding -n kube-system vsphere-csi-kubesystem --role=extension-apiserver-authentication-reader --serviceaccount=vsphere:vsphere-csi-controller
 
 - name: Create Cloud Controlelr Manager Service Account
+  delegate_to: localhost
   k8s:
     state: present
     wait: true
@@ -87,10 +95,12 @@
     definition: "{{ lookup('template', 'templates/service_account.yaml.j2') }}"
 
 - name: Set SCC Policy
+  delegate_to: localhost
   shell:
     cmd: oc adm policy add-scc-to-user privileged -z cloud-controller-manager
 
 - name: Create Cloud Controller Service
+  delegate_to: localhost
   k8s:
     state: present
 #    name:
@@ -101,6 +111,7 @@
     definition: "{{ lookup('template', 'templates/vsphere_cloud_controller_manager_service.yaml.j2') }}"
 
 - name: Create Cloud Controller Daemonset
+  delegate_to: localhost
   k8s:
     state: present
     wait: true
@@ -111,6 +122,7 @@
     definition: "{{ lookup('template', 'templates/vsphere_cloud_controller_manager_daemonset.yaml.j2') }}"
 
 - name: Create vsphere-csi-controller Service Account
+  delegate_to: localhost
   k8s:
     state: present
     wait: true
@@ -121,6 +133,7 @@
     definition: "{{ lookup('template', 'templates/vsphere-csi-controller-rbac.yaml.j2') }}"
 
 - name: Create CSI Controller Stateful Set
+  delegate_to: localhost
   k8s:
     state: present
     wait: true
@@ -131,6 +144,7 @@
     definition: "{{ lookup('template', 'templates/vsphere-csi-controller-ss.yaml.j2') }}"
 
 - name: Create CSI Node Daemon Set
+  delegate_to: localhost
   k8s:
     state: present
     wait: true
