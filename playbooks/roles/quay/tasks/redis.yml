@@ -1,0 +1,19 @@
+---
+
+- name: Create redis directory
+  become: true
+  file:
+    path: '/var/lib/redis'
+    state: directory
+    owner: root
+    group: root
+    mode: '0777'
+
+- name: launching mysql container
+  become: true
+  command: >
+    podman run --detach \
+    --restart=always -p 6379:6379 \
+    --privileged=true \
+    -v /var/lib/redis:/var/lib/redis/data:Z \
+    registry.access.redhat.com/rhscl/redis-32-rhel7
