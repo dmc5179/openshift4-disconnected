@@ -1,0 +1,14 @@
+---
+
+- name: Apply NFS Provisioner ICSP
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/nfs-provisioner-icsp.yaml.j2') }}"
+  tags:
+    - never
+    - icsp
+
