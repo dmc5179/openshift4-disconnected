@@ -73,8 +73,11 @@ air_gapped: true
 mirror_registry: 'localhost:5000'
 mirror_transport: 'https'
 
+dns_zone_one: 'example.com'
+dns_zone_two: 'example.io'
+
 bind_zone_domains:
-  - name: "example.com"
+  - name: "{{ dns_zone_one }}"
     create_reverse_zones: true
     create_forward_zones: true
     name_servers:
@@ -91,7 +94,7 @@ bind_zone_domains:
         ip: "192.168.3.22"
     networks:
       - '192.168.3'
-  - name: 'example.io'
+  - name: '{{ dns_zone_two }}'           # Domain name
     create_reverse_zones: true
     create_forward_zones: true
     networks:
