@@ -35,6 +35,7 @@
   with_items:
     - 53/tcp
     - 53/udp
+  when: "'firewalld.service' in services"
   tags:
     - bind
 
