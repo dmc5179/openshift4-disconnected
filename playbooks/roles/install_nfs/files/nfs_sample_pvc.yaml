@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nfs-provisioner-sample
+  annotations:
+    volume.beta.kubernetes.io/storage-class: nfs-storage-provisioner
+  labels:
+    app: nfs-provisioner
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
