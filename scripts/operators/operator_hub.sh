@@ -18,22 +18,28 @@ export COMM_OP_REPO="${LOCAL_REG}/olm/community-operators:v1"
 
 export OPERATOR_REGISTRY='quay.io/operator-framework/operator-registry-server:v1.6.1'
 
+echo "Building redhat-operators catalog image"
 /usr/local/bin/oc adm catalog build --insecure \
     --appregistry-org redhat-operators "--to=${RH_OP_REPO}" \
     "--from=${OPERATOR_REGISTRY}" "--registry-config=${LOCAL_SECRET_JSON}"
 
+echo "Building certified operators catalog image"
 /usr/local/bin/oc adm catalog build --insecure \
     --appregistry-org certified-operators "--to=${CERT_OP_REPO}" \
     "--from=${OPERATOR_REGISTRY}" "--registry-config=${LOCAL_SECRET_JSON}"
 
+echo "Building community operators catalog image"
 /usr/local/bin/oc adm catalog build --insecure \
     --appregistry-org community-operators "--to=${COMM_OP_REPO}" \
     "--from=${OPERATOR_REGISTRY}" "--registry-config=${LOCAL_SECRET_JSON}"
 
+echo "Mirroring redhat-operators catalog"
 /usr/local/bin/oc adm catalog mirror ${RH_OP_REPO} ${LOCAL_REG} -a ${LOCAL_SECRET_JSON} --insecure
 
+echo "Mirroring certified-operators catalog"
 /usr/local/bin/oc adm catalog mirror ${CERT_OP_REPO} ${LOCAL_REG} -a ${LOCAL_SECRET_JSON} --insecure
 
+#echo "Mirroring community-operators catalog"
 #/usr/local/bin/oc adm catalog mirror ${COMM_OP_REPO} ${LOCAL_REG} -a ${LOCAL_SECRET_JSON} --insecure
 
 exit 0
