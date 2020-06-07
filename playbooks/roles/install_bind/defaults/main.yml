@@ -92,6 +92,8 @@ bind_zone_domains:
 #            type: 'A'
       - name: lunchbox
         ip: "192.168.3.22"
+      - name: quay
+        ip: "192.168.3.14"
     networks:
       - '192.168.3'
   - name: '{{ dns_zone_two }}'           # Domain name
@@ -106,6 +108,7 @@ bind_zone_domains:
         ip: "10.0.106.42"
         aliases:
           - name: registry
+          - name: quay
       - name: api
         ip: '10.0.106.42'
         aliases:
