@@ -2,7 +2,7 @@
 - name: Populate service facts
   service_facts:
 
-- name: Configure firewall for BIND DNS
+- name: Configure firewall for quay
   become: true
   firewalld:
     permanent: yes
@@ -10,7 +10,7 @@
     state: enabled
     port: "{{ item }}"
   with_items:
-    - 8554/tcp
+    - 8443/tcp
     - 80/tcp
     - 443/tcp
   when: "'firewalld.service' in services"
