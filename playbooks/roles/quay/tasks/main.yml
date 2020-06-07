@@ -1,2 +1,17 @@
 ---
 # tasks file for quay
+
+- name: Install dependencies
+  import_tasks: dependencies.yml
+
+- name: Configure firewall
+  import_tasks: firewall.yml
+
+- name: Deploy MySQL
+  import_tasks: mysql.yml
+
+- name: Deploy Redis
+  import_tasks: redis.yml
+
+- name: Deploy Quay
+  import_tasks: quay.yml
