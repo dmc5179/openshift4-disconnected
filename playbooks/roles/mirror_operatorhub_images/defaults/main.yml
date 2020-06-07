@@ -1,6 +1,6 @@
 ---
 # defaults file for mirror_operatorhub_images
-run_as_root: true
+run_as_root: false
 redhat_operators: true
 # TODO: supported operators mirror not working yet
 supported_operators: false
@@ -16,9 +16,7 @@ comm_op_repo: "{{ mirror_registry }}/olm/community-operators:v1"
 
 operator_registry: 'quay.io/operator-framework/operator-registry-server:v1.6.1'
 
-pull_secret_file: ''
-
-oc: 'oc'
+oc: '/usr/local/bin/oc'
 
 mirror_base: '/tmp/'
 
