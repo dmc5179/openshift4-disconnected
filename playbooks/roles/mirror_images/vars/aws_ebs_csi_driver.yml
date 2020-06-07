@@ -1,10 +1,23 @@
 ---
 aws_ebs_csi_driver_images:
-  - "docker.io/amazon/aws-ebs-csi-driver:v0.5.0"
-  - "quay.io/k8scsi/csi-provisioner:v1.5.0"
-  - "quay.io/k8scsi/csi-attacher:v1.2.0"
-  - "quay.io/k8scsi/csi-snapshotter:v2.1.1"
-  - "quay.io/k8scsi/livenessprobe:v1.1.0"
-  - "quay.io/k8scsi/csi-resizer:"
-  - "quay.io/k8scsi/csi-node-driver-registrar:v1.1.0"
-
+  - repo: 'docker.io'
+    image: 'amazon/aws-ebs-csi-driver'
+    tag: 'v0.5.0'
+  - repo: 'quay.io'
+    image: 'k8scsi/csi-provisioner'
+    tag: 'v1.5.0'
+  - repo: 'quay.io'
+    image: 'k8scsi/csi-attacher'
+    tag: 'v1.2.0'
+  - repo: 'quay.io'
+    image: 'k8scsi/csi-snapshotter'
+    tag: 'v2.1.1'
+  - repo: 'quay.io'
+    image: 'k8scsi/livenessprobe'
+    tag: 'v1.1.0'
+  - repo: 'quay.io'
+    image: 'k8scsi/csi-resizer'
+    tag: 'latest'
+  - repo: 'quay.io'
+    image: 'k8scsi/csi-node-driver-registrar'
+    tag: 'v1.1.0'

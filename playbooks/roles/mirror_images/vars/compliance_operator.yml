@@ -1,10 +1,23 @@
 ---
 compliance_operator_images:
-  - "quay.io/complianceascode/ocp4:latest"
-  - "quay.io/compliance-operator/openscap-ocp:1.3.3"
-  - "quay.io/compliance-operator/resultscollector:latest"
-  - "quay.io/compliance-operator/resultserver:latest"
-  - "quay.io/compliance-operator/remediation-aggregator:latest"
-  - "quay.io/compliance-operator/api-resource-collector:latest"
-  - "quay.io/compliance-operator/compliance-operator:latest"
-
+  - repo: 'quay.io'
+    image: 'complianceascode/ocp4'
+    tag: 'latest'
+  - repo: 'quay.io'
+    image: 'compliance-operator/openscap-ocp'
+    tag: '1.3.3'
+  - repo: 'quay.io'
+    image: 'compliance-operator/resultscollector'
+    tag: 'latest'
+  - repo: 'quay.io'
+    image: 'compliance-operator/resultserver'
+    tag: 'latest'
+  - repo: 'quay.io'
+    image: 'compliance-operator/remediation-aggregator'
+    tag: 'latest'
+  - repo: 'quay.io'
+    image: 'compliance-operator/api-resource-collector'
+    tag: 'latest'
+  - repo: 'quay.io'
+    image: 'compliance-operator/compliance-operator'
+    tag: 'latest'

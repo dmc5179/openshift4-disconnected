@@ -9,7 +9,7 @@
     - never
     - push
 
-- name: Push vSphere CSI Driver Images to mirror registry
+- name: Push additional iages to mirror registry
   become: false
   shell:
     cmd: |
@@ -22,6 +22,9 @@
 
     executable: /bin/bash
   with_items:
+    - '{{ images }}'
+    - '{{ tower_images }}'
+    - '{{ compliance_operator_images }}'
     - '{{ vsphere_csi_images }}'
   tags:
     - never

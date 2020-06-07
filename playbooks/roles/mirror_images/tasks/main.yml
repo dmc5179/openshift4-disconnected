@@ -7,12 +7,6 @@
     extensions:
         - yml
 
-- name: Push images to mirror repo
-  include_tasks: push.yml
-  tags:
-    - never
-    - push
-
 - name: Install skopeo
   become: true
   package:
@@ -36,7 +30,7 @@
 #    group: root
 #    mode: '0755'
 
-- name: Mirror vSphere CSI Driver Images
+- name: Mirror Additional Images
   become: true
   shell:
     cmd: |
@@ -49,64 +43,15 @@
 
     executable: /bin/bash
   with_items:
+    - '{{ images }}'
+    - '{{ tower_images }}'
+    - '{{ compliance_operator_images }}'
     - '{{ vsphere_csi_images }}'
+  tags:
+    - mirror
 
-
-- name: Mirror additional container images
-  become: true
-  shell:
-    cmd: |
-
-        if ! test -e "{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
-        then
-          skopeo copy --authfile "{{ pull_secret }}" \
-            "docker://{{ item }}" "docker-archive://{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
-        fi
-
-    executable: /bin/bash
-  with_items:
-    - "{{ images }}"
-
-- name: Include list of Ansible Tower Images
-  include_vars: tower.yml
-  when:
-    - (mirror_tower | bool)
-
-- name: Mirror Ansible Tower images
-  become: true
-  shell:
-    cmd: |
-
-        if ! test -e  "{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
-        then
-          skopeo copy --authfile "{{ pull_secret }}" \
-            "docker://{{ item }}" "docker-archive://{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
-        fi
-
-    executable: /bin/bash
-  with_items:
-    - "{{ tower_images }}"
-  when:
-    - (mirror_tower | bool)
-
-- name: Include list of Compliance Operator Images
-  include_vars: compliance_operator.yml
-  when:
-    - (mirror_compliance_operator | bool)
-
-- name: Mirror Compliance Operator images
-  become: true
-  shell:
-    cmd: |
-
-        if ! test -e  "{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
-        then 
-          skopeo copy --authfile "{{ pull_secret }}" \
-            "docker://{{ item }}" "docker-archive://{{ mirror_base }}/additional_images/{{ ( item | replace(':','_') | replace('/','-') ) }}.tar"
-        fi
-
-    executable: /bin/bash
-  with_items:
-    - "{{ compliance_operator_images }}"
-  when:
-    - (mirror_compliance_operator | bool)
+- name: Push images to mirror repo
+  include_tasks: push.yml
+  tags:
+    - never
+    - push
