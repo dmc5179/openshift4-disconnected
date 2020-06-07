@@ -13,7 +13,7 @@
 - name: Mirror redhat-operators images
   become: "{{ run_as_root }}"
   shell:
-    cmd: "{{ oc }} adm catalog mirror {{ rh_op_repo }} {{ mirror_transport }}://{{ mirror_registry }} -a {{ pull_secret }} --insecure"
+    cmd: "{{ oc }} adm catalog mirror {{ rh_op_repo }} {{ mirror_registry }} -a {{ pull_secret }} --insecure"
     executable: /bin/bash
   when: (redhat_operators | bool)
   tags:
@@ -31,7 +31,7 @@
 - name: Mirror certified-operators images
   become: "{{ run_as_root }}"
   shell:
-    cmd: "{{ oc }} adm catalog mirror {{ supp_op_repo }} {{ mirror_transport }}://{{ mirror_registry }} -a {{ pull_secret }} --insecure"
+    cmd: "{{ oc }} adm catalog mirror {{ supp_op_repo }} {{ mirror_registry }} -a {{ pull_secret }} --insecure"
     executable: /bin/bash
   when: (supported_operators | bool)
   tags:
@@ -49,7 +49,7 @@
 - name: Mirror community-operators images
   become: "{{ run_as_root }}"
   shell:
-    cmd: "{{ oc }} adm catalog mirror {{ comm_op_repo }} {{ mirror_transport }}://{{ mirror_registry }} -a {{ pull_secret }} --insecure"
+    cmd: "{{ oc }} adm catalog mirror {{ comm_op_repo }} {{ mirror_registry }} -a {{ pull_secret }} --insecure"
     executable: /bin/bash
   when: (community_operators | bool)
   tags:
