@@ -1,0 +1,10 @@
+---
+
+quay_images:
+  - repo: 'registry.access.redhat.com'
+    image: 'rhscl/mysql-57-rhel7'
+    tag: 'latest'
+  - repo: 'registry.access.redhat.com'
+    image: 'rhscl/redis-32-rhel7'
+    tag: 'latest'
+
