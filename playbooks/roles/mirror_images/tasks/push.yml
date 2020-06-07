@@ -26,6 +26,7 @@
     - '{{ tower_images }}'
     - '{{ compliance_operator_images }}'
     - '{{ vsphere_csi_images }}'
+    - '{{ quay_images }}'
   tags:
     - never
     - push
