@@ -1,0 +1,9 @@
+---
+
+- name: launching quay container
+  become: true
+  command: >
+    podman run --privileged=true --publish 8443:8443 \
+    --name {{ quay_container_name }} \
+    --detach quay.io/redhat/quay:v3.3.0 \
+    config '{{ quay_password }}'

@@ -3,7 +3,7 @@
 - name: Create redis directory
   become: true
   file:
-    path: '/var/lib/redis'
+    path: '{{ redis_dir }}'
     state: directory
     owner: root
     group: root
@@ -15,5 +15,6 @@
     podman run --detach \
     --restart=always -p 6379:6379 \
     --privileged=true \
+    --name {{ redis_container_name }} \
     -v /var/lib/redis:/var/lib/redis/data:Z \
     registry.access.redhat.com/rhscl/redis-32-rhel7
