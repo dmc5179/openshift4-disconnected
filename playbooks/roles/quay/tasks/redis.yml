@@ -1,4 +1,10 @@
 ---
+- name: Check if redis exists
+  become: true
+  shell:
+    cmd: podman ps | grep '{{ redis_container_name }}'
+  ignore_errors: true
+  register: redis_info
 
 - name: Create redis directory
   become: true
@@ -8,8 +14,10 @@
     owner: root
     group: root
     mode: '0777'
+  when:
+    - (redis_info.rc != 0)
 
-- name: launching mysql container
+- name: launching redis container
   become: true
   command: >
     podman run --detach \
@@ -18,3 +26,5 @@
     --name {{ redis_container_name }} \
     -v /var/lib/redis:/var/lib/redis/data:Z \
     registry.access.redhat.com/rhscl/redis-32-rhel7
+  when:
+    - (redis_info.rc != 0)

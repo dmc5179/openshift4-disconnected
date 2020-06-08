@@ -1,9 +1,67 @@
 ---
 
-- name: launching quay container
+- name: Create storage location for quay
+  become: true
+  file:
+    path: '{{ item }}'
+    state: directory
+  with_items:
+    - '/mnt/quay/config'
+    - '/mnt/quay/storage'
+
+- name: Generate an OpenSSL private key with the default values (4096 bits, RSA)
+  become: true
+  openssl_privatekey:
+    path: '/mnt/quay/config/ssl.key'
+
+- name: Generate an OpenSSL Certificate Signing Request
+  become: true
+  openssl_csr:
+    path: '/mnt/quay/config/{{ quay_hostname }}.csr'
+    privatekey_path: '/mnt/quay/config/ssl.key'
+    common_name: '{{ quay_hostname }}'
+    subject_alt_name: '{{ quay_SAN }}'
+
+- name: Generate a Self Signed OpenSSL certificate
+  become: true
+  openssl_certificate:
+    path: '/mnt/quay/config/ssl.crt'
+    privatekey_path: '/mnt/quay/config/ssl.key'
+    csr_path: '/mnt/quay/config/{{ quay_hostname }}.csr'
+    provider: selfsigned
+
+- name: Check if quay exists
+  become: true
+  shell:
+    cmd: podman ps | grep -v redis | grep -v mysql | grep '{{ quay_container_name }}'
+  ignore_errors: true
+  register: quay_info
+
+- name: launching quay container in config mode
   become: true
   command: >
     podman run --privileged=true --publish 8443:8443 \
     --name {{ quay_container_name }} \
     --detach quay.io/redhat/quay:v3.3.0 \
     config '{{ quay_password }}'
+  when:
+    ( (quay_config_mode | bool) and (quay_info.rc != 0) )
+
+- name: Copy quay config
+  template:
+    src: config.yaml.j2
+    dest: "/mnt/quay/config/config.yaml"
+  when:
+    (not (quay_config_mode | bool) ) and (quay_info.rc != 0)
+
+- name: launching quay container in standard mode
+  become: true
+  command: >
+    podman run --privileged=true --publish 8443:8443 \
+    --publish 8080:8080 --sysctl net.core.somaxconn=4096 \
+    --name {{ quay_container_name }} \
+    -v /mnt/quay/config:/conf/stack:Z \
+    -v /mnt/quay/storage:/datastorage:Z \
+    --detach quay.io/redhat/quay:v3.3.0 \
+  when:
+    (not (quay_config_mode | bool) ) and (quay_info.rc != 0)
