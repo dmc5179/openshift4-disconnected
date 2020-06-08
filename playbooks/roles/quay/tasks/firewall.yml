@@ -11,8 +11,5 @@
     port: "{{ item }}"
   with_items:
     - 8443/tcp
-    - 80/tcp
     - 443/tcp
-    - 3306/tcp
-    - 6379/tcp
   when: "'firewalld.service' in services"

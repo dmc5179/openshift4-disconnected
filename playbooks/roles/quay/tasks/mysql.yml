@@ -1,4 +1,11 @@
 ---
+- name: Check if mysql exists
+  become: true
+  shell:
+    cmd: podman ps | grep '{{ mysql_container_name }}'
+  ignore_errors: true
+  register: mysql_info
+
 - name: Create mysql directory
   become: true
   file:
@@ -7,6 +14,8 @@
     owner: root
     group: root
     mode: '0777'
+  when:
+    - (mysql_info.rc != 0)
 
 - name: launching mysql container
   become: true
@@ -22,3 +31,5 @@
     --publish 3306:3306 \
     -v /var/lib/mysql:/var/lib/mysql/data:Z \
     registry.access.redhat.com/rhscl/mysql-57-rhel7
+  when:
+    - (mysql_info.rc != 0)
