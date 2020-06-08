@@ -34,6 +34,9 @@ cp "${INSTALL_CONFIG}" "${IGNITION_CONFIGS}/"
 
 ${OPENSHIFT_INSTALL} create manifests --dir=${IGNITION_CONFIGS}
 
+# In a UPI install the workers are set to 0. The installer is not going to make worker nodes for us
+# Because of this we need to make the masters as not schedulable. If we do not do this then the cluster
+# will try to start scheduling things on the master nodes which we don't want
 sed -i 's/mastersSchedulable: true/mastersSchedulable: false/g' ${IGNITION_CONFIGS}/manifests/cluster-scheduler-02-config.yml
 
 # Set the cluster version operator to use a dummy value
