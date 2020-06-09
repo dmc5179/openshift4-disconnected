@@ -38,7 +38,7 @@
     - name: Remove old ignition configs
       become: true
       file:
-        path: '/var/www/html/ignition'
+        path: '{{ httpd_document_root }}/ignition'
         state: absent
       tags:
         - ignition
@@ -56,7 +56,7 @@
     - name: Create Ignition staging location
       become: true
       file:
-        path: '/var/www/html/ignition'
+        path: '{{ httpd_document_root }}/ignition'
         state: directory
         mode: '0755'
         setype: 'httpd_sys_content_t'
@@ -67,7 +67,7 @@
       become: true
       copy:
         src: "{{ item }}"
-        dest: "/var/www/html/ignition/"
+        dest: "{{ httpd_document_root }}/ignition/"
         mode: '0755'
         setype: 'httpd_sys_content_t'
       with_items:
@@ -85,7 +85,7 @@
       become: true
       copy:
         src: "files/append-bootstrap.ign"
-        dest: "/var/www/html/ignition/append-bootstrap.ign"
+        dest: "{{ httpd_document_root }}/ignition/append-bootstrap.ign"
         mode: '0755'
         setype: 'httpd_sys_content_t'
       tags:
@@ -95,7 +95,7 @@
 #    - name: Create append-bootstrap ignition
 #      template:
 #        src: "{{ lookup('template', 'templates/append-bootstrap.ign.j2') }}"
-#        dest: '/var/www/html/ignition/append-bootstrap.ign'
+#        dest: '{{ httpd_document_root }}/ignition/append-bootstrap.ign'
 #        mode: '0755'
 #        setype: 'httpd_sys_content_t'        
 
