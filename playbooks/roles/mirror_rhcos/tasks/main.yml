@@ -20,9 +20,9 @@
     state: absent
     path: "{{ item }}"
   with_items:
-    - "{{ mirror_base }}/var/www/html/install/bios.raw.gz"
-    - "{{ mirror_base }}/var/lib/tftpboot/rhcos/initramfs.img"
-    - "{{ mirror_base }}/var/lib/tftpboot/rhcos/kernel"
+    - "{{ mirror_base }}/var/www/html/install/rhcos-{{rhcos_ver}}-{{ arch }}-metal.{{ arch }}.raw.gz"
+    - "{{ mirror_base }}/var/lib/tftpboot/rhcos/rhcos-{{rhcos_ver}}-{{ arch }}-installer-initramfs.{{ arch }}.img"
+    - "{{ mirror_base }}/var/lib/tftpboot/rhcos/rhcos-{{rhcos_ver}}-{{ arch }}-installer-kernel-{{ arch }}"
   tags:
     - mirror
 
@@ -30,7 +30,7 @@
   become: "{{ run_as_root }}"
   get_url:
     url: "{{ ocp_bios }}"
-    dest: "{{ mirror_base }}/var/www/html/install/bios.raw.gz"
+    dest: "{{ mirror_base }}/var/www/html/install/rhcos-{{rhcos_ver}}-{{ arch }}-metal.{{ arch }}.raw.gz"
     mode: 0555
   tags:
     - mirror
@@ -39,7 +39,7 @@
   become: "{{ run_as_root }}"
   get_url:
     url: "{{ ocp_initramfs }}"
-    dest: "{{ mirror_base }}/var/lib/tftpboot/rhcos/initramfs.img"
+    dest: "{{ mirror_base }}/var/lib/tftpboot/rhcos/rhcos-{{rhcos_ver}}-{{ arch }}-installer-initramfs.{{ arch }}.img"
     mode: 0555
   tags:
     - mirror
@@ -48,7 +48,7 @@
   become: "{{ run_as_root }}"
   get_url:
     url: "{{ ocp_install_kernel }}"
-    dest: "{{ mirror_base }}/var/lib/tftpboot/rhcos/kernel"
+    dest: "{{ mirror_base }}/var/lib/tftpboot/rhcos/rhcos-{{rhcos_ver}}-{{ arch }}-installer-kernel-{{ arch }}"
     mode: 0555
   tags:
     - mirror
