@@ -19,6 +19,7 @@ ocp_base_domain: 'example.com'
 ocp_cluster_name: 'caas'
 
 num_workers: 3
+num_masters: 3
 
 air_gapped: true
 
