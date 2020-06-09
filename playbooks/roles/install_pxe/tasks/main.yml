@@ -49,6 +49,21 @@
     mode: 0555
   with_items: "{{ workers | lower }}"
 
+- name: Populate service facts
+  service_facts:
+
+- name: Configure firewall for TFTP Server
+  firewalld:
+    permanent: yes
+    immediate: yes
+    state: enabled
+    port: "{{ item }}"
+  with_items:
+    - 69/udp
+  when:
+    ('firewalld.service' in services) and
+    (ansible_facts.services["firewalld.service"].state is match("running"))
+
 - name: Start and enable tftp server
   systemd:
     name: tftp-server
