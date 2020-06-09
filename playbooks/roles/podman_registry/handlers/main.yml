@@ -1,9 +1,2 @@
 ---
 # handlers file for podman-registry
-- name: update trusted ca
-  become: true
-  command: update-ca-trust extract
-  when:
-    (ansible_distribution == "RedHat") or
-    (ansible_distribution == "CentOS") or
-    (ansible_distribution == "Fedora")

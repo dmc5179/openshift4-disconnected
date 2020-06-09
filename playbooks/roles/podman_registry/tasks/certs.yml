@@ -4,6 +4,8 @@
   openssl_privatekey:
     path: "{{docker_registry_conf_dir}}/pki/registry.key"
     size: 4096
+  tags:
+    - certificate
 
 - name: Generate an OpenSSL CSR
   become: "{{ run_as_root }}"
@@ -11,6 +13,9 @@
     path: "{{docker_registry_conf_dir}}/pki/registry.csr"
     privatekey_path: "{{docker_registry_conf_dir}}/pki/registry.key"
     common_name: "{{ docker_registry_hostname }}"
+    subject_alt_name: '{{ docker_registry_SAN }}'
+  tags:
+    - certificate
 
 - name: Generate a Self Signed OpenSSL Certificate
   become: "{{ run_as_root }}"
@@ -19,6 +24,8 @@
     privatekey_path: "{{docker_registry_conf_dir}}/pki/registry.key"
     csr_path: "{{docker_registry_conf_dir}}/pki/registry.csr"
     provider: selfsigned
+  tags:
+    - certificate
 
 # Make sure to trust the self signed cert we just made
 - name: Copy self signed cert to local PKI trust
@@ -27,5 +34,15 @@
     src: "{{docker_registry_conf_dir}}/pki/registry.crt"
     dest: '/etc/pki/ca-trust/source/anchors/'
     remote_src: true
-  notify:
-    - update trusted ca
+  tags:
+    - certificate
+
+- name: update trusted ca
+  become: true
+  command: update-ca-trust extract
+  when:
+    (ansible_distribution == "RedHat") or
+    (ansible_distribution == "CentOS") or
+    (ansible_distribution == "Fedora")
+  tags:
+    - certificate
