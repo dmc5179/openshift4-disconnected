@@ -59,7 +59,9 @@
     - 111/udp
     - 2049/tcp
     - 2049/udp
-  when: "'firewalld.service' in services"
+  when: 
+    ('firewalld.service' in services) and
+    (ansible_facts.services["firewalld.service"].state is match("running"))
 
 - name: Ensure nfs is running.
   become: true
