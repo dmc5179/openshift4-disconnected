@@ -1,9 +1,9 @@
 ---
-- name: Generate an OpenSSL private key with a different size (4096 bits)
+- name: Generate an OpenSSL private key
   become: "{{ run_as_root }}"
   openssl_privatekey:
     path: "{{docker_registry_conf_dir}}/pki/registry.key"
-    size: 2048
+    size: 4096
 
 - name: Generate an OpenSSL CSR
   become: "{{ run_as_root }}"
