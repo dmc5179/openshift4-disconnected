@@ -28,10 +28,10 @@
     hostname: '{{ vcenter_hostname }}'
     username: '{{ vcenter_username }}'
     password: '{{ vcenter_password }}'
-    src: '{{ mirror_base }}/rhcos/rhcos-4.3.8-x86_64-vmware.x86_64.ova'
+    src: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-vmware.{{ arch }}.ova'
     datacenter: '{{ datacenter_name }}'
     datastore: '{{ datastore_name }}'
-    path: 'caas/rhcos-4.3.8-x86_64-vmware.x86_64.ova'
+    path: 'caas/rhcos-{{ rhcos_ver }}-{{ arch }}-vmware.{{ arch }}.ova'
     validate_certs: "{{ ssl_enabled }}"
   delegate_to: localhost
   when: (upload_ova | bool)
