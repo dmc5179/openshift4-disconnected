@@ -58,7 +58,9 @@
   with_items:
     - 67/udp
     - 68/udp
-  when: "'firewalld.service' in services"
+  when:
+    ('firewalld.service' in services) and
+    (ansible_facts.services["firewalld.service"].state is match("running"))
 
 - name: "Ensure service is {{ dhcp_global_server_state | default('started') }}"
   service:
