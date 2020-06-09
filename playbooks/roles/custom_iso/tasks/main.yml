@@ -17,6 +17,12 @@
   with_items:
     - '{{ ocp_nodes }}'
 
+- name: Create directory for mounting ISO
+  become: true
+  file:
+    path: '/mnt/rhcos'
+    state: directory
+
 - name: Mount RHCOS ISO ReadOnly
   become: true
   mount:
@@ -38,7 +44,7 @@
   become: true
   mount:
     path: /mnt/rhcos
-    src: /opt/openshift/rhcos/rhcos-4.3.8-x86_64-installer.x86_64.iso
+    src: '/opt/openshift/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer.{{ arch }}.iso'
     fstype: iso9660
     opts: ro,noauto
     state: absent
