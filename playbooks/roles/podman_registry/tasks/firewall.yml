@@ -2,14 +2,6 @@
 - name: Populate service facts
   service_facts:
 
-# Firewall needs to be running to configure it
-- name: Start firewalld
-  become: true
-  service:
-    name: firewalld
-    state: started
-  when: "'firewalld.service' in services"
-
 - name: Enable registry port zone internal
   become: true
   firewalld:
@@ -18,7 +10,9 @@
     permanent: true
     immediate: true
     state: enabled
-  when: "'firewalld.service' in services"
+  when:
+    ('firewalld.service' in services) and
+    (ansible_facts.services["firewalld.service"].state is match("running"))
 
 - name: Enable registry port zone public
   become: true
@@ -28,7 +22,9 @@
     permanent: true
     immediate: true
     state: enabled
-  when: "'firewalld.service' in services"
+  when:
+    ('firewalld.service' in services) and
+    (ansible_facts.services["firewalld.service"].state is match("running"))
 
 - name: Enable https service
   become: true
@@ -37,7 +33,9 @@
     permanent: true
     immediate: true
     state: enabled
-  when: "'firewalld.service' in services"
+  when:
+    ('firewalld.service' in services) and
+    (ansible_facts.services["firewalld.service"].state is match("running"))
 
 - name: Enable http service
   become: true
@@ -46,4 +44,6 @@
     permanent: true
     immediate: true
     state: enabled
-  when: "'firewalld.service' in services"
+  when:
+    ('firewalld.service' in services) and
+    (ansible_facts.services["firewalld.service"].state is match("running"))
