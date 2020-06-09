@@ -17,18 +17,11 @@
   with_items:
     - '{{ ocp_nodes }}'
 
-#- name: Extract kernel and ramdisk from a LiveCD
-#  iso_extract:
-#    image: /opt/openshift/rhcos/rhcos-4.3.8-x86_64-installer.x86_64.iso
-#    dest: /tmp/rhcos
-#    files:
-#    - '*'
-
 - name: Mount RHCOS ISO ReadOnly
   become: true
   mount:
     path: /mnt/rhcos
-    src: /opt/openshift/rhcos/rhcos-4.3.8-x86_64-installer.x86_64.iso
+    src: '/opt/openshift/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer.{{ arch }}.iso'
     fstype: iso9660
     opts: ro,noauto
     state: mounted
@@ -98,7 +91,7 @@
 - name: Create custom ISO for each host
   become: true
   shell:
-    cmd: 'xorriso -as mkisofs -U -r -v -T -J -joliet-long -V "RHCOS.x86_64" -volset "RHCOS.x86_64" -A "RHCOS.x86_64" -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot -e images/efiboot.img -no-emul-boot -isohybrid-mbr /usr/share/syslinux/isohdpfx.bin -o "{{ tmp_dir }}/{{ item.name }}.iso" "{{ tmp_dir }}/{{ item.name }}"'
+    cmd: 'xorriso -as mkisofs -U -r -v -T -J -joliet-long -V "RHCOS-{{ rhcos_ver }}.{{ arch }}" -volset "RHCOS-{{ rhcos_ver }}.{{ arch }}" -A "RHCOS-{{ rhcos_ver }}.{{ arch }}" -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot -e images/efiboot.img -no-emul-boot -isohybrid-mbr /usr/share/syslinux/isohdpfx.bin -o "{{ tmp_dir }}/{{ item.name }}.iso" "{{ tmp_dir }}/{{ item.name }}"'
     creates: '{{ tmp_dir }}/{{ item.name }}.iso'
   with_items:
     - '{{ ocp_nodes }}'
