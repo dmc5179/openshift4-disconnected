@@ -1,0 +1,45 @@
+---
+- hosts: helper_node
+  gather_facts: true
+  become: false
+  tasks:
+
+    - name: Set the state of a virtual machine to poweroff
+      vmware_guest_powerstate:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: '{{ vcenter_port }}'
+        validate_certs: '{{ ssl_enabled }}'
+        name: "{{ item }}"
+        state: powered-on
+      delegate_to: localhost
+      ignore_errors: true
+      loop_control:
+        pause: 5
+      with_items:
+        - 'master0'
+        - 'master1'
+        - 'master2'
+
+    - name: Pause to wait for the master nodes to boot
+      pause:
+        minutes: 2
+ 
+    - name: Set the state of a virtual machine to poweroff
+      vmware_guest_powerstate:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: '{{ vcenter_port }}'
+        validate_certs: '{{ ssl_enabled }}'
+        name: "{{ item }}"
+        state: powered-on
+      delegate_to: localhost
+      ignore_errors: true
+      loop_control:
+        pause: 5
+      with_items:
+        - 'worker0'
+        - 'worker1'
+        - 'worker2'
