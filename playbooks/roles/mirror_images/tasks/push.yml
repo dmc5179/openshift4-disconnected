@@ -9,7 +9,7 @@
     - never
     - push
 
-- name: Push additional iages to mirror registry
+- name: Push additional images to mirror registry
   become: false
   shell:
     cmd: |
@@ -18,15 +18,18 @@
         then
           skopeo copy --authfile "{{ pull_secret }}" \
            "docker-archive://{{ mirror_base }}/additional_images/{{ ( item.repo | replace('.','_') ) }}-{{ ( item.image | replace(':','_') | replace('/','-') ) }}-{{ ( item.tag | replace(':','_') | replace('/','-') ) }}.tar" "docker://{{mirror_registry}}/{{item.image}}:{{item.tag}}"
+
         fi
 
     executable: /bin/bash
   with_items:
-    - '{{ images }}'
     - '{{ tower_images }}'
     - '{{ compliance_operator_images }}'
     - '{{ vsphere_csi_images }}'
     - '{{ quay_images }}'
+    - '{{ nvidia_gpu_images }}'
+    - '{{ nfs_provisioner_images }}'
+    - '{{ aws_ebs_csi_driver_images }}'
   tags:
     - never
     - push
