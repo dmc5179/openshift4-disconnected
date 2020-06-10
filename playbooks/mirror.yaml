@@ -52,7 +52,7 @@
 # TODO: This has a bug in it
 #    - name: Mirror Operator Hub Images
 #      import_role:
-#        name: mirror_operatorhub_images
+#        name: operatorhub
 #      when: (mirror_operatorhub_images | bool)
 #      tags:
 #        - mirror_operatorhub_images

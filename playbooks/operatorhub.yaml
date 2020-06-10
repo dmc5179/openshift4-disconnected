@@ -8,4 +8,4 @@
     #
     - name: Deploy Operator Hub
       import_role:
-        name: mirror_operatorhub_images
+        name: operatorhub
