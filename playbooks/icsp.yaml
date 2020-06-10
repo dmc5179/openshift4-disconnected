@@ -62,9 +62,9 @@
           tags:
             - icsp
 
-    - name: Apply any Image Content Source Policies from mirror_operatorhub_images role
+    - name: Apply any Image Content Source Policies from operatorhub role
       include_role:
-        name: mirror_operatorhub_images
+        name: operatorhub
         apply:
           tags:
             - icsp

@@ -1,5 +1,5 @@
 ---
-# defaults file for mirror_operatorhub_images
+# defaults file for operatorhub
 run_as_root: false
 redhat_operators: true
 # TODO: supported operators mirror not working yet

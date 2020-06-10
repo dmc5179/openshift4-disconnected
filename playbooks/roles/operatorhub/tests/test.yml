@@ -2,4 +2,4 @@
 - hosts: localhost
   remote_user: root
   roles:
-    - mirror_operatorhub_images
+    - operatorhub
