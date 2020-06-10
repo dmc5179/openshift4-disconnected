@@ -53,14 +53,14 @@
 
 - name: Add vCenter port to global cloud provider config
   lineinfile:
-    path: /home/danclark/cloud-provider-config.yaml
+    path: "{{ ignition_configs }}/manifests/cloud-provider-config.yaml"
     insertafter: '\[Global\]'
     line: '    port = "{{ vcenter_port }}"'
     firstmatch: true
 
 - name: Disable SSL for vCenter API endpoint
   lineinfile:
-    path: /home/danclark/cloud-provider-config.yaml
+    path: "{{ ignition_configs }}/manifests/cloud-provider-config.yaml"
     regexp: 'insecure-flag = "1"'
     line: '    insecure-flag = "true"'
 
