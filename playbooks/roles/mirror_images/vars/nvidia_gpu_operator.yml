@@ -22,3 +22,6 @@ nvidia_gpu_images:
   - repo: 'quay.io'
     image: k8scsi/csi-node-driver-registrar
     tag: "v1.1.0"
+  - repo: 'docker.io'
+    image: 'nvidia/samples'
+    tag: 'cuda10.2-vectorAdd'
