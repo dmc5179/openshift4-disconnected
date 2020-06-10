@@ -35,7 +35,9 @@
   with_items:
     - 53/tcp
     - 53/udp
-  when: "'firewalld.service' in services"
+  when:
+    ('firewalld.service' in services) and
+    (ansible_facts.services["firewalld.service"].state is match("running"))
   tags:
     - bind
 
