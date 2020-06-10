@@ -7,4 +7,3 @@ quay_images:
   - repo: 'registry.access.redhat.com'
     image: 'rhscl/redis-32-rhel7'
     tag: 'latest'
-

@@ -39,20 +39,23 @@
         then
           skopeo copy --authfile "{{ pull_secret }}" \
             "docker://{{ item.repo }}/{{item.image}}:{{item.tag}}" "docker-archive://{{ mirror_base }}/additional_images/{{ ( item.repo | replace('.','_') ) }}-{{ ( item.image | replace(':','_') | replace('/','-') ) }}-{{ ( item.tag | replace(':','_') | replace('/','-') ) }}.tar"
+
         fi
 
     executable: /bin/bash
   with_items:
-    - '{{ images }}'
     - '{{ tower_images }}'
     - '{{ compliance_operator_images }}'
     - '{{ vsphere_csi_images }}'
     - '{{ quay_images }}'
+    - '{{ nvidia_gpu_images }}'
+    - '{{ nfs_provisioner_images }}'
+    - '{{ aws_ebs_csi_driver_images }}'
   tags:
     - mirror
 
 - name: Push images to mirror repo
-  include_tasks: push.yml
+  import_tasks: push.yml
   tags:
     - never
     - push
