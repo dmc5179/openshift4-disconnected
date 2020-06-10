@@ -226,8 +226,8 @@
       type: thin
       datastore: '{{ datastore_name }}'
     hardware:
-      memory_mb: 8192
-      num_cpus: 4
+      memory_mb: 16384
+      num_cpus: 8
       num_cpu_cores_per_socket: 2
       scsi: paravirtual
 #      memory_reservation_lock: false
