@@ -28,7 +28,6 @@
     kubeconfig: "{{ kubeconfig  }}"
     definition: "{{ lookup('template', 'templates/compliance_operators_icsp.yaml.j2') }}"
   tags:
-    - install
     - icsp
 
 - name: Apply compliance CRDs
