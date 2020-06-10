@@ -1,17 +1,200 @@
 ---
 # tasks file for quay
 
-- name: Install dependencies
-  import_tasks: dependencies.yml
+- name: Install podman
+  become: true
+  package:
+    name: podman
+    state: present
 
-- name: Configure firewall
-  import_tasks: firewall.yml
+- name: Populate service facts
+  service_facts:
 
-- name: Deploy MySQL
-  import_tasks: mysql.yml
+- name: Configure firewall for quay
+  become: true
+  firewalld:
+    permanent: yes
+    immediate: yes
+    state: enabled
+    port: "{{ item }}"
+  with_items:
+    - 8443/tcp
+    - 443/tcp
+  when:
+    ('firewalld.service' in services) and
+    (ansible_facts.services["firewalld.service"].state is match("running"))
 
-- name: Deploy Redis
-  import_tasks: redis.yml
+#- name: Check if quay pod exists
+#  become: true
+#  shell:
+#    cmd: podman pod exists '{{ quay_pod_name }}'
+#  ignore_errors: true
+#  register: quay_pod
 
-- name: Deploy Quay
-  import_tasks: quay.yml
+#- name: Create quay pod if DNE
+#  become: true
+#  shell:
+#    cmd: podman pod create --name '{{ quay_pod_name }}' --publish 8443:8443
+#  when:
+#    - (quay_pod.rc != 0)
+
+- name: Check if mysql exists
+  become: true
+  shell:
+    cmd: podman ps | grep '{{ mysql_container_name }}'
+  ignore_errors: true
+  register: mysql_info
+  tags:
+    - mysql
+
+- name: Create mysql directory
+  become: true
+  file:
+    path: '{{ mysql_dir }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0777'
+  when:
+    - (mysql_info.rc != 0)
+  tags:
+    - mysql
+
+- name: launching mysql container
+  become: true
+  command: >
+    podman run --detach \
+    --restart=always \
+    --env MYSQL_ROOT_PASSWORD={{mysql_root_password}} \
+    --env MYSQL_USER={{mysql_user}} \
+    --env MYSQL_PASSWORD={{mysql_password}} \
+    --env MYSQL_DATABASE={{mysql_database}} \
+    --name {{ mysql_container_name }} \
+    --privileged=true \
+    --publish 3306:3306 \
+    -v '{{ mysql_dir }}:/var/lib/mysql/data:Z' \
+    registry.access.redhat.com/rhscl/mysql-57-rhel7
+  when:
+    - (mysql_info.rc != 0)
+  tags:
+    - mysql
+
+- name: Check if redis exists
+  become: true
+  shell:
+    cmd: podman ps | grep '{{ redis_container_name }}'
+  ignore_errors: true
+  register: redis_info
+  tags:
+    - redis
+
+- name: Create redis directory
+  become: true
+  file:
+    path: '{{ redis_dir }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0777'
+  when:
+    - (redis_info.rc != 0)
+  tags:
+    - redis
+
+- name: launching redis container
+  become: true
+  command: >
+    podman run --detach \
+    --restart=always \
+    --restart=always -p 6379:6379 \
+    --privileged=true \
+    --name {{ redis_container_name }} \
+    -v '{{ redis_dir }}:/var/lib/redis/data:Z' \
+    registry.access.redhat.com/rhscl/redis-32-rhel7
+  when:
+    - (redis_info.rc != 0)
+  tags:
+    - redis
+
+- name: Create storage location for quay
+  become: true
+  file:
+    path: '{{ item }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0777'
+  with_items:
+    - '{{ base_dir }}/config'
+    - '{{ base_dir }}/storage'
+
+#- name: Generate an OpenSSL private key with the default values (4096 bits, RSA)
+#  become: true
+#  openssl_privatekey:
+#    path: '{{ base_dir }}/config/ssl.key'
+#  tags:
+#    - certificate
+
+#- name: Generate an OpenSSL Certificate Signing Request
+#  become: true
+#  openssl_csr:
+#    path: '{{ base_dir }}/config/{{ quay_hostname }}.csr'
+#    privatekey_path: '{{ base_dir }}/config/ssl.key'
+#    common_name: '{{ quay_hostname }}'
+#    subject_alt_name: '{{ quay_SAN }}'
+#  tags:
+#    - certificate
+
+#- name: Generate a Self Signed OpenSSL certificate
+#  become: true
+#  openssl_certificate:
+#    path: '{{ base_dir }}/config/ssl.crt'
+#    privatekey_path: '{{ base_dir }}/config/ssl.key'
+#    csr_path: '{{ base_dir }}/config/{{ quay_hostname }}.csr'
+#    provider: selfsigned
+#  tags:
+#    - certificate
+
+- name: Check if quay exists
+  become: true
+  shell:
+    cmd: podman ps | grep -v redis | grep -v mysql | grep '{{ quay_container_name }}'
+  ignore_errors: true
+  register: quay_info
+  tags:
+    - quay
+
+- name: launching quay container in config mode
+  become: true
+  command: >
+    podman run --privileged=true \
+    --publish 8443:8443
+    --name {{ quay_container_name }} \
+    --detach quay.io/redhat/quay:v3.3.0 \
+    config '{{ quay_password }}'
+  when:
+    ( (quay_config_mode | bool) and (quay_info.rc != 0) )
+  tags:
+    - quay
+
+#- name: Copy quay config
+#  template:
+#    src: config.yaml.j2
+#    dest: "{{ base_dir }}/config/config.yaml"
+#  when:
+#    (not (quay_config_mode | bool) ) and (quay_info.rc != 0)
+
+- name: launching quay container in standard mode
+  become: true
+  command: >
+    podman run --privileged=true \
+    --publish 8443:8443 \
+    --sysctl net.core.somaxconn=4096 \
+    --name {{ quay_container_name }} \
+    -v '{{ base_dir }}/config:/conf/stack:Z' \
+    -v '{{ base_dir }}/storage:/datastorage:Z' \
+    --detach quay.io/redhat/quay:v3.3.0 \
+  when:
+    (not (quay_config_mode | bool) ) and (quay_info.rc != 0)
+  tags:
+    - quay
