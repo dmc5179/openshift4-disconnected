@@ -1,0 +1,25 @@
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  name: nvidia-gpu-operator-icsp
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - {{ mirror_registry }}/nvidia/gpu-operator
+    source: docker.io/nvidia/gpu-operator
+  - mirrors:
+    - {{ mirror_registry }}/nvidia/driver
+    source: docker.io/nvidia/driver
+  - mirrors:
+    - {{ mirror_registry }}/nvidia/container-toolkit
+    source: docker.io/nvidia/container-toolkit
+  - mirrors:
+    - {{ mirror_registry }}/nvidia/k8s-device-plugin
+    source: docker.io/nvidia/k8s-device-plugin
+  - mirrors:
+    - {{ mirror_registry }}/nvidia/dcgm-exporter
+    source: docker.io/nvidia/dcgm-exporter
+  - mirrors:
+    - {{ mirror_registry }}/nvidia/pod-gpu-metrics-exporter
+    source: docker.io/nvidia/pod-gpu-metrics-exporter
