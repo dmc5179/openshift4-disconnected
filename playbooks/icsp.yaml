@@ -10,6 +10,7 @@
       include_role:
         name: '{{ item }}'
       with_items:
+        - nvidia_gpu_operator
         - compliance-operator
         - install_nfs
         - vsphere_csi_driver
