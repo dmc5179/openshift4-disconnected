@@ -1,2 +1,15 @@
 ---
 # tasks file for nvidia_gpu_operator
+
+- name: Apply Nvidia GPU Operator ICSP
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/nvidia-gpu-operator-icsp.yaml.j2') }}"
+  tags:
+    - never
+    - icsp
+
