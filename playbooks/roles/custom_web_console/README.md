@@ -1,8 +1,7 @@
 Role Name
 =========
 
-A brief description of the role goes here.
-
+https://docs.openshift.com/container-platform/4.3/web_console/customizing-the-web-console.html
 Requirements
 ------------
 
