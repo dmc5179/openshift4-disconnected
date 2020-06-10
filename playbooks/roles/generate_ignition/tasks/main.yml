@@ -51,6 +51,19 @@
     regexp: 'upstream:.*'
     replace: 'upstream: http://localhost:8080/graph'
 
+- name: Add vCenter port to global cloud provider config
+  lineinfile:
+    path: /home/danclark/cloud-provider-config.yaml
+    insertafter: '\[Global\]'
+    line: '    port = "{{ vcenter_port }}"'
+    firstmatch: true
+
+- name: Disable SSL for vCenter API endpoint
+  lineinfile:
+    path: /home/danclark/cloud-provider-config.yaml
+    regexp: 'insecure-flag = "1"'
+    line: '    insecure-flag = "true"'
+
 - name: Create ignition configs
   shell: "{{ openshift_install }} create ignition-configs --dir={{ ignition_configs }}"
 
