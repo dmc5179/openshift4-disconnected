@@ -1,0 +1,9 @@
+---
+- hosts: helper_node
+  gather_facts: true
+  become: false
+  tasks:
+
+    - name: Install and Configure Compliance Operator
+      import_role:
+        name: compliance-operator
