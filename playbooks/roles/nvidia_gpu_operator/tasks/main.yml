@@ -5,7 +5,7 @@
   delegate_to: localhost
   k8s:
     state: present
-    wait: true
+    wait: false
     kubeconfig: "{{ kubeconfig  }}"
     validate_certs: '{{ ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/nvidia-gpu-operator-icsp.yaml.j2') }}"
