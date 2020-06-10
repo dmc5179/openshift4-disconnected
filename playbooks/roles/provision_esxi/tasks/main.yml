@@ -13,6 +13,7 @@
 - name: Create a VM folder on given datacenter
   vcenter_folder:
     hostname: '{{ vcenter_hostname }}'
+    port: '{{ vcenter_port }}'
     username: '{{ vcenter_username }}'
     password: '{{ vcenter_password }}'
     datacenter_name: '{{ datacenter_name }}'
@@ -26,6 +27,7 @@
 - name: Copy RHCOS OVA to Datastore
   vsphere_copy:
     hostname: '{{ vcenter_hostname }}'
+    port: '{{ vcenter_port }}'
     username: '{{ vcenter_username }}'
     password: '{{ vcenter_password }}'
     src: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-vmware.{{ arch }}.ova'
