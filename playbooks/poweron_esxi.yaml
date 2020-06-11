@@ -4,7 +4,7 @@
   become: false
   tasks:
 
-    - name: Set the state of a virtual machine to poweroff
+    - name: Set the state of a virtual machine to poweron
       vmware_guest_powerstate:
         hostname: "{{ vcenter_hostname }}"
         username: "{{ vcenter_username }}"
@@ -26,7 +26,7 @@
       pause:
         minutes: 2
  
-    - name: Set the state of a virtual machine to poweroff
+    - name: Set the state of a virtual machine to poweron
       vmware_guest_powerstate:
         hostname: "{{ vcenter_hostname }}"
         username: "{{ vcenter_username }}"
