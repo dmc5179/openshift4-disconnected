@@ -242,3 +242,26 @@
     kubeconfig: "{{ kubeconfig  }}"
     validate_certs: '{{ ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/vsphere-csi-node-ds.yaml.j2') }}"
+
+- name: Gather info from datacenter about specific datastore
+  vmware_datastore_info:
+    hostname: '{{ vcenter_hostname }}'
+    username: '{{ vcenter_username }}'
+    password: '{{ vcenter_password }}'
+    port: '{{ vcenter_port }}'
+    datacenter_name: '{{ datacenter_name }}'
+    name: '{{ datastore_name }}'
+    validate_certs: no
+  delegate_to: localhost
+  register: datastore_info
+
+- name: Create Storage Class
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: true
+    namespace: '{{ vsphere_namespace }}'
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/vsphere_csi_storage_class.yaml.j2') }}"
+
