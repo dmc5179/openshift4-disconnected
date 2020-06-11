@@ -1,4 +1,10 @@
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cloud-controller-manager
+  namespace: {{ vsphere_namespace }}
+---
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -30,8 +36,7 @@ spec:
       serviceAccountName: cloud-controller-manager
       containers:
         - name: vsphere-cloud-controller-manager
-#          image: gcr.io/cloud-provider-vsphere/cpi/release/manager:latest
-          image: registry.redhatgovic.io:5000/cloud-provider-vsphere/cpi/release/manager:latest
+          image: gcr.io/cloud-provider-vsphere/cpi/release/manager:latest
           args:
             - --v=2
             - --cloud-provider=vsphere
@@ -48,3 +53,19 @@ spec:
       - name: vsphere-config-volume
         configMap:
           name: cloud-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    component: cloud-controller-manager
+  name: vsphere-cloud-controller-manager
+  namespace: {{ vsphere_namespace }}
+spec:
+  type: NodePort
+  ports:
+    - port: 43001
+      protocol: TCP
+      targetPort: 43001
+  selector:
+    component: cloud-controller-manager

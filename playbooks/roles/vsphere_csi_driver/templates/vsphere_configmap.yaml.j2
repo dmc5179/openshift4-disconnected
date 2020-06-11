@@ -5,9 +5,15 @@ data:
   vsphere.conf: |
     [Global]
     port = "{{ vcenter_port }}"
-    insecure-flag = "true"
-    secret-namespace = "{{ vsphere_namespace }}"
     secret-name = "cpi-global-secret"
+    secret-namespace = "{{ vsphere_namespace }}"
+    insecure-flag = "true"
+
+    [Workspace]
+    server = "{{ vcenter_hostname }}"
+    datacenter = "{{ datacenter_name }}"
+    default-datastore = "{{ datastore_name }}"
+    folder = "{{ ocp_cluster_name }}"
 
     [VirtualCenter "{{ vcenter_hostname }}"]
     datacenters = "{{ datacenter_name }}"
