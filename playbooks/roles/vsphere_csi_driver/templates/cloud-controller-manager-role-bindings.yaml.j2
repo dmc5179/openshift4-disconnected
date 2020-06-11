@@ -4,7 +4,7 @@ items:
   kind: RoleBinding
   metadata:
     name: servicecatalog.k8s.io:apiserver-authentication-reader
-    namespace: vsphere
+    namespace: {{ vsphere_namespace }}
   roleRef:
     apiGroup: rbac.authorization.k8s.io
     kind: Role
@@ -13,7 +13,7 @@ items:
   - apiGroup: ""
     kind: ServiceAccount
     name: cloud-controller-manager
-    namespace: vsphere
+    namespace: {{ vsphere_namespace }}
   - apiGroup: ""
     kind: User
     name: cloud-controller-manager
@@ -28,7 +28,7 @@ items:
   subjects:
   - kind: ServiceAccount
     name: cloud-controller-manager
-    namespace: vsphere
+    namespace: {{ vsphere_namespace }}
   - kind: User
     name: cloud-controller-manager
 kind: List

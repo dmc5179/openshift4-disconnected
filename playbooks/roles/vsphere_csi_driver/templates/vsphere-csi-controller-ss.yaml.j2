@@ -3,7 +3,7 @@ kind: StatefulSet
 apiVersion: apps/v1
 metadata:
   name: vsphere-csi-controller
-  namespace: vsphere
+  namespace: {{ vsphere_namespace }}
 spec:
   serviceName: vsphere-csi-controller
   replicas: 1

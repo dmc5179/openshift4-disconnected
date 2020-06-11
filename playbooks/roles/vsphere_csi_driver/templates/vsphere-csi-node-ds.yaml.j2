@@ -3,7 +3,7 @@ kind: DaemonSet
 apiVersion: apps/v1
 metadata:
   name: vsphere-csi-node
-  namespace: vsphere
+  namespace: {{ vsphere_namespace }}
 spec:
   selector:
     matchLabels:
