@@ -123,6 +123,85 @@
     validate_certs: '{{ ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/vsphere_cloud_controller_manager_daemonset.yaml.j2') }}"
 
+- name: Remove existing temp file
+  file:
+    path: /tmp/csi-vsphere.conf
+    state: absent
+
+- name: Set cluster-id in csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: Global
+    option: cluster-id
+    value: "\"demo-cluster-id\""
+    mode: '0600'
+
+- name: Set insecure-flag in csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: "VirtualCenter \"{{ vcenter_hostname }}\""
+    option: insecure-flag
+    value: "\"true\""
+    mode: '0600'
+
+- name: Set user in csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: "VirtualCenter \"{{ vcenter_hostname }}\""
+    option: user
+    value: "\"{{ vcenter_username }}\""
+    mode: '0600'
+
+- name: Set password in csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: "VirtualCenter \"{{ vcenter_hostname }}\""
+    option: password
+    value: "\"{{ vcenter_password }}\""
+    mode: '0600'
+
+- name: Set port in csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: "VirtualCenter \"{{ vcenter_hostname }}\""
+    option: port
+    value: "\"{{ vcenter_port }}\""
+    mode: '0600'
+
+- name: Set datacenters in csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: "VirtualCenter \"{{ vcenter_hostname }}\""
+    option: datacenters
+    value: "\"{{ datacenter_name }}\""
+    mode: '0600'
+
+#- name: Slurp the csi-vsphere.conf
+#  slurp:
+#    src: /tmp/csi-vsphere.conf
+#  register: csi_vsphere_conf
+
+#- name: Create CSI vSphere Secret
+#  delegate_to: localhost
+#  k8s:
+#    state: present
+#    wait: true
+#    name: vsphere-config-secret
+#    namespace: '{{ vsphere_namespace }}'
+#    kubeconfig: "{{ kubeconfig  }}"
+#    validate_certs: '{{ ssl_enabled }}'
+#    definition: /tmp/csi-vsphere.conf
+#    definition: "{{ lookup('template', 'templates/csi-vsphere.conf.j2') }}"
+
+- name: Create CSI vCenter Secret
+  shell:
+    cmd: oc create secret generic vsphere-config-secret --from-file=/tmp/csi-vsphere.conf --namespace={{ vsphere_namespace }}
+
+- name: Cleanup temp file
+  file:
+    path: /tmp/csi-vsphere.conf
+    state: absent
+
 - name: Create RBAC for CSI Drivers
   delegate_to: localhost
   k8s:
