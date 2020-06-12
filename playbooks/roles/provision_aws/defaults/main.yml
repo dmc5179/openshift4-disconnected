@@ -1,0 +1,20 @@
+---
+# defaults file for provision_aws
+
+
+ami_id: 'ami-00d4375c5625a0988'
+bootstrap_instance_type: 'i3.large'
+ssh_key_name: 'Combine'
+subnet: 'subnet-092a00c216e3afdad' 
+security_group_ids: 'sg-0b6c28f41aac7ce72'
+tag_specs: 'ResourceType=string,Tags=[{Key=Name,Value=caas-bootstrap}]'
+ip_addr: '<PRIVATE_IP>'
+--user-data '{"ignition":{"config":{"replace":{"source":"http://${HTTPD_IP}/openshift4/bootstrap.ign","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
+
+aws_ocp_nodes:
+  - name: bootstrap
+    instance: 'i3.large'
+    subnet: ''
+    sec_grp_ids: ''
+    tag_specs: ''
+    ip: ''
