@@ -1,2 +1,10 @@
 ---
 # tasks file for aws_ebs_csi_driver
+
+- name: Apply ICSP Mapping
+  include_tasks: icsp.yml
+  tags:
+    - never
+    - icsp
+
+#- name: Apply helm chart
