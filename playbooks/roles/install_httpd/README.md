@@ -1,8 +1,6 @@
 # Ansible role `httpd`
 
-[![Build Status](https://travis-ci.org/bertvv/ansible-role-httpd.svg?branch=master)](https://travis-ci.org/bertvv/ansible-role-httpd)
-
-A simple Ansible role for installing and configuring the Apache web server for RHEL/CentOS 7 and Fedora 28+. Specifically, the responsibilities of this role are to:
+A simple Ansible role for installing and configuring the Apache web server for RHEL/CentOS 8 and Fedora 28+. Specifically, the responsibilities of this role are to:
 
 - Install the necessary packages;
 - Maintain the main configuration file;
@@ -83,32 +81,13 @@ httpd_ssl_certificate_file: 'acme-inc.crt'
 
 The same goes for a certificate chain file and CA certificate file. Ensure they are available in the `files/` directory, and define variables `httpd_ssl_certificate_chain_file`, and `httpd_ssl_ca_certificate_file`, respectively.
 
-## Example Playbook
-
-See the test playbooks in either the [Vagrant](https://github.com/bertvv/ansible-role-httpd/blob/vagrant-tests/test.yml) or [Docker](https://github.com/bertvv/ansible-role-httpd/blob/docker-tests/test.yml) test environment. See the section Testing for details.
-
-## Testing
-
-There are two types of test environments available. One powered by Vagrant, another by Docker. The latter is suitable for running automated tests on Travis-CI. Test code is kept in separate orphan branches. For details of how to set up these test environments on your own machine, see the README files in the respective branches:
-
-- Vagrant: [vagrant-tests](https://github.com/bertvv/ansible-role-httpd/tree/vagrant-tests)
-- Docker: [docker-tests](https://github.com/bertvv/ansible-role-httpd/tree/docker-tests)
-
-## Contributing
-
-Issues, feature requests, ideas are appreciated and can be posted in the Issues section.
-
-Pull requests are also very welcome. The best way to submit a PR is by first creating a fork of this Github project, then creating a topic branch for the suggested change and pushing that branch to your own fork. Github can then easily create a PR based on that branch.
-
 ## License
 
 2-clause BSD license, see [LICENSE.md](LICENSE.md)
 
 ## Contributors
 
-- [Bert Van Vreckem](https://github.com/bertvv/) (maintainer)
-- [Richard Marko](https://github.com/sorki)
-- [Lander Van den Bulcke](https://github.com/landervdb/)
+- [Dan Clark](https://github.com/dmc5179/) (maintainer)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTgyMDMwMTUzOF19
+eyJoaXN0b3J5IjpbLTQ5NzQ1MjQyXX0=
 -->
