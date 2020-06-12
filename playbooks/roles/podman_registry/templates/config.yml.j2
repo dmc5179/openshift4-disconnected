@@ -7,8 +7,8 @@ auth:
 log:
   level: debug
 http:
-  addr: 0.0.0.0:5000
-  hostname: https://{{docker_registry_hostname}}
+  addr: 0.0.0.0:{{docker_registry_https_port}}
+  hostname: https://{{docker_registry_hostname}}:{{docker_registry_https_port}}
   tls:
 {% if docker_registry_pki_enabled or docker_registry_ssl_standalone_enabled or docker_registry_ssl_local_standalone_enabled %}
     certificate: /pki/registry.crt
