@@ -1,0 +1,18 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+  vars:
+    nodes:
+      - 'master0'
+      - 'master1'
+      - 'master2'
+      - 'worker0'
+      - 'worker1'
+      - 'worker2'
+  tasks:
+
+    - name: Reboot node and wait for port 22 to respond
+      include_tasks: cycle_host.yaml
+      loop: '{{ nodes }}'
