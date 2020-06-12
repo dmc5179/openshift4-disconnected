@@ -7,12 +7,13 @@ A simple Ansible role for installing and configuring the Apache web server for R
 - Maintain the configuration file for `mod_ssl`. The default settings are based on the recommendations of [Mozilla's SSL Configuration Generator](https://mozilla.github.io/server-side-tls/ssl-config-generator/?server=apache-2.4.34&openssl=1.1.0i&hsts=yes&profile=modern);
 - Install custom certificate files;
 - Enable and maintain the configuration file for `mod_status`.
+- Configure firewalld (if installed and running)
 
 Currently, no virtual hosts or other features are provided.
 
 ## Requirements
 
-- The firewall settings are not considered to be a concern of this role. You can use another role for this, e.g. [bertvv.rh-base](https://galaxy.ansible.com/bertvv/rh-base).
+- No requirements.
 
 ## Dependencies
 
@@ -89,5 +90,5 @@ The same goes for a certificate chain file and CA certificate file. Ensure they 
 
 - [Dan Clark](https://github.com/dmc5179/) (maintainer)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTQ5NzQ1MjQyXX0=
+eyJoaXN0b3J5IjpbMTE0OTI0OTY5MiwtNDk3NDUyNDJdfQ==
 -->
