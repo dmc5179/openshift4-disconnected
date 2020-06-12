@@ -1,9 +1,6 @@
 ---
 # tasks file for vsphere_csi_driver
 
-# TODO: Need to mirror the images for this CSI driver
-#       As well as create the Image Content Source Policy Mapping
-
 - name: Apply ICSP Mapping
   include_tasks: icsp.yml
   tags:
