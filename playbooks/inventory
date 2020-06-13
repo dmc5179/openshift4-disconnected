@@ -1,30 +1,34 @@
 [all]
 
 [dhcp_server]
+localhost ansible_python_interpreter=/usr/bin/python3 ansible_connection=local
 
 [pxe_server]
+localhost ansible_python_interpreter=/usr/bin/python3 ansible_connection=local
 
 [dns_server]
+localhost ansible_python_interpreter=/usr/bin/python3 ansible_connection=local
 
 [helper_node]
+localhost ansible_python_interpreter=/usr/bin/python3 ansible_connection=local
 
 [httpd_server]
+localhost ansible_python_interpreter=/usr/bin/python3 ansible_connection=local
 
 [mirror_server]
+localhost ansible_python_interpreter=/usr/bin/python3 ansible_connection=local
 
 [registry_server]
+localhost ansible_python_interpreter=/usr/bin/python3 ansible_connection=local
 
 [nfs_server]
+localhost ansible_python_interpreter=/usr/bin/python3 ansible_connection=local
 
 [load_balancer]
+localhost ansible_python_interpreter=/usr/bin/python3 ansible_connection=local
 
 [ntp_server]
-
-[bootstrap]
-
-[masters]
-
-[workers]
+localhost ansible_python_interpreter=/usr/bin/python3 ansible_connection=local
 
 [all:vars]
 
@@ -36,15 +40,3 @@
 #ansible_become=yes
 #ansible_become_method=sudo
 #ansible_become_user=root
-
-
-install_bind=false
-install_dhcp=false
-install_httpd=true
-install_pxe=false
-install_nfs=true
-install_roles=false
-install_ntp=false
-install_helm=false
-podman_registry=true
-additional_images=false
