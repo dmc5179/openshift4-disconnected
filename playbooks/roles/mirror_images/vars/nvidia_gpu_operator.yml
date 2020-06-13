@@ -28,3 +28,6 @@ nvidia_gpu_images:
   - repo: 'quay.io'
     image: 'kubernetes_incubator/node-feature-discovery'
     tag: 'v0.4.0'
+  - repo: 'docker.io'
+    image: 'nvidia/container-toolkit'
+    tag: '1.0.0-alpha.3'
