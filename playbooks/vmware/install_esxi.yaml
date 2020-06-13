@@ -5,8 +5,10 @@
   tasks:
 
     - name: Customize ISO
-      import_role:
+      include_role:
         name: custom_iso
+      with_items:
+        - '{{ ocp_nodes }}'
       tags:
         - iso
 
@@ -52,6 +54,8 @@
     - name: Modify Ignition Files
       include_role:
         name: modify_ignition
+      tags:
+        - ignition
 
     - name: Create Ignition staging location
       become: true
