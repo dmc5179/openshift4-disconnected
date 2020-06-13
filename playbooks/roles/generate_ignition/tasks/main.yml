@@ -22,11 +22,20 @@
     src: "{{ pull_secret }}"
   register: slurped_pull_secret_b64
 
+- name: Fetch CA Bundle
+  slurp:
+    src: "{{ certificate_bundle }}"
+  register: slurped_ca_bundle_b64
+
 - name: Copy template install-config.yaml
   template:
     src: install-config.yaml.j2
     dest: "{{ ignition_configs }}/install-config.yaml"
     mode: 0664
+
+- name: Ensure proper spacing of additionalTrustBundle
+  shell:
+    cmd: awk -i inplace 'BEGIN{c=0}  /BEGIN CERTIFICATE/{c=1}  {if (c==1) print " ",$0}  {if (c==0) print $0}  /END CERTIFICATE/{c=0}' "{{ ignition_configs }}/install-config.yaml"
 
 - name: Create manifests
   shell: "{{ openshift_install }} create manifests --dir={{ ignition_configs }}"
@@ -57,12 +66,16 @@
     insertafter: '\[Global\]'
     line: '    port = "{{ vcenter_port }}"'
     firstmatch: true
+  when:
+    - (platform is match("vmware"))
 
 - name: Disable SSL for vCenter API endpoint
   lineinfile:
     path: "{{ ignition_configs }}/manifests/cloud-provider-config.yaml"
     regexp: 'insecure-flag = "1"'
     line: '    insecure-flag = "true"'
+  when:
+    - (platform is match("vmware"))
 
 - name: Create ignition configs
   shell: "{{ openshift_install }} create ignition-configs --dir={{ ignition_configs }}"
