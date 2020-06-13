@@ -7,5 +7,5 @@ metadata:
     storageclass.kubernetes.io/is-default-class: "true"
 provisioner: csi.vsphere.vmware.com
 parameters:
-  datastoreurl: "{{ info.datastores[0].url }}"
+  datastoreurl: "{{ datastore_info.datastores[0].url }}"
   fstype: "ext4"
