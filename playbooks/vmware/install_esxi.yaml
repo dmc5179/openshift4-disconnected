@@ -95,14 +95,6 @@
       tags:
         - ignition
 
-# TODO: Jinja doesn't seem to like a json file
-#    - name: Create append-bootstrap ignition
-#      template:
-#        src: "{{ lookup('template', 'templates/append-bootstrap.ign.j2') }}"
-#        dest: '{{ httpd_document_root }}/ignition/append-bootstrap.ign'
-#        mode: '0755'
-#        setype: 'httpd_sys_content_t'        
-
     - name: Provision ESXi Infrastructure
       import_role:
         name: provision_esxi
