@@ -1,2 +1,6 @@
 ---
 # defaults file for nvidia_gpu_operator
+
+mirror_base: '/tmp'
+
+archive: '{{ mirror_base }}/gpu-operator/gpu-operator-1.0.0.tgz'
