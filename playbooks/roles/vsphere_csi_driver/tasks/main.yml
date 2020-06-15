@@ -99,6 +99,10 @@
   shell:
     cmd: oc adm policy add-scc-to-user privileged -z cloud-controller-manager
 
+- name: Pause 15 seconds to let scc policy catchup
+  pause:
+    seconds: 15
+
 # This was to try and break things up. Doesn't work yet
 #- name: Create Cloud Controller Service
 #  delegate_to: localhost
@@ -125,15 +129,82 @@
     path: /tmp/csi-vsphere.conf
     state: absent
 
-- name: Set cluster-id in csi-vsphere.conf
+# TODO: Not actually sure how to get the cluster ID
+#       I had to get it with the VMWare PowerCLI module and commands on windows....
+- name: Set cluster-id in Global section of csi-vsphere.conf
   ini_file:
     path: /tmp/csi-vsphere.conf
     section: Global
     option: cluster-id
-    value: "\"demo-cluster-id\""
+#    value: "\"ClusterComputeResource-domain-c293\""
+    value: '42Pandas'
     mode: '0600'
 
-- name: Set insecure-flag in csi-vsphere.conf
+- name: Set port in Global section of csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: Global
+    option: port
+    value: "\"{{ vcenter_port }}\""
+    mode: '0600'
+
+#- name: Set secret-name in Global section of csi-vsphere.conf
+#  ini_file:
+#    path: /tmp/csi-vsphere.conf
+#    section: Global
+#    option: secret-name
+#    value: "vsphere-creds"
+#    mode: '0600'
+
+#- name: Set secret-namespace in Global section of csi-vsphere.conf
+#  ini_file:
+#    path: /tmp/csi-vsphere.conf
+#    section: Global
+#    option: secret-namespace
+#    value: "kube-system"
+#    mode: '0600'
+
+- name: Set insecure-flag in Global section of csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: Global
+    option: insecure-flag
+    value: "\"true\""
+    mode: '0600'
+
+- name: Set server in Workspace section of csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: Workspace
+    option: server
+    value: "{{ vcenter_hostname }}"
+    mode: '0600'
+
+- name: Set datacenter in Workspace section of csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: Workspace
+    option: datacenter
+    value: "{{ datacenter_name }}"
+    mode: '0600'
+
+- name: Set default-datastore in Workspace section of csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: Workspace
+    option: 'default-datastore'
+    value: "{{ datastore_name }}"
+    mode: '0600'
+
+- name: Set folder in Workspace section of csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: Workspace
+    option: folder
+    value: "caas"
+    mode: '0600'
+
+- name: Set insecure-flag in VirtualCenter section of csi-vsphere.conf
   ini_file:
     path: /tmp/csi-vsphere.conf
     section: "VirtualCenter \"{{ vcenter_hostname }}\""
@@ -141,7 +212,8 @@
     value: "\"true\""
     mode: '0600'
 
-- name: Set user in csi-vsphere.conf
+# TODO: Try to use the existing cloud provider credentials instead
+- name: Set user in VirtualCenter section of csi-vsphere.conf
   ini_file:
     path: /tmp/csi-vsphere.conf
     section: "VirtualCenter \"{{ vcenter_hostname }}\""
@@ -149,7 +221,8 @@
     value: "\"{{ vcenter_username }}\""
     mode: '0600'
 
-- name: Set password in csi-vsphere.conf
+# TODO: Try to use the existing cloud provider credentials instead
+- name: Set password in VirtualCenter section of csi-vsphere.conf
   ini_file:
     path: /tmp/csi-vsphere.conf
     section: "VirtualCenter \"{{ vcenter_hostname }}\""
@@ -157,7 +230,7 @@
     value: "\"{{ vcenter_password }}\""
     mode: '0600'
 
-- name: Set port in csi-vsphere.conf
+- name: Set port in VirtualCenter section of csi-vsphere.conf
   ini_file:
     path: /tmp/csi-vsphere.conf
     section: "VirtualCenter \"{{ vcenter_hostname }}\""
@@ -165,7 +238,7 @@
     value: "\"{{ vcenter_port }}\""
     mode: '0600'
 
-- name: Set datacenters in csi-vsphere.conf
+- name: Set datacenters in VirtualCenter section of csi-vsphere.conf
   ini_file:
     path: /tmp/csi-vsphere.conf
     section: "VirtualCenter \"{{ vcenter_hostname }}\""
