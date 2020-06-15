@@ -65,7 +65,14 @@
     path: "{{ ignition_configs }}/manifests/cloud-provider-config.yaml"
     insertafter: '\[Global\]'
     line: '    port = "{{ vcenter_port }}"'
-    firstmatch: true
+  when:
+    - (platform is match("vmware"))
+
+- name: Add vCenter port to VirtualCenter cloud provider config
+  lineinfile:
+    path: "{{ ignition_configs }}/manifests/cloud-provider-config.yaml"
+    insertafter: '\[VirtualCenter.*\]'
+    line: '    report = "{{ vcenter_port }}"'
   when:
     - (platform is match("vmware"))
 
@@ -74,6 +81,14 @@
     path: "{{ ignition_configs }}/manifests/cloud-provider-config.yaml"
     regexp: 'insecure-flag = "1"'
     line: '    insecure-flag = "true"'
+  when:
+    - (platform is match("vmware"))
+
+- name: Fix line due to ansible bug
+  lineinfile:
+    path: "{{ ignition_configs }}/manifests/cloud-provider-config.yaml"
+    regexp: 'report = \"{{ vcenter_port }}\"'
+    line: '    port = "{{ vcenter_port }}"'
   when:
     - (platform is match("vmware"))
 
