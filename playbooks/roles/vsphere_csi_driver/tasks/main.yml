@@ -27,6 +27,10 @@
     - 'worker1.caas'
     - 'worker2.caas'
 
+- name: Pause for taint to take effect
+  pause:
+    seconds: 5
+
 - name: Create cloud control config map
   delegate_to: localhost
   k8s:
@@ -83,36 +87,18 @@
     cmd: oc create rolebinding -n kube-system vsphere-cpi-kubesystem --role=extension-apiserver-authentication-reader --serviceaccount=vsphere:cloud-controller-manager
   ignore_errors: true
 
-# This was to try and break things up. Doesn't work yet
-#- name: Create Cloud Controlelr Manager Service Account
-#  delegate_to: localhost
-#  k8s:
-#    state: present
-#    wait: true
-#    namespace: '{{ vsphere_namespace }}'
-#    kubeconfig: "{{ kubeconfig  }}"
-#    validate_certs: '{{ ssl_enabled }}'
-#    definition: "{{ lookup('template', 'templates/service_account.yaml.j2') }}"
+- name: Pause to let role binding take effect
+  pause:
+    seconds: 5
 
 - name: Set SCC Policy
   delegate_to: localhost
   shell:
     cmd: oc adm policy add-scc-to-user privileged -z cloud-controller-manager
 
-- name: Pause 15 seconds to let scc policy catchup
+- name: Pause to let scc policy take effect
   pause:
-    seconds: 15
-
-# This was to try and break things up. Doesn't work yet
-#- name: Create Cloud Controller Service
-#  delegate_to: localhost
-#  k8s:
-#    state: present
-#    namespace: '{{ vsphere_namespace }}'
-#    wait: true
-#    kubeconfig: "{{ kubeconfig  }}"
-#    validate_certs: '{{ ssl_enabled }}'
-#    definition: "{{ lookup('template', 'templates/vsphere_cloud_controller_manager_service.yaml.j2') }}"
+    seconds: 5
 
 - name: Create Cloud Controller Daemonset
   delegate_to: localhost
@@ -267,6 +253,10 @@
   shell:
     cmd: oc create secret generic vsphere-config-secret --from-file=/tmp/csi-vsphere.conf --namespace={{ vsphere_namespace }}
 
+- name: Pause to let secret apply
+  pause:
+    seconds: 5
+
 - name: Cleanup temp file
   file:
     path: /tmp/csi-vsphere.conf
@@ -288,10 +278,18 @@
     cmd: oc create rolebinding -n kube-system vsphere-csi-kubesystem --role=extension-apiserver-authentication-reader --serviceaccount=vsphere:vsphere-csi-controller
   ignore_errors: true
 
+- name: Pause to let role binding apply
+  pause:
+    seconds: 5
+
 - name: RoleBinding is needed for the vsphere-csi-controller service account
   delegate_to: localhost
   shell:
     cmd: oc adm policy add-scc-to-user privileged -z vsphere-csi-controller
+
+- name: Pause to let adm policy take effect
+  pause:
+    seconds: 5
 
 - name: Create CSI Controller Stateful Set
   delegate_to: localhost
@@ -334,4 +332,3 @@
     kubeconfig: "{{ kubeconfig  }}"
     validate_certs: '{{ ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/vsphere_csi_storage_class.yaml.j2') }}"
-
