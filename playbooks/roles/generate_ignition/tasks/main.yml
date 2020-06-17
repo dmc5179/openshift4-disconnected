@@ -39,7 +39,6 @@
 
 - name: Create manifests
   shell: "{{ openshift_install }} create manifests --dir={{ ignition_configs }}"
-#  creates: "{{ ignition_configs }}/manifests/cluster-config.yaml"
 
 - name: Set masters to unschedulable
   replace:
