@@ -1,5 +1,5 @@
 ---
-vsphere_csi_images:
+vsphere_csi_images_v1:
   - repo: 'gcr.io'
     image: 'cloud-provider-vsphere/cpi/release/manager'
     tag: 'latest'
@@ -24,3 +24,23 @@ vsphere_csi_images:
   - repo: 'quay.io'
     image: 'k8scsi/livenessprobe'
     tag: 'v1.1.0'
+
+vsphere_csi_images_v2:
+  - repo: 'quay.io'
+    image: 'k8scsi/csi-attacher'
+    tag: 'v2.0.0'
+  - repo: 'gcr.io'
+    image: 'cloud-provider-vsphere/csi/release/driver'
+    tag: 'v2.0.0'
+  - repo: 'gcr.io'
+    image: 'cloud-provider-vsphere/csi/release/syncer'
+    tag: 'v2.0.0'
+  - repo: 'quay.io'
+    image: 'k8scsi/csi-provisioner'
+    tag: 'v1.4.0'
+  - repo: 'quay.io'
+    image: 'k8scsi/csi-node-driver-registrar'
+    tag: 'v1.2.0'
+  - repo: 'gcr.io'
+    image: 'cloud-provider-vsphere/csi/release/driver'
+    tag: 'v2.0.0'
