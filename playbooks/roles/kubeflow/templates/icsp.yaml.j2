@@ -1,0 +1,86 @@
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  name: kubeflow
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - {{ }}/argoproj/argoui
+    source: docker.io/argoproj/argoui
+  - mirrors:
+    - {{ }}/kubeflow-images-public/centraldashboard
+    source: gcr.io/kubeflow-images-public/centraldashboard
+  - mirrors:
+    - {{ }}/argoproj/workflow-controller
+    source: docker.io/argoproj/workflow-controller
+  - mirrors:
+    - {{ }}/
+    source: 
+  - mirrors:
+    - {{ }}/
+    source: 
+  - mirrors:
+    - {{ }}/
+    source: 
+
+"docker.io/istio/proxy_init:1.1.6"
+]]
+"docker.io/istio/kubectl:1.1.6"
+"docker.io/istio/kubectl:1.1.6"
+"docker.io/istio/kubectl:1.1.6"
+"docker.io/istio/galley:1.1.6"
+"docker.io/istio/proxyv2:1.1.6"
+"docker.io/istio/proxyv2:1.1.6"
+"grafana/grafana:6.0.2"
+"docker.io/kiali/kiali:v0.16"
+"docker.io/istio/mixer:1.1.6"
+"docker.io/istio/proxyv2:1.1.6"
+"docker.io/istio/mixer:1.1.6"
+"docker.io/istio/proxyv2:1.1.6"
+"docker.io/istio/pilot:1.1.6"
+"docker.io/istio/proxyv2:1.1.6"
+"docker.io/prom/prometheus:v2.3.1"
+"docker.io/istio/citadel:1.1.6"
+"docker.io/istio/sidecar_injector:1.1.6"
+"docker.io/jaegertracing/all-in-one:1.9"
+argoproj/argoui:v2.3.0
+argoproj/workflow-controller:v2.3.0
+gcr.io/kubeflow-images-public/centraldashboard
+"quay.io/jetstack/cert-manager-cainjector:v0.11.0"
+"quay.io/jetstack/cert-manager-controller:v0.11.0"
+"quay.io/jetstack/cert-manager-webhook:v0.11.0"
+image:
+gcr.io/kubeflow-images-public/jupyter-web-app:v0.5.0
+image:
+quay.io/kubeflow/tf-notebook-image:v0.7.0
+quay.io/kubeflow/tf-notebook-image:v0.7.0
+mysql:8.0.3
+gcr.io/kubeflow-images-public/metadata:v0.1.11
+gcr.io/tfx-oss-public/ml_metadata_store_server:0.15.1
+gcr.io/ml-pipeline/envoy:metadata-grpc
+gcr.io/kubeflow-images-public/metadata-frontend:v0.1.8
+gcr.io/kubeflow-images-public/notebook-controller:v20190614-v0-160-g386f2749-e3b0c4
+gcr.io/kubeflow-images-public/pytorch-operator:v0.6.0-18-g5e36a57
+tensorflow/tensorflow:1.8.0
+gcr.io/kubeflow-images-public/tf_operator:kubeflow-tf-operator-postsubmit-v1-5adee6f-6109-a25c
+gcr.io/kubeflow-images-public/katib/v1alpha3/katib-controller
+gcr.io/kubeflow-images-public/katib/v1alpha3/katib-db-manager
+mysql:8
+gcr.io/kubeflow-images-public/katib/v1alpha3/katib-ui
+docker.io/kubeflowkatib/mxnet-mnist
+gcr.io/ml-pipeline/api-server
+minio/minio:RELEASE.2018-02-09T22-40-05Z
+mysql:5.6
+gcr.io/ml-pipeline/persistenceagent
+gcr.io/ml-pipeline/frontend
+gcr.io/ml-pipeline/viewer-crd-controller:0.1.31
+gcr.io/ml-pipeline/scheduledworkflow
+gcr.io/ml-pipeline/visualization-server
+gcr.io/kubeflow-images-public/profile-controller:v20190619-v0-219-gbd3daa8c-dirty-1ced0e
+gcr.io/kubeflow-images-public/kfam:v20190612-v0-170-ga06cdb79-dirty-a33ee4
+gcr.io/$(project)/profile-controller:latest
+image:
+image:
+image:
+
