@@ -46,7 +46,8 @@
   with_items:
     - '{{ tower_images }}'
     - '{{ compliance_operator_images }}'
-    - '{{ vsphere_csi_images }}'
+    - '{{ vsphere_csi_images_v1 }}'
+    - '{{ vsphere_csi_images_v2 }}'
     - '{{ quay_images }}'
     - '{{ nvidia_gpu_images }}'
     - '{{ nfs_provisioner_images }}'
