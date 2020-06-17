@@ -148,7 +148,7 @@
 #- name: Generate a Self Signed OpenSSL certificate
 #  become: true
 #  openssl_certificate:
-#    path: '{{ base_dir }}/config/ssl.crt'
+#    path: '{{ base_dir }}/config/ssl.cert'
 #    privatekey_path: '{{ base_dir }}/config/ssl.key'
 #    csr_path: '{{ base_dir }}/config/{{ quay_hostname }}.csr'
 #    provider: selfsigned
@@ -189,6 +189,7 @@
   command: >
     podman run --privileged=true \
     --publish 8443:8443 \
+    --publish 8080:8080 \
     --sysctl net.core.somaxconn=4096 \
     --name {{ quay_container_name }} \
     -v '{{ base_dir }}/config:/conf/stack:Z' \

@@ -15,5 +15,5 @@ redis_container_name: 'quay-redis'
 quay_container_name: 'quay'
 quay_password: '$y$j9T$znxnlii9krRxLVWoav/uh1$nMXAqx8xhsH4NS9HallclbfA2pYqcNlSSqc11pwVbG2'
 quay_config_mode: false
-quay_hostname: 'bastion.42pandas.com'
+quay_hostname: 'quay.redhatgovic.io'
 quay_SAN: 'DNS:quay.redhatgovic.io'
