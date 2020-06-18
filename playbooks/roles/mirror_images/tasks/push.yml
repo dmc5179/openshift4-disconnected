@@ -31,6 +31,7 @@
     - '{{ nvidia_gpu_images }}'
     - '{{ nfs_provisioner_images }}'
     - '{{ aws_ebs_csi_driver_images }}'
+    - '{{ kubeflow_images }}'
   tags:
     - never
     - push
