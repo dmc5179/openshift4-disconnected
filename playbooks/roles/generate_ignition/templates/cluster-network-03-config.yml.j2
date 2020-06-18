@@ -11,6 +11,6 @@ spec:
   defaultNetwork:
     type: OpenShiftSDN
     openshiftSDNConfig:
-      mode: NetworkPolicy
+      mode: {{ network_policy }}
       mtu: {{ mtu }}
       vxlanPort: {{ vxlanPort }}
