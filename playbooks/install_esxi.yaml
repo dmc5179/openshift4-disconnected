@@ -8,7 +8,7 @@
       include_role:
         name: custom_iso
       with_items:
-        - '{{ ocp_nodes }}'
+        - '{{ openshift_hosts }}'
       tags:
         - iso
 
@@ -23,7 +23,7 @@
         validate_certs: "{{ ssl_enabled }}"
       delegate_to: localhost
       with_items:
-        - '{{ ocp_nodes }}'
+        - '{{ openshift_hosts }}'
       loop_control:
         pause: 5
       tags:

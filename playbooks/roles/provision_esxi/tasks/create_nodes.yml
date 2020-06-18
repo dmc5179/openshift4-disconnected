@@ -20,52 +20,6 @@
 #    state: present
 #  delegate_to: localhost
 
-#- name: Deploy bootstrap node
-#  vmware_deploy_ovf:
-#    hostname: '{{ vcenter_hostname }}'
-#    username: '{{ vcenter_username }}'
-#    password: '{{ vcenter_password }}'
-#    datacenter: '{{ datacenter_name }}'
-#    datastore: '{{ datastore_name }}'
-#    port: "{{ vcenter_port }}"
-#    name: bootstrap
-#    folder: '/42Pandas Main Datacenter/vm/caas'
-#    disk_provisioning: thin
-#    networks: "{u'VM Network':u'openshift'}"
-#    validate_certs: "{{ ssl_enabled }}"
-#    power_on: false
-#    ovf: '/opt/openshift/rhcos/rhcos-4.3.8-x86_64-vmware.x86_64.ova'
-#    properties:
-#      guestinfo.ignition.config.data: '{{ append_bootstrap.content }}'
-#      guestinfo.ignition.config.data.encoding: 'base64'
-#      guestinfo.coreos.config.data: '{{ append_bootstrap.content }}'
-#      guestinfo.coreos.config.data.encoding: 'base64'
-#      guestinfo.hostname: 'bootstrap.caas.redhatgovic.io'
-#      guestinfo.interface.0.name: 'ens192'
-#      guestinfo.interface.0.dhcp: 'no'
-#      guestinfo.interface.0.role: 'public'
-#      guestinfo.interface.0.ip.0.address: '10.0.106.50/24'
-#      guestinfo.interface.0.route.0.gateway: '10.0.106.1'
-#      guestinfo.interface.0.route.0.destination: '0.0.0.0/0'
-#      guestinfo.dns.server.0: '10.0.106.42'
-#      disk.EnableUUID: true
-#  delegate_to: localhost
-
-#- name: Change virtual machine's boot order and related parameters
-#  vmware_guest_boot_manager:
-#    hostname: "{{ vcenter_hostname }}"
-#    username: "{{ vcenter_username }}"
-#    password: "{{ vcenter_password }}"
-#    port: "{{ vcenter_port }}"
-#    name: bootstrap
-#    boot_delay: 5000
-#    enter_bios_setup: false
-#    boot_retry_enabled: false
-#    boot_firmware: efi
-#    secure_boot_enabled: False
-#    validate_certs: "{{ ssl_enabled }}"
-#  delegate_to: localhost
-
 - name: Create bootstrap
   vmware_guest:
     hostname: "{{ vcenter_hostname }}"
@@ -104,6 +58,8 @@
       state: present
     networks:
     - name: 'openshift'
+      device_type: vmxnet3
+#      mac: "{{ openshift_hosts.name['bootstrap'].mac }}"
     wait_for_ip_address: no
   delegate_to: localhost
   register: deploy_bootstrap
@@ -132,7 +88,7 @@
 
 - name: Pause to wait for bootstrap to initialized
   pause:
-    minutes: 1
+    minutes: 5
 
 - name: Create master nodes
   vmware_guest:
@@ -171,6 +127,8 @@
       iso_path: "[USB-Datastore] /ISOs/{{ item }}.iso"
     networks:
     - name: 'openshift'
+      device_type: vmxnet3
+#      mac: "{{ openshift_hosts.name['item'].mac }}"
     wait_for_ip_address: no
   delegate_to: localhost
   register: deploy
@@ -246,6 +204,8 @@
       iso_path: "[USB-Datastore] /ISOs/{{ item }}.iso"
     networks:
     - name: 'openshift'
+      device_type: vmxnet3
+#      mac: "{{ openshift_hosts.name['item'].mac }}"
     wait_for_ip_address: no
   delegate_to: localhost
   register: deploy
