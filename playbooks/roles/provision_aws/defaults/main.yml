@@ -11,7 +11,7 @@ tag_specs: 'ResourceType=string,Tags=[{Key=Name,Value=caas-bootstrap}]'
 ip_addr: '<PRIVATE_IP>'
 --user-data '{"ignition":{"config":{"replace":{"source":"http://${HTTPD_IP}/openshift4/bootstrap.ign","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
 
-aws_ocp_nodes:
+aws_openshift_hosts:
   - name: bootstrap
     instance: 'i3.large'
     subnet: ''
