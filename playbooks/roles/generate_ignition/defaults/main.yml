@@ -36,3 +36,10 @@ certificate_bundle: '/opt/openshift/etc/docker-registry/pki/registry.crt'
 
 # none, vmware, aws, azure, gcp
 platform: none
+
+cluster_network_cidr: '10.128.0.0/14'
+cluster_network_prefix: 23
+service_network_cidr: '172.30.0.0/16'
+
+mtu: 1450
+vxlanPort: 4789

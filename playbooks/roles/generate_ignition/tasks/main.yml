@@ -5,52 +5,72 @@
   file:
     path: "{{ ignition_configs }}"
     state: absent
+  tags:
+    - manifests
 
 - name: Create ignition configs directory
   file:
     path: "{{ ignition_configs }}"
     state: directory
     mode: '0755'
+  tags:
+    - manifests
 
 - name: Fetch public key
   slurp:
     src: "{{ ssh_public_key_file }}"
   register: slurped_key_b64
+  tags:
+    - manifests
 
 - name: Fetch pull secret
   slurp:
     src: "{{ pull_secret }}"
   register: slurped_pull_secret_b64
+  tags:
+    - manifests
 
 - name: Fetch CA Bundle
   slurp:
     src: "{{ certificate_bundle }}"
   register: slurped_ca_bundle_b64
+  tags:
+    - manifests
 
 - name: Copy template install-config.yaml
   template:
     src: install-config.yaml.j2
     dest: "{{ ignition_configs }}/install-config.yaml"
     mode: 0664
+  tags:
+    - manifests
 
 - name: Ensure proper spacing of additionalTrustBundle
   shell:
     cmd: awk -i inplace 'BEGIN{c=0}  /BEGIN CERTIFICATE/{c=1}  {if (c==1) print " ",$0}  {if (c==0) print $0}  /END CERTIFICATE/{c=0}' "{{ ignition_configs }}/install-config.yaml"
+  tags:
+    - manifests
 
 - name: Create manifests
   shell: "{{ openshift_install }} create manifests --dir={{ ignition_configs }}"
+  tags:
+    - manifests
 
 - name: Set masters to unschedulable
   replace:
     path: "{{ ignition_configs }}/manifests/cluster-scheduler-02-config.yml"
     regexp: 'mastersSchedulable: true'
     replace: 'mastersSchedulable: false'
+  tags:
+    - manifests
 
 - name: Set cluster upgrade channel
   replace:
     path: "{{ ignition_configs }}/manifests/cvo-overrides.yaml"
     regexp: 'channel:.*'
     replace: 'channel: {{ cluster_channel }}'
+  tags:
+    - manifests
 
 # Prevent the cluster from trying to reach the Cincinnati for update graphs
 - name: Set dummy Cincinnati server
@@ -58,6 +78,8 @@
     path: "{{ ignition_configs }}/manifests/cvo-overrides.yaml"
     regexp: 'upstream:.*'
     replace: 'upstream: http://localhost:8080/graph'
+  tags:
+    - manifests
 
 - name: Add vCenter port to global cloud provider config
   lineinfile:
@@ -66,6 +88,8 @@
     line: '    port = "{{ vcenter_port }}"'
   when:
     - (platform is match("vmware"))
+  tags:
+    - manifests
 
 - name: Add vCenter port to VirtualCenter cloud provider config
   lineinfile:
@@ -74,6 +98,8 @@
     line: '    report = "{{ vcenter_port }}"'
   when:
     - (platform is match("vmware"))
+  tags:
+    - manifests
 
 - name: Disable SSL for vCenter API endpoint
   lineinfile:
@@ -82,6 +108,8 @@
     line: '    insecure-flag = "true"'
   when:
     - (platform is match("vmware"))
+  tags:
+    - manifests
 
 - name: Fix line due to ansible bug
   lineinfile:
@@ -90,6 +118,16 @@
     line: '    port = "{{ vcenter_port }}"'
   when:
     - (platform is match("vmware"))
+  tags:
+    - manifests
+
+- name: Customize MTU and vxlanPort
+  template:
+    src: cluster-network-03-config.yml.j2
+    dest: "{{ ignition_configs }}/manifests/cluster-network-03-config.yml"
+    mode: 0640
+  tags:
+    - manifests
 
 - name: Create ignition configs
   shell: "{{ openshift_install }} create ignition-configs --dir={{ ignition_configs }}"
