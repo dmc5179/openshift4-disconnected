@@ -282,12 +282,12 @@ option ntp-servers {{ subnet.ntp_servers|join(', ') }};
 {% endif %}
 }
 {% endfor %}
-{% if dhcp_hosts is defined %}
+{% if openshift_hosts is defined %}
 
 #
 # Host declarations
 #
-{% for host in dhcp_hosts %}
+{% for host in openshift_hosts %}
 host {{ host.name | replace (" ","_") | replace ("'","_") | replace (":","_") }} {
   hardware ethernet {{ host.mac }};
 {% if host.ip is defined %}

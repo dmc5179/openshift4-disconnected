@@ -10,7 +10,10 @@ dhcp_subnets:
     range_end: 10.0.106.250
 
 # Example IP assignment
-#dhcp_hosts:
+# Note that this array shares the same name as the top level
+# openshift_hosts that is used by other roles. Unless using this role independently
+# you may not have to fill out the array here.
+#openshift_hosts:
 #  - name: cl1
 #    mac: '00:11:22:33:44:55'
 #    ip: 192.168.222.150
