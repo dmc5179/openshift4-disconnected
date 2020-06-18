@@ -4,6 +4,6 @@
   become: true
   tasks:
 
-    - name: Install and Configure BIND DNS
+    - name: Install and Configure DHCP Server
       include_role:
         name: install_dhcp
