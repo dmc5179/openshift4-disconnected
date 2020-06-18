@@ -1,13 +1,17 @@
 ---
 # defaults file for install_dhcp
 
-dhcp_subnets:
-  - ip: 10.0.106.0
-    netmask: 255.255.255.0
-    domain_name_servers:
-      - 10.0.106.42
-    range_begin: 10.0.106.200
-    range_end: 10.0.106.250
+# Example subnet assignment
+# Note that this array shares the same name as the top level
+# openshift_hosts that is used by other roles. Unless using this role independently
+# you may not have to fill out the array here.
+#dhcp_subnets:
+#  - ip: 10.0.106.0
+#    netmask: 255.255.255.0
+#    domain_name_servers:
+#      - 10.0.106.42
+#    range_begin: 10.0.106.200
+#    range_end: 10.0.106.250
 
 # Example IP assignment
 # Note that this array shares the same name as the top level
