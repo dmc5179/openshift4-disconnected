@@ -24,3 +24,12 @@
 #  - name: cl2
 #    mac: '00:de:ad:be:ef:00'
 #    ip: 192.168.222.151
+
+
+# Server where PXE is configured
+# could be TFTP, HTTP, etc...
+#dhcp_pxeboot_server: 10.0.106.42
+
+#dhcp_global_domain_name:
+#dhcp_global_domain_search:
+#dhcp_global_server_name:
