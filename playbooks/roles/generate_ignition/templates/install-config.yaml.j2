@@ -13,11 +13,11 @@ metadata:
   name: {{ ocp_cluster_name }}
 networking:
   clusterNetwork:
-  - cidr: 10.128.0.0/14
-    hostPrefix: 23
+  - cidr: {{ cluster_network_cidr }}
+    hostPrefix: {{ cluster_network_prefix }}
   networkType: OpenShiftSDN
   serviceNetwork:
-  - 172.30.0.0/16
+  - {{ service_network_cidr }}
 platform:
   vsphere:
     vcenter: {{ vcenter_hostname }}
