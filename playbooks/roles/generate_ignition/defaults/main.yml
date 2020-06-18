@@ -43,3 +43,5 @@ service_network_cidr: '172.30.0.0/16'
 
 mtu: 1450
 vxlanPort: 4789
+
+network_policy: 'NetworkPolicy'
