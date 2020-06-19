@@ -1,7 +1,66 @@
 #!/usr/bin/python
 
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+ANSIBLE_METADATA = {
+    'metadata_version': '1.1',
+    'status': ['preview'],
+    'supported_by': 'community'
+}
+
+DOCUMENTATION = '''
+---
+module: filetranspiler
+
+short_description: Creates an Ignition JSON file from a fake root.
+
+version_added: "2.4"
+
+description:
+    - "This is my longer description explaining my test module"
+
+options:
+    name:
+        description:
+            - This is the message to send to the test module
+        required: true
+    new:
+        description:
+            - Control to demo if the result of this module is changed or not
+        required: false
+
+author:
+    - Dan Clark (@dmc5179)
+'''
+
+EXAMPLES = '''
+# Pass in a message
+- name: Test with a message
+  my_test:
+    name: hello world
+
+# pass in a message and have changed true
+- name: Test with a message and changed output
+  my_test:
+    name: hello world
+    new: true
+
+# fail the module
+- name: Test failure of the module
+  my_test:
+    name: fail me
+'''
+
+RETURN = '''
+original_message:
+    description: The original name param that was passed in
+    type: str
+    returned: always
+message:
+    description: The output message that the test module generates
+    type: str
+    returned: always
+'''
 
 from ansible.module_utils.basic import *
 
