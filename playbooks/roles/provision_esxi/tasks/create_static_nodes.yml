@@ -1,8 +1,4 @@
 ---
-#- name: Base64 encode append-bootstrap
-#  slurp:
-#    src: "/var/www/html/ignition/append-bootstrap.ign"
-#  register: append_bootstrap
 
 #- name: Deploy Virtual Machine from template in content library
 #  vmware_content_deploy_template:
