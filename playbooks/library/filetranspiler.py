@@ -2,6 +2,18 @@
 
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
+import abc 
+import argparse
+import base64
+import json
+import magic
+import os
+import pathlib
+import stat
+import yaml
+
+from ansible.module_utils.basic import AnsibleModule
+
 ANSIBLE_METADATA = {
     'metadata_version': '1.1',
     'status': ['preview'],
@@ -61,19 +73,6 @@ message:
     type: str
     returned: always
 '''
-
-from ansible.module_utils.basic import *
-
-import abc
-import argparse
-import base64
-import json
-import magic
-import os
-import pathlib
-import stat
-import yaml
-
 
 __version__ = '1.1.2'
 
@@ -365,16 +364,16 @@ def loader(ignition_file):
 
 def main():
 
- global module
+    global module
 
     module = AnsibleModule(
         argument_spec=dict(
             ignition=dict(type='path', required=True),
             fakeroot=dict(type='path', required=True),
-            output=dict(type='path', required=False),
+            output=dict(type='path', required=True),
             pretty=dict(type='bool', default=False),
             dereference=dict(type='bool', default=False),
-            output_format=dict(type='str', choices=['json', 'yaml')
+            output_format=dict(type='str', choices=['json', 'yaml'])
         ),
         supports_check_mode=False,
     )
@@ -382,17 +381,12 @@ def main():
 ######
 
     # Open the base ignition file and load it
-    if args.ignition is not None:
-        # Get the ignition config
-        try:
-            ignition_cfg, spec_cls = loader(args.ignition)
-            ignition_spec = spec_cls(ignition_cfg, args)
-        except FileTranspilerError as err:
-            parser.error(err)
-    else:
-        # Default to empty spec 2.3.0
-        ignition_cfg = { "ignition": { "version": "2.3.0" } }
-        ignition_spec = SpecV2(ignition_cfg, args)
+    # Get the ignition config
+    try:
+        ignition_cfg, spec_cls = loader(module.params['ignition'])
+        ignition_spec = spec_cls(ignition_cfg, module.params)
+    except FileTranspilerError as err:
+        parser.error(err)
 
     # Merge the and output the results
     merged_ignition = ignition_spec.merge()
@@ -406,13 +400,9 @@ def main():
             ignition_out = json.dumps(merged_ignition)
     else:
         ignition_out = yaml.safe_dump(merged_ignition)
-    if args.output:
-        with open(args.output, 'w') as out_f:
-            out_f.write(ignition_out)
-    else:
-        print(ignition_out)
 
-
+    with open(module.params['output'], 'w') as out_f:
+        out_f.write(ignition_out)
 
 ######
 
