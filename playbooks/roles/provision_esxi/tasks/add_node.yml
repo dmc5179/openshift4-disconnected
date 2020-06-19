@@ -1,0 +1,14 @@
+---
+# Playbook for adding a node to the OCP 4 cluster on VMWare
+
+
+#base64 --wrap=0 ./api-int.pem 1> ./api.int.base64
+
+
+- name: Get a cert from an https port
+  get_certificate:
+    host: "api-int.{{ ocp_cluster_name }}.{{ ocp_base_domain }}"
+    port: 22623
+  delegate_to: localhost
+  run_once: true
+  register: cert
