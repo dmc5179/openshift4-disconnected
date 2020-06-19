@@ -10,4 +10,12 @@ dhcp_subnets:
 
 # Server where PXE is configured
 # could be TFTP, HTTP, etc...
-dhcp_pxeboot_server: 10.0.106.42
+dhcp_pxeboot_server: '10.0.106.42'
+dhcp_global_next_server: '10.0.106.42'
+
+#dhcp_global_ntp_servers:
+
+#dhcp_global_routers:
+
+dhcp_global_domain_name: 'example.com'
+dhcp_global_domain_search: 'example.com'
