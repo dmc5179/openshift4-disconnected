@@ -9,12 +9,11 @@
       file:
         path: '/var/www/html/ignition'
         state: absent
-      tags:
-        - ignition
 
     - name: Generate Ignition Files
       import_role:
         name: generate_ignition
-      tags:
-        - ignition
 
+    - name: Modify Ignition Files
+      include_role:
+        name: modify_ignition
