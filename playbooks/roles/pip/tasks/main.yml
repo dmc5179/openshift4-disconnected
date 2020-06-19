@@ -1,2 +1,18 @@
 ---
 # tasks file for pip
+
+- name: Download pip modules
+  shell:
+    cmd: pip3 download -d /opt/openshift/pip "{{ item.name }}=={{ item.version }}"
+  with_items:
+    - '{{ pip_modules }}'
+  tags:
+    - mirror
+
+- name: Install mirrored pip modules
+  shell:
+    cmd: pip3 install --user -d /opt/openshift/pip "{{ item.name }}=={{ item.version }}"
+  with_items:
+    - '{{ pip_modules }}'
+  tags:
+    - install
