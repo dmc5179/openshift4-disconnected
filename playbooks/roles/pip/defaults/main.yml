@@ -1,6 +1,9 @@
 ---
 # defaults file for pip
 
+mirror_base: '/opt/openshift'
+pip_cmd: pip3
+
 pip_modules:
   - name: kubernetes
     version: '11.0.0'
