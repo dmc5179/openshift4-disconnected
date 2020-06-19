@@ -1,0 +1,18 @@
+---
+- hosts: localhost
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: filetranspiler testing
+      filetranspiler:
+        ignition: ''
+        fakeroot: ''
+        output: ''
+        pretty: false
+        dereference: false
+        output_format: 'json'
+      register: result
+
+    - debug:
+        var: result
