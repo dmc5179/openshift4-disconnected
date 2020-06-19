@@ -1,6 +1,8 @@
 ---
 # defaults file for provision_esxi
 
+mirror_base: '/opt/openshift'
+
 ssl_enabled: false
 
 vcenter_username: ''

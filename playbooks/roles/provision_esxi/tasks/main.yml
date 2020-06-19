@@ -24,27 +24,15 @@
   register: vm_folder_creation_result
   delegate_to: localhost
 
-- name: Copy RHCOS OVA to Datastore
-  vsphere_copy:
-    hostname: '{{ vcenter_hostname }}'
-    port: '{{ vcenter_port }}'
-    username: '{{ vcenter_username }}'
-    password: '{{ vcenter_password }}'
-    src: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-vmware.{{ arch }}.ova'
-    datacenter: '{{ datacenter_name }}'
-    datastore: '{{ datastore_name }}'
-    path: 'caas/rhcos-{{ rhcos_ver }}-{{ arch }}-vmware.{{ arch }}.ova'
-    validate_certs: "{{ ssl_enabled }}"
-  delegate_to: localhost
-  when: (upload_ova | bool)
-
-# TODO: OVA Template cannot be used with static IPs
-#       This is a known issue
-#- name: Include Tasks to create template
-#  include_tasks: create_template.yml
-
 #- name: Include tasks to create networks
 #  include_tasks: create_network.yml
 
-- name: Include tasks to create nodes
-  include_tasks: create_nodes.yml
+- name: Include tasks to create nodes with static IPs
+  include_tasks: create_static_nodes.yml
+  when:
+    - (network_mode is match("static"))
+
+- name: Include tasks to create nodes with DHCP
+  include_tasks: create_dhcp_nodes.yml
+  when:
+    - (network_mode is match("dhcp"))

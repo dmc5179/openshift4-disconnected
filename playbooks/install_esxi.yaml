@@ -9,6 +9,7 @@
         name: custom_iso
       with_items:
         - '{{ openshift_hosts }}'
+      when: (network_mode is match("static"))
       tags:
         - iso
 
@@ -24,8 +25,9 @@
       delegate_to: localhost
       with_items:
         - '{{ openshift_hosts }}'
-      loop_control:
-        pause: 5
+#      loop_control:
+#        pause: 5
+      when: (network_mode is match("static"))
       tags:
         - iso
 
@@ -34,6 +36,7 @@
       file:
         path: '/tmp/rhcos'
         state: absent
+      when: (network_mode is match("static"))
       tags:
         - iso
 
@@ -52,6 +55,7 @@
     - name: Modify Ignition Files
       include_role:
         name: modify_ignition
+      when: (network_mode is match("static"))
 
     - name: Create Ignition staging location
       become: true
