@@ -1,0 +1,15 @@
+NAME="{{ item.device }}"
+DEVICE="{{ item.device }}"
+ONBOOT=yes
+BOOTPROTO=none
+IPADDR="{{ item.ip }}"
+NETMASK="{{ item.netmask }}"
+GATEWAY="{{ item.gateway }}"
+TYPE=Ethernet
+DNS1="{{ item.nameserver }}"
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=no
+IPV6_FAILURE_FATAL=no
+IPV6_ADDR_GEN_MODE=stable-privacy
+DOMAIN="{{ ocp_cluster_name }}.{{ ocp_base_domain }} {{ ocp_base_domain }}"

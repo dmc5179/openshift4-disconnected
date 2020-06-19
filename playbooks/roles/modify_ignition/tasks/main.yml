@@ -1,30 +1,31 @@
 ---
 # tasks file for modify_ignition
 
-- name: Customize bootstrap ignition
-  shell: 
-    cmd: '{{filetranspiler}} -i {{ ignition_configs }}/bootstrap.ign -f {{ fake_root_base }}/bootstrap --format json > {{ ignition_configs }}/bootstrap_static.ign'
-#    executable: python3
-  register: bootstrap_static
+- name: Cleanup existing fakeroots
+  file:
+    path: '{{ fake_root_base }}'
+    state: absent
 
-- name: Replace original ignition
-  copy:
-    src: "{{ ignition_configs }}/bootstrap_static.ign"
-    dest: "{{ ignition_configs }}/bootstrap.ign"
-    remote_src: true
-   
-- name: Customize master ignition
-  shell:
-    cmd: '{{filetranspiler}} -i {{ ignition_configs }}/master.ign -f {{ fake_root_base }}/{{ item }} --format json > {{ ignition_configs }}/{{ item }}.ign'
+- name: Build fakeroots directory structure
+  file:
+    path: '{{ fake_root_base }}/{{ item.name }}/etc/sysconfig/network-scripts'
+    state: directory
   with_items:
-    - 'master0'
-    - 'master1'
-    - 'master2'
+    - '{{ openshift_hosts }}'
 
-- name: Customize worker ignition
-  shell:
-    cmd: '{{filetranspiler}} -i {{ ignition_configs }}/worker.ign -f {{ fake_root_base }}/{{ item }} --format json > {{ ignition_configs }}/{{ item }}.ign'
+- name: Create static network configs
+  template:
+    src: 'ifcfg.j2'
+    dest: '{{ fake_root_base }}/{{ item.name }}/etc/sysconfig/network-scripts/ifcfg-{{ item.device }}'
+    mode: 0640
   with_items:
-    - 'worker0'
-    - 'worker1'
-    - 'worker2'
+    - '{{ openshift_hosts }}'
+
+- name: Customize ignition
+  shell:
+    cmd: |
+
+      {{filetranspiler}} -i {{ ignition_configs }}/{{ item.type }}.ign -f {{ fake_root_base }}/{{ item.name }} --format json -o {{ ignition_configs }}/{{ item.name }}.ign
+
+  with_items:
+    - '{{ openshift_hosts }}'
