@@ -17,3 +17,5 @@
     - name: Modify Ignition Files
       include_role:
         name: modify_ignition
+      when:
+        - (network_mode is match("static"))
