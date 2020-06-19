@@ -13,7 +13,6 @@
       include_role:
         name: tools
 
-    # TODO: Role not complete. For mirroring pip modules. All hosts will need this?
     - name: Install and configure pip modules
       include_role:
         name: pip
