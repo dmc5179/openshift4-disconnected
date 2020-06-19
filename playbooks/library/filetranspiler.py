@@ -99,8 +99,8 @@ class IgnitionSpec(abc.ABC):
         :type cli_args: argparse.Namespace
         """
         self.ignition_cfg = ignition_cfg
-        self.fake_root = cli_args.fake_root
-        self.dereference_symlinks = cli_args.dereference_symlinks
+        self.fake_root = cli_args['fake_root']
+        self.dereference_symlinks = cli_args['dereference_symlinks']
         self.mimetype = magic.open(magic.MAGIC_MIME)
         self.mimetype.load()
 
@@ -369,16 +369,14 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             ignition=dict(type='path', required=True),
-            fakeroot=dict(type='path', required=True),
+            fake_root=dict(type='path', required=True),
             output=dict(type='path', required=True),
             pretty=dict(type='bool', default=False),
-            dereference=dict(type='bool', default=False),
+            dereference_symlinks=dict(type='bool', default=False),
             output_format=dict(type='str', choices=['json', 'yaml'])
         ),
         supports_check_mode=False,
     )
-
-######
 
     # Open the base ignition file and load it
     # Get the ignition config
@@ -391,8 +389,8 @@ def main():
     # Merge the and output the results
     merged_ignition = ignition_spec.merge()
 
-    if args.format == 'json':
-        if args.pretty:
+    if module.params['output_format'] == 'json':
+        if module.params['pretty']:
             ignition_out = json.dumps(
                 merged_ignition, sort_keys=True,
                 indent=4, separators=(',', ': '))
@@ -402,9 +400,11 @@ def main():
         ignition_out = yaml.safe_dump(merged_ignition)
 
     with open(module.params['output'], 'w') as out_f:
-        out_f.write(ignition_out)
+        out = out_f.write(ignition_out)
 
-######
+    result = {'dest': module.params['output']}
+    result['path'] = module.params['output']
+    result['changed'] = out
 
     module.exit_json(**result)
 
