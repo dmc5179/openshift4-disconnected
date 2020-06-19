@@ -48,14 +48,10 @@
     - name: Generate Ignition Files
       import_role:
         name: generate_ignition
-      tags:
-        - ignition
 
     - name: Modify Ignition Files
       include_role:
         name: modify_ignition
-      tags:
-        - ignition
 
     - name: Create Ignition staging location
       become: true
