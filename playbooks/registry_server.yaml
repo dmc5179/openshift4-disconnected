@@ -7,3 +7,9 @@
     - name: Install and Start Docker Registry with Podman
       import_role:
         name: podman_registry
+
+# TODO: Add option to push images
+#     - name: Push mirrored images to repo
+#      include_role:
+#        name: mirror_images
+
