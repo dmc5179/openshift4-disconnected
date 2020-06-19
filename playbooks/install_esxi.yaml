@@ -70,14 +70,8 @@
         dest: "{{ httpd_document_root }}/ignition/"
         mode: '0755'
         setype: 'httpd_sys_content_t'
-      with_items:
-        - '/opt/openshift/cluster/bootstrap.ign'
-        - '/opt/openshift/cluster/master0.ign'
-        - '/opt/openshift/cluster/master1.ign'
-        - '/opt/openshift/cluster/master2.ign'
-        - '/opt/openshift/cluster/worker0.ign'
-        - '/opt/openshift/cluster/worker1.ign'
-        - '/opt/openshift/cluster/worker2.ign'
+      with_fileglob:
+        - '{{ ignition_configs }}/*.ign'
       tags:
         - ignition
 
