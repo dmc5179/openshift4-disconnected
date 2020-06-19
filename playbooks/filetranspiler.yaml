@@ -6,11 +6,11 @@
 
     - name: filetranspiler testing
       filetranspiler:
-        ignition: ''
-        fakeroot: ''
-        output: ''
+        ignition: '/tmp/ignition/bootstrap.ign'
+        fake_root: '/tmp/fakeroots/bootstrap/'
+        output: '/tmp/ignition/modified/bootstrap.ign'
         pretty: false
-        dereference: false
+        dereference_symlinks: false
         output_format: 'json'
       register: result
 
