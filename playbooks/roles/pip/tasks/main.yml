@@ -1,9 +1,16 @@
 ---
 # tasks file for pip
 
+- name: Create directory for mirroring pip modules
+  file:
+    path: '{{ mirror_base }}/pip'
+    state: directory
+  tags:
+    - mirror
+
 - name: Download pip modules
   shell:
-    cmd: pip3 download -d /opt/openshift/pip "{{ item.name }}=={{ item.version }}"
+    cmd: {{ pip_cmd }} download -d '{{ mirror_base }}/pip' "{{ item.name }}=={{ item.version }}"
   with_items:
     - '{{ pip_modules }}'
   tags:
@@ -11,7 +18,7 @@
 
 - name: Install mirrored pip modules
   shell:
-    cmd: pip3 install --user -d /opt/openshift/pip "{{ item.name }}=={{ item.version }}"
+    cmd: {{ pip_cmd }} install --user -d '{{ mirror_base }}/pip' "{{ item.name }}=={{ item.version }}"
   with_items:
     - '{{ pip_modules }}'
   tags:
