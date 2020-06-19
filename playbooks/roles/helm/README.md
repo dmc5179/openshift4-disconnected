@@ -1,7 +1,7 @@
 Role Name
 =========
 
-A brief description of the role goes here.
+THIS ROLE IS NOT COMPLETE AND IS NOT READY FOR USE
 
 Requirements
 ------------
