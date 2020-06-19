@@ -1,70 +1,51 @@
 ---
 
-- name: Create a VM folder on given datacenter
-  vcenter_folder:
-    hostname: '{{ vcenter_hostname }}'
-    username: '{{ vcenter_username }}'
-    password: '{{ vcenter_password }}'
-    datacenter_name: datacenter_name
-    folder_name: sample_vm_folder
-    folder_type: vm
-    state: present
-  register: vm_folder_creation_result
-  delegate_to: localhost
-
-# The datastore is already provided
-#- name: Create a datastore folder on given datacenter
-#  vcenter_folder:
-#    hostname: '{{ vcenter_hostname }}'
-#    username: '{{ vcenter_username }}'
-#    password: '{{ vcenter_password }}'
-#    datacenter_name: datacenter_name
-#    folder_name: sample_datastore_folder
-#    folder_type: datastore
-#    state: present
-#  register: datastore_folder_creation_result
-#  delegate_to: localhost
-
-- name: Create a sub folder under VM folder on given datacenter
-  vcenter_folder:
-    hostname: '{{ vcenter_hostname }}'
-    username: '{{ vcenter_username }}'
-    password: '{{ vcenter_password }}'
-    datacenter_name: datacenter_name
-    folder_name: sample_sub_folder
-    parent_folder: vm_folder
-    state: present
-  register: sub_folder_creation_result
-  delegate_to: localhost
-
 # To create a template, make a VM and mark it as a template
-- name: Create a virtual machine template for the OCP nodes
-  vmware_guest:
-    hostname: "{{ vcenter_hostname }}"
-    username: "{{ vcenter_username }}"
-    password: "{{ vcenter_password }}"
-    is_template: true
+#- name: Create a virtual machine template for the OCP nodes
+#  vmware_guest:
+#    hostname: "{{ vcenter_hostname }}"
+#    username: "{{ vcenter_username }}"
+#    password: "{{ vcenter_password }}"
+#    is_template: true
+#    validate_certs: no
+#    folder: /DC1/vm/
+#    name: test_vm_0001
+#    state: poweredon
+#    guest_id: centos64Guest
+#    # This is hostname of particular ESXi server on which user wants VM to be deployed
+#    vcenter_hostname: "{{ vcenter_hostname }}"
+#    disk:
+#    - size_gb: 30
+#      type: thin
+#      datastore: datastore1
+#    hardware:
+#      memory_mb: 4096
+#      num_cpus: 4
+#      scsi: paravirtual
+#    networks:
+#    - name: VM Network
+#      mac: aa:bb:dd:aa:00:14
+#      ip: 10.10.10.100
+#      netmask: 255.255.255.0
+#      device_type: vmxnet3
+#    wait_for_ip_address: yes
+#  delegate_to: localhost
+#  register: deploy_vm
+
+
+- vmware_deploy_ovf:
+    hostname: '{{ vcenter_hostname }}'
+    username: '{{ vcenter_username }}'
+    password: '{{ vcenter_password }}'
+    datacenter: '{{ datacenter_name }}'
+    port: '{{ vcenter_port }}'
+    cluster: Cluster1
+    datastore: '{{ datastore_name }}'
+    disk_provisioning: thin
+    folder: '{{ datacenter_name }}/{{ ocp_cluster_name }}'
+    name: bootstrap
+    networks: "{u'VM Network':u'{{ ProvisioningNetworkLabel }}'}"
     validate_certs: no
-    folder: /DC1/vm/
-    name: test_vm_0001
-    state: poweredon
-    guest_id: centos64Guest
-    # This is hostname of particular ESXi server on which user wants VM to be deployed
-    vcenter_hostname: "{{ vcenter_hostname }}"
-    disk:
-    - size_gb: 30
-      type: thin
-      datastore: datastore1
-    hardware:
-      memory_mb: 4096
-      num_cpus: 4
-      scsi: paravirtual
-    networks:
-    - name: VM Network
-      mac: aa:bb:dd:aa:00:14
-      ip: 10.10.10.100
-      netmask: 255.255.255.0
-      device_type: vmxnet3
-    wait_for_ip_address: yes
+    power_on: no
+    ovf: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-vmware.{{ arch }}.ova'
   delegate_to: localhost
-  register: deploy_vm
