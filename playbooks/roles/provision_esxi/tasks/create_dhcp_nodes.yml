@@ -27,7 +27,6 @@
     port: '{{ vcenter_port }}'
     datastore: '{{ datastore_name }}'
     disk_provisioning: thin
-#    folder: '{{ datacenter_name }}/{{ ocp_cluster_name }}'
     name: bootstrap
     networks: "{u'VM Network':u'openshift'}"
     validate_certs: '{{ ssl_enabled }}'
@@ -87,11 +86,6 @@
       hotadd_memory: false
       version: 14 # Hardware version of virtual machine
       boot_firmware: "efi"
-#    networks:
-#      - name: 'openshift'
-#        device_type: vmxnet3
-#        mac: '00:50:56:97:0c:85'
-#        mac: "{{ openshift_hosts.name['bootstrap'].mac }}"
     wait_for_ip_address: false
   delegate_to: localhost
 
