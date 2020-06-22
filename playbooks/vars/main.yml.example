@@ -1,5 +1,17 @@
 ---
 
+#This needs to be set to the disk where you are installing RHCOS
+disk: 'sda'
+
+# RedHat CoreOS Version. Might not match OpenShift Version
+# 4.3.8 and 4.4.3 currently available
+rhcos_ver: '4.4.3'
+# OpenShift Version
+# 4.3.21 and 4.4.7 currently available
+ocp_ver: '4.4.7'
+# RHCOS and OpenShift Architecture
+arch: 'x86_64'
+
 openshift_bootstrap:
   - name: 'bootstrap'
     mac: 'AA:AA:AA:AA:AA:AA'
