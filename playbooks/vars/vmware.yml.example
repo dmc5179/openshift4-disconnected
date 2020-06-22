@@ -1,0 +1,14 @@
+---
+
+platform: vmware
+vcenter_username: 'danclark'
+vcenter_password: 'M@rch!985'
+vcenter_hostname: 'vcenter.redhatgovic.io'
+esxi_hostname: 'lunchbox.42pandas.com'
+vcenter_port: 8443
+datacenter_name: '42Pandas Main Datacenter'
+datastore_name: 'NVMe-Datastore'
+vswitch_name: 'openshift'
+portgroup_name: 'ocp_pg'
+vcenter_cluster_name: 'lunchbox.42pandas.com'
+rhcos_template_name: 'rhcos'
