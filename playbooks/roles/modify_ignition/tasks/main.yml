@@ -11,7 +11,9 @@
     path: '{{ fake_root_base }}/{{ item.name }}/etc/sysconfig/network-scripts'
     state: directory
   with_items:
-    - '{{ openshift_hosts }}'
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
 
 - name: Create static network configs
   template:
@@ -19,7 +21,9 @@
     dest: '{{ fake_root_base }}/{{ item.name }}/etc/sysconfig/network-scripts/ifcfg-{{ item.device }}'
     mode: 0640
   with_items:
-    - '{{ openshift_hosts }}'
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
 
 - name: Customize ignition
   shell:
@@ -28,4 +32,6 @@
       {{filetranspiler}} -i {{ ignition_configs }}/{{ item.type }}.ign -f {{ fake_root_base }}/{{ item.name }} --format json -o {{ ignition_configs }}/{{ item.name }}.ign
 
   with_items:
-    - '{{ openshift_hosts }}'
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
