@@ -3,4 +3,6 @@
 
 tmp_dir: '/tmp/rhcos'
 
-openshift_hosts: {}
+openshift_bootstrap: {}
+openshift_masters: {}
+openshift_workers: {}
