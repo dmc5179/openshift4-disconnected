@@ -69,7 +69,9 @@
     group: root
     state: link
   with_items:
-    - '{{ openshift_hosts }}'
+    - '{{ openshift_boostrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
 
 - name: Populate service facts
   service_facts:
