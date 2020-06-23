@@ -131,6 +131,8 @@
 
 - name: Create ignition configs
   shell: "{{ openshift_install }} create ignition-configs --dir={{ ignition_configs }}"
+  tags:
+    - ignition
 
 - name: Create kube config location
   file:
