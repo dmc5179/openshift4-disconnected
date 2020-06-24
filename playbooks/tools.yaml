@@ -1,0 +1,9 @@
+---
+- hosts: helper_node
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Install tools like openshift-install and oc
+      include_role:
+        name: tools

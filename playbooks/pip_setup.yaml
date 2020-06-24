@@ -1,0 +1,9 @@
+---
+- hosts: helper_node
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Install and configure pip modules
+      include_role:
+        name: pip
