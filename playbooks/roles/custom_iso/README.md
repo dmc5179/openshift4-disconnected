@@ -1,38 +1,32 @@
-Role Name
-=========
+# Ansible role 'custom_iso'
 
-A brief description of the role goes here.
+A simple role for creating a custom Red Hat CoreOS (RHCOS) ISO for use with static IP based OpenShift clusters. Specific responsibilities of this role:
 
-Requirements
-------------
+- Install necessary packages for creating an ISO image file
+- Setting the kernel and boot loader options for each custom_iso
+- Creating an ISO image for each host in the OpenShift cluster
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+## Requirements
 
-Role Variables
---------------
+- No Requirements
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+## Dependencies
 
-Dependencies
-------------
+- No Dependencies
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+## Role Variables
 
-Example Playbook
-----------------
+| Variable                                     | Default                       | Comments                                                                                |
+| :---                                         | :---                          | :---                                                                                    |
+| `tmp_dir`                                    | /tmp/rhcos                    | Location for staging ISO builds                                                         |
+| 'openshift_bootstrap'                        | {}                            | Bootstrap node configuration. See |
+| 'openshift_masters'                          | {}                            | Master nodes configuration. See |
+| 'openshift_workers'                          | {}                            | Worker nodes configuration. See |
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+## License
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+2-clause BSD license, see [LICENSE.md](LICENSE.md)
 
-License
--------
+## Contributors
 
-BSD
-
-Author Information
-------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+- [Dan Clark](https://github.com/dmc5179/) (maintainer)
