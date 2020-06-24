@@ -1,6 +1,6 @@
 # Ansible role `httpd`
 
-A simple Ansible role for installing and configuring the Apache web server for RHEL/CentOS 8 and Fedora 28+. Specifically, the responsibilities of this role are to:
+A simple Ansible role for installing and configuring the Apache web server for RHEL 8. Specifically, the responsibilities of this role are to:
 
 - Install the necessary packages;
 - Maintain the main configuration file;
@@ -61,7 +61,7 @@ None of the variables below are required
 
 ## Installing certificates
 
-By default, the role uses the self-signed certificate that is generated when installing `mod_ssl`. If you want to use a custom certificate, put it in a subdirectory named `files/`, relative to your main playbook location. Then set the appropriate role variables. For instructions on how to set up your own (self-signed) certificates, see e.g. the [CentOS Wiki](https://wiki.centos.org/HowTos/Https).
+By default, the role uses the self-signed certificate that is generated when installing `mod_ssl`. If you want to use a custom certificate, put it in a subdirectory named `files/`, relative to your main playbook location. Then set the appropriate role variables. For instructions on how to set up your own (self-signed) certificates, see the following Red Hat Solutions Article [How to create a self-signed certificate on Red Hat Enterprise Linux with OpenSSL](https://access.redhat.com/solutions/532583).
 
 E.g. you have a server key `acme-inc.key` and certificate file `acme-inc.crt`. The directory structure should look:
 
@@ -89,6 +89,3 @@ The same goes for a certificate chain file and CA certificate file. Ensure they 
 ## Contributors
 
 - [Dan Clark](https://github.com/dmc5179/) (maintainer)
-<!--stackedit_data:
-eyJoaXN0b3J5IjpbMTE0OTI0OTY5MiwtNDk3NDUyNDJdfQ==
--->
