@@ -1,5 +1,5 @@
 ---
 - hosts: localhost
-  remote_user: root
+#  remote_user: root
   roles:
-    - active_directory
+    - ../../active_directory
