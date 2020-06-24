@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Mirror RHCOS ISO/VMDK/etc...
+      import_role:
+        name: mirror_rhcos
