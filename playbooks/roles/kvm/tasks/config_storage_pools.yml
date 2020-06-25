@@ -1,0 +1,46 @@
+---
+
+- name: config_storage pools | ensure storage pool paths exist
+  become: true
+  file:
+    path: "{{ item['path'] }}"
+    state: directory
+  loop: "{{ kvm_storage_pools }}"
+
+- name: config_storage_pools | defining storage pools
+  become: true
+  virt_pool:
+    command: define
+    name: "{{ item['name'] }}"
+    xml: "{{ lookup('template', 'vm-pool.xml.j2') }}"
+  register: kvm_pools_defined
+  loop: "{{ kvm_storage_pools }}"
+
+- name: config_storage pools | setting state of storage pools
+  become: true
+  virt_pool:
+    name: "{{ item['name'] }}"
+    state: "{{ item['state'] }}"
+  when: item['state'] is defined
+  loop: "{{ kvm_storage_pools }}"
+
+- name: config_storage pools | setting storage pools to autostart
+  virt_pool:
+    autostart: true
+    name: "{{ item['name'] }}"
+  become: true
+  when:
+    - item['autostart'] is defined
+    - item['autostart']
+    - (item['state'] | default("")) == "active"
+  loop: "{{ kvm_storage_pools }}"
+
+- name: config_storage pools | setting storage pools to not autostart
+  virt_pool:
+    autostart: false
+    name: "{{ item['name'] }}"
+  become: true
+  when:
+    - item['autostart'] is defined
+    - not item['autostart']
+  loop: "{{ kvm_storage_pools }}"

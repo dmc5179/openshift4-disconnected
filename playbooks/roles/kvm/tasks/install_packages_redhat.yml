@@ -1,0 +1,28 @@
+---
+- name: redhat | Installing KVM
+  become: true
+  package:
+    name: "{{ kvm_redhat_packages }}"
+    state: present
+  register: result
+  until: result is successful
+
+- name: redhat | Creating libvirt Group
+  become: true
+  group:
+    name: libvirt
+    state: present
+#  when: >
+#    (ansible_distribution == "Fedora" and
+#    ansible_distribution_major_version <= '12') or
+#    (ansible_distribution == "CentOS" and
+#    ansible_distribution_major_version <= '6') or
+#    (ansible_distribution == "RedHat" and
+#    ansible_distribution_major_version <= '6')
+
+- name: redhat | Ensuring libvirtd Service Is Enabled and Started
+  become: true
+  systemd:
+    name: libvirtd
+    enabled: true
+    state: started

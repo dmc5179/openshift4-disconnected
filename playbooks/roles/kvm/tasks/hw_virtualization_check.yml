@@ -1,0 +1,15 @@
+---
+
+- name: hw_virtualization_check | load cpu info
+  become: true
+  slurp:
+    src: /proc/cpuinfo
+  register: cpu_info
+
+- name: hw_virtualization_check | idenitfy hw virtualization support
+  set_fact:
+    kvm_domain_type: "{{ cpu_info['content'] | b64decode | regex_search('(vmx|svm)', multiline=True) | ternary('kvm', 'qemu') }}"
+
+- name: Show kvm domain type
+  debug:
+    var: kvm_domain_type

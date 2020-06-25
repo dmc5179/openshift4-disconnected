@@ -1,0 +1,42 @@
+---
+
+- name: set_facts | Setting Debian Facts
+  set_fact:
+    kvm_service_name: libvirtd
+  when: ansible_distribution in ["Debian", "CentOS"]
+
+- name: set_facts | Setting Ubuntu Facts
+  set_fact:
+    kvm_service_name: libvirt-bin
+  when: ansible_distribution == "Ubuntu"
+
+- name: set_facts | Defining Debian packages to install
+  set_fact:
+    kvm_debian_packages:
+      - bridge-utils
+      - libvirt-bin
+      - python[3]*-libvirt
+      - python[3]*-lxml
+      - qemu-kvm
+  when: >
+    (ansible_distribution == "Debian" and
+    ansible_distribution_major_version|int < 9)
+    or
+    (ansible_distribution == "Ubuntu" and
+    ansible_distribution_version < "18.10")
+
+- name: set_facts | Defining Debian packages to install
+  set_fact:
+    kvm_debian_packages:
+      - bridge-utils
+      - libvirt-daemon-system
+      - libvirt-clients
+      - python[3]*-libvirt
+      - python[3]*-lxml
+      - qemu-kvm
+  when: >
+    (ansible_distribution == "Debian" and
+    ansible_distribution_major_version|int >= 9)
+    or
+    (ansible_distribution == "Ubuntu" and
+    ansible_distribution_version >= "18.10")
