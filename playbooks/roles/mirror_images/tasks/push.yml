@@ -23,6 +23,7 @@
 
     executable: /bin/bash
   with_items:
+    - '{{ images }}'
     - '{{ tower_images }}'
     - '{{ compliance_operator_images }}'
     - '{{ vsphere_csi_images_v1 }}'
