@@ -1,0 +1,5 @@
+- hosts: kvm_servers
+  tasks:
+
+    - import_role:
+        name: kvm
