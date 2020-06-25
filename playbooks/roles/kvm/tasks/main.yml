@@ -51,8 +51,3 @@
 
 #- include: system_tweaks.yml
 #  when: kvm_enable_system_tweaks
-
-#- include: apparmor.yml
-#  when:
-#    - kvm_disable_apparmor
-#    - ansible_os_family == "Debian"
