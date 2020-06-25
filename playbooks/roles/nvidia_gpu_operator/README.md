@@ -1,5 +1,7 @@
 # Ansible role 'nvidia_gpu_operator'
 
+Ansible role to install the Nvidia GPU Operator on an OpenShift cluster using helm
+
 ## Requirements
 
 - No Requirements

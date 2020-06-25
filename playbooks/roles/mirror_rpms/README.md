@@ -1,5 +1,7 @@
 # Ansible role 'mirror_rpms'
 
+Ansible role for mirroring Red Hat RPMS for install OpenShift in a disconnected or air-gap environment
+
 ## Requirements
 
 - No Requirements
@@ -10,8 +12,25 @@
 
 ## Role Variables
 
-| Variable                                     | Default                       | Comments                                                                                |
-| :---                                         | :---                          | :---                                                                                    |
+| Variable                   | Default                       | Comments                                                                                |
+| :---                       | :---                          | :---                                                                                    |
+| run_as_root                | 
+| repo_depth                 |
+| rhel7_enabled              |
+| rhel7_repositories         |
+| epel7_enabled              |
+| epel7_repository           |
+| rhel8_enabled              |
+| rhel8_repositories         |
+| epel8_enabled              |
+| epel8_repository           |
+| mirror_base                |
+| repo_mirror_base           |
+| repo_srv_base              |
+| arch                       |
+| air_gapped                 |
+| mirror_registry            |
+| mirror_transport           |
 
 Example Playbook
 ----------------

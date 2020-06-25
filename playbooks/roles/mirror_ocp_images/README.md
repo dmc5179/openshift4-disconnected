@@ -1,5 +1,7 @@
 # Ansible role 'mirror_ocp_images'
 
+Role for mirroring the OpenShift base container images needed to install an OpenShift cluster
+
 ## Requirements
 
 - No Requirements
@@ -10,8 +12,21 @@
 
 ## Role Variables
 
-| Variable                                     | Default                       | Comments                                                                                |
-| :---                                         | :---                          | :---                                                                                    |
+| Variable             | Default                       | Comments                                                                                |
+| :---                 | :---                          | :---                                                                                    |
+| ocp_release          |
+| arch                 |
+| local_reg            |
+| local_repo           |
+| product_repo         |
+| mirror_base          |
+| pull_secret          |
+| release_name         |
+| mirror_to_reg        |
+| mirror_to_dir        |
+| air_gapped           |
+| mirror_registry      |
+| mirror_transport     |
 
 Example Playbook
 ----------------

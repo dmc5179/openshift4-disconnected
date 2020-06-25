@@ -1,5 +1,12 @@
 # Ansible role 'mirror_rhcos'
 
+Ansible role for mirroring the Red Hat CoreOS install media.
+Role includes variables for mirroring RHCOS as:
+- VMDK
+- ISO
+- Azure VD
+- GPE
+
 ## Requirements
 
 - No Requirements
@@ -10,8 +17,19 @@
 
 ## Role Variables
 
-| Variable                                     | Default                       | Comments                                                                                |
-| :---                                         | :---                          | :---                                                                                    |
+| Variable                    | Default                       | Comments                                                                                |
+| :---                        | :---                          | :---                                                                                    |
+| run_as_root                 | 
+| mirror_base                 |
+| mirror_vmdk                 |
+| mirror_azure                |
+| mirror_gcp                  |
+| mirror_iso                  |
+| mirror_raw                  |
+| mirror_ova                  |
+| air_gapped                  |
+| mirror_registry             |    
+| mirror_transport            |     
 
 Example Playbook
 ----------------

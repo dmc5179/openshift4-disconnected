@@ -1,5 +1,7 @@
 # Ansible role 'podman_registry'
 
+Ansible role to standup a basic docker registry using podman
+
 ## Requirements
 
 - No Requirements

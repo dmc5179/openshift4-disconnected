@@ -1,4 +1,6 @@
-# Ansible role ''
+# Ansible role 'custom_web_console'
+
+A simple ansible role for customizing the main OpenShift login page along with the error page and links that display on the main page
 
 ## Requirements
 

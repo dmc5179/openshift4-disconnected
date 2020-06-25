@@ -1,5 +1,7 @@
 # Ansible role 'install_nfs'
 
+Ansible role to install and configure an NFS server as well as add the NFS server as a storage class to OpenShift
+
 ## Requirements
 
 - No Requirements
@@ -10,8 +12,23 @@
 
 ## Role Variables
 
-| Variable                                     | Default                       | Comments                                                                                |
-| :---                                         | :---                          | :---                                                                                    |
+| Variable                | Default                       | Comments                                                                                |
+| :---                    | :---                          | :---                                                                                    |
+| nfs_exports             |                     
+| nfs_rpcbind_state       |
+| nfs_rpcbind_enabled     |
+| air_gapped              |
+| mirror_registry         |
+| mirror_transport        |
+| kubeconfig              |
+| ocp_base_domain         |
+| ocp_cluster_name        |
+| nfs_namespace           |
+| ssl_enabled             |
+| nfs_server              |
+| nfs_path                |
+| nfs_sc_default          | 
+
 
 Example Playbook
 ----------------
