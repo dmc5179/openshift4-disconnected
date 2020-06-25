@@ -14,7 +14,6 @@ master_schedulable: false
 cluster_channel: 'fast'
 
 fips: true
-pullSecret: ''
 ssh_public_key_file: '~/.ssh/id_ed25519.pub'
 
 ocp_base_domain: 'example.com'
