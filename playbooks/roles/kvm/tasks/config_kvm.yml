@@ -21,17 +21,5 @@
     group: root
     mode: u=rw,g=r,o=r
   become: true
-  notify: "restart {{ kvm_service_name }}"
+  notify: "restart libvirtd"
   when: not ansible_check_mode
-
-- name: config_kvm | configuring kvm
-  replace:
-    dest: /etc/default/libvirt-bin
-    regexp: '^libvirtd_opts="-d"'
-    replace: 'libvirtd_opts="-d -l"'
-  become: true
-  notify: "restart {{ kvm_service_name }}"
-  when:
-    - kvm_enable_tcp
-    - ansible_os_family == "Debian"
-    - not ansible_check_mode
