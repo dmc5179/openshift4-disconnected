@@ -1,4 +1,4 @@
-# Ansible role ''
+# Ansible role 'enable_signatures'
 
 A simple role to enable image signatures in OpenShift 4
 

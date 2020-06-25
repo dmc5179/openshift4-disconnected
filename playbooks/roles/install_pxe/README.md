@@ -10,8 +10,17 @@
 
 ## Role Variables
 
-| Variable                                     | Default                       | Comments                                                                                |
-| :---                                         | :---                          | :---                                                                                    |
+| Variable                  | Default                       | Comments                                                                                |
+| :---                      | :---                          | :---                                                                                    |
+| tftp_root_directory       | 
+| pxeserver_directory       |
+| pxeserver_path            |
+| pxeserver_ip              |
+| pxeserver_images          |
+| image_url                 |
+| ignition_url              |
+| disk                      |
+
 
 Example Playbook
 ----------------

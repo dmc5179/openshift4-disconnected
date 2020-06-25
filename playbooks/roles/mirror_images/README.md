@@ -1,6 +1,7 @@
 # Ansible role 'mirror_images'
 
-A simple role for
+Role for mirroring container images for disconnected and air-gapped environments.
+This role is intended to list images outside of the base images needed to install OpenShift and the images needed for OperatorHub
 
 ## Requirements
 
@@ -12,8 +13,15 @@ A simple role for
 
 ## Role Variables
 
-| Variable                                     | Default                       | Comments                                                                                |
-| :---                                         | :---                          | :---                                                                                    |
+| Variable                         | Default                       | Comments                                                                                |
+| :---                             | :---                          | :---                                                                                    |
+| air_gapped                       |
+| mirror_registry                  |
+| mirror_transport                 |
+| mirror_tower                     |
+| mirror_compliance_operator       |         
+| pull_secret                      |
+| mirror_base                      |
 
 Example Playbook
 ----------------
