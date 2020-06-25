@@ -1,0 +1,34 @@
+---
+
+dist: bionic
+
+language: python
+python:
+  - 3.6
+services: docker
+
+env:
+  global:
+    - ROLE_NAME: kvm
+  matrix:
+    - MOLECULE_DISTRO_BOX: generic/ubuntu1804
+    - MOLECULE_DISTRO_BOX: debian/buster64
+    - MOLECULE_DISTRO_BOX: debian/stretch64
+    - MOLECULE_DISTRO_BOX: centos/7
+
+install:
+  - sudo add-apt-repository universe && sudo apt update
+  - wget https://releases.hashicorp.com/vagrant/2.1.1/vagrant_2.1.1_x86_64.deb
+  - sudo dpkg -i vagrant_2.1.1_x86_64.deb
+  - sudo apt install qemu-kvm qemu-utils libvirt-bin libvirt0 libvirt-dev
+  - vagrant plugin install vagrant-libvirt
+  - pip install molecule==2.22 docker python-vagrant paramiko
+  - sudo chmod o+rwx /var/run/libvirt/libvirt-sock
+
+before_script:
+  - cd ../
+  - mv ansible*$ROLE_NAME $ROLE_NAME
+  - cd $ROLE_NAME
+
+script:
+  - molecule test

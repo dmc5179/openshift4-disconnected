@@ -1,0 +1,38 @@
+---
+
+- name: config virtual_networks | define virtual networks
+  become: true
+  virt_net:
+    command: define
+    name: "{{ item['name'] }}"
+    xml: "{{ lookup('template', 'vm-network.xml.j2') }}"
+  loop: "{{ kvm_virtual_networks }}"
+
+- name: config virtual networks | setting state of virtual networks
+  become: true
+  virt_net:
+    name: "{{ item['name'] }}"
+    state: "{{ item['state'] }}"
+  when: item['state'] is defined
+  loop: "{{ kvm_virtual_networks }}"
+
+- name: config virtual networks | setting virtual networks to autostart
+  become: true
+  virt_net:
+    autostart: true
+    name: "{{ item['name'] }}"
+  when:
+    - item['autostart'] is defined
+    - item['autostart']
+    - (item['state'] | default("")) == "active"
+  loop: "{{ kvm_virtual_networks }}"
+
+- name: config virtual networks | setting virtual networks to not autostart
+  become: true
+  virt_net:
+    autostart: false
+    name: "{{ item['name'] }}"
+  when:
+    - item['autostart'] is defined
+    - not item['autostart']
+  loop: "{{ kvm_virtual_networks }}"

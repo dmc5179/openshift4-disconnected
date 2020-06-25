@@ -1,0 +1,56 @@
+<domain type='{{ kvm_domain_type }}'>
+  <name>{{ item.name }}</name>
+  <memory unit='MB'>{{ item.memory }}</memory>
+  <vcpu>{{ item.vcpu }}</vcpu>
+  <os>
+    <type>hvm</type>
+{% for dev in item['boot_devices'] %}
+    <boot dev='{{ dev }}'/>
+{% endfor %}
+    <bootmenu enable='yes'/>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+  </features>
+  <devices>
+{% if item['graphics'] is defined and item['graphics']|bool %}
+    <graphics type='spice' autoport='yes'/>
+{% endif %}
+{% if item['cdrom'] is defined %}
+{%   if item['cdrom']['source'] is defined %}
+    <disk type='file' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source file='{{ item['cdrom']['source'] }}'/>
+      <target dev='hdc' bus='ide'/>
+      <readonly/>
+      <address type='drive' controller='0' bus='1' unit='0'/>
+    </disk>
+{%   endif %}
+{% endif %}
+{% for hd in item['disks'] %}
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='{{ kvm_images_format_type }}' cache='{{ kvm_images_cache_mode }}'/>
+      <source file='{{ kvm_images_path }}/{{ hd['name'] }}.{{ kvm_images_format_type }}'/>
+{%   if hd.disk_driver|lower == 'virtio' %}
+      <target dev='vd{{ "abcdefghijklmnopqrstuvwxyz"[loop.index0] }}' bus='{{ hd['disk_driver'] }}'/>
+{%   elif hd.disk_driver|lower == 'sata' or hd['disk_driver']|lower == 'scsi' or hd['disk_driver']|lower == 'sd' %}
+      <target dev='sd{{ "abcdefghijklmnopqrstuvwxyz"[loop.index0] }}' bus='{{ hd['disk_driver'] }}'/>
+{%   endif %}
+    </disk>
+{% endfor %}
+{% for int in item['network_interfaces'] %}
+    <interface type='{{ int['type'] }}'>
+{%   if int['portgroup'] is not defined %}
+      <source {{ int['type'] }}='{{ int['source'] }}'/>
+{%   elif int['portgroup'] is defined %}
+      <source {{ int['type'] }}='{{ int['source'] }}' portgroup='{{ int['portgroup'] }}'/>
+{%   endif %}
+      <model type='{{ int['network_driver'] }}'/>
+    </interface>
+{% endfor %}
+    <console type='pty'>
+      <target type='serial' port='0'/>
+    </console>
+  </devices>
+</domain>
