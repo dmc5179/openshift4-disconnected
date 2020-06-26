@@ -1,0 +1,49 @@
+---
+# tasks file for ansible-openvswitch
+
+- name: Installing OVS Packages
+  become: true
+  package:
+    name: "{{ item }}"
+    state: "present"
+  with_items: '{{ openvswitch_packages }}'
+
+- name: service | Ensuring OVS Service Is Started And Enabled On Boot
+  service:
+    name: "openvswitch"
+    state: "started"
+    enabled: true
+  become: true
+
+- name: system_tuning | Managing sysctl
+  sysctl:
+    name: "{{ item['name'] }}"
+    value: "{{ item['value'] }}"
+    state: "present"
+  become: true
+  with_items: '{{ openvswitch_system_tuning }}'
+  when: openvswitch_system_tuning is defined
+
+- name: bridges | Managing OVS Bridges
+  openvswitch_bridge:
+    bridge: "{{ item['bridge'] }}"
+    parent: "{{ item['parent']|default(omit) }}"
+    state: "{{ item['state'] }}"
+    timeout: "{{ item['timeout']|default(omit) }}"
+    vlan: "{{ item['vlan']|default(omit) }}"
+  become: true
+  with_items: '{{ openvswitch_bridges }}'
+  when: openvswitch_bridges is defined
+
+- name: ports | Managing OVS Ports
+  openvswitch_port:
+    bridge: "{{ item[0]['bridge'] }}"
+    port: "{{ item[1]['port'] }}"
+    state: "{{ item[1]['state'] }}"
+    tag: "{{ item[1]['tag']|default(omit) }}"
+    timeout: "{{ item[0]['timeout']|default(omit) }}"
+  become: true
+  with_subelements:
+    - '{{ openvswitch_ports }}'
+    - ports
+  when: openvswitch_ports is defined
