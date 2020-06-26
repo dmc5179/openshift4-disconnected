@@ -8,8 +8,8 @@
 - name: SEBool allow haproxy connect any port
   seboolean:
     name: haproxy_connect_any
-    state: yes
-    persistent: yes
+    state: true
+    persistent: true
   notify:
     - restart haproxy
 
@@ -27,8 +27,8 @@
 
 - name: Configure firewall for haproxy
   firewalld:
-    permanent: yes
-    immediate: yes
+    permanent: true
+    immediate: true
     state: enabled
     port: "{{ item }}"
   with_items:

@@ -319,7 +319,7 @@
     port: '{{ vcenter_port }}'
     datacenter_name: '{{ datacenter_name }}'
     name: '{{ datastore_name }}'
-    validate_certs: no
+    validate_certs: false
   delegate_to: localhost
   register: datastore_info
 
