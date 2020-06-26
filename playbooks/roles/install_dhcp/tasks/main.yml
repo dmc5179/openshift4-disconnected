@@ -51,8 +51,8 @@
 
 - name: Configure firewall for DHCP Server
   firewalld:
-    permanent: yes
-    immediate: yes
+    permanent: true
+    immediate: true
     state: enabled
     port: "{{ item }}"
   with_items:

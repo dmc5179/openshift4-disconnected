@@ -7,7 +7,7 @@
 #    username: "{{ vcenter_username }}"
 #    password: "{{ vcenter_password }}"
 #    is_template: true
-#    validate_certs: no
+#    validate_certs: false
 #    folder: /DC1/vm/
 #    name: test_vm_0001
 #    state: poweredon
@@ -28,7 +28,7 @@
 #      ip: 10.10.10.100
 #      netmask: 255.255.255.0
 #      device_type: vmxnet3
-#    wait_for_ip_address: yes
+#    wait_for_ip_address: true
 #  delegate_to: localhost
 #  register: deploy_vm
 
@@ -45,7 +45,7 @@
     folder: '{{ datacenter_name }}/{{ ocp_cluster_name }}'
     name: bootstrap
     networks: "{u'VM Network':u'{{ ProvisioningNetworkLabel }}'}"
-    validate_certs: no
-    power_on: no
+    validate_certs: false
+    power_on: false
     ovf: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-vmware.{{ arch }}.ova'
   delegate_to: localhost

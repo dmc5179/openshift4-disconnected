@@ -30,7 +30,7 @@
     owner: root
     group: root
     mode: '0755'
-    remote_src: yes
+    remote_src: true
 
 - name: Build deployment configuration
   shell:

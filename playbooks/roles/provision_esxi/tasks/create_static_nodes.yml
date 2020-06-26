@@ -56,7 +56,7 @@
     - name: 'openshift'
       device_type: vmxnet3
 #      mac: "{{ openshift_hosts.name['bootstrap'].mac }}"
-    wait_for_ip_address: no
+    wait_for_ip_address: false
   delegate_to: localhost
   register: deploy_bootstrap
 
@@ -125,7 +125,7 @@
     - name: 'openshift'
       device_type: vmxnet3
 #      mac: "{{ openshift_hosts.name['item'].mac }}"
-    wait_for_ip_address: no
+    wait_for_ip_address: false
   delegate_to: localhost
   register: deploy
   with_items:
@@ -202,7 +202,7 @@
     - name: 'openshift'
       device_type: vmxnet3
 #      mac: "{{ openshift_hosts.name['item'].mac }}"
-    wait_for_ip_address: no
+    wait_for_ip_address: false
   delegate_to: localhost
   register: deploy
   with_items:
