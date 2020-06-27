@@ -1,5 +1,11 @@
 ---
 
+- name: Install required python libraries
+  become: true
+  package:
+    name: python3-lxml
+    state: present
+
 - name: config virtual_networks | define virtual networks
   become: true
   virt_net:
