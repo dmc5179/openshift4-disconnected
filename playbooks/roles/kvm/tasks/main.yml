@@ -20,12 +20,12 @@
     - kvm_config_users
     - kvm_users is defined
 
-#- include: config_ssh.yml
-#  tags:
-#    - config_ssh
-#  when:
-#    - kvm_allow_root_ssh is defined
-#    - kvm_allow_root_ssh
+- include: config_ssh.yml
+  tags:
+    - config_ssh
+  when:
+    - kvm_allow_root_ssh is defined
+    - kvm_allow_root_ssh
 
 - include: config_virtual_networks.yml
   tags:
@@ -41,13 +41,13 @@
     - kvm_config_storage_pools
     - kvm_storage_pools is defined
 
-#- include: config_vms.yml
-#  tags:
-#    - config_vms
-#  when:
-#    - kvm_manage_vms is defined
-#    - kvm_manage_vms
-#    - kvm_vms is defined
+- include: config_vms.yml
+  tags:
+    - config_vms
+  when:
+    - kvm_manage_vms is defined
+    - kvm_manage_vms
+    - kvm_vms is defined
 
-#- include: system_tweaks.yml
-#  when: kvm_enable_system_tweaks
+- include: system_tweaks.yml
+  when: kvm_enable_system_tweaks
