@@ -69,7 +69,6 @@
     command: info
   when:
     - item['host'] is not defined
-    - ansible_version.full | version_compare('2.3', '>=')
   loop: "{{ kvm_vms }}"
 
 - name: config_vms | Setting autostart status
@@ -81,5 +80,4 @@
   when:
     - item['host'] is defined
     - inventory_hostname == item['host']
-    - ansible_version.full | version_compare('2.3', '>=')
   loop: "{{ kvm_vms }}"
