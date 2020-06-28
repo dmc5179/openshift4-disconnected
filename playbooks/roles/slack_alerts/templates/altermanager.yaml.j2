@@ -1,0 +1,29 @@
+global:
+  resolve_timeout: 5m
+route:
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 12h
+  receiver: default
+  routes:
+  - match:
+      alertname: Watchdog
+    repeat_interval: 5m
+    receiver: watchdog
+  - match:
+      severity: "critical"
+    receiver: "cluster_receiver"
+  - match_re:
+      namespace: "^(openshift|kube)$"
+    receiver: "cluster_receiver"
+  - match_re:
+      alertname: "^(Cluster|Cloud|Machine|Pod|Kube|MCD|Alertmanager|etcd|TargetDown|CPU|Node|Clock|Prometheus|Failing|Network|IPTable)$"
+    receiver: "cluster_receiver"
+receivers:
+- name: default
+- name: watchdog
+- name: "cluster_receiver"
+    slack_configs:
+      - api_url: "https://hooks.slack.com/services/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"
+        channel: "#project"
+        send_resolved: true
