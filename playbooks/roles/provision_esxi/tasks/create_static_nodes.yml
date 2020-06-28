@@ -55,8 +55,8 @@
     networks:
     - name: 'openshift'
       device_type: vmxnet3
-#      mac: "{{ openshift_hosts.name['bootstrap'].mac }}"
-    wait_for_ip_address: false
+      mac: "{{ openshift_bootstrap.mac }}"
+    wait_for_ip_address: no
   delegate_to: localhost
   register: deploy_bootstrap
 
@@ -96,7 +96,7 @@
     datacenter: '{{ datacenter_name }}'
     folder: '{{ datacenter_name }}/vm/caas/'
     guest_id: coreos64Guest
-    name: '{{ item }}'
+    name: '{{ item.name }}'
     state: poweredon
     disk:
     - size_gb: 50
@@ -120,18 +120,16 @@
       boot_firmware: "efi"
     cdrom:
       type: iso
-      iso_path: "[USB-Datastore] /ISOs/{{ item }}.iso"
+      iso_path: "[USB-Datastore] /ISOs/{{ item.name }}.iso"
     networks:
     - name: 'openshift'
       device_type: vmxnet3
-#      mac: "{{ openshift_hosts.name['item'].mac }}"
-    wait_for_ip_address: false
+      mac: "{{ item.mac }}"
+    wait_for_ip_address: no
   delegate_to: localhost
   register: deploy
   with_items:
-    - 'master0'
-    - 'master1'
-    - 'master2'
+    - '{{ openshift_masters }}'
 
 - name: Pause to wait for masters to initialize
   pause:
@@ -144,7 +142,7 @@
     username: "{{ vcenter_username }}"
     password: "{{ vcenter_password }}"
     port: "{{ vcenter_port }}"
-    name: '{{ item }}'
+    name: '{{ item.name }}'
     boot_delay: 5000
     enter_bios_setup: false
     boot_retry_enabled: false
@@ -155,9 +153,7 @@
     validate_certs: "{{ ssl_enabled }}"
   delegate_to: localhost
   with_items:
-    - 'master0'
-    - 'master1'
-    - 'master2'
+    - '{{ openshift_masters }}'
 
 - name: Pause to wait for masters
   pause:
@@ -173,7 +169,7 @@
     datacenter: '{{ datacenter_name }}'
     folder: '{{ datacenter_name }}/vm/caas/'
     guest_id: coreos64Guest
-    name: '{{ item }}'
+    name: '{{ item.name }}'
     state: poweredon
     disk:
     - size_gb: 50
@@ -197,18 +193,16 @@
       boot_firmware: "efi"
     cdrom:
       type: iso
-      iso_path: "[USB-Datastore] /ISOs/{{ item }}.iso"
+      iso_path: "[USB-Datastore] /ISOs/{{ item.name }}.iso"
     networks:
     - name: 'openshift'
       device_type: vmxnet3
-#      mac: "{{ openshift_hosts.name['item'].mac }}"
-    wait_for_ip_address: false
+      mac: "{{ item.mac }}"
+    wait_for_ip_address: no
   delegate_to: localhost
   register: deploy
   with_items:
-    - 'worker0'
-    - 'worker1'
-    - 'worker2'
+    - '{{ openshift_workers }}'
 
 - name: Pause to wait for worker nodes to initialize
   pause:
@@ -221,7 +215,7 @@
     username: "{{ vcenter_username }}"
     password: "{{ vcenter_password }}"
     port: "{{ vcenter_port }}"
-    name: '{{ item }}'
+    name: '{{ item.name }}'
     boot_delay: 5000
     enter_bios_setup: false
     boot_retry_enabled: false
@@ -232,6 +226,4 @@
     validate_certs: "{{ ssl_enabled }}"
   delegate_to: localhost
   with_items:
-    - 'worker0'
-    - 'worker1'
-    - 'worker2'
+    - '{{ openshift_workers }}'
