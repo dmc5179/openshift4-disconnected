@@ -7,6 +7,7 @@
     state: absent
   tags:
     - manifests
+    - install-config
 
 - name: Create ignition configs directory
   file:
@@ -15,13 +16,50 @@
     mode: '0755'
   tags:
     - manifests
+    - install-config
+
+- file:
+    path: "{{ ansible_env.HOME }}/.ssh"
+    state: directory
+    mode: 0700
+  tags:
+    - manifests
+    - install-config
+
+- name: Generate SSH keypair for cluster nodes
+  openssh_keypair:
+   path: "{{ ansible_env.HOME }}/.ssh/{{ cluster_name}}_rsa"
+   size: 4096
+   comment: "Key for {{ cluster_name}} OpenShift 4 Cluster"
+   state: present
+  tags:
+    - manifests
+    - install-config
 
 - name: Fetch public key
   slurp:
-    src: "{{ ssh_public_key_file }}"
+#    src: "{{ ssh_public_key_file }}"
+    src: '{{ ansible_env.HOME }}/.ssh/{{ cluster_name}}_rsa.pub'
   register: slurped_key_b64
   tags:
     - manifests
+    - install-config
+
+- name: Configure SSH client for cluster node access
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.ssh/config"
+    line: "{{ item.line }}"
+    state: present
+    backup: yes
+    create: yes
+  with_items:
+    - { line: "Host *" }
+    - { line: "    HostName %h.{{ cluster_name }}.{{ base_domain }}" }
+    - { line: "    User core" }
+    - { line: "    IdentityFile {{ ansible_env.HOME }}/.ssh/{{ cluster_name }}_rsa" }
+  tags:
+    - manifests
+    - install-config
 
 - name: Fetch pull secret
   slurp:
@@ -29,13 +67,47 @@
   register: slurped_pull_secret_b64
   tags:
     - manifests
+    - install-config
 
-- name: Fetch CA Bundle
+- name: Slurp Mirror Registry Certificate Bundle
   slurp:
     src: "{{ certificate_bundle }}"
-  register: slurped_ca_bundle_b64
+  register: slurped_registry_ca_bundle_b64
   tags:
     - manifests
+    - install-config
+
+- name: Create directory for vCenter Root Certificates
+  file:
+    path: '/tmp/vcenter'
+    state: directory
+  when:
+    - (platform is match("vmware"))
+  tags:
+    - manifests
+    - install-config
+
+- name: Download vCenter Root Certificates
+  unarchive:
+    src: 'https://{{ vcenter_hostname }}:{{ vcenter_port }}/certs/download.zip'
+    dest: /tmp/vcenter
+    remote_src: true
+    validate_certs: false
+  when:
+    - (platform is match("vmware"))
+  tags:
+    - manifests
+    - install-config
+
+- name: Slurp vCenter Root Certificates
+  slurp:
+    src: "{{ lookup('fileglob', '/tmp/vcenter/certs/lin/*.0') }}"
+  register: slurped_vcenter_ca_bindle_b64
+  when:
+    - (platform is match("vmware"))
+  tags:
+    - manifests 
+    - install-config
 
 - name: Copy template install-config.yaml
   template:
@@ -44,12 +116,14 @@
     mode: 0664
   tags:
     - manifests
+    - install-config
 
 - name: Ensure proper spacing of additionalTrustBundle
   shell:
     cmd: awk -i inplace 'BEGIN{c=0}  /BEGIN CERTIFICATE/{c=1}  {if (c==1) print " ",$0}  {if (c==0) print $0}  /END CERTIFICATE/{c=0}' "{{ ignition_configs }}/install-config.yaml"
   tags:
     - manifests
+    - install-config
 
 - name: Create manifests
   shell: "{{ openshift_install }} create manifests --dir={{ ignition_configs }}"
