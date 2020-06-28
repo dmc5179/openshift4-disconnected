@@ -8,11 +8,3 @@
     - name: Install mirrored Ansible Roles
       include_role:
         name: install_roles
-
-    - name: Install tools like openshift-install and oc
-      include_role:
-        name: tools
-
-    - name: Install and configure pip modules
-      include_role:
-        name: pip
