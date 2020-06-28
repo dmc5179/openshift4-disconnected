@@ -1,0 +1,11 @@
+---
+
+  # TODO: fix to use something other than shell
+- name: Replace altert manager secret
+  shell:
+    cmd: oc -n openshift-monitoring create secret generic alertmanager-main --from-file=templates/altermanager.yaml --dry-run -o=yaml |  oc -n openshift-monitoring replace secret --filename=-
+
+  # TODO: fix to use something other than shell
+- name: Delete alert manager pods to replace secret
+  shell:
+    cmd: oc delete pods -l alertmanager-main -n openshift-monitoring
