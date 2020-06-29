@@ -3,16 +3,26 @@
 
 - name: Ensure staging directory exists
   file:
-    name: "{{ staging_dir }}"
+    name: "{{ item }}"
     state: directory
+  with_items:
+    - '{{ roles_staging_dir }}'
+    - '{{ collections_staging_dir }}'
+  tags:
+    - mirror
 
 - name: Download Ansible Roles
-  command:
-    argv:
-      - 'ansible-galaxy'
-      - 'install'
-      - '--roles-path'
-      - "{{ staging_dir }}"
-      - "{{ item }}"
+  shell:
+    cmd: 'ansible-galaxy install --roles-path {{ roles_staging_dir }} {{ item }}'
   with_items:
     - "{{ ansible_roles }}"
+  tags:
+    - mirror
+
+- name: Fetch Anisble Collections
+  shell:
+    cmd: 'ansible-galaxy collection install  --collections-path {{ collections_staging_dir }} {{ item }}'
+  with_items:
+    - '{{ ansible_collections }}'
+  tags:
+    - mirror

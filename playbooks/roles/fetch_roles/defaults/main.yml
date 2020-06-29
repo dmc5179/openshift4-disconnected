@@ -1,7 +1,10 @@
 ---
 # defaults file for fetch_roles
+air_gapped: true
 
-staging_dir: '/tmp/ansible_roles'
+mirror_base: '/tmp'
+roles_staging_dir: '{{ mirror_base }}/ansible_roles'
+collections_staging_dir: '{{ mirror_base }}/ansible_collections'
 
 ansible_roles:
   - bertvv.bind
@@ -9,7 +12,5 @@ ansible_roles:
   - bertvv.tftp
   - mariuszczyz.centos_pxe
 
-air_gapped: true
-
-mirror_registry: 'localhost:5000'
-mirror_transport: 'https'
+ansible_collections:
+  - freeipa.ansible_freeipa
