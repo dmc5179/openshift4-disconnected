@@ -10,19 +10,15 @@
         username: "{{ vcenter_username }}"
         password: "{{ vcenter_password }}"
         port: '{{ vcenter_port }}'
-        validate_certs: '{{ ssl_enabled }}'
-        name: "{{ item }}"
+        validate_certs: '{{ vmware_ssl_enabled }}'
+        name: "{{ item.name }}"
         state: powered-off
       delegate_to: localhost
       ignore_errors: true
       with_items:
-        - 'bootstrap'
-        - 'master0'
-        - 'master1'
-        - 'master2'
-        - 'worker0'
-        - 'worker1'
-        - 'worker2'
+        - '{{ openshift_bootstrap }}'
+        - '{{ openshift_masters }}'
+        - '{{ openshift_workers }}'
 
     - name: Cleanup Nodes
       vmware_guest:
@@ -30,20 +26,16 @@
         username: "{{ vcenter_username }}"
         password: "{{ vcenter_password }}"
         port: '{{ vcenter_port }}'
-        validate_certs: '{{ ssl_enabled }}'
+        validate_certs: '{{ vmware_ssl_enabled }}'
         datacenter: '{{ datacenter_name }}'
-        name: '{{ item }}'
+        name: '{{ item.name }}'
         state: absent
       delegate_to: localhost
       ignore_errors: true
       with_items:
-        - 'bootstrap'
-        - 'master0'
-        - 'master1'
-        - 'master2'
-        - 'worker0'
-        - 'worker1'
-        - 'worker2'
+        - '{{ openshift_bootstrap }}'
+        - '{{ openshift_masters }}'
+        - '{{ openshift_workers }}'
 
     - name: Delete RHCOS custom ISOs from vsphere
       vsphere_file:
@@ -54,9 +46,11 @@
         datastore: 'USB-Datastore'
         state: absent
         path: 'ISOs/{{ item.name }}.iso'
-        validate_certs: "{{ ssl_enabled }}"
+        validate_certs: "{{ vmware_ssl_enabled }}"
       delegate_to: localhost
       with_items:
-        - '{{ openshift_hosts }}'
+        - '{{ openshift_bootstrap }}'
+        - '{{ openshift_masters }}'
+        - '{{ openshift_workers }}'
       loop_control:
         pause: 2
