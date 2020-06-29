@@ -1,8 +1,7 @@
 ---
-
-
 # 4.3 March 23, 2020 at 5:28:02 AM UTC-
 ec2_ami: 'ami-0347efb61e552e57b'
 ec2_region: 'us-east-1'
 ec2_endpoint: 'https://ec2.us-iso-east-1.c2s.ic.gov'
 s3_endpoint: 'https://s3.us-iso-east-1.c2s.ic.gov'
+aws_ssl: true
