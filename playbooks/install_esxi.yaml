@@ -8,7 +8,9 @@
       include_role:
         name: custom_iso
       with_items:
-        - '{{ openshift_hosts }}'
+        - '{{ openshift_bootstrap }}'
+        - '{{ openshift_masters }}'
+        - '{{ openshift_workers }}'
       when: (network_mode is match("static"))
       tags:
         - iso
@@ -21,10 +23,12 @@
         src: '/tmp/rhcos/{{ item.name }}.iso'
         datastore: 'USB-Datastore'
         path: 'ISOs/{{ item.name }}.iso'
-        validate_certs: "{{ ssl_enabled }}"
+        validate_certs: "{{ vmware_ssl_enabled }}"
       delegate_to: localhost
       with_items:
-        - '{{ openshift_hosts }}'
+        - '{{ openshift_bootstrap }}'
+        - '{{ openshift_masters }}'
+        - '{{ openshift_workers }}'
 #      loop_control:
 #        pause: 5
       when: (network_mode is match("static"))
