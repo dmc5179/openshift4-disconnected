@@ -1,14 +1,15 @@
 ---
 
 platform: vmware
-vcenter_username: 'danclark'
-vcenter_password: 'M@rch!985'
-vcenter_hostname: 'vcenter.redhatgovic.io'
-esxi_hostname: 'lunchbox.42pandas.com'
-vcenter_port: 8443
-datacenter_name: '42Pandas Main Datacenter'
+vcenter_username: ''
+vcenter_password: ''
+vcenter_hostname: 'vcenter.example.com'
+esxi_hostname: 'esxi.example.com'
+vcenter_port: 443
+datacenter_name: 'Example Main Datacenter'
 datastore_name: 'NVMe-Datastore'
 vswitch_name: 'openshift'
 portgroup_name: 'ocp_pg'
-vcenter_cluster_name: 'lunchbox.42pandas.com'
+vcenter_cluster_name: 'esxi.example.com'
 rhcos_template_name: 'rhcos'
+vmware_ssl_enabled: false

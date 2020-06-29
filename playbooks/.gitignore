@@ -1,6 +1,5 @@
 *.swp
 *.mine
 ansible.log
-vars/aws.yml
-vars/main.yml
-vars/vmware.yml
+group_vars/all/infra/aws.yml
+group_vars/all/infra/vmware.yml
