@@ -1,0 +1,8 @@
+---
+- hosts: helper_node
+  gather_facts: true
+  tasks:
+
+    - name: Fetch and install vCenter CA
+      include_role:
+        name: vmware
