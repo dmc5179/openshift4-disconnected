@@ -7,7 +7,7 @@
     state: present
     wait: false
     kubeconfig: "{{ kubeconfig  }}"
-    validate_certs: '{{ ssl_enabled }}'
+    validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/nvidia-gpu-operator-icsp.yaml.j2') }}"
   tags:
     - never
