@@ -1,29 +1,23 @@
 ---
 
-- name: Set enableUUID
+- name: Set enableUUID on {{ vmhost }}
   shell:
-    cmd: govc vm.change -vm {{ item_name }} -e="disk.enableUUID=1"
-  with_items:
-    - '{{ openshift_masters }}'
-    - '{{ openshift_workers }}'
+    cmd: govc vm.change -vm {{ vmhost }} -e="disk.enableUUID=1"
   environment:
-    GOVC_USERNAME:
-    GOVC_PASSWORD:
-    GOVC_INSECURE:
-    GOVC_DATACENTER:
-    GOVC_DATASTORE:
-    GOVC_HOST:
+    GOVC_USERNAME: '{{ vcenter_username }}'
+    GOVC_PASSWORD: '{{ vcenter_password }}'
+    GOVC_INSECURE: 1
+    GOVC_DATACENTER: '{{ datacenter_name }}'
+    GOVC_DATASTORE: '{{ datastore_name }}'
+    GOVC_HOST: '{{ vcenter_hostname }}:{{ vcenter_port }}'
 
-- name: Set VM HW Version
+- name: Set VM HW Version on {{ vmhost }}
   shell:
-    cmd: govc vm.upgrade -version={{ vm_hw_ver }} -vm {{ item.name }}
-  with_items:
-    - '{{ openshift_masters }}'
-    - '{{ openshift_workers }}'
+    cmd: govc vm.upgrade -version={{ vm_hw_ver }} -vm {{ vmhost }}
   environment:
-    GOVC_USERNAME:
-    GOVC_PASSWORD:
-    GOVC_INSECURE:
-    GOVC_DATACENTER:
-    GOVC_DATASTORE:
-    GOVC_HOST:
+    GOVC_USERNAME: '{{ vcenter_username }}'
+    GOVC_PASSWORD: '{{ vcenter_password }}'
+    GOVC_INSECURE: 1
+    GOVC_DATACENTER: '{{ datacenter_name }}'
+    GOVC_DATASTORE: '{{ datastore_name }}'
+    GOVC_HOST: '{{ vcenter_hostname }}:{{ vcenter_port }}'
