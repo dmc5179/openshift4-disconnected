@@ -16,7 +16,7 @@
 
 - name: Set VM HW Version
   shell:
-    cmd: govc vm.upgrade -version=15 -vm {{ item.name }}
+    cmd: govc vm.upgrade -version={{ vm_hw_ver }} -vm {{ item.name }}
   with_items:
     - '{{ openshift_masters }}'
     - '{{ openshift_workers }}'
