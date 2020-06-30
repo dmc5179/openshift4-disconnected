@@ -15,7 +15,7 @@
 #    datacenter: '{{ datacenter_name }}'
 #    datastore: '{{ datastore_name }}'
 #    path: 'caas/rhcos-{{ rhcos_ver }}-{{ arch }}-vmware.{{ arch }}.ova'
-#    validate_certs: "{{ ssl_enabled }}"
+#    validate_certs: "{{ vmware_ssl_enabled }}"
 #  delegate_to: localhost
 #  when: (upload_ova | bool)
 
@@ -29,7 +29,7 @@
     disk_provisioning: thin
     name: bootstrap
     networks: "{u'VM Network':u'openshift'}"
-    validate_certs: '{{ ssl_enabled }}'
+    validate_certs: '{{ vmware_ssl_enabled }}'
     power_on: false
     ovf: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-vmware.{{ arch }}.ova'
     inject_ovf_env: true
@@ -56,7 +56,7 @@
 #      - ethernet
       - disk
     secure_boot_enabled: false
-    validate_certs: "{{ ssl_enabled }}"
+    validate_certs: "{{ vmware_ssl_enabled }}"
   delegate_to: localhost
 
 
@@ -66,7 +66,7 @@
     username: "{{ vcenter_username }}"
     password: "{{ vcenter_password }}"
     port: '{{ vcenter_port }}'
-    validate_certs: '{{ ssl_enabled }}'
+    validate_certs: '{{ vmware_ssl_enabled }}'
     datacenter: '{{ datacenter_name }}'
 #    folder: '{{ datacenter_name }}/vm/caas/'
     guest_id: coreos64Guest
@@ -96,7 +96,7 @@
     password: "{{ vcenter_password }}"
     datacenter: "{{ datacenter_name }}"
     port: '{{ vcenter_port }}'
-    validate_certs: '{{ ssl_enabled }}'
+    validate_certs: '{{ vmware_ssl_enabled }}'
     name: bootstrap
     gather_network_info: false
     networks:
@@ -114,7 +114,7 @@
     username: "{{ vcenter_username }}"
     password: "{{ vcenter_password }}"
     port: '{{ vcenter_port }}'
-    validate_certs: '{{ ssl_enabled }}'
+    validate_certs: '{{ vmware_ssl_enabled }}'
     name: bootstrap
     state: powered-on
   delegate_to: localhost

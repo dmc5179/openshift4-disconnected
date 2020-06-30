@@ -7,7 +7,7 @@
 #    username: '{{ vcenter_username }}'
 #    password: '{{ vcenter_password }}'
 ##    cluster_name: '{{ cluster_name }}'
-#    validate_certs: "{{ ssl_enabled }}"
+#    validate_certs: "{{ vmware_ssl_enabled }}"
 #  delegate_to: localhost
 #  register: all_hosts_vswitch_info
 
@@ -23,7 +23,7 @@
     password: '{{ vcenter_password }}'
     switch: '{{ vswitch_name }}'
     mtu: 1500
-    validate_certs: "{{ ssl_enabled }}"
+    validate_certs: "{{ vmware_ssl_enabled }}"
   delegate_to: localhost
 
 - name: Add Portgroup with all settings defined
@@ -34,7 +34,7 @@
     esxi_hostname: "{{ inventory_hostname }}"
     switch: "{{ vswitch_name }}"
     portgroup: "{{ portgroup_name }}"
-    validate_certs: "{{ ssl_enabled }}"
+    validate_certs: "{{ vmware_ssl_enabled }}"
     vlan_id: 10
 #    security:
 #        promiscuous_mode: False
@@ -71,5 +71,5 @@
       subnet_mask: 255.255.255.0
     state: present
     enable_mgmt: false
-    validate_certs: "{{ ssl_enabled }}"
+    validate_certs: "{{ vmware_ssl_enabled }}"
   delegate_to: localhost
