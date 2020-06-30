@@ -5,5 +5,10 @@
   tasks:
 
     - name: VMWare Govc tool management
-      import_role:
+      include_role:
         name: govc
+      vars:
+        vmhost: '{{ item.name }}'
+      with_items:
+        - '{{ openshift_masters }}'
+        - '{{ openshift_workers }}'
