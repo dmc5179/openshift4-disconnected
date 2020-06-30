@@ -1,18 +1,18 @@
 ---
 
 - name: Mirror govc binary
-  include_tasks: mirror.yml
+  import_tasks: mirror.yml
   tags:
     - never
     - mirror
 
 - name: Install govc binary from mirror
-  include_tasks: install.yml
+  import_tasks: install.yml
   tags:
     - never
     - install
 
 - name: Upgrade VM HW Version Number
-  include_tasks: upgrade.yml
+  import_tasks: upgrade.yml
   tags:
     - upgrade
