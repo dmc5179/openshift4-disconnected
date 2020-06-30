@@ -1,0 +1,10 @@
+---
+
+- name: Extract govc
+  become: true
+  unarchive:
+    src: '{{ mirror_base }}/govc/govc_linux_amd64.gz'
+    dest: '/usr/local/bin'
+    owner: root
+    group: root
+    mode: 0755

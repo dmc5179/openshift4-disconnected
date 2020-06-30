@@ -1,0 +1,29 @@
+---
+
+- name: Set enableUUID
+  shell:
+    cmd: govc vm.change -vm {{ item_name }} -e="disk.enableUUID=1"
+  with_items:
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
+  environment:
+    GOVC_USERNAME:
+    GOVC_PASSWORD:
+    GOVC_INSECURE:
+    GOVC_DATACENTER:
+    GOVC_DATASTORE:
+    GOVC_HOST:
+
+- name: Set VM HW Version
+  shell:
+    cmd: govc vm.upgrade -version=15 -vm {{ item.name }}
+  with_items:
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
+  environment:
+    GOVC_USERNAME:
+    GOVC_PASSWORD:
+    GOVC_INSECURE:
+    GOVC_DATACENTER:
+    GOVC_DATASTORE:
+    GOVC_HOST:
