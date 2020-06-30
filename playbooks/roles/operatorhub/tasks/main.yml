@@ -67,6 +67,7 @@
     state: present
     wait: true
     kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
     definition:
       apiVersion: operators.coreos.com/v1alpha1
       kind: CatalogSource
@@ -87,6 +88,7 @@
     state: present
     wait: true
     kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
     definition:
       apiVersion: operators.coreos.com/v1alpha1
       kind: CatalogSource
@@ -107,6 +109,7 @@
     state: present
     wait: true
     kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
     definition:
       apiVersion: operators.coreos.com/v1alpha1
       kind: CatalogSource
@@ -127,6 +130,7 @@
     state: absent
     wait: true
     kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
     definition:
       apiVersion: operators.coreos.com/v1alpha1
       kind: CatalogSource
@@ -147,6 +151,7 @@
     state: absent
     wait: true
     kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
     definition:
       apiVersion: operators.coreos.com/v1alpha1
       kind: CatalogSource
@@ -167,6 +172,7 @@
     state: absent
     wait: true
     kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
     definition:
       apiVersion: operators.coreos.com/v1alpha1
       kind: CatalogSource
