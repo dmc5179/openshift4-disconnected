@@ -10,17 +10,13 @@
         username: "{{ vcenter_username }}"
         password: "{{ vcenter_password }}"
         port: '{{ vcenter_port }}'
-        validate_certs: '{{ ssl_enabled }}'
-        name: "{{ item }}"
+        validate_certs: '{{ vmware_ssl_enabled }}'
+        name: "{{ item.name }}"
         state: shutdown-guest
       delegate_to: localhost
       ignore_errors: true
       loop_control:
         pause: 5
       with_items:
-        - 'worker0'
-        - 'worker1'
-        - 'worker2'
-        - 'master0'
-        - 'master1'
-        - 'master2'
+        - '{{ openshift_workers }}'
+        - '{{ openshift_masters }}'
