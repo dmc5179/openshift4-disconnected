@@ -1,28 +1,12 @@
 ---
 
-#- name: Deploy Virtual Machine from template in content library
-#  vmware_content_deploy_template:
-#    hostname: '{{ vcenter_hostname }}'
-#    username: '{{ vcenter_username }}'
-#    password: '{{ vcenter_password }}'
-#    validate_certs: "{{ ssl_enabled }}"
-#    port: "{{ vcenter_port }}"
-#    template: '{{ rhcos_template_name }}'
-#    datastore: '{{ datastore_name }}'
-#    folder: caas
-#    datacenter: '{{ datacenter_name }}'
-#    name: bootstrap
-#    resource_pool: test_rp
-#    state: present
-#  delegate_to: localhost
-
 - name: Create bootstrap
   vmware_guest:
     hostname: "{{ vcenter_hostname }}"
     username: "{{ vcenter_username }}"
     password: "{{ vcenter_password }}"
     port: '{{ vcenter_port }}'
-    validate_certs: '{{ ssl_enabled }}'
+    validate_certs: '{{ vmware_ssl_enabled }}'
     datacenter: '{{ datacenter_name }}'
     folder: '{{ datacenter_name }}/vm/caas/'
     guest_id: coreos64Guest
@@ -37,12 +21,6 @@
       num_cpus: 8
       num_cpu_cores_per_socket: 2
       scsi: paravirtual
-#      memory_reservation_lock: false
-#      mem_limit: 8192
-#      mem_reservation: 4096
-#      cpu_limit: 8192
-#      cpu_reservation: 4096
-#      max_connections: 5
       hotadd_cpu: true
       hotremove_cpu: true
       hotadd_memory: false
@@ -55,7 +33,7 @@
     networks:
     - name: 'openshift'
       device_type: vmxnet3
-      mac: "{{ openshift_bootstrap.mac }}"
+      mac: "{{ openshift_bootstrap[0].mac }}"
     wait_for_ip_address: no
   delegate_to: localhost
   register: deploy_bootstrap
@@ -79,7 +57,7 @@
     boot_order:
       - disk
     secure_boot_enabled: False
-    validate_certs: "{{ ssl_enabled }}"
+    validate_certs: "{{ vmware_ssl_enabled }}"
   delegate_to: localhost
 
 - name: Pause to wait for bootstrap to initialized
@@ -92,14 +70,14 @@
     username: "{{ vcenter_username }}"
     password: "{{ vcenter_password }}"
     port: '{{ vcenter_port }}'
-    validate_certs: '{{ ssl_enabled }}'
+    validate_certs: '{{ vmware_ssl_enabled }}'
     datacenter: '{{ datacenter_name }}'
     folder: '{{ datacenter_name }}/vm/caas/'
     guest_id: coreos64Guest
     name: '{{ item.name }}'
     state: poweredon
     disk:
-    - size_gb: 50
+    - size_gb: 40
       type: thin
       datastore: '{{ datastore_name }}'
     hardware:
@@ -107,12 +85,6 @@
       num_cpus: 4
       num_cpu_cores_per_socket: 2
       scsi: paravirtual
-#      memory_reservation_lock: false
-#      mem_limit: 8192
-#      mem_reservation: 4096
-#      cpu_limit: 8192
-#      cpu_reservation: 4096
-#      max_connections: 5
       hotadd_cpu: true
       hotremove_cpu: true
       hotadd_memory: false
@@ -150,7 +122,7 @@
     boot_order:
       - disk
     secure_boot_enabled: False
-    validate_certs: "{{ ssl_enabled }}"
+    validate_certs: "{{ vmware_ssl_enabled }}"
   delegate_to: localhost
   with_items:
     - '{{ openshift_masters }}'
@@ -165,14 +137,14 @@
     username: "{{ vcenter_username }}"
     password: "{{ vcenter_password }}"
     port: '{{ vcenter_port }}'
-    validate_certs: '{{ ssl_enabled }}'
+    validate_certs: '{{ vmware_ssl_enabled }}'
     datacenter: '{{ datacenter_name }}'
     folder: '{{ datacenter_name }}/vm/caas/'
     guest_id: coreos64Guest
     name: '{{ item.name }}'
     state: poweredon
     disk:
-    - size_gb: 50
+    - size_gb: 40
       type: thin
       datastore: '{{ datastore_name }}'
     hardware:
@@ -180,12 +152,6 @@
       num_cpus: 8
       num_cpu_cores_per_socket: 2
       scsi: paravirtual
-#      memory_reservation_lock: false
-#      mem_limit: 8192
-#      mem_reservation: 4096
-#      cpu_limit: 8192
-#      cpu_reservation: 4096
-#      max_connections: 5
       hotadd_cpu: true
       hotremove_cpu: true
       hotadd_memory: false
@@ -223,7 +189,7 @@
     boot_order:
       - disk
     secure_boot_enabled: False
-    validate_certs: "{{ ssl_enabled }}"
+    validate_certs: "{{ vmware_ssl_enabled }}"
   delegate_to: localhost
   with_items:
     - '{{ openshift_workers }}'

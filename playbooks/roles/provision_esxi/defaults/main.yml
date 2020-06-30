@@ -3,7 +3,7 @@
 
 mirror_base: '/opt/openshift'
 
-ssl_enabled: false
+vmware_ssl_enabled: false
 
 vcenter_username: ''
 vcenter_password: ''

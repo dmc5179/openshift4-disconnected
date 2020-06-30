@@ -20,7 +20,7 @@
     folder_name: 'caas'
     folder_type: vm
     state: present
-    validate_certs: "{{ ssl_enabled }}"
+    validate_certs: "{{ vmware_ssl_enabled }}"
   register: vm_folder_creation_result
   delegate_to: localhost
 
