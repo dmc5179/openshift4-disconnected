@@ -1,3 +1,4 @@
 ---
 
-
+api_url: 'https://hooks.slack.com/services/XXX/YYY/ZZZ'
+channel: '#project'
