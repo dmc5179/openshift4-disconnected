@@ -13,9 +13,6 @@ fakeroots: 'fakeroots'
 
 ###############################################
 
-#This needs to be set to the disk where you are installing RHCOS
-disk: 'sda'
-
 # RedHat CoreOS Version. Might not match OpenShift Version
 # 4.3.8 and 4.4.3 currently available
 rhcos_ver: '4.4.3'
@@ -63,8 +60,6 @@ docker_registry_hostname: 'localhost'
 #####################################################
 # OpenShift Hosts
 #####################################################
-
-air_gapped: true
 
 # static or dhcp network mode for installing the cluster
 network_mode: static
