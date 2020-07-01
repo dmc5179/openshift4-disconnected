@@ -3,3 +3,4 @@
 ansible.log
 group_vars/all/infra/aws.yml
 group_vars/all/infra/vmware.yml
+group_vars/all/infra/all.yml
