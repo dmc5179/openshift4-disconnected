@@ -1,4 +1,17 @@
 ---
+# Fully air-gap install??
+air_gapped: true
+
+###################################################################
+# Path to binaries
+###################################################################
+openshift_install: '/usr/local/bin/openshift-install'
+openshift_client: '/usr/local/bin/oc'
+kubectl: '/usr/local/bin/kubectl'
+filetranspile: '/usr/local/bin/filetranspiler'
+fakeroots: 'fakeroots'
+
+###############################################
 
 #This needs to be set to the disk where you are installing RHCOS
 disk: 'sda'
@@ -12,9 +25,56 @@ ocp_ver: '4.4.7'
 # RHCOS and OpenShift Architecture
 arch: 'x86_64'
 
+kube_ssl_enabled: false
+kubeconfig: "{{ ansible_env.HOME }}/.kube/config"
+
+master_count: 3
+worker_count: 3
+
+fips_enabled: false
+
+ocp_base_domain: 'example.com'
+cluster_name: 'caas'
+
+ssh_public_key_file: '{{ ansible_env.HOME }}/.ssh/id_rsa.pub'
+
+# Certificate bundle that will be added to the install-config.yaml
+# This generally includes a certificate for the disconnected docker registry
+certificate_bundle: '/etc/pki/ca-trust/source/anchors/quay.cert'
+
+###############################################
+
+###############################################################
+# Base directory for all other mirror tasks
+################################################################
+mirror_base: '/opt/openshift'
+mirror_registry: 'quay.example.com'
+mirror_transport: 'https'
+ignition_configs: "{{ mirror_base }}/cluster"
+# This is the secret that will be uploaded to the mirror server
+# for use in mirroring images
+local_pull_secret: '{{ ansible_env.HOME }}/Downloads/pull-secret.txt'
+# This is the same secret as above but located on the mirror server
+pull_secret: '/opt/openshift/pull-secret.txt'
+
+docker_registry_hostname: 'localhost'
+
+
+#####################################################
+# OpenShift Hosts
+#####################################################
+
+air_gapped: true
+
+# static or dhcp network mode for installing the cluster
+network_mode: static
+
+#This needs to be set to the disk where you are installing RHCOS
+disk: 'sda'
+
 openshift_bootstrap:
   - name: 'bootstrap'
-    mac: 'AA:AA:AA:AA:AA:AA'
+    mac: '00:50:56:97:0c:85'
     ip: '192.168.1.50'
     device: 'ens192'
     netmask: '255.255.255.0'
