@@ -1,0 +1,10 @@
+---
+- hosts: localhost
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Mirror Additional Images
+      import_role:
+        name: mirror_images
+        tasks_from: push
