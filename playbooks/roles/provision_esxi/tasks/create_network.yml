@@ -6,7 +6,7 @@
 #    hostname: '{{ vcenter_hostname }}'
 #    username: '{{ vcenter_username }}'
 #    password: '{{ vcenter_password }}'
-##    cluster_name: '{{ cluster_name }}'
+##    cluster_name: '{{ vcenter_cluster_name }}'
 #    validate_certs: "{{ vmware_ssl_enabled }}"
 #  delegate_to: localhost
 #  register: all_hosts_vswitch_info
