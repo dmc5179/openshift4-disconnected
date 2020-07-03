@@ -28,9 +28,9 @@
 
 - name: Generate SSH keypair for cluster nodes
   openssh_keypair:
-   path: "{{ ansible_env.HOME }}/.ssh/{{ cluster_name}}_rsa"
+   path: "{{ ansible_env.HOME }}/.ssh/{{ ocp_cluster_name}}_rsa"
    size: 4096
-   comment: "Key for {{ cluster_name}} OpenShift 4 Cluster"
+   comment: "Key for {{ ocp_cluster_name}} OpenShift 4 Cluster"
    state: present
   tags:
     - manifests
@@ -39,7 +39,7 @@
 - name: Fetch public key
   slurp:
 #    src: "{{ ssh_public_key_file }}"
-    src: '{{ ansible_env.HOME }}/.ssh/{{ cluster_name}}_rsa.pub'
+    src: '{{ ansible_env.HOME }}/.ssh/{{ ocp_cluster_name}}_rsa.pub'
   register: slurped_key_b64
   tags:
     - manifests
@@ -56,9 +56,9 @@
 #    mode: 0600
 #  with_items:
 #    - { line: "Host *" }
-#    - { line: "    HostName %h.{{ cluster_name }}.{{ ocp_base_domain }}" }
+#    - { line: "    HostName %h.{{ ocp_cluster_name }}.{{ ocp_base_domain }}" }
 #    - { line: "    User core" }
-#    - { line: "    IdentityFile {{ ansible_env.HOME }}/.ssh/{{ cluster_name }}_rsa" }
+#    - { line: "    IdentityFile {{ ansible_env.HOME }}/.ssh/{{ ocp_cluster_name }}_rsa" }
 #  tags:
 #    - manifests
 #    - install-config
