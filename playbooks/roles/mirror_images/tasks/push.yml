@@ -5,9 +5,12 @@
     dir: vars
     extensions:
         - yml
-  tags:
-    - never
-    - push
+
+- name: Install skopeo
+  become: true
+  package:
+    name: skopeo
+    state: present
 
 - name: Push additional images to mirror registry
   become: false
@@ -33,6 +36,3 @@
     - '{{ nfs_provisioner_images }}'
     - '{{ aws_ebs_csi_driver_images }}'
     - '{{ kubeflow_images }}'
-  tags:
-    - never
-    - push
