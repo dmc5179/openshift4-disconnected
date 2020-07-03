@@ -1,0 +1,7 @@
+---
+
+- name: Pull Additional Images
+  include_tasks: pull.yml
+
+- name: Push Additional Images
+  include_tasks: push.yml
