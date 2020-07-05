@@ -1,0 +1,14 @@
+---
+
+- name: Create mirror directory for helm
+  become: "{{ run_as_root }}"
+  file:
+    path: "{{ mirror_base }}/helm"
+    state: directory
+
+- name: Mirror helm binary
+  become: "{{ run_as_root }}"
+  get_url:
+    url: "https://get.helm.sh/helm-v{{ helm_version }}-linux-{{ arch }}.tar.gz"
+    dest: "{{ mirror_base }}/helm/helm-v{{ helm_version }}-linux-{{ arch }}.tar.gz"
+    mode: '0444'
