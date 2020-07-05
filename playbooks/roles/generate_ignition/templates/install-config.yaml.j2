@@ -19,12 +19,20 @@ networking:
   serviceNetwork:
   - {{ service_network_cidr }}
 platform:
+{% if platform == 'vmware' %}
   vsphere:
     vcenter: {{ vcenter_hostname }}
     username: {{ vcenter_username }}
     password: {{ vcenter_password }}
     datacenter: {{ datacenter_name }}
     defaultDatastore: {{ datastore_name }}
+{% elif platform == 'aws' %}
+  none: {}
+{% elif platform == 'gcp' %}
+  none: {}
+{% else %}
+  none: {}
+{% endif %}
 pullSecret: '{{ slurped_pull_secret_b64.content | b64decode }}'
 sshKey: '{{ slurped_key_b64.content | b64decode }}'
 additionalTrustBundle: |
