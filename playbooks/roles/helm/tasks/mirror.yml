@@ -12,3 +12,46 @@
     url: "https://get.helm.sh/helm-v{{ helm_version }}-linux-{{ arch }}.tar.gz"
     dest: "{{ mirror_base }}/helm/helm-v{{ helm_version }}-linux-{{ arch }}.tar.gz"
     mode: '0444'
+
+- name: Check for existing helm binary
+  stat:
+    path: '/usr/local/bin/helm'
+  register: helm_stat
+
+# Need helm installed on this host to mirror the charts
+block:
+  - name: Create temp directory to extract helm
+    become: "{{ run_as_root }}"
+    file:
+      path: '/tmp/helm'
+      state: directory
+
+  - name: Install helm
+    become: "{{ run_as_root }}"
+    unarchive:
+      src: "{{ mirror_base }}/helm/helm-v{{ helm_version }}-linux-{{ arch }}.tar.gz"
+      dest: '/tmp/helm'
+      remote_src: true
+
+  - name: Move helm binary
+    become: "{{ run_as_root }}"
+    copy:
+      src: '/tmp/helm/linux-amd64/helm'
+      dest: '/usr/local/bin/helm'
+      owner: root
+      group: root
+      mode: '0755'
+      remote_src: true
+
+  - name: Cleanup temp helm directory
+    become: "{{ run_as_root }}"
+    file:
+      path: '/tmp/helm'
+      state: absent
+  when: helm_stat.stat.exists == false
+
+- name: Pull helm charts
+  shell:
+    cmd: helm fetch --repo '{{ item.repo }}' --destination '{{ mirror_base }}/helm' '{{ item.chart }}'
+  with_items:
+    - '{{ helm_charts }}'
