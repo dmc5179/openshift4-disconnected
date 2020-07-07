@@ -46,7 +46,9 @@
   with_items:
     - "{{ httpd_port }}"
     - "{{ httpd_ssl_port }}"
-  when: "'firewalld.service' in services"
+  when:
+    ('firewalld.service' in services) and
+    (ansible_facts.services["firewalld.service"].state is match("running"))
 
 - name: create ssl directory
   file:
