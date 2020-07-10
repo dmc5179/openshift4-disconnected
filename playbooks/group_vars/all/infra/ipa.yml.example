@@ -1,0 +1,5 @@
+---
+
+ipa_host: 'example.com'
+ipa_user: 'admin'
+ipa_password: 'password'

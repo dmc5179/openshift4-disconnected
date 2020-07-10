@@ -3,6 +3,7 @@
 - name: Create DNS Zone
   ipa_dnszone:
     ipa_host: '{{ ipa_host }}'
+    ipa_user: '{{ ipa_user }}'
     ipa_pass: '{{ ipa_password }}'
     state: present
     zone_name: '{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
@@ -10,14 +11,30 @@
 
 - name: Create OpenShift A Records
   ipa_dnsrecord:
-    name: '{{ item.name }}'
+    record_name: '{{ item.name }}'
     zone_name: '{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
-    record_type: 'AAAA'
+    record_type: 'A'
     record_value: '{{ item.ip }}'
     record_ttl: 300
     ipa_host: '{{ ipa_host }}'
+    ipa_user: '{{ ipa_user }}'
     ipa_pass: '{{ ipa_password }}'
     state: present
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
+
+- name: Create OpenShift PTR Records
+  ipa_dnsrecord:
+    ipa_host: '{{ ipa_host }}'
+    ipa_user: '{{ ipa_user }}'
+    ipa_pass: '{{ ipa_password }}'
+    state: present
+    zone_name: 169.15.10.in-addr.arpa
+    record_name: "{{ item.ip.split('.')[-1][-2:] }}"
+    record_type: 'PTR'
+    record_value: '{{ item.name }}.{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
   with_items:
     - '{{ openshift_bootstrap }}'
     - '{{ openshift_masters }}'
@@ -26,12 +43,13 @@
 - name: Create OpenShift SRV records
   ipa_dnsrecord:
     ipa_host: '{{ ipa_host }}'
+    ipa_user: '{{ ipa_user }}'
     ipa_pass: '{{ ipa_password }}'
     state: present
     zone_name: '{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
     record_name: '_etcd-server-ssl._tcp.{{ ocp_cluster_name }}'
     record_type: 'SRV'
-    record_value: '10 0 2380 etcd-{{ idx }}.{{ ocp_cluster_name }}.{{ dns_zone_two }}.'
+    record_value: '10 0 2380 etcd-{{ idx }}.{{ ocp_cluster_name }}.{{ ocp_base_domain }}.'
   with_items:
     - '{{ openshift_masters }}'
   loop_control:
