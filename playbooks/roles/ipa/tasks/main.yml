@@ -25,6 +25,21 @@
     - '{{ openshift_masters }}'
     - '{{ openshift_workers }}'
 
+- name: Create OpenShift PTR Records
+  ipa_dnsrecord:
+    ipa_host: '{{ ipa_host }}'
+    ipa_user: '{{ ipa_user }}'
+    ipa_pass: '{{ ipa_password }}'
+    state: present
+    zone_name: 169.15.10.in-addr.arpa
+    record_name: "{{ item.ip.split('.')[-1][-2:] }}"
+    record_type: 'PTR'
+    record_value: '{{ item.name }}.{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
+
 - name: Create OpenShift SRV records
   ipa_dnsrecord:
     ipa_host: '{{ ipa_host }}'
