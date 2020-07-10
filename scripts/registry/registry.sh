@@ -42,7 +42,7 @@ podman run --name registry_server -p ${REGISTRY_PORT}:5000 \
 -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
 --hostname=${REGISTRY_HOSTNAME} \
 --detach \
-#{REGISTRY_IMG}
+${REGISTRY_IMG}
 
 # Configure SELinux to allow containers in systemd services
 sudo setsebool -P container_manage_cgroup on
