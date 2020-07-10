@@ -4,8 +4,7 @@
   become: false
   tasks:
 
-    # Tags mirror, install, and uninstall can be passed to this playbook
-    #
     - name: Deploy Operator Hub
-      import_role:
+      include_role:
         name: operatorhub
+        tasks_from: mirror
