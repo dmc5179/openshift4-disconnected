@@ -1,0 +1,28 @@
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  name: awsebscsi
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - {{ mirror_registry }}/amazon/aws-ebs-csi-driver
+    source: docker.io/amazon/aws-ebs-csi-driver
+  - mirrors:
+    - {{ mirror_registry }}/k8scsi/csi-provisioner
+    source: quay.io/k8scsi/csi-provisioner
+  - mirrors:
+    - {{ mirror_registry }}/k8scsi/csi-attacher
+    source: quay.io/k8scsi/csi-attacher
+  - mirrors:
+    - {{ mirror_registry }}/k8scsi/csi-snapshotter
+    source: quay.io/k8scsi/csi-snapshotter
+  - mirrors:
+    - {{ mirror_registry }}/k8scsi/livenessprobe
+    source: quay.io/k8scsi/livenessprobe
+  - mirrors:
+    - {{ mirror_registry }}/k8scsi/csi-resizer
+    source: quay.io/k8scsi/csi-resizer
+  - mirrors:
+    - {{ mirror_registry }}/k8scsi/csi-node-driver-registrar
+    source: quay.io/k8scsi/csi-node-driver-registrar

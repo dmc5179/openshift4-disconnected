@@ -1,0 +1,11 @@
+---
+- hosts: helper_node
+  gather_facts: true
+  become: false
+  tasks:
+
+    # Tags mirror, install, and uninstall can be passed to this playbook
+    #
+    - name: Deploy AWS EBS CSI Storage Driver
+      import_role:
+        name: aws_ebs_csi_driver

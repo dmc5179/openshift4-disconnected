@@ -1,22 +1,59 @@
-Role Name
-=========
+# Ansible role 'haproxy'
 
-A brief description of the role goes here.
+Installs HAProxy on Red Hat Enterprise Linux servers.
 
-Requirements
-------------
+## Requirements
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+- No Requirements
 
-Role Variables
---------------
+## Dependencies
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+- No Dependencies
 
-Dependencies
-------------
+## Role Variables
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+Available variables are listed below, along with default values (see `defaults/main.yml`):
+
+    haproxy_socket: /var/lib/haproxy/stats
+
+The socket through which HAProxy can communicate (for admin purposes or statistics). To disable/remove this directive, set `haproxy_socket: ''` (an empty string).
+
+    haproxy_chroot: /var/lib/haproxy
+
+The jail directory where chroot() will be performed before dropping privileges. To disable/remove this directive, set `haproxy_chroot: ''` (an empty string). Only change this if you know what you're doing!
+
+    haproxy_user: haproxy
+    haproxy_group: haproxy
+
+The user and group under which HAProxy should run. Only change this if you know what you're doing!
+
+    haproxy_frontend_name: 'hafrontend'
+    haproxy_frontend_bind_address: '*'
+    haproxy_frontend_port: 80
+    haproxy_frontend_mode: 'http'
+
+HAProxy frontend configuration directives.
+
+    haproxy_backend_name: 'habackend'
+    haproxy_backend_mode: 'http'
+    haproxy_backend_balance_method: 'roundrobin'
+    haproxy_backend_httpchk: 'HEAD / HTTP/1.1\r\nHost:localhost'
+
+HAProxy backend configuration directives.
+
+    haproxy_backend_servers:
+      - name: app1
+        address: 192.168.0.1:80
+      - name: app2
+        address: 192.168.0.2:80
+
+A list of backend servers (name and address) to which HAProxy will distribute requests.
+
+    haproxy_global_vars:
+      - 'ssl-default-bind-ciphers ABCD+KLMJ:...'
+      - 'ssl-default-bind-options no-sslv3'
+
+A list of extra global variables to add to the global configuration section inside `haproxy.cfg`.
 
 Example Playbook
 ----------------
@@ -27,12 +64,10 @@ Including an example of how to use your role (for instance, with variables passe
       roles:
          - { role: username.rolename, x: 42 }
 
-License
--------
+## License
 
-BSD
+2-clause BSD license, see [LICENSE.md](LICENSE.md)
 
-Author Information
-------------------
+## Contributors
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+- [Dan Clark](https://github.com/dmc5179/) (maintainer)

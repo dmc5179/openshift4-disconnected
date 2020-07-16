@@ -1,0 +1,10 @@
+---
+- hosts: helper_node
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Install Ansible roles and collections from mirror
+      include_role:
+        name: mirror_roles
+        tasks_from: install

@@ -1,0 +1,7 @@
+---
+
+- name: Mirror OperatorHub Images
+  include_tasks: mirror.yml
+
+- name: Install Disconnected OperatorHub
+  include_tasks: install.yml

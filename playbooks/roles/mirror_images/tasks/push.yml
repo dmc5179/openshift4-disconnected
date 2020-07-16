@@ -1,0 +1,38 @@
+---
+
+- name: Include all .yml var files
+  include_vars:
+    dir: vars
+    extensions:
+        - yml
+
+- name: Install skopeo
+  become: true
+  package:
+    name: skopeo
+    state: present
+
+- name: Push additional images to mirror registry
+  become: false
+  shell:
+    cmd: |
+
+        if test -e "{{ mirror_base }}/additional_images/{{ ( item.repo | replace('.','_') ) }}-{{ ( item.image | replace(':','_') | replace('/','-') ) }}-{{ ( item.tag | replace(':','_') | replace('/','-') ) }}.tar"
+        then
+          skopeo copy --authfile "{{ pull_secret }}" \
+           "docker-archive://{{ mirror_base }}/additional_images/{{ ( item.repo | replace('.','_') ) }}-{{ ( item.image | replace(':','_') | replace('/','-') ) }}-{{ ( item.tag | replace(':','_') | replace('/','-') ) }}.tar" "docker://{{mirror_registry}}/{{item.image}}:{{item.tag}}"
+
+        fi
+
+    executable: /bin/bash
+  with_items:
+    - '{{ images }}'
+    - '{{ tower_images }}'
+    - '{{ compliance_operator_images }}'
+    - '{{ vsphere_csi_images_v1 }}'
+    - '{{ vsphere_csi_images_v2 }}'
+    - '{{ quay_images }}'
+    - '{{ nvidia_gpu_images }}'
+    - '{{ nfs_provisioner_images }}'
+    - '{{ aws_ebs_csi_driver_images }}'
+    - '{{ kubeflow_images }}'

@@ -1,0 +1,11 @@
+---
+
+- name: users | adding kvm users
+  user:
+    name: "{{ item }}"
+    groups: "{{ kvm_unix_sock_group }},kvm"
+    append: true
+    state: present
+  become: true
+  loop: "{{ kvm_users }}"
+  when: not ansible_check_mode

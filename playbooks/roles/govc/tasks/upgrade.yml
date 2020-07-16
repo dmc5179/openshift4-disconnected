@@ -1,0 +1,23 @@
+---
+
+- name: Set enableUUID on {{ vmhost }}
+  shell:
+    cmd: govc vm.change -vm {{ vmhost }} -e="disk.enableUUID=1"
+  environment:
+    GOVC_USERNAME: '{{ vcenter_username }}'
+    GOVC_PASSWORD: '{{ vcenter_password }}'
+    GOVC_INSECURE: 1
+    GOVC_DATACENTER: '{{ datacenter_name }}'
+    GOVC_DATASTORE: '{{ datastore_name }}'
+    GOVC_HOST: '{{ vcenter_hostname }}:{{ vcenter_port }}'
+
+- name: Set VM HW Version on {{ vmhost }}
+  shell:
+    cmd: govc vm.upgrade -version={{ vm_hw_ver }} -vm {{ vmhost }}
+  environment:
+    GOVC_USERNAME: '{{ vcenter_username }}'
+    GOVC_PASSWORD: '{{ vcenter_password }}'
+    GOVC_INSECURE: 1
+    GOVC_DATACENTER: '{{ datacenter_name }}'
+    GOVC_DATASTORE: '{{ datastore_name }}'
+    GOVC_HOST: '{{ vcenter_hostname }}:{{ vcenter_port }}'

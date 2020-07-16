@@ -1,6 +1,10 @@
 ---
 # handlers file for install_httpd
 
+- name: test httpd configuration validity
+  command: "{{ httpd_binary }} -t"
+  changed_when: false
+
 - name: restart httpd
   service:
     name: httpd

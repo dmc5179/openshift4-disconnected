@@ -1,0 +1,21 @@
+---
+
+- name: Extract govc
+  become: true
+  shell:
+    cmd: gunzip '{{ mirror_base }}/govc/govc_linux_amd64.gz'
+    creates: '{{ mirror_base }}/govc/govc_linux_amd64'
+
+- name: Rename extracted file
+  become: true
+  copy:
+    src: '{{ mirror_base }}/govc/govc_linux_amd64'
+    dest: /usr/local/bin/govc
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Cleanup original mirror location
+  file:
+    path: '{{ mirror_base }}/govc'
+    state: absent

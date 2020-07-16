@@ -1,0 +1,21 @@
+---
+- hosts: helper_node
+  gather_facts: true
+  become: false
+  tasks:
+
+    - name: Remove old ignition configs
+      become: true
+      file:
+        path: '/var/www/html/ignition'
+        state: absent
+
+    - name: Generate Ignition Files
+      import_role:
+        name: generate_ignition
+
+    - name: Modify Ignition Files
+      include_role:
+        name: modify_ignition
+      when:
+        - (network_mode is match("static"))

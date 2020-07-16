@@ -1,0 +1,54 @@
+---
+
+- name: Create nfs provisioner namespace
+  delegate_to: localhost
+  k8s:
+    name: '{{ nfs_namespace }}'
+    api_version: v1
+    kind: Namespace
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+
+- name: Create NFS RBAC
+  delegate_to: localhost
+  k8s:
+    state: present
+    namespace: '{{ nfs_namespace }}'
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('file', 'files/nfs-provisioner-rbac.yaml') }}"
+
+- name: Add hostmount SCC
+  delegate_to: localhost
+  shell:
+    cmd: oc adm policy add-scc-to-user hostmount-anyuid 'system:serviceaccount:{{ nfs_namespace }}:nfs-client-provisioner'
+
+- name: Create NFS Deployment
+  delegate_to: localhost
+  k8s:
+    state: present
+    namespace: '{{ nfs_namespace }}'
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/nfs-provisioner-deployment.yaml.j2') }}"
+
+- name: Create NFS Storage Class
+  delegate_to: localhost
+  k8s:
+    state: present
+    namespace: '{{ nfs_namespace }}'
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('file', 'files/nfs-provisioner-sc.yaml') }}"
+
+# Not all clusters will have NFS or set it as the default
+- name: Set NFS Storage class as default
+  shell:
+    cmd: oc annotate storageclass nfs-storage-provisioner storageclass.kubernetes.io/is-default-class="true"
+  when:
+    - (nfs_sc_default | bool)

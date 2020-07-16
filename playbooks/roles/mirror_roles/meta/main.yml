@@ -1,0 +1,30 @@
+---
+galaxy_info:
+  playbook_name: mirror_roles
+  author: Dan Clark
+  description: Role to fetch other ansible roles
+  company: Red Hat
+
+  license: GPLv3
+
+  min_ansible_version: 2.2
+
+  platforms:
+    - name: EL
+      versions:
+        - 7
+        - 8
+    - name: Fedora
+      versions:
+        - 31
+    - name: Amazon
+      versions:
+        - "2017.12"
+
+  galaxy_tags:
+    - rhcos
+    - aws
+    - openshift
+    - ocp
+
+dependencies: []

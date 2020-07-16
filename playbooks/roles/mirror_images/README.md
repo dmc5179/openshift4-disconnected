@@ -1,22 +1,27 @@
-Role Name
-=========
+# Ansible role 'mirror_images'
 
-A brief description of the role goes here.
+Role for mirroring container images for disconnected and air-gapped environments.
+This role is intended to list images outside of the base images needed to install OpenShift and the images needed for OperatorHub
 
-Requirements
-------------
+## Requirements
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+- No Requirements
 
-Role Variables
---------------
+## Dependencies
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+- No Dependencies
 
-Dependencies
-------------
+## Role Variables
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+| Variable                         | Default                       | Comments                                                                                |
+| :---                             | :---                          | :---                                                                                    |
+| air_gapped                       |
+| mirror_registry                  |
+| mirror_transport                 |
+| mirror_tower                     |
+| mirror_compliance_operator       |         
+| pull_secret                      |
+| mirror_base                      |
 
 Example Playbook
 ----------------
@@ -27,12 +32,10 @@ Including an example of how to use your role (for instance, with variables passe
       roles:
          - { role: username.rolename, x: 42 }
 
-License
--------
+## License
 
-BSD
+2-clause BSD license, see [LICENSE.md](LICENSE.md)
 
-Author Information
-------------------
+## Contributors
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+- [Dan Clark](https://github.com/dmc5179/) (maintainer)

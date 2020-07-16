@@ -1,6 +1,7 @@
 ---
 # defaults file for install_nfs
-nfs_exports: []
+nfs_exports:
+  - '/mnt/nfs'
 
 nfs_rpcbind_state: started
 nfs_rpcbind_enabled: true
@@ -9,3 +10,17 @@ air_gapped: true
 
 mirror_registry: 'localhost:5000'
 mirror_transport: 'https'
+
+kubeconfig: "~/.kube/config"
+
+ocp_base_domain: 'example.com'
+ocp_cluster_name: 'caas'
+
+nfs_namespace: 'nfs-provisioner'
+
+ssl_enabled: false
+
+nfs_server: '10.0.106.42'
+nfs_path: '/export'
+
+nfs_sc_default: false

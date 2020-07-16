@@ -1,5 +1,5 @@
 ---
 - hosts: localhost
-  remote_user: root
+#  remote_user: root
   roles:
-    - custom_web_console
+    - ../../custom_web_console

@@ -1,0 +1,7 @@
+---
+
+mirror_registry: 'localhost:5000'
+
+kubeconfig:
+
+kube_ssl_enabled: false

@@ -5,17 +5,11 @@
     name: "{{ httpd_requirements }}"
     state: present
     executable: "{{ pip_exec }}"
-  register: httpd_install_requirements
-  until: httpd_install_requirements is succeeded
-  retries: 3
 
 - name: install apache httpd
   package:
     name: "{{ httpd_packages }}"
     state: present
-  register: httpd_install_apache_httpd
-  until: httpd_install_apache_httpd is succeeded
-  retries: 3
 
 - name: modify selinux settings
   seboolean:
@@ -29,7 +23,7 @@
 
 - name: allow connections to custom port
   seport:
-    ports: "{{ item }}"
+    ports: '{{ item }}'
     proto: tcp
     setype: http_port_t
     state: present
@@ -39,6 +33,22 @@
   loop:
     - "{{ httpd_port }}"
     - "{{ httpd_ssl_port }}"
+
+- name: Populate service facts
+  service_facts:
+
+- name: Allow http server ports in firewall
+  firewalld:
+    permanent: true
+    immediate: true
+    state: enabled
+    port: '{{ item }}/tcp'
+  with_items:
+    - "{{ httpd_port }}"
+    - "{{ httpd_ssl_port }}"
+  when:
+    ('firewalld.service' in services) and
+    (ansible_facts.services["firewalld.service"].state is match("running"))
 
 - name: create ssl directory
   file:

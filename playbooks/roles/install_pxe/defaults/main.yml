@@ -1,7 +1,15 @@
 ---
 # defaults file for install_pxe
 
-air_gapped: true
+tftp_root_directory: '/var/lib/tftpboot'
+pxeserver_directory: "pxelinux"
+pxeserver_path: "{{ tftp_root_directory }}/{{ pxeserver_directory }}"
+pxeserver_ip: "{{ ansible_default_ipv4.address }}"
+pxeserver_images: []
 
-mirror_registry: 'localhost:5000'
-mirror_transport: 'https'
+# Location of the bios.raw.gz
+image_url: 'http://{{ helper.ipaddr }}:8080'
+ignition_url: 'http://{{ helper.ipaddr }}:8080'
+
+# This needs to be set to the disk where you are installing RHCOS
+disk: 'sda'

@@ -1,0 +1,42 @@
+---
+
+- name: Cleanup temp directory
+  delegate_to: localhost
+  become: true
+  file:
+    path: '{{ vcenter_tmp }}'
+    state: absent
+
+- name: Create directory for vCenter Root Certificates
+  delegate_to: localhost
+  file:
+    path: '{{ vcenter_tmp }}'
+    state: directory
+
+- name: Download vCenter Root Certificates
+  delegate_to: localhost
+  unarchive:
+    src: 'https://{{ vcenter_hostname }}:{{ vcenter_port }}/certs/download.zip'
+    dest: '{{ vcenter_tmp }}'
+    remote_src: true
+    validate_certs: false
+
+- name: Install vCenter Root CA into trust store
+  become: true
+  delegate_to: localhost
+  copy:
+    src: "{{ lookup('fileglob', '{{ vcenter_tmp }}/certs/lin/*.0') }}"
+    dest: '/etc/pki/ca-trust/source/anchors/'
+
+- name: Update CA trust store
+  become: true
+  delegate_to: localhost
+  shell:
+    cmd: update-ca-trust extract
+
+- name: Cleanup temp directory
+  delegate_to: localhost
+  become: true
+  file:
+    path: '{{ vcenter_tmp }}'
+    state: absent

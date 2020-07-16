@@ -1,0 +1,9 @@
+---
+- hosts: dhcp_server
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Install and Configure DHCP Server
+      include_role:
+        name: install_dhcp

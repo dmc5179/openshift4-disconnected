@@ -1,0 +1,13 @@
+---
+# defaults file for ipa
+
+ipa_host: 'example.com'
+ipa_user: 'admin'
+ipa_password: 'password'
+
+ocp_base_domain: 'example.com'
+ocp_cluster_name: 'caas'
+
+openshift_bootstrap: {}
+openshift_masters: {}
+openshift_workers: {}

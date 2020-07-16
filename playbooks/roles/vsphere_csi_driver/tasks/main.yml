@@ -1,2 +1,334 @@
 ---
 # tasks file for vsphere_csi_driver
+
+- name: Apply ICSP Mapping
+  include_tasks: icsp.yml
+  tags:
+    - never
+    - icsp
+
+- name: Create vsphere namespace for CSI Drivers
+  delegate_to: localhost
+  k8s:
+    name: vsphere
+    api_version: v1
+    kind: Namespace
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+
+- name: Taint Worker Nodes
+  delegate_to: localhost
+  shell:
+    cmd: 'oc adm taint node --overwrite=true {{item}}.{{ocp_base_domain}} node.cloudprovider.kubernetes.io/uninitialized=true:NoSchedule'
+  with_items:
+    - 'worker0.caas'
+    - 'worker1.caas'
+    - 'worker2.caas'
+
+- name: Pause for taint to take effect
+  pause:
+    seconds: 5
+
+- name: Create cloud control config map
+  delegate_to: localhost
+  k8s:
+    state: present
+    name: cloud-config
+    namespace: '{{ vsphere_namespace }}'
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/vsphere_configmap.yaml.j2') }}"
+
+- name: Create CPI Global Secret
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/cpi-global-secret.yaml.j2') }}"
+
+- name: Create cloud control manager roles
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: true
+    namespace: '{{ vsphere_namespace }}'
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/cloud-controller-manager-roles.yaml.j2') }}"
+
+- name: Create cloud control manager role bindings
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig  }}"
+    namespace: '{{ vsphere_namespace }}'
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/cloud-controller-manager-role-bindings.yaml.j2') }}"
+
+#- name: Create role bindings for non kube-system namespace
+#  delegate_to: localhost
+#  k8s:
+#    state: present
+#    name: vsphere-cpi-kubesystem
+#    namespace: kube-system
+#    wait: true
+#    kubeconfig: "{{ kubeconfig  }}"
+#    validate_certs: '{{ kube_ssl_enabled }}'
+#    definition: "{{ lookup('template', 'templates/vsphere_cpi_kubesystem_rolebinding.yaml.j2') }}"
+
+- name: RoleBinding is needed for the cloud-controller-manager service account.
+  shell:
+    cmd: oc create rolebinding -n kube-system vsphere-cpi-kubesystem --role=extension-apiserver-authentication-reader --serviceaccount=vsphere:cloud-controller-manager
+  ignore_errors: true
+
+- name: Pause to let role binding take effect
+  pause:
+    seconds: 5
+
+- name: Set SCC Policy
+  delegate_to: localhost
+  shell:
+    cmd: oc adm policy add-scc-to-user privileged -z cloud-controller-manager
+
+- name: Pause to let scc policy take effect
+  pause:
+    seconds: 5
+
+- name: Create Cloud Controller Daemonset
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: true
+    namespace: '{{ vsphere_namespace }}'
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/vsphere_cloud_controller_manager_daemonset.yaml.j2') }}"
+
+- name: Remove existing temp file
+  file:
+    path: /tmp/csi-vsphere.conf
+    state: absent
+
+# TODO: Not actually sure how to get the cluster ID
+#       I had to get it with the VMWare PowerCLI module and commands on windows....
+- name: Set cluster-id in Global section of csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: Global
+    option: cluster-id
+#    value: "\"ClusterComputeResource-domain-c293\""
+    value: '42Pandas'
+    mode: '0600'
+
+- name: Set port in Global section of csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: Global
+    option: port
+    value: "\"{{ vcenter_port }}\""
+    mode: '0600'
+
+#- name: Set secret-name in Global section of csi-vsphere.conf
+#  ini_file:
+#    path: /tmp/csi-vsphere.conf
+#    section: Global
+#    option: secret-name
+#    value: "vsphere-creds"
+#    mode: '0600'
+
+#- name: Set secret-namespace in Global section of csi-vsphere.conf
+#  ini_file:
+#    path: /tmp/csi-vsphere.conf
+#    section: Global
+#    option: secret-namespace
+#    value: "kube-system"
+#    mode: '0600'
+
+- name: Set insecure-flag in Global section of csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: Global
+    option: insecure-flag
+    value: "\"true\""
+    mode: '0600'
+
+- name: Set server in Workspace section of csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: Workspace
+    option: server
+    value: "{{ vcenter_hostname }}"
+    mode: '0600'
+
+- name: Set datacenter in Workspace section of csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: Workspace
+    option: datacenter
+    value: "{{ datacenter_name }}"
+    mode: '0600'
+
+- name: Set default-datastore in Workspace section of csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: Workspace
+    option: 'default-datastore'
+    value: "{{ datastore_name }}"
+    mode: '0600'
+
+- name: Set folder in Workspace section of csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: Workspace
+    option: folder
+    value: "caas"
+    mode: '0600'
+
+- name: Set insecure-flag in VirtualCenter section of csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: "VirtualCenter \"{{ vcenter_hostname }}\""
+    option: insecure-flag
+    value: "\"true\""
+    mode: '0600'
+
+# TODO: Try to use the existing cloud provider credentials instead
+- name: Set user in VirtualCenter section of csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: "VirtualCenter \"{{ vcenter_hostname }}\""
+    option: user
+    value: "\"{{ vcenter_username }}\""
+    mode: '0600'
+
+# TODO: Try to use the existing cloud provider credentials instead
+- name: Set password in VirtualCenter section of csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: "VirtualCenter \"{{ vcenter_hostname }}\""
+    option: password
+    value: "\"{{ vcenter_password }}\""
+    mode: '0600'
+
+- name: Set port in VirtualCenter section of csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: "VirtualCenter \"{{ vcenter_hostname }}\""
+    option: port
+    value: "\"{{ vcenter_port }}\""
+    mode: '0600'
+
+- name: Set datacenters in VirtualCenter section of csi-vsphere.conf
+  ini_file:
+    path: /tmp/csi-vsphere.conf
+    section: "VirtualCenter \"{{ vcenter_hostname }}\""
+    option: datacenters
+    value: "\"{{ datacenter_name }}\""
+    mode: '0600'
+
+#- name: Slurp the csi-vsphere.conf
+#  slurp:
+#    src: /tmp/csi-vsphere.conf
+#  register: csi_vsphere_conf
+
+#- name: Create CSI vSphere Secret
+#  delegate_to: localhost
+#  k8s:
+#    state: present
+#    wait: true
+#    name: vsphere-config-secret
+#    namespace: '{{ vsphere_namespace }}'
+#    kubeconfig: "{{ kubeconfig  }}"
+#    validate_certs: '{{ kube_ssl_enabled }}'
+#    definition: /tmp/csi-vsphere.conf
+#    definition: "{{ lookup('template', 'templates/csi-vsphere.conf.j2') }}"
+
+- name: Create CSI vCenter Secret
+  shell:
+    cmd: oc create secret generic vsphere-config-secret --from-file=/tmp/csi-vsphere.conf --namespace={{ vsphere_namespace }}
+
+- name: Pause to let secret apply
+  pause:
+    seconds: 5
+
+- name: Cleanup temp file
+  file:
+    path: /tmp/csi-vsphere.conf
+    state: absent
+
+- name: Create RBAC for CSI Drivers
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: true
+    namespace: '{{ vsphere_namespace }}'
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/vsphere-csi-controller-rbac.yaml.j2') }}"
+
+- name: RoleBinding is needed for the vsphere-csi-controller service account
+  delegate_to: localhost
+  shell:
+    cmd: oc create rolebinding -n kube-system vsphere-csi-kubesystem --role=extension-apiserver-authentication-reader --serviceaccount=vsphere:vsphere-csi-controller
+  ignore_errors: true
+
+- name: Pause to let role binding apply
+  pause:
+    seconds: 5
+
+- name: RoleBinding is needed for the vsphere-csi-controller service account
+  delegate_to: localhost
+  shell:
+    cmd: oc adm policy add-scc-to-user privileged -z vsphere-csi-controller
+
+- name: Pause to let adm policy take effect
+  pause:
+    seconds: 5
+
+- name: Create CSI Controller Stateful Set
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: true
+    namespace: '{{ vsphere_namespace }}'
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/vsphere-csi-controller-ss.yaml.j2') }}"
+
+- name: Create CSI Node Daemon Set
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: true
+    namespace: '{{ vsphere_namespace }}'
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/vsphere-csi-node-ds.yaml.j2') }}"
+
+- name: Gather info from datacenter about specific datastore
+  vmware_datastore_info:
+    hostname: '{{ vcenter_hostname }}'
+    username: '{{ vcenter_username }}'
+    password: '{{ vcenter_password }}'
+    port: '{{ vcenter_port }}'
+    datacenter_name: '{{ datacenter_name }}'
+    name: '{{ datastore_name }}'
+    validate_certs: false
+  delegate_to: localhost
+  register: datastore_info
+
+- name: Create Storage Class
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: true
+    namespace: '{{ vsphere_namespace }}'
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/vsphere_csi_storage_class.yaml.j2') }}"

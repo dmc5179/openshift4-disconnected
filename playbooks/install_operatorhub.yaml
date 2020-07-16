@@ -1,0 +1,10 @@
+---
+- hosts: locahost
+  gather_facts: true
+  become: false
+  tasks:
+
+    - name: Deploy Operator Hub
+      include_role:
+        name: operatorhub
+        tasks_from: install

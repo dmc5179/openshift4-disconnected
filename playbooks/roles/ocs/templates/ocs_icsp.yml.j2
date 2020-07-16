@@ -1,0 +1,42 @@
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  name: ocs
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - {{ mirror_registry }}/noobaa/pause
+    source: quay.io/noobaa/pause
+
+  - mirrors:
+    - {{ mirror_registry }}/rh-storage-partners/mcg-core
+    source: quay.io/rh-storage-partners/mcg-core
+
+  - mirrors:
+    - {{ mirror_registry }}/rh-storage-partners/mcg-operator
+    source: quay.io/rh-storage-partners/mcg-operator
+
+  - mirrors:
+    - {{ mirror_registry }}/rh-storage-partners/ocs-olm-operator
+    source: quay.io/rh-storage-partners/ocs-olm-operator
+
+  - mirrors:
+    - {{ mirror_registry }}/rh-storage-partners/ocs-operator
+    source: quay.io/rh-storage-partners/ocs-operator
+
+  - mirrors:
+    - {{ mirror_registry }}/rh-storage-partners/rhceph
+    source: quay.io/rh-storage-partners/rhceph
+
+  - mirrors:
+    - {{ mirror_registry }}/rh-storage-partners/rook-ceph
+    source: quay.io/rh-storage-partners/rook-ceph
+
+  - mirrors:
+    - {{ mirror_registry }}/openshift4/ose-csi-driver-registrar
+    source: registry.redhat.io/openshift4/ose-csi-driver-registrar
+
+  - mirrors:
+    - {{ mirror_registry }}/openshift4/ose-csi-external-attacher
+    source: registry.redhat.io/openshift4/ose-csi-external-attacher

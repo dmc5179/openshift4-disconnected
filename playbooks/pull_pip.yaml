@@ -1,0 +1,10 @@
+---
+- hosts: helper_node
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Mirror pip modules
+      include_role:
+        name: pip
+        tasks_from: pull

@@ -2,4 +2,4 @@
 - hosts: localhost
   remote_user: root
   roles:
-    - install_pxe
+    - ../../install_pxe

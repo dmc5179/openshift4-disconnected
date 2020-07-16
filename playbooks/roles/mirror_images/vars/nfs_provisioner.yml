@@ -1,0 +1,6 @@
+---
+
+nfs_provisioner_images:
+  - repo: 'quay.io'
+    image: 'external_storage/nfs-client-provisioner'
+    tag: 'latest'

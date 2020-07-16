@@ -1,22 +1,45 @@
-Role Name
-=========
+# Ansible role 'generate_ignition'
 
-A brief description of the role goes here.
+## Requirements
 
-Requirements
-------------
+- No Requirements
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+## Dependencies
 
-Role Variables
---------------
+- No Dependencies
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+## Role Variables
 
-Dependencies
-------------
+| Variable                                      | Default                                             | Comments                                                                                |
+| :---                                          | :---                                                | :---                                                                                    |
+| openshift_install                             | openshift-install                                   | Path to the openshift-install binary |
+| openshift_client                              | oc                                                  | Path to the oc command  |
+| kubectl                                       | kubectl                                             | Path to the kubectl command  |
+| kubeauth                                      | ~/.kube/auth                                        | Path where the kube auth will be copied to  |
+| mirror_base                                   | /opt/openshift                                      | Path to the base mirror directory |
+| ignition_configs                              | {{ mirror_base }}/cluster                           | Subpath of the mirror directory where the manifests and ignition files will be  |
+| pull_secret                                   | {{ mirror_base }}/pull-secret.txt                   | Pull secret to add to the cluster. Should include auth for pulling from disconnected registry  |
+| master_schedulable                            | false                                               | For UPI clusters set this to false  |
+| cluster_channel                               | fast                                                | Cluster Update Channel  |
+| fips                                          | true                                                | Enable FIPS  |
+| ssh_public_key_file                           | ~/.ssh/id_ed25519.pub                               |   |
+| ocp_base_domain                               | example.com                                         |   |
+| ocp_cluster_name                              | caas                                                |   |
+| num_workers                                   | 3                                                   |   |
+| num_masters                                   | 3                                                   |   |
+| air_gapped                                    | true                                                |   |
+| mirror_registry                               | localhost:5000                                      |   |
+| mirror_transport                              | https                                               |   |
+| fips_enabled                                  | false                                               |   |
+| certificate_bundle                            | /opt/openshift/etc/docker-registry/pki/registry.crt |   |
+| platform                                      | none                                                |   |
+| cluster_network_cidr                          | 10.128.0.0/14                                       |   |
+| cluster_network_prefix                        | 23                                                  |   |
+| service_network_cidr                          | 172.30.0.0/16                                       |   |
+| mtu                                           | 1450                                                |   |
+| vxlanPort                                     | 4789                                                |   |
+| network_policy                                | NetworkPolicy                                       |   |
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
 
 Example Playbook
 ----------------
@@ -27,12 +50,10 @@ Including an example of how to use your role (for instance, with variables passe
       roles:
          - { role: username.rolename, x: 42 }
 
-License
--------
+## License
 
-BSD
+2-clause BSD license, see [LICENSE.md](LICENSE.md)
 
-Author Information
-------------------
+## Contributors
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+- [Dan Clark](https://github.com/dmc5179/) (maintainer)

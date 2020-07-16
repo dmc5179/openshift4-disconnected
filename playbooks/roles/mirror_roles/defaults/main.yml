@@ -1,0 +1,16 @@
+---
+# defaults file for mirror_roles
+air_gapped: true
+
+mirror_base: '/tmp'
+roles_staging_dir: '{{ mirror_base }}/ansible_roles'
+collections_staging_dir: '{{ mirror_base }}/ansible_collections'
+
+ansible_roles:
+  - bertvv.bind
+  - bertvv.dhcp
+  - bertvv.tftp
+  - mariuszczyz.centos_pxe
+
+ansible_collections:
+  - freeipa.ansible_freeipa

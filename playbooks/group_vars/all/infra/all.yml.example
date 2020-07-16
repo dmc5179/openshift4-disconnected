@@ -1,0 +1,159 @@
+---
+# Fully air-gap install??
+air_gapped: true
+
+###################################################################
+# Path to binaries
+###################################################################
+openshift_install: '/usr/local/bin/openshift-install'
+openshift_client: '/usr/local/bin/oc'
+kubectl: '/usr/local/bin/kubectl'
+filetranspile: '/usr/local/bin/filetranspiler'
+fakeroots: 'fakeroots'
+
+###############################################
+
+# RedHat CoreOS Version. Might not match OpenShift Version
+# 4.3.8 and 4.4.3 currently available
+rhcos_ver: '4.4.3'
+# OpenShift Version
+# 4.3.21 and 4.4.7 currently available
+ocp_ver: '4.4.7'
+# RHCOS and OpenShift Architecture
+arch: 'x86_64'
+
+kube_ssl_enabled: false
+kubeconfig: "{{ ansible_env.HOME }}/.kube/config"
+
+master_count: 3
+worker_count: 3
+
+fips_enabled: false
+
+ocp_base_domain: 'example.com'
+ocp_cluster_name: 'caas'
+
+ssh_public_key_file: '{{ ansible_env.HOME }}/.ssh/id_rsa.pub'
+
+# Certificate bundle that will be added to the install-config.yaml
+# This generally includes a certificate for the disconnected docker registry
+certificate_bundle: '/etc/pki/ca-trust/source/anchors/quay.cert'
+
+###############################################
+
+###############################################################
+# Base directory for all other mirror tasks
+################################################################
+mirror_base: '/opt/openshift'
+mirror_registry: 'quay.example.com'
+mirror_transport: 'https'
+ignition_configs: "{{ mirror_base }}/cluster"
+# This is the secret that will be uploaded to the mirror server
+# for use in mirroring images
+local_pull_secret: '{{ ansible_env.HOME }}/Downloads/pull-secret.txt'
+# This is the same secret as above but located on the mirror server
+pull_secret: '/opt/openshift/pull-secret.txt'
+
+docker_registry_hostname: 'localhost'
+
+
+#####################################################
+# OpenShift Hosts
+#####################################################
+
+# static or dhcp network mode for installing the cluster
+network_mode: static
+
+#This needs to be set to the disk where you are installing RHCOS
+disk: 'sda'
+
+openshift_bootstrap:
+  - name: 'bootstrap'
+    mac: '00:50:56:97:0c:85'
+    ip: '192.168.1.50'
+    device: 'ens192'
+    netmask: '255.255.255.0'
+    gateway: '192.168.1.1'
+    hostname: 'bootstrap.{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
+    nameserver: '192.168.1.42'
+    ignserver: 'http://192.168.1.42:8090'
+    bios_path: 'install/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz'
+    ign_path: 'ignition/bootstrap.ign'
+    type: 'bootstrap'
+
+openshift_masters:
+  - name: 'master0'
+    ip: '192.168.1.51'
+    device: 'ens192'
+    mac: '00:50:56:97:7d:3c'
+    netmask: '255.255.255.0'
+    gateway: '192.168.1.1'
+    hostname: 'master0.{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
+    nameserver: '192.168.1.42'
+    ignserver: 'http://192.168.1.42:8090'
+    bios_path: 'install/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz'
+    ign_path: 'ignition/master0.ign'
+    type: 'master'
+  - name: 'master1'
+    ip: '192.168.1.52'
+    device: 'ens192'
+    mac: '00:50:56:97:5e:fc'
+    netmask: '255.255.255.0'
+    gateway: '192.168.1.1'
+    hostname: 'master1.{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
+    nameserver: '192.168.1.42'
+    ignserver: 'http://192.168.1.42:8090'
+    bios_path: 'install/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz'
+    ign_path: 'ignition/master1.ign'
+    type: 'master'
+  - name: 'master2'
+    ip: '192.168.1.53'
+    device: 'ens192'
+    mac: '00:50:56:97:1e:f8'
+    netmask: '255.255.255.0'
+    gateway: '192.168.1.1'
+    hostname: 'master2.{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
+    nameserver: '192.168.1.42'
+    ignserver: 'http://192.168.1.42:8090'
+    bios_path: 'install/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz'
+    ign_path: 'ignition/master2.ign'
+    type: 'master'
+
+
+openshift_workers:
+  - name: 'worker0'
+    ip: '192.168.1.61'
+    device: 'ens192'
+    mac: '00:50:56:97:1e:9b'
+    netmask: '255.255.255.0'
+    gateway: '192.168.1.1'
+    hostname: 'worker0.{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
+    nameserver: '192.168.1.42'
+    ignserver: 'http://192.168.1.42:8090'
+    bios_path: 'install/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz'
+    ign_path: 'ignition/worker0.ign'
+    type: 'worker'
+  - name: 'worker1'
+    ip: '192.168.1.62'
+    device: 'ens192'
+    mac: '00:50:56:97:aa:49'
+    netmask: '255.255.255.0'
+    gateway: '192.168.1.1'
+    hostname: 'worker1.{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
+    nameserver: '192.168.1.42'
+    ignserver: 'http://192.168.1.42:8090'
+    bios_path: 'install/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz'
+    ign_path: 'ignition/worker1.ign'
+    type: 'worker'
+  - name: 'worker2'
+    ip: '192.168.1.63'
+    device: 'ens192'
+    mac: '00:50:56:97:4c:2f'
+    netmask: '255.255.255.0'
+    gateway: '192.168.1.1'
+    hostname: 'worker2.{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
+    nameserver: '192.168.1.42'
+    ignserver: 'http://192.168.1.42:8090'
+    bios_path: 'install/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz'
+    ign_path: 'ignition/worker2.ign'
+    type: 'worker'

@@ -1,0 +1,54 @@
+---
+
+- name: Create master instance(s)
+  ec2:
+    region: "{{ aws_region }}"
+    instance_type: "{{ ec2_instance_type_master }}"
+    image: "{{ ec2_ami_ids[aws_region][ec2_ami_type] }}"
+    key_name: "{{ ec2_key_name }}"
+    user_data: "{{ lookup('template', 'user_data/master.yml.j2') }}"
+    vpc_subnet_id: "{{ ec2_public_subnet_id }}"
+    group_id:
+      - "{{ ec2_create_security_group_ssh.group_id }}"
+      - "{{ ec2_create_security_group_cluster.group_id }}"
+      - "{{ ec2_create_security_group_master.group_id }}"
+    volumes:
+      - device_name: /dev/sda1
+        volume_type: gp2
+        volume_size: "{{ ec2_volume_size_master_root }}"
+        delete_on_termination: true
+    instance_tags:
+      OpenShiftClusterName: "{{ cluster_name }}"
+      OpenShiftClusterNameVerbose: "{{ cluster_name_verbose }}"
+      OpenShiftRole: master
+    exact_count: "{{ master_node_count }}"
+    count_tag:
+      OpenShiftClusterName: "{{ cluster_name }}"
+      OpenShiftClusterNameVerbose: "{{ cluster_name_verbose }}"
+      OpenShiftRole: master
+    wait: true
+  register: ec2_create_master_instances
+
+- name: Get list of master instance(s) IDs
+  set_fact:
+    ec2_create_master_instance_ids: "{{ ec2_create_master_instances.tagged_instances | map(attribute='id') | list | sort }}"
+
+- name: Tag master instance(s)
+  ec2_tag:
+    region: "{{ aws_region }}"
+    resource: "{{ item }}"
+    tags:
+      Name: "{{ cluster_name_verbose }}-master{{ '%02d' | format(idx + 1) }}"
+    state: present
+  loop: "{{ ec2_create_master_instance_ids }}"
+  loop_control:
+    index_var: idx
+
+- name: Tag first master instance as the bastion
+  ec2_tag:
+    region: "{{ aws_region }}"
+    resource: "{{ ec2_create_master_instance_ids[0] }}"
+    tags:
+      OpenShiftBastion: "true"
+    state: present
+

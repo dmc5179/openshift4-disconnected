@@ -1,22 +1,26 @@
-Role Name
-=========
+# Ansible role 'compliance-operator'
 
-A brief description of the role goes here.
+A simple role for deploying the [Red Hat Compliance Operator](https://github.com/openshift/compliance-operator) on Red Hat openshift
 
-Requirements
-------------
+The compliance-operator is a OpenShift Operator that allows an administrator to run compliance scans and provide remediations for the issues found. The operator leverages OpenSCAP under the hood to perform the scans.
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+By default, the operator runs in the openshift-compliance namespace, so make sure all namespaced resources like the deployment or the custom resources the operator consumes are created there. However, it is possible for the operator to be deployed in other namespaces as well.
 
-Role Variables
---------------
+The compliance operator is still Tech Preview
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+## Requirements
 
-Dependencies
-------------
+- Currently the compliance operator does not support digest based image deployment. This requires modification of the registries in
+  /etc/containers/registries.conf on each node
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+## Dependencies
+
+- No Dependencies
+
+## Role Variables
+
+| Variable                                     | Default                       | Comments                                                                                |
+| :---                                         | :---                          | :---                                                                                    |
 
 Example Playbook
 ----------------
@@ -27,12 +31,10 @@ Including an example of how to use your role (for instance, with variables passe
       roles:
          - { role: username.rolename, x: 42 }
 
-License
--------
+## License
 
-BSD
+2-clause BSD license, see [LICENSE.md](LICENSE.md)
 
-Author Information
-------------------
+## Contributors
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+- [Dan Clark](https://github.com/dmc5179/) (maintainer)

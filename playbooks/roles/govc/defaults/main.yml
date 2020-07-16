@@ -1,0 +1,13 @@
+---
+
+mirror_base: '/opt/openshift'
+
+govc_version: "0.23.0"
+govc_path: /usr/bin
+govc_tmp: /tmp
+govc_file: "{{govc_path}}/govc"
+
+govc_download_url: "https://github.com/vmware/govmomi/releases/download/v{{ govc_version }}/govc_linux_amd64.gz"
+
+vm_hw_ver: 15
+vmhost: ''

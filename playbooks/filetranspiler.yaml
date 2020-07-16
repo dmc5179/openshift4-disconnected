@@ -1,0 +1,18 @@
+---
+- hosts: localhost
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: filetranspiler testing
+      filetranspiler:
+        ignition: '/tmp/ignition/bootstrap.ign'
+        fake_root: '/tmp/fakeroots/bootstrap/'
+        output: '/tmp/ignition/modified/bootstrap.ign'
+        pretty: false
+        dereference_symlinks: false
+        output_format: 'json'
+      register: result
+
+    - debug:
+        var: result

@@ -1,25 +1,35 @@
-Role Name
-=========
+# Ansible role 'aws_ebs_csi_driver'
 
-A brief description of the role goes here.
+A simple role for installing the AWS EBS CSI Storage Driver on OpenShift
 
-Requirements
-------------
+## Requirements
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+- There are 2 methods to deploy the AWS EBS CSI Storage Driver:
+  - IAM roles
+  - API Keys
 
-Role Variables
---------------
+For some AWS environments where API Keys are ephemeral, only the IAM deployment can be used. The IAM deployment model requires the AWS EBS CSI Storage pods
+be able to access the AWS metadata API endpoint. This endpoint is considered a link local address which OpenShift will not route. To resolve this issue the base
+AWS EBS CSI Storage Driver deployment yaml has been modified to enable hostPorts so the AWS EBS CSI Storage pods can access the AWS metadata endpoints.
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+For Some AWS environments that API has customer SSL certificates. The AWS EBS CSI Storage Driver deployment yaml has also been modified to allow the AWS CSI Storage pods
+to mount the /etc/pki directory of the underlying host node. The allows the pods to validate the certificates used to sign the AWS API endpoints.
 
-Dependencies
-------------
+Note: The AWS EBS CSI Storage driver is not directly supported by Red Hat.
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+## Dependencies
 
-Example Playbook
-----------------
+- No Dependencies
+
+## Role Variables
+
+| Variable                                     | Default                       | Comments                                                                                |
+| :---                                         | :---                          | :---                                                                                    |
+
+## Installing the Image Content Source Policy for Air-gap and disconnected OpenShift clusterversion
+
+
+
 
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
@@ -27,12 +37,10 @@ Including an example of how to use your role (for instance, with variables passe
       roles:
          - { role: username.rolename, x: 42 }
 
-License
--------
+## License
 
-BSD
+2-clause BSD license, see [LICENSE.md](LICENSE.md)
 
-Author Information
-------------------
+## Contributors
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+- [Dan Clark](https://github.com/dmc5179/) (maintainer)

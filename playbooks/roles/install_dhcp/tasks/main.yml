@@ -1,2 +1,70 @@
+# roles/dhcp/tasks/main.yml
 ---
-# tasks file for install_dhcp
+
+- name: Install packages
+  package:
+    name: "{{ dhcp_packages }}"
+    state: present
+  tags: dhcp
+
+- name: Install custom includes
+  template:
+    src: "{{ item }}"
+    dest: "{{ dhcp_config_dir }}/{{ ( item | basename ).split('.j2')[0] }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items: "{{ dhcp_custom_includes }}"
+  when: dhcp_custom_includes is defined
+  notify: restart dhcp
+  tags: dhcp
+
+- name: Install includes
+  copy:
+    src: "{{ item }}"
+    dest: "{{ dhcp_config_dir }}/{{ item | basename }}"
+  with_items: "{{ dhcp_global_includes }}"
+  when: dhcp_global_includes is defined
+  ignore_errors: "{{ dhcp_global_includes_missing }}"
+  tags: dhcp
+
+- name: Set config directory perms
+  file:
+    path: "{{ dhcp_config | dirname }}"
+    state: directory
+    mode: 0755
+  tags: dhcp
+
+- name: Install config file
+  template:
+    src: etc_dhcp_dhcpd.conf.j2
+    dest: "{{ dhcp_config }}"
+    owner: root
+    group: root
+    mode: 0644
+    validate: 'dhcpd -t -cf %s'
+  notify: restart dhcp
+  tags: dhcp
+
+- name: Populate service facts
+  service_facts:
+
+- name: Configure firewall for DHCP Server
+  firewalld:
+    permanent: true
+    immediate: true
+    state: enabled
+    port: "{{ item }}"
+  with_items:
+    - 67/udp
+    - 68/udp
+  when:
+    ('firewalld.service' in services) and
+    (ansible_facts.services["firewalld.service"].state is match("running"))
+
+- name: "Ensure service is {{ dhcp_global_server_state | default('started') }}"
+  service:
+    name: "{{ dhcp_service }}"
+    state: "{{ dhcp_global_server_state | default('started') }}"
+    enabled: true
+  tags: dhcp

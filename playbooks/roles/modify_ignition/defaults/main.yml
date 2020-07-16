@@ -1,8 +1,5 @@
 ---
 # defaults file for modify_ignition
-filetranspile: 'filetranspile'
+filetranspiler: '/usr/local/bin/filetranspiler'
 
-air_gapped: true
-
-mirror_registry: 'localhost:5000'
-mirror_transport: 'https'
+fake_root_base: '/tmp/fakeroots'

@@ -1,0 +1,12 @@
+---
+
+- name: Ensure mirror directory exists
+  file:
+    path: '{{ mirror_base }}/govc'
+    state: directory
+
+- name: Download govc
+  get_url:
+    url: '{{ govc_download_url }}' 
+    dest: '{{ mirror_base }}/govc/'
+    mode: '0440'
