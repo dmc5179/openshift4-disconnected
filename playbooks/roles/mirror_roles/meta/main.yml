@@ -1,6 +1,6 @@
 ---
 galaxy_info:
-  playbook_name: fetch_roles
+  playbook_name: mirror_roles
   author: Dan Clark
   description: Role to fetch other ansible roles
   company: Red Hat

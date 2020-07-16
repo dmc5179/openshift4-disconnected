@@ -2,4 +2,4 @@
 - hosts: localhost
 #  remote_user: root
   roles:
-    - ../../fetch_roles
+    - ../../mirror_roles
