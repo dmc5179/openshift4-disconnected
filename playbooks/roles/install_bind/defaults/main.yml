@@ -68,14 +68,8 @@ bind_zone_master_server_ip: '192.168.3.42'
 # File mode for master zone files (needs to be something like 0660 for dynamic updates)
 bind_zone_file_mode: "0640"
 
-air_gapped: true
-
-mirror_registry: 'localhost:5000'
-mirror_transport: 'https'
-
 dns_zone_one: 'example.com'
 dns_zone_two: 'example.io'
-
 
 # Sample config for a DNS facing 2 zones
 bind_zone_domains:
