@@ -1,5 +1,8 @@
 ---
 
+# Bind is the only type supported by the role currently
+dns_server: bind
+
 bind_forwarders:
   - '1.1.1.1'
   - '8.8.8.8'
