@@ -7,6 +7,7 @@
     name:
       - syslinux
       - genisoimage
+      - xorriso
     state: present
 
 - name: Create directory for ISO extraction
