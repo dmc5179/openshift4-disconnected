@@ -1,5 +1,11 @@
 ---
 
+bind_forwarders:
+  - '1.1.1.1'
+  - '8.8.8.8'
+
+bind_zone_master_server_ip: '192.169.3.42'
+
 # If using a bastion jump host you may need
 # 2 zones to handle both sides
 dns_zone_one: 'external.com'
