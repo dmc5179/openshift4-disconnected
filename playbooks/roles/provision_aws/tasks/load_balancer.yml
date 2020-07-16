@@ -1,0 +1,85 @@
+---
+
+# Create a target group with IP address targets
+- elb_target_group:
+    name: api-server
+    protocol: tcp
+    port: 6443
+    vpc_id: '{{ vpc_id }}'
+    health_check_path: /
+    successful_response_codes: "200,250-260"
+    target_type: ip
+    targets:
+      - Id: 10.0.106.50
+        Port: 6443
+      - Id: 10.0.106.51
+        Port: 6443
+      - Id: 10.0.106.52
+        Port: 6443
+      - Id: 10.0.106.53
+        Port: 6443
+    state: present
+    wait_timeout: 200
+    wait: True
+
+# Create a target group with IP address targets
+- elb_target_group:
+    name: machineconfig-server
+    protocol: http
+    port: 22623
+    vpc_id: '{{ vpc_id }}'
+    health_check_path: /
+    successful_response_codes: "200,250-260"
+    target_type: ip
+    targets:
+      - Id: 10.0.106.50
+        Port: 22623
+      - Id: 10.0.106.51
+        Port: 22623
+      - Id: 10.0.106.52
+        Port: 22623
+      - Id: 10.0.106.53
+        Port: 22623
+    state: present
+    wait_timeout: 200
+    wait: True
+
+# Create a target group with IP address targets
+- elb_target_group:
+    name: ingress-http
+    protocol: tcp
+    port: 80
+    vpc_id: '{{ vpc_id }}'
+    health_check_path: /
+    successful_response_codes: "200,250-260"
+    target_type: ip
+    targets:
+      - Id: 10.0.106.61
+        Port: 80
+      - Id: 10.0.106.62
+        Port: 80
+      - Id: 10.0.106.63
+        Port: 80
+    state: present
+    wait_timeout: 200
+    wait: True
+
+# Create a target group with IP address targets
+- elb_target_group:
+    name: ingress-https
+    protocol: tcp
+    port: 443
+    vpc_id: '{{ vpc_id }}'
+    health_check_path: /
+    successful_response_codes: "200,250-260"
+    target_type: ip
+    targets:
+      - Id: 10.0.106.61
+        Port: 443
+      - Id: 10.0.106.62
+        Port: 443
+      - Id: 10.0.106.63
+        Port: 443
+    state: present
+    wait_timeout: 200
+    wait: True
