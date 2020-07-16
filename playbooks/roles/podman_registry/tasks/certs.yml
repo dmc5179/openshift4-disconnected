@@ -49,6 +49,28 @@
   tags:
     - certificate
 
+- name: Copy private key to host tls directory
+  become: true
+  copy:
+    src: "{{docker_registry_conf_dir}}/pki/registry.key"
+    dest: '/etc/pki/tls/private/registry.key'
+    owner: root
+    group: root
+    mode: '0660'
+  tags:
+    - certificate
+
+- name: Copy certificate to host tls directory
+  become: true
+  copy:
+    src: "{{docker_registry_conf_dir}}/pki/registry.crt"
+    dest: '/etc/pki/tls/certs/registry.crt'
+    owner: root
+    group: root
+    mode: '0664'
+  tags:
+    - certificate
+
 - name: update trusted ca
   become: true
   command: update-ca-trust extract
