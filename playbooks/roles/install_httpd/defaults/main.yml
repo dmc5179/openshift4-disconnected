@@ -18,11 +18,6 @@ httpd_proxy_preserve_host: true
 
 pip_exec: 'pip3'
 
-air_gapped: true
-
-mirror_registry: 'localhost:5000'
-mirror_transport: 'https'
-
 httpd_access_log: logs/access_log
 httpd_access_log_ssl: logs/ssl_access_log
 httpd_document_root: '/var/www/html'
