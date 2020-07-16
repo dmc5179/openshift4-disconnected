@@ -1,0 +1,10 @@
+---
+- hosts: helper_node
+  gather_facts: true
+  become: false
+  tasks:
+
+    - name: Mirror Ansible roles and collections
+      include_role:
+        name: mirror_roles
+        tasks_from: pull

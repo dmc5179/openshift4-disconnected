@@ -4,7 +4,7 @@
   become: true
   tasks:
 
-    # TODO: Role not complete
-    - name: Install mirrored Ansible Roles
+    - name: Install Ansible roles and collections from mirror
       include_role:
-        name: install_roles
+        name: mirror_roles
+        tasks_from: install
