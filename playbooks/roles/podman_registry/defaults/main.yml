@@ -64,4 +64,4 @@ mirror_registry: 'localhost:5000'
 mirror_transport: 'https'
 
 # Format of: DNS:hostname
-docker_registry_SAN: ''
+docker_registry_SAN: 'DNS:{{ ansible_fqdn }},IP:{{ansible_default_ipv4.address}}'
