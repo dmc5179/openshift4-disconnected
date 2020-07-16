@@ -7,6 +7,7 @@
     name:
       - syslinux
       - genisoimage
+      - xorriso
     state: present
 
 - name: Create directory for ISO extraction
@@ -14,6 +15,10 @@
   file:
     path: '/tmp/rhcos/{{ item.name }}'
     state: directory
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
 
 - name: Create directory for mounting ISO
   become: true
@@ -35,6 +40,10 @@
   shell:
     cmd: 'rsync -a /mnt/rhcos/* /tmp/rhcos/{{ item.name }}'
     creates: '/tmp/rhcos/{{ item.name }}/README.md'
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
 
 - name: Umount RHCOS ISO and cleanup
   become: true
@@ -51,6 +60,10 @@
     path: '{{ tmp_dir }}/{{ item.name }}/isolinux/isolinux.cfg'
     regexp: '^default vesamenu.c32'
     line: 'default linux'
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
 
 - name: Set timeout to 0 for BIOS Boot
   become: true
@@ -58,6 +71,10 @@
     path: '{{ tmp_dir }}/{{ item.name }}/isolinux/isolinux.cfg'
     regexp: '^timeout 600'
     line: 'timeout 0'
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
 
 - name: Set timeout to 0 for UEFI Boot
   become: true
@@ -65,28 +82,48 @@
     path: '{{ tmp_dir }}/{{ item.name }}/EFI/redhat/grub.cfg'
     regexp: '^set timeout=60'
     line: 'set timeout=0'
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
 
 - name: Append kernel options for BIOS Boot
   become: true
   replace:
     path: '{{ tmp_dir }}/{{ item.name }}/isolinux/isolinux.cfg'
     regexp: 'coreos.inst=yes'
-    replace: 'coreos.inst=yes ip={{ item.ip }}::{{ item.gateway }}:{{ item.netmask }}:{{ item.hostname }}:ens192:none nameserver={{ item.nameserver }} coreos.inst.install_dev=sda coreos.inst.image_url={{ item.ignserver }}/{{ item.bios_path }} coreos.inst.ignition_url={{ item.ignserver }}/{{ item.ign_path }}'
+    replace: 'coreos.inst=yes ip={{ item.ip }}::{{ item.gateway }}:{{ item.netmask }}:{{ item.hostname }}:ens192:none nameserver={{ item.nameserver }} coreos.inst.install_dev={{ disk }} coreos.inst.image_url={{ item.ignserver }}/{{ item.bios_path }} coreos.inst.ignition_url={{ item.ignserver }}/{{ item.ign_path }}'
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
 
 - name: Append kernel options for EFI Boot
   become: true
   replace:
     path: '{{ tmp_dir }}/{{ item.name }}/EFI/redhat/grub.cfg'
     regexp: 'coreos.inst=yes'
-    replace: 'coreos.inst=yes ip={{ item.ip }}::{{ item.gateway }}:{{ item.netmask }}:{{ item.hostname }}:ens192:none nameserver={{ item.nameserver }} coreos.inst.install_dev=sda coreos.inst.image_url={{ item.ignserver }}/{{ item.bios_path }} coreos.inst.ignition_url={{ item.ignserver }}/{{ item.ign_path }}'
+    replace: 'coreos.inst=yes ip={{ item.ip }}::{{ item.gateway }}:{{ item.netmask }}:{{ item.hostname }}:ens192:none nameserver={{ item.nameserver }} coreos.inst.install_dev={{ disk }} coreos.inst.image_url={{ item.ignserver }}/{{ item.bios_path }} coreos.inst.ignition_url={{ item.ignserver }}/{{ item.ign_path }}'
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
 
 - name: Create custom ISO for each host
   become: true
   shell:
     cmd: 'xorriso -as mkisofs -U -r -v -T -J -joliet-long -V "RHCOS-{{ rhcos_ver }}.{{ arch }}" -volset "RHCOS-{{ rhcos_ver }}.{{ arch }}" -A "RHCOS-{{ rhcos_ver }}.{{ arch }}" -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot -e images/efiboot.img -no-emul-boot -isohybrid-mbr /usr/share/syslinux/isohdpfx.bin -o "{{ tmp_dir }}/{{ item.name }}.iso" "{{ tmp_dir }}/{{ item.name }}"'
     creates: '{{ tmp_dir }}/{{ item.name }}.iso'
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
 
 - name: Make ISO bootable on EFI systems
   become: true
   shell:
     cmd: 'isohybrid --uefi {{ tmp_dir }}/{{ item.name }}.iso'
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
