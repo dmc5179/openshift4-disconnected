@@ -1,2 +1,8 @@
 ---
 # tasks file for pip
+
+- name: Mirror pip modules
+  include_tasks: pull.yml
+
+- name: Install pip modules
+  include_tasks: install.yml

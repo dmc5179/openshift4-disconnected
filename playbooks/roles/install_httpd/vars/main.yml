@@ -1,7 +1,7 @@
 ---
 # vars file for httpd
 httpd_requirements:
-  - pyopenssl
+  - pyOpenSSL
 
 httpd_sebooleans:
   - httpd_can_network_connect
@@ -29,3 +29,10 @@ httpd_modules_path: modules
 
 # This variable is used in handlers to test the configuration.
 httpd_binary: httpd
+
+httpd_config: /etc/httpd/conf/httpd.conf
+httpd_ssl_config: /etc/httpd/conf.d/ssl.conf
+httpd_status_config: /etc/httpd/conf.d/status.conf
+
+httpd_cert_dir: /etc/pki/tls/certs
+httpd_key_dir: /etc/pki/tls/private

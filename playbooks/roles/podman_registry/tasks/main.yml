@@ -1,7 +1,7 @@
 ---
 # tasks file for podman-registry
 - name: Install Dependencies
-  become: "{{ run_as_root }}"
+  become: true
   yum:
     name:
       - podman
@@ -24,12 +24,12 @@
   file:
     state: directory
     dest: '{{item}}'
-    owner: root
-    group: root
-    mode: 0700
+    mode: 0755
+  tags:
+    - certificates
 
 - name: Upgrade pip
-  become: "{{ run_as_root }}"
+  become: true
   pip:
     name: pip
     executable: "{{ pip_executable }}"
@@ -43,6 +43,7 @@
     executable: "{{ pip_executable }}"
     state: present
 #    version: '1.7.2'
+    extra_args: '--user'
 
 - name: Install bcrypt for htpassword
   become: "{{ run_as_root }}"
@@ -51,6 +52,7 @@
     executable: "{{ pip_executable }}"
     state: present
 #    version: '3.1.7'
+    extra_args: '--user'
 
 - name: Install cryptography for htpassword
   become: "{{ run_as_root }}"
@@ -59,6 +61,7 @@
     executable: "{{ pip_executable }}"
     state: present
 #    version: '2.9.2'
+    extra_args: '--user'
 
 - name: add passwds to auth/registry.htpasswd
   become: "{{ run_as_root }}"
@@ -124,14 +127,14 @@
   when: docker_registry_activate
 
 - name: Install service file for podman registry
-  become: "{{ run_as_root }}"
+  become: true
   template:
     src: 'podman-registry.service.j2'
     dest: '/usr/lib/systemd/system/podman-registry.service'
     mode: '0644'
 
 - name: Enable podman registry systemd service
-  become: "{{ run_as_root }}"
+  become: true
   systemd:
     name: podman-registry
     daemon-reload: true

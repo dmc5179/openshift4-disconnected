@@ -1,0 +1,10 @@
+---
+- hosts: localhost
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Install Helm binaries
+      import_role:
+        name: helm
+        tasks_from: install

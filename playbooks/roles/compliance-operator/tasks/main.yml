@@ -16,6 +16,7 @@
     state: present
     wait: true
     kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('file', '{{ mirror_base }}/compliance-operator/deploy/ns.yaml') }}"
   tags:
     - install
@@ -24,11 +25,12 @@
   delegate_to: localhost
   k8s:
     state: present
-    wait: true
+    wait: false
     kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/compliance_operators_icsp.yaml.j2') }}"
   tags:
-    - install
+    - never
     - icsp
 
 - name: Apply compliance CRDs
@@ -38,6 +40,7 @@
     state: present
     wait: true
     kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('file', '{{ item }}') }}"
   with_fileglob:
     - "{{ mirror_base }}/compliance-operator/deploy/crds/*crd.yaml"
@@ -51,6 +54,7 @@
     state: present
     wait: true
     kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('file', '{{ mirror_base }}/compliance-operator/deploy/{{ item }}') }}"
   with_items:
     - "service_account.yaml"
@@ -67,7 +71,7 @@
     state: present
     wait: true
     kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/compliance_operators_icsp.yaml.j2') }}"
   tags:
     - install
-

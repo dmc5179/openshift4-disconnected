@@ -17,10 +17,10 @@
     cmd: |
 
         /usr/local/bin/oc adm release mirror -a "{{ pull_secret }}" \
-           "--from=quay.io/{{ product_repo }}/{{ release_name }}:{{ ocp_release }}-{{ arch }}" \
+           "--from=quay.io/{{ product_repo }}/{{ release_name }}:{{ ocp_ver }}-{{ arch }}" \
            "--insecure=true" \
-           "--to-release-image={{ local_reg }}/{{ local_repo }}:{{ ocp_release }}-{{ arch }}" \
-           "--to={{ local_reg }}/{{ local_repo }}" 
+           "--to-release-image={{ mirror_registry }}:{{ mirror_registry_port }}/{{ local_repo }}:{{ ocp_ver }}-{{ arch }}" \
+           "--to={{ mirror_registry }}:{{ mirror_registry_port }}/{{ local_repo }}" 
 
     executable: /bin/bash
   when: (mirror_to_reg | bool)
@@ -35,7 +35,7 @@
 #- name: Mirror OpenShift 4 Cluster Images to Disk
 #  shell: |
 #
-#    oc adm release mirror "quay.io/openshift-release-dev/ocp-release:{{ ocp_release }}-{{ arch }}" \
+#    oc adm release mirror "quay.io/openshift-release-dev/ocp-release:{{ ocp_ver }}-{{ arch }}" \
 #    '--to-dir=/tmp/release'
 #
 #  when: (mirror_to_dir | bool)

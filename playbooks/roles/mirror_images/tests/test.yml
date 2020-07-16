@@ -1,5 +1,4 @@
 ---
 - hosts: localhost
-  remote_user: root
   roles:
-    - mirror_images
+    - ../../mirror_images

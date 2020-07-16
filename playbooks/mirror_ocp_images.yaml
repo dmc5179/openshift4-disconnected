@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Mirror OpenShift Cluster Images
+      import_role:
+        name: mirror_ocp_images

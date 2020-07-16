@@ -1,0 +1,9 @@
+---
+# tasks file for active_directory
+
+- name: Create Windows Domain
+  include_tasks: create_domain.yml
+  when: (create_domain | bool)
+
+- name: Add DNS entries to Windows Domain
+  include_tasks: create_dns_entries.yml

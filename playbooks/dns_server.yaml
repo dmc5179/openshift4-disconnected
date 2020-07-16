@@ -1,0 +1,15 @@
+---
+- hosts: dns_server
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Install and Configure BIND DNS
+      include_role:
+        name: install_bind
+      when: dns_server is match("bind")
+
+#    - name: Install and Configure IPA
+#      include_role:
+#        name: ipa
+#      when: dns_server is match("ipa")

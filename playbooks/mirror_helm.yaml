@@ -1,0 +1,10 @@
+---
+- hosts: localhost
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Mirror Helm binaries and repositories
+      import_role:
+        name: helm
+        tasks_from: mirror

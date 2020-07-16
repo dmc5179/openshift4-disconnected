@@ -1,43 +1,220 @@
 ---
 # tasks file for generate_ignition
 
+- name: Remove existing ignition configs
+  file:
+    path: "{{ ignition_configs }}"
+    state: absent
+  tags:
+    - manifests
+    - install-config
+
 - name: Create ignition configs directory
   file:
-    name: "{{ ignition_configs }}"
+    path: "{{ ignition_configs }}"
     state: directory
+    mode: '0755'
+  tags:
+    - manifests
+    - install-config
+
+- file:
+    path: "{{ ansible_env.HOME }}/.ssh"
+    state: directory
+    mode: 0700
+  tags:
+    - manifests
+    - install-config
+
+- name: Generate SSH keypair for cluster nodes
+  openssh_keypair:
+   path: "{{ ansible_env.HOME }}/.ssh/{{ ocp_cluster_name}}_rsa"
+   size: 4096
+   comment: "Key for {{ ocp_cluster_name}} OpenShift 4 Cluster"
+   state: present
+  tags:
+    - manifests
+    - install-config
+
+- name: Fetch public key
+  slurp:
+#    src: "{{ ssh_public_key_file }}"
+    src: '{{ ansible_env.HOME }}/.ssh/{{ ocp_cluster_name}}_rsa.pub'
+  register: slurped_key_b64
+  tags:
+    - manifests
+    - install-config
+
+# TODO: This tasks doesn't work very well
+#- name: Configure SSH client for cluster node access
+#  lineinfile:
+#    path: "{{ ansible_env.HOME }}/.ssh/config"
+#    line: "{{ item.line }}"
+#    state: present
+#    backup: yes
+#    create: yes
+#    mode: 0600
+#  with_items:
+#    - { line: "Host *" }
+#    - { line: "    HostName %h.{{ ocp_cluster_name }}.{{ ocp_base_domain }}" }
+#    - { line: "    User core" }
+#    - { line: "    IdentityFile {{ ansible_env.HOME }}/.ssh/{{ ocp_cluster_name }}_rsa" }
+#  tags:
+#    - manifests
+#    - install-config
+
+- name: Fetch pull secret
+  slurp:
+    src: "{{ pull_secret }}"
+  register: slurped_pull_secret_b64
+  tags:
+    - manifests
+    - install-config
+
+- name: Slurp Mirror Registry Certificate Bundle
+  slurp:
+    src: "{{ certificate_bundle }}"
+  register: slurped_registry_ca_bundle_b64
+  tags:
+    - manifests
+    - install-config
+
+- name: Create directory for vCenter Root Certificates
+  file:
+    path: '/tmp/vcenter'
+    state: directory
+  when:
+    - (platform is match("vmware"))
+  tags:
+    - manifests
+    - install-config
+
+- name: Download vCenter Root Certificates
+  unarchive:
+    src: 'https://{{ vcenter_hostname }}:{{ vcenter_port }}/certs/download.zip'
+    dest: /tmp/vcenter
+    remote_src: true
+    validate_certs: false
+  when:
+    - (platform is match("vmware"))
+  tags:
+    - manifests
+    - install-config
+
+- name: Slurp vCenter Root Certificates
+  slurp:
+    src: "{{ lookup('fileglob', '/tmp/vcenter/certs/lin/*.0') }}"
+  register: slurped_vcenter_ca_bindle_b64
+  when:
+    - (platform is match("vmware"))
+  tags:
+    - manifests 
+    - install-config
 
 - name: Copy template install-config.yaml
   template:
     src: install-config.yaml.j2
-    dest: "~"
+    dest: "{{ ignition_configs }}/install-config.yaml"
     mode: 0664
+  tags:
+    - manifests
+    - install-config
+
+- name: Ensure proper spacing of additionalTrustBundle
+  shell:
+    cmd: awk -i inplace 'BEGIN{c=0}  /BEGIN CERTIFICATE/{c=1}  {if (c==1) print " ",$0}  {if (c==0) print $0}  /END CERTIFICATE/{c=0}' "{{ ignition_configs }}/install-config.yaml"
+  tags:
+    - manifests
+    - install-config
 
 - name: Create manifests
   shell: "{{ openshift_install }} create manifests --dir={{ ignition_configs }}"
-  creates: "{{ ignition_configs }}/manifests/cluster-config.yaml"
+  tags:
+    - manifests
 
 - name: Set masters to unschedulable
-  lineinfile:
+  replace:
     path: "{{ ignition_configs }}/manifests/cluster-scheduler-02-config.yml"
     regexp: 'mastersSchedulable: true'
-    line: 'mastersSchedulable: {{ master_schedulable }}'
+    replace: 'mastersSchedulable: false'
+  tags:
+    - manifests
 
 - name: Set cluster upgrade channel
-  lineinfile:
+  replace:
     path: "{{ ignition_configs }}/manifests/cvo-overrides.yaml"
     regexp: 'channel:.*'
-    line: 'channel: {{ cluster_channel }}'
+    replace: 'channel: {{ cluster_channel }}'
+  tags:
+    - manifests
 
 # Prevent the cluster from trying to reach the Cincinnati for update graphs
 - name: Set dummy Cincinnati server
-  lineinfile:
+  replace:
     path: "{{ ignition_configs }}/manifests/cvo-overrides.yaml"
     regexp: 'upstream:.*'
-    line: 'upstream: http://localhost:8080/graph'
+    replace: 'upstream: http://localhost:8080/graph'
+  tags:
+    - manifests
+
+- name: Add vCenter port to global cloud provider config
+  lineinfile:
+    path: "{{ ignition_configs }}/manifests/cloud-provider-config.yaml"
+    insertafter: '\[Global\]'
+    line: '    port = "{{ vcenter_port }}"'
+  when:
+    - (platform is match("vmware"))
+  tags:
+    - manifests
+
+- name: Add vCenter port to VirtualCenter cloud provider config
+  lineinfile:
+    path: "{{ ignition_configs }}/manifests/cloud-provider-config.yaml"
+    insertafter: '\[VirtualCenter.*\]'
+    line: '    report = "{{ vcenter_port }}"'
+  when:
+    - (platform is match("vmware"))
+  tags:
+    - manifests
+
+- name: Disable SSL for vCenter API endpoint
+  lineinfile:
+    path: "{{ ignition_configs }}/manifests/cloud-provider-config.yaml"
+    regexp: 'insecure-flag = "1"'
+    line: '    insecure-flag = "true"'
+  when:
+    - (platform is match("vmware"))
+  tags:
+    - manifests
+
+- name: Fix line due to ansible bug
+  lineinfile:
+    path: "{{ ignition_configs }}/manifests/cloud-provider-config.yaml"
+    regexp: 'report = \"{{ vcenter_port }}\"'
+    line: '    port = "{{ vcenter_port }}"'
+  when:
+    - (platform is match("vmware"))
+  tags:
+    - manifests
+
+- name: Customize MTU and vxlanPort
+  template:
+    src: cluster-network-03-config.yml.j2
+    dest: "{{ ignition_configs }}/manifests/cluster-network-03-config.yml"
+    mode: 0640
+  tags:
+    - manifests
 
 - name: Create ignition configs
   shell: "{{ openshift_install }} create ignition-configs --dir={{ ignition_configs }}"
-  creates: "{{ ignition_configs }}/master.ign"
+  tags:
+    - ignition
+
+- name: Create kube config location
+  file:
+    path: "~/.kube"
+    state: directory
+    mode: '0755'
 
 - name: Set kube config
   copy:

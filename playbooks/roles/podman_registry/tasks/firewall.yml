@@ -2,48 +2,48 @@
 - name: Populate service facts
   service_facts:
 
-# Firewall needs to be running to configure it
-- name: Start firewalld
-  become: "{{ run_as_root }}"
-  service:
-    name: firewalld
-    state: started
-  when: "'firewalld.service' in services"
-
 - name: Enable registry port zone internal
-  become: "{{ run_as_root }}"
+  become: true
   firewalld:
     port: "{{ docker_registry_https_port }}/tcp"
     zone: internal
     permanent: true
     immediate: true
     state: enabled
-  when: "'firewalld.service' in services"
+  when:
+    ('firewalld.service' in services) and
+    (ansible_facts.services["firewalld.service"].state is match("running"))
 
 - name: Enable registry port zone public
-  become: "{{ run_as_root }}"
+  become: true
   firewalld:
     port: "{{ docker_registry_https_port }}/tcp"
     zone: public
     permanent: true
     immediate: true
     state: enabled
-  when: "'firewalld.service' in services"
+  when:
+    ('firewalld.service' in services) and
+    (ansible_facts.services["firewalld.service"].state is match("running"))
 
 - name: Enable https service
-  become: "{{ run_as_root }}"
+  become: true
   firewalld:
     service: https
     permanent: true
     immediate: true
     state: enabled
-  when: "'firewalld.service' in services"
+  when:
+    ('firewalld.service' in services) and
+    (ansible_facts.services["firewalld.service"].state is match("running"))
 
 - name: Enable http service
-  become: "{{ run_as_root }}"
+  become: true
   firewalld:
     service: http
     permanent: true
     immediate: true
     state: enabled
-  when: "'firewalld.service' in services"
+  when:
+    ('firewalld.service' in services) and
+    (ansible_facts.services["firewalld.service"].state is match("running"))

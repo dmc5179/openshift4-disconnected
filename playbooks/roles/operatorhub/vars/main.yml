@@ -1,0 +1,4 @@
+---
+# vars file for operatorhub
+
+patch_json: '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'

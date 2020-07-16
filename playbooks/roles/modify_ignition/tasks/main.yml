@@ -1,30 +1,37 @@
 ---
 # tasks file for modify_ignition
 
-- name: Customize bootstrap ignition
-  shell: python3 "{{ filetranspile }}" -i "${IGNITION_CONFIGS}/bootstrap.ign" -f "${FAKEROOTS}/bootstrap_fake-root"  --format json > "${IGNITION_CONFIGS}/bootstrap_static.ign"
+- name: Cleanup existing fakeroots
+  file:
+    path: '{{ fake_root_base }}'
+    state: absent
 
-- name: Replace original ignition
-  copy:
-    src: "{{ ignition_configs }}/bootstrap_static.ign"
-    dest: "{{ ignition_configs }}/bootstrap.ign"
-    remote_src: true
-    
+- name: Build fakeroots directory structure
+  file:
+    path: '{{ fake_root_base }}/{{ item.name }}/etc/sysconfig/network-scripts'
+    state: directory
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
 
+- name: Create static network configs
+  template:
+    src: 'ifcfg.j2'
+    dest: '{{ fake_root_base }}/{{ item.name }}/etc/sysconfig/network-scripts/ifcfg-{{ item.device }}'
+    mode: 0640
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
 
-# Customize master node ignition files. Need 1 for each due to static IPs
-for i in $(seq 0 $(expr ${MASTERS} - 1))
-do
+- name: Customize ignition
+  shell:
+    cmd: |
 
-  python3 "${FILETRANSPILE}" -i "${IGNITION_CONFIGS}/master.ign" -f "${FAKEROOTS}/master${i}_fake-root" --format json > "${IGNITION_CONFIGS}/master${i}.ign"
+      {{filetranspiler}} -i {{ ignition_configs }}/{{ item.type }}.ign -f {{ fake_root_base }}/{{ item.name }} --format json -o {{ ignition_configs }}/{{ item.name }}.ign
 
-done
-
-# Customize worker node ignition files. Need 1 for each due to static IPs
-for i in $(seq 0 $(expr ${WORKERS} - 1))
-do
-
-  python3 "${FILETRANSPILE}" -i "${IGNITION_CONFIGS}/worker.ign" -f "${FAKEROOTS}/worker${i}_fake-root" --format json > "${IGNITION_CONFIGS}/worker${i}.ign"
-
-done
-
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'

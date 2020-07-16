@@ -1,0 +1,11 @@
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: vmware-csi-sc
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+provisioner: csi.vsphere.vmware.com
+parameters:
+  datastoreurl: "{{ datastore_info.datastores[0].url }}"
+  fstype: "ext4"

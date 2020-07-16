@@ -1,0 +1,10 @@
+---
+- hosts: helm_server
+  gather_facts: true
+  become: "{{ run_as_root }}"
+  tasks:
+
+# TODO: This role is not complete
+    - name: Install and configure helm repo
+      import_role:
+        name: helm

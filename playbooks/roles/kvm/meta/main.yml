@@ -1,0 +1,30 @@
+---
+galaxy_info:
+  author: Larry Smith Jr.
+  description: An [Ansible] role to install [KVM]
+
+  license: license (MIT)
+  min_ansible_version: 1.2
+  platforms:
+    - name: EL
+      versions:
+        - 6
+        - 7
+    - name: Ubuntu
+      versions:
+        - bionic
+        - cosmic
+        - trusty
+        - xenial
+        - yakkety
+        - zesty
+    - name: Debian
+      versions:
+        - jessie
+        - stretch
+
+  galaxy_tags:
+    - cloud
+    - networking
+    - system
+dependencies: []

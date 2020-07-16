@@ -1,0 +1,41 @@
+---
+- hosts: helper_node
+  gather_facts: true
+  become: false
+  tasks:
+
+    - name: Set the state of a virtual machine to poweron
+      vmware_guest_powerstate:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: '{{ vcenter_port }}'
+        validate_certs: '{{ vmware_ssl_enabled }}'
+        name: "{{ item.name }}"
+        state: powered-on
+      delegate_to: localhost
+      ignore_errors: true
+      loop_control:
+        pause: 5
+      with_items:
+        - '{{ openshift_masters }}'
+
+    - name: Pause to wait for the master nodes to boot
+      pause:
+        minutes: 2
+ 
+    - name: Set the state of a virtual machine to poweron
+      vmware_guest_powerstate:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: '{{ vcenter_port }}'
+        validate_certs: '{{ vmware_ssl_enabled }}'
+        name: "{{ item.name }}"
+        state: powered-on
+      delegate_to: localhost
+      ignore_errors: true
+      loop_control:
+        pause: 5
+      with_items:
+        - '{{ openshift_workers }}'

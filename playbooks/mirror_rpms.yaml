@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Mirror RPM Repositories
+      import_role:
+        name: mirror_rpms

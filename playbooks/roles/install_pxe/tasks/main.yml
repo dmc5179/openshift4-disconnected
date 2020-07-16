@@ -1,57 +1,96 @@
 ---
 # tasks file for install_pxe
 
-- name: Install the tftp packages
+- name: Install tftp packages
+  become: true
   package:
-    name:
-      - tftp
-      - tftp-server
+    name: "{{ item }}"
+    state: installed
+  with_items:
+    - "{{ pxeserver_packages }}"
+  tags:
+    - pxeserver
 
-- name: Create TFTP config
+- name: Create directory for PXEboot related files
   file:
-    path: /var/lib/tftpboot/pxelinux.cfg
+    path: "{{ pxeserver_path }}"
     state: directory
-    mode: 0755
+  tags: pxeserver
 
-- name: Create TFTP RHCOS dir
+- name: Make Network Boot Programs for BIOS and UEFI based systems available
+  command: cp "{{ item }}" "{{ pxeserver_path }}/{{ item|regex_replace('.*/', '') }}"
+  args:
+    creates: "{{ pxeserver_path }}/{{ item|regex_replace('.*/', '') }}"
+  with_items: "{{ pxeserver_files }}"
+  tags: pxeserver
+
+- name: Create directory for PXE server configuration
   file:
-    path: /var/lib/tftpboot/rhcos
+    path: "{{ pxeserver_path }}/pxelinux.cfg"
     state: directory
-    mode: 0755
+  tags: pxeserver
 
-- name: Copy over files needed for TFTP
-  shell: "cp -a /usr/share/syslinux/* /var/lib/tftpboot"
-  creates: "/var/lib/tftpboot/vesa.c32"
+- name: Create directories for boot images
+  file:
+    path: "{{ pxeserver_path }}/{{ item.name }}"
+    state: directory
+  with_items: "{{ pxeserver_images }}"
+  tags: pxeserver
 
 - name: Set the default tftp file
   template:
     src: ../templates/default.j2
-    dest: /var/lib/tftpboot/pxelinux.cfg/default
+    dest: "{{ pxeserver_path }}/pxelinux.cfg/default"
     mode: 0555
 
 - name: Set the bootstrap specific tftp file
   template:
-    src: ../templates/pxe-bootstrap.j2
-    dest: "/var/lib/tftpboot/pxelinux.cfg/01-{{ bootstrap.macaddr | regex_replace (':', '-')}}"
+    src: "templates/pxe-bootstrap.j2"
+    dest: "{{ pxeserver_path }}/pxelinux.cfg/pxe-bootstrap"
     mode: 0555
 
 - name: Set the master specific tftp files
   template:
-    src: ../templates/pxe-master.j2
-    dest: "/var/lib/tftpboot/pxelinux.cfg/01-{{ item.macaddr | regex_replace (':', '-')}}"
+    src: "templates/pxe-master.j2"
+    dest: "{{ pxeserver_path }}/pxelinux.cfg/pxe-master"
     mode: 0555
-  with_items: "{{ masters | lower }}"
 
 - name: Set the worker specific tftp files
   template:
-    src: ../templates/pxe-worker.j2
-    dest: "/var/lib/tftpboot/pxelinux.cfg/01-{{ item.macaddr | regex_replace (':', '-')}}"
+    src: "templates/pxe-worker.j2"
+    dest: "{{ pxeserver_path }}/pxelinux.cfg/pxe-worker"
     mode: 0555
-  with_items: "{{ workers | lower }}"
+
+- name: Assign hosts to a boot menu
+  file:
+    src: 'pxe-{{ item.type }}'
+    dest: '{{ pxeserver_path }}/pxelinux.cfg/{{ item.ip | ip4_hex }}'
+    owner: root
+    group: root
+    state: link
+  with_items:
+    - '{{ openshift_boostrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
+
+- name: Populate service facts
+  service_facts:
+
+- name: Configure firewall for TFTP Server
+  firewalld:
+    permanent: true
+    immediate: true
+    state: enabled
+    port: "{{ item }}"
+  with_items:
+    - 69/udp
+  when:
+    ('firewalld.service' in services) and
+    (ansible_facts.services["firewalld.service"].state is match("running"))
 
 - name: Start and enable tftp server
   systemd:
-    name: tftp-server
+    name: tftp
     state: started
     enabled: true
     daemon_reload: true

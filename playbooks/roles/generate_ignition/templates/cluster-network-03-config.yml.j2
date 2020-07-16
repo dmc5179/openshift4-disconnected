@@ -1,0 +1,16 @@
+apiVersion: operator.openshift.io/v1
+kind: Network
+metadata:
+  name: cluster
+spec: 
+  clusterNetwork:
+  - cidr: {{ cluster_network_cidr }}
+    hostPrefix: {{ cluster_network_prefix }}
+  serviceNetwork:
+  - {{ service_network_cidr }}
+  defaultNetwork:
+    type: OpenShiftSDN
+    openshiftSDNConfig:
+      mode: {{ network_policy }}
+      mtu: {{ mtu }}
+      vxlanPort: {{ vxlanPort }}

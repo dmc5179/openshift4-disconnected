@@ -1,0 +1,35 @@
+global:
+  resolve_timeout: "5m"
+receivers:
+  - name: "watchdog_receiver"
+    slack_configs:
+      - api_url: "{{ api_url }}"
+        channel: "{{ channel }}"
+  - name: "cluster_receiver"
+    slack_configs:
+      - api_url: "{{ api_url }}"
+        channel: "{{ channel }}"
+  # set a proper receiver if you want a default receiver for all alerts
+  - name: "null"
+route:
+  group_by: ['alertname', 'cluster', 'service']
+  # Below interval as for lab purpose, please set proper value for your environment.
+  group_interval: "1m"
+  group_wait: "10s"
+  repeat_interval: "2m"
+  # set a proper receiver if you want a default receiver for all alerts
+  receiver: "null"
+  routes:
+  - match:
+      alertname: "Watchdog"
+    receiver: "watchdog_receiver"
+  - match_re:
+      namespace: "^(openshift|kube)$"
+    receiver: "cluster_receiver"
+  # To get alertname, browse to Prometheus UI > Alerts 
+  - match_re:
+      alertname: "^(Cluster|Cloud|Machine|Pod|Kube|MCD|Alertmanager|etcd|TargetDown|CPU|Node|Clock|Prometheus|Failing|Network|IPTable)$"
+    receiver: "cluster_receiver"
+  - match:
+      severity: "critical"
+    receiver: "cluster_receiver"

@@ -1,0 +1,19 @@
+---
+# defaults file for quay
+
+base_dir: '/opt/openshift/quay'
+quay_pod_name: 'quay-pod'
+
+mysql_dir: '{{ base_dir }}/mysql'
+mysql_container_name: 'quay-mysql'
+mysql_database: 'enterpriseregistrydb'
+mysql_password: 'JzxCTamgFBmHRhcGFtoPHFkrx1BH2vwQ'
+mysql_user: 'quayuser'
+mysql_root_password: 'L36PrivxRB02bqOB9jtZtWiCcMsApOGn'
+redis_dir: '{{ base_dir }}/redis'
+redis_container_name: 'quay-redis'
+quay_container_name: 'quay'
+quay_password: '$y$j9T$znxnlii9krRxLVWoav/uh1$nMXAqx8xhsH4NS9HallclbfA2pYqcNlSSqc11pwVbG2'
+quay_config_mode: false
+quay_hostname: 'quay.redhatgovic.io'
+quay_SAN: 'DNS:quay.redhatgovic.io'

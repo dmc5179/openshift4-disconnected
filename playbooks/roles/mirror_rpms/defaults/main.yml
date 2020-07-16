@@ -25,8 +25,9 @@ epel8_enabled: false
 epel8_repository:
 
 # Directory to mirror the RPMs into
-mirror_base: '/tmp/'
+mirror_base: '/var/www/html'
 repo_mirror_base: "{{ mirror_base }}/repos"
+repo_srv_base: '/var/www/html'
 arch: 'x86_64'
 
 air_gapped: true

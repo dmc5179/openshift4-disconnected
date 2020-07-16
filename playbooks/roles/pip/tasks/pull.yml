@@ -1,0 +1,11 @@
+---
+- name: Create directory for mirroring pip modules
+  file:
+    path: '{{ mirror_base }}/pip'
+    state: directory
+
+- name: Download pip modules
+  shell:
+    cmd: {{ pip_cmd }} download -d '{{ mirror_base }}/pip' "{{ item.name }}=={{ item.version }}"
+  with_items:
+    - '{{ pip_modules }}'

@@ -1,2 +1,67 @@
 ---
 # defaults file for pip
+
+mirror_base: '/opt/openshift'
+pip_cmd: pip3
+
+pip_modules:
+  - name: kubernetes
+    version: '11.0.0'
+  - name: MarkupSafe
+    version: '1.1.1'
+  - name: cachetools
+    version: '4.1.0'
+  - name: certifi
+    version: '2020.4.5.1'
+  - name: dictdiffer
+    version: 0.8.1
+  - name: google-auth
+    version: 1.16.0
+  - name: idna
+    version: 2.9
+  - name: jinja2
+    version: 2.11.2
+  - name: oauthlib
+    version: 3.1.0
+  - name: openshift
+    version: 0.11.1
+  - name: pyasn1
+    version: 0.4.8
+  - name: pyasn1-modules
+    version: 0.2.8
+  - name: python-dateutil
+    version: 2.8.1
+  - name: python-string-utils
+    version: 1.0.0
+  - name: pyyaml
+    version: 5.3.1
+  - name: requests
+    version: 2.23.0
+  - name: requests-oauthlib
+    version: 1.3.0
+  - name: rsa
+    version: 4.0
+  - name: ruamel.yaml
+    version: 0.16.10
+  - name: ruamel.yaml.clib
+    version: 0.2.0
+  - name: setuptools
+    version: 47.1.1
+  - name: six
+    version: 1.15.0
+  - name: urllib3
+    version: 1.25.9
+  - name: websocket-client
+    version: 0.57.0
+  - name: pyvim
+    version: 3.0.2
+  - name: pyvmomi
+    version: 7.0
+  - name: PyYAML
+    version: 5.3.1
+  - name: pyOpenSSl
+    version: 18.0.0
+  - name: yamllint
+    version: 1.23.0
+  - name: pylint
+    version: 2.5.3

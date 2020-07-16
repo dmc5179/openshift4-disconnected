@@ -1,0 +1,13 @@
+---
+
+- name: Apply vSphere CSI ICSP
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: false
+    kubeconfig: "{{ kubeconfig  }}"
+    validate_certs: '{{ ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/vsphere_csi_icsp.yaml.j2') }}"
+  tags:
+    - never
+    - icsp

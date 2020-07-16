@@ -1,22 +1,32 @@
-Role Name
-=========
+# Ansible role 'mirror_ocp_images'
 
-A brief description of the role goes here.
+Role for mirroring the OpenShift base container images needed to install an OpenShift cluster
 
-Requirements
-------------
+## Requirements
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+- No Requirements
 
-Role Variables
---------------
+## Dependencies
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+- No Dependencies
 
-Dependencies
-------------
+## Role Variables
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+| Variable             | Default                       | Comments                                                                                |
+| :---                 | :---                          | :---                                                                                    |
+| ocp_release          |
+| arch                 |
+| local_reg            |
+| local_repo           |
+| product_repo         |
+| mirror_base          |
+| pull_secret          |
+| release_name         |
+| mirror_to_reg        |
+| mirror_to_dir        |
+| air_gapped           |
+| mirror_registry      |
+| mirror_transport     |
 
 Example Playbook
 ----------------
@@ -27,12 +37,10 @@ Including an example of how to use your role (for instance, with variables passe
       roles:
          - { role: username.rolename, x: 42 }
 
-License
--------
+## License
 
-BSD
+2-clause BSD license, see [LICENSE.md](LICENSE.md)
 
-Author Information
-------------------
+## Contributors
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+- [Dan Clark](https://github.com/dmc5179/) (maintainer)

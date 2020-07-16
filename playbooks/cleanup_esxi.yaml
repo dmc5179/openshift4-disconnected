@@ -1,0 +1,56 @@
+---
+- hosts: helper_node
+  gather_facts: true
+  become: false
+  tasks:
+
+    - name: Set the state of a virtual machine to poweroff
+      vmware_guest_powerstate:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: '{{ vcenter_port }}'
+        validate_certs: '{{ vmware_ssl_enabled }}'
+        name: "{{ item.name }}"
+        state: powered-off
+      delegate_to: localhost
+      ignore_errors: true
+      with_items:
+        - '{{ openshift_bootstrap }}'
+        - '{{ openshift_masters }}'
+        - '{{ openshift_workers }}'
+
+    - name: Cleanup Nodes
+      vmware_guest:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        port: '{{ vcenter_port }}'
+        validate_certs: '{{ vmware_ssl_enabled }}'
+        datacenter: '{{ datacenter_name }}'
+        name: '{{ item.name }}'
+        state: absent
+      delegate_to: localhost
+      ignore_errors: true
+      with_items:
+        - '{{ openshift_bootstrap }}'
+        - '{{ openshift_masters }}'
+        - '{{ openshift_workers }}'
+
+    - name: Delete RHCOS custom ISOs from vsphere
+      vsphere_file:
+        hostname: '{{ esxi_hostname }}'
+        username: '{{ vcenter_username }}'
+        password: '{{ vcenter_password }}'
+        datacenter: '{{ datacenter_name }}'
+        datastore: 'USB-Datastore'
+        state: absent
+        path: 'ISOs/{{ item.name }}.iso'
+        validate_certs: "{{ vmware_ssl_enabled }}"
+      delegate_to: localhost
+      with_items:
+        - '{{ openshift_bootstrap }}'
+        - '{{ openshift_masters }}'
+        - '{{ openshift_workers }}'
+      loop_control:
+        pause: 2

@@ -23,6 +23,24 @@
   tags:
     - bind
 
+- name: Populate service facts
+  service_facts:
+
+- name: Configure firewall for BIND DNS
+  firewalld:
+    permanent: true
+    immediate: true
+    state: enabled
+    port: "{{ item }}"
+  with_items:
+    - 53/tcp
+    - 53/udp
+  when:
+    ('firewalld.service' in services) and
+    (ansible_facts.services["firewalld.service"].state is match("running"))
+  tags:
+    - bind
+
 - name: Ensure runtime directories referenced in config exist
   file:
     path: "{{ item }}"

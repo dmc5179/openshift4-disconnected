@@ -1,0 +1,19 @@
+---
+- hosts: helper_node
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Configure repos locally
+      include_role:
+        name: configure_repos
+      vars:
+        - rhel_7_server_ansible_28_rpms: false
+        - rhel_7_server_extras_rpms: false
+        - rhel_7_server_ose_43_rpms: false
+        - rhel_7_server_rpms: false
+        - ansible_29_for_rhel_8_x86_64_rpms: true
+        - rhel_8_for_x86_64_appstream_rpms: true
+        - rhel_8_for_x86_64_baseos_rpms: true
+        - repo_server: 'file://'
+        - repo_path: '/opt/openshift/repos'

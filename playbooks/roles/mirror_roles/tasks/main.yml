@@ -1,0 +1,8 @@
+---
+# tasks file for mirror_roles
+
+- name: Pull Ansible roles and collections
+  include_tasks: pull.yml
+
+- name: Install Ansible roles and collections from mirror
+  include_tasks: install.yml

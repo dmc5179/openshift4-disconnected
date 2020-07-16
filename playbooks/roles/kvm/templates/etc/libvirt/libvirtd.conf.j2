@@ -1,0 +1,82 @@
+#################################################################
+#
+# Network connectivity controls
+#
+{% if not kvm_enable_tls %}
+listen_tls = 0
+{% endif %}
+{% if kvm_enable_tcp %}
+listen_tcp = 1
+{% endif %}
+tls_port = "{{ kvm_tls_port }}"
+tcp_port = "{{ kvm_tcp_port }}"
+listen_addr = "{{ kvm_listen_addr }}"
+{% if kvm_enable_mdns %}
+mdns_adv = 1
+{% endif %}
+
+#################################################################
+#
+# UNIX socket access controls
+#
+unix_sock_group = "{{ kvm_unix_sock_group }}"
+unix_sock_dir = "{{ kvm_unix_sock_dir }}"
+
+#################################################################
+#
+# Authentication.
+#
+auth_unix_ro = "{{ kvm_auth_unix_ro }}"
+auth_unix_rw = "{{ kvm_auth_unix_rw }}"
+{% if kvm_enable_tcp %}
+auth_tcp = "none"
+{% endif %}
+auth_tls = "none"
+
+#################################################################
+#
+# Processing controls
+#
+max_clients = {{ kvm_max_clients }}
+max_queued_clients = {{ kvm_max_queued_clients }}
+max_anonymous_clients = {{ kvm_max_anonymous_clients }}
+min_workers = {{ kvm_min_workers }}
+max_workers = {{ kvm_max_workers }}
+prio_workers = {{ kvm_prio_workers }}
+max_requests = {{ kvm_max_requests }}
+max_client_requests = {{ kvm_max_client_requests }}
+admin_min_workers = {{ kvm_admin_min_workers }}
+admin_max_workers = {{ kvm_admin_max_workers }}
+admin_max_clients = {{ kvm_admin_max_clients }}
+admin_max_queued_clients = {{ kvm_admin_max_queued_clients }}
+admin_max_client_requests = {{ kvm_admin_max_client_requests }}
+
+#################################################################
+#
+# Logging controls
+#
+log_level = {{ kvm_log_level }}
+#log_filters="3:remote 4:event"
+{% if kvm_enable_libvirtd_syslog is defined and kvm_enable_libvirtd_syslog %}
+log_outputs="3:syslog:libvirtd"
+{% endif %}
+
+##################################################################
+#
+# Auditing
+#
+audit_level = 2
+audit_logging = {{ kvm_audit_logging }}
+
+###################################################################
+# Keepalive protocol:
+#
+keepalive_interval = {{ kvm_keepalive_interval }}
+keepalive_count = {{ kvm_keepalive_count }}
+admin_keepalive_interval = {{ kvm_admin_keepalive_interval }}
+admin_keepalive_count = {{ kvm_admin_keepalive_count }}
+
+###################################################################
+# Open vSwitch:
+#
+ovs_timeout = {{ kvm_ovs_timeout }}

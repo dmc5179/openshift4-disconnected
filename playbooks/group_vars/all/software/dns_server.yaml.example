@@ -1,0 +1,128 @@
+---
+
+# Bind is the only type supported by the role currently
+dns_server: bind
+
+bind_forwarders:
+  - '1.1.1.1'
+  - '8.8.8.8'
+
+bind_zone_master_server_ip: '192.169.3.42'
+
+# If using a bastion jump host you may need
+# 2 zones to handle both sides
+dns_zone_one: 'external.com'
+dns_zone_two: 'internal.com'
+
+ocp_cluster_name: 'caas'
+
+bind_zone_domains:
+  - name: "{{ dns_zone_one }}"
+    create_reverse_zones: true
+    create_forward_zones: true
+    name_servers:
+      - 'bastion'
+    hosts:
+      - name: bastion
+        ip: "192.168.3.42"
+      - name: vcenter
+        ip: "192.168.3.47"
+      - name: lunchbox
+        ip: "192.168.3.22"
+      - name: quay
+        ip: "192.168.3.14"
+    networks:
+      - '192.168.3'
+  - name: '{{ dns_zone_two }}'
+    create_reverse_zones: true
+    create_forward_zones: true
+    networks:
+      - '10.0'
+    name_servers:
+      - 'bastion'
+    hosts:
+      - name: bastion
+        ip: "10.0.106.42"
+        aliases:
+          - name: registry
+          - name: quay
+      - name: api
+        ip: '10.0.106.42'
+        aliases:
+          - name: 'api.{{ ocp_cluster_name }}'
+      - name: apiint
+        ip: '10.0.106.42'
+        aliases:
+          - name: 'api-int.{{ ocp_cluster_name }}'
+      - name: apiwildcard
+        ip: '10.0.106.42'
+        aliases:
+          - name: '*.apps.{{ ocp_cluster_name }}'
+      - name: vcenter
+        ip: '10.0.106.47'
+        aliases:
+          - name: 'vcenter.{{ ocp_cluster_name }}'
+      - name: vcenterproxy
+        ip: '10.0.106.48'
+      - name: bootstrap
+        ip: '10.0.106.50'
+        aliases:
+          - name: 'bootstrap.{{ ocp_cluster_name }}'
+      - name: master0
+        ip: '10.0.106.51'
+        aliases:
+          - name: 'master0.{{ ocp_cluster_name }}'
+#          - name: 'etcd0'
+#          - name: 'etcd0.{{ ocp_cluster_name }}'
+      - name: master1
+        ip: '10.0.106.52'
+        aliases:
+          - name: 'master1.{{ ocp_cluster_name }}'
+#          - name: 'etcd1'
+#          - name: 'etcd1.{{ ocp_cluster_name }}'
+      - name: master2
+        ip: '10.0.106.53'
+        aliases:
+          - name: 'master2.{{ ocp_cluster_name }}'
+#          - name: 'etcd2'
+#          - name: 'etcd2.{{ ocp_cluster_name }}'
+      - name: worker0
+        ip: '10.0.106.61'
+        aliases:
+          - 'worker0.{{ ocp_cluster_name }}'
+      - name: worker1
+        ip: '10.0.106.62'
+        aliases:
+          - name: 'worker1.{{ ocp_cluster_name }}'
+      - name: worker2
+        ip: '10.0.106.63'
+        aliases:
+          - name: 'worker2.{{ ocp_cluster_name }}'
+      - name: etcd0
+        ip: '10.0.106.51'
+        aliases:
+          - name: 'etcd-0.{{ ocp_cluster_name }}'
+      - name: etcd1
+        ip: '10.0.106.52'
+        aliases:
+          - name: 'etcd-1.{{ ocp_cluster_name }}'
+      - name: etcd2
+        ip: '10.0.106.53'
+        aliases:
+          - name: 'etcd-2.{{ ocp_cluster_name }}'
+    services:
+      - name: '_etcd-server-ssl._tcp.{{ ocp_cluster_name }}'
+        priority: 0
+        weight: 10
+        port: 2380
+        target: 'etcd-0.{{ ocp_cluster_name }}.{{ dns_zone_two }}.'
+      - name: '_etcd-server-ssl._tcp.{{ ocp_cluster_name }}'
+        priority: 0
+        weight: 10
+        port: 2380
+        target: 'etcd-1.{{ ocp_cluster_name }}.{{ dns_zone_two }}.'
+      - name: '_etcd-server-ssl._tcp.{{ ocp_cluster_name }}'
+        priority: 0
+        weight: 10
+        port: 2380
+        target: 'etcd-2.{{ ocp_cluster_name }}.{{ dns_zone_two }}.'

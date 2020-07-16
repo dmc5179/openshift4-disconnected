@@ -1,0 +1,9 @@
+---
+- hosts: pxe_server
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Install and Configure PXE TFTP Server
+      include_role:
+        name: install_pxe

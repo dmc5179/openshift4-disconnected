@@ -1,0 +1,9 @@
+---
+- hosts: httpd_server
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Install and Configure HTTPD Server
+      include_role:
+        name: install_httpd

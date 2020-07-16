@@ -1,12 +1,18 @@
 ---
 # defaults file for provision_esxi
 
-ssl_enabled: false
+mirror_base: '/opt/openshift'
+
+vmware_ssl_enabled: false
 
 vcenter_username: ''
 vcenter_password: ''
 vcenter_hostname: ''
 datacenter_name: 'ha-datacenter'
+datastore_name: 'NVMe-Datastore'
 vswitch_name: ''
 portgroup_name: ''
-cluster_name: ''
+vcenter_cluster_name: ''
+upload_ova: false
+arch: 'x86_64'
+rhcos_ver: '4.3.8'

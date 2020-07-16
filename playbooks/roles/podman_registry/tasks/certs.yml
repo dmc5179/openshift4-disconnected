@@ -1,16 +1,32 @@
 ---
-- name: Generate an OpenSSL private key with a different size (4096 bits)
+- name: Generate an OpenSSL private key
   become: "{{ run_as_root }}"
   openssl_privatekey:
     path: "{{docker_registry_conf_dir}}/pki/registry.key"
-    size: 2048
+    size: 4096
+    type: 'RSA'
+  tags:
+    - certificate
 
 - name: Generate an OpenSSL CSR
   become: "{{ run_as_root }}"
   openssl_csr:
     path: "{{docker_registry_conf_dir}}/pki/registry.csr"
+    country_name: 'US'
+    state_or_province_name: 'Virginia'
+    locality_name: 'Chantilly'
+    organization_name: 'RedHat'
+    organizational_unit_name: 'RedHat'
     privatekey_path: "{{docker_registry_conf_dir}}/pki/registry.key"
     common_name: "{{ docker_registry_hostname }}"
+    subject_alt_name: '{{ docker_registry_SAN }}'
+    subject_alt_name_critical: true
+    use_common_name_for_san: true
+    basic_constraints_critical: true
+    basicConstraints: ['CA:TRUE']
+    state: present
+  tags:
+    - certificate
 
 - name: Generate a Self Signed OpenSSL Certificate
   become: "{{ run_as_root }}"
@@ -19,13 +35,48 @@
     privatekey_path: "{{docker_registry_conf_dir}}/pki/registry.key"
     csr_path: "{{docker_registry_conf_dir}}/pki/registry.csr"
     provider: selfsigned
+    selfsigned_version: 3
+  tags:
+    - certificate
 
 # Make sure to trust the self signed cert we just made
 - name: Copy self signed cert to local PKI trust
-  become: "{{ run_as_root }}"
+  become: true
   copy:
     src: "{{docker_registry_conf_dir}}/pki/registry.crt"
     dest: '/etc/pki/ca-trust/source/anchors/'
     remote_src: true
-  notify:
-    - update trusted ca
+  tags:
+    - certificate
+
+- name: Copy private key to host tls directory
+  become: true
+  copy:
+    src: "{{docker_registry_conf_dir}}/pki/registry.key"
+    dest: '/etc/pki/tls/private/registry.key'
+    owner: root
+    group: root
+    mode: '0660'
+  tags:
+    - certificate
+
+- name: Copy certificate to host tls directory
+  become: true
+  copy:
+    src: "{{docker_registry_conf_dir}}/pki/registry.crt"
+    dest: '/etc/pki/tls/certs/registry.crt'
+    owner: root
+    group: root
+    mode: '0664'
+  tags:
+    - certificate
+
+- name: update trusted ca
+  become: true
+  command: update-ca-trust extract
+  when:
+    (ansible_distribution == "RedHat") or
+    (ansible_distribution == "CentOS") or
+    (ansible_distribution == "Fedora")
+  tags:
+    - certificate

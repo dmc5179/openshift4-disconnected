@@ -1,0 +1,121 @@
+---
+
+- name: Base64 encode append-bootstrap
+  slurp:
+    src: "/var/www/html/ignition/append-bootstrap.ign"
+  register: append_bootstrap
+
+#- name: Copy RHCOS OVA to Datastore
+#  vsphere_copy:
+#    hostname: '{{ vcenter_hostname }}'
+#    port: '{{ vcenter_port }}'
+#    username: '{{ vcenter_username }}'
+#    password: '{{ vcenter_password }}'
+#    src: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-vmware.{{ arch }}.ova'
+#    datacenter: '{{ datacenter_name }}'
+#    datastore: '{{ datastore_name }}'
+#    path: 'caas/rhcos-{{ rhcos_ver }}-{{ arch }}-vmware.{{ arch }}.ova'
+#    validate_certs: "{{ vmware_ssl_enabled }}"
+#  delegate_to: localhost
+#  when: (upload_ova | bool)
+
+- vmware_deploy_ovf:
+    hostname: '{{ vcenter_hostname }}'
+    username: '{{ vcenter_username }}'
+    password: '{{ vcenter_password }}'
+    datacenter: '{{ datacenter_name }}'
+    port: '{{ vcenter_port }}'
+    datastore: '{{ datastore_name }}'
+    disk_provisioning: thin
+    name: bootstrap
+    networks: "{u'VM Network':u'openshift'}"
+    validate_certs: '{{ vmware_ssl_enabled }}'
+    power_on: false
+    ovf: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-vmware.{{ arch }}.ova'
+    inject_ovf_env: true
+    properties:
+       guestinfo.ignition.config.data: '{{ append_bootstrap.content }}'
+       guestinfo.ignition.config.data.encoding: base64
+       disk.EnableUUID: TRUE
+  delegate_to: localhost
+  tags: deploy_ovf
+
+# Change the boot order or we'll be in a boot to ISO loop
+- name: Change bootstrap boot order and related parameters
+  vmware_guest_boot_manager:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    port: "{{ vcenter_port }}"
+    name: bootstrap
+    boot_delay: 5000
+    enter_bios_setup: false
+    boot_retry_enabled: false
+    boot_firmware: efi
+    boot_order:
+#      - ethernet
+      - disk
+    secure_boot_enabled: false
+    validate_certs: "{{ vmware_ssl_enabled }}"
+  delegate_to: localhost
+
+
+- name: Change bootstrap hardware settings
+  vmware_guest:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    port: '{{ vcenter_port }}'
+    validate_certs: '{{ vmware_ssl_enabled }}'
+    datacenter: '{{ datacenter_name }}'
+#    folder: '{{ datacenter_name }}/vm/caas/'
+    guest_id: coreos64Guest
+    name: bootstrap
+    state: present
+    disk:
+      - size_gb: 50
+        type: thin
+        datastore: '{{ datastore_name }}'
+    hardware:
+      memory_mb: 16384
+      num_cpus: 8
+      num_cpu_cores_per_socket: 2
+      scsi: paravirtual
+      hotadd_cpu: true
+      hotremove_cpu: true
+      hotadd_memory: false
+      version: 14 # Hardware version of virtual machine
+      boot_firmware: "efi"
+    wait_for_ip_address: false
+  delegate_to: localhost
+
+- name: Change network adapter settings of virtual machine
+  vmware_guest_network:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    datacenter: "{{ datacenter_name }}"
+    port: '{{ vcenter_port }}'
+    validate_certs: '{{ vmware_ssl_enabled }}'
+    name: bootstrap
+    gather_network_info: false
+    networks:
+      - name: "openshift"
+        state: present
+        device_type: vmxnet3
+        manual_mac: "00:50:56:97:0c:85"
+        connected: true
+  delegate_to: localhost
+  register: network_info
+
+- name: Turn bootstrap node on
+  vmware_guest_powerstate:
+    hostname: "{{ vcenter_hostname }}"
+    username: "{{ vcenter_username }}"
+    password: "{{ vcenter_password }}"
+    port: '{{ vcenter_port }}'
+    validate_certs: '{{ vmware_ssl_enabled }}'
+    name: bootstrap
+    state: powered-on
+  delegate_to: localhost
+  register: deploy

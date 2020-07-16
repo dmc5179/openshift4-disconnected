@@ -1,0 +1,31 @@
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  name: vspherecsi
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - {{ mirror_registry }}/cloud-provider-vsphere/cpi/release/manager
+    source: gcr.io/cloud-provider-vsphere/cpi/release/manager
+  - mirrors:
+    - {{ mirror_registry }}/cloud-provider-vsphere/csi/release/driver
+    source: gcr.io/cloud-provider-vsphere/csi/release/driver
+  - mirrors:
+    - {{ mirror_registry }}/cloud-provider-vsphere/csi/release/syncer
+    source: gcr.io/cloud-provider-vsphere/csi/release/syncer
+  - mirrors:
+    - {{ mirror_registry }}/google_containers/busybox
+    source: gcr.io/google_containers/busybox
+  - mirrors:
+    - {{ mirror_registry }}/k8scsi/csi-attacher
+    source: quay.io/k8scsi/csi-attacher
+  - mirrors:
+    - {{ mirror_registry }}/k8scsi/csi-node-driver-registrar
+    source: quay.io/k8scsi/csi-node-driver-registrar
+  - mirrors:
+    - {{ mirror_registry }}/k8scsi/csi-provisioner
+    source: quay.io/k8scsi/csi-provisioner
+  - mirrors:
+    - {{ mirror_registry }}/k8scsi/livenessprobe
+    source: quay.io/k8scsi/livenessprobe

@@ -1,0 +1,9 @@
+---
+- hosts: ntp_server
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Install and Configure NTP Server
+      include_role:
+        name: install_ntp

@@ -1,0 +1,25 @@
+---
+
+- name: config_kvm | Load all groups
+  getent:
+    database: group
+    split: ':'
+  check_mode: false
+
+- name: config_kvm | Set unix_sock_group
+  set_fact:
+    kvm_unix_sock_group: "{{ ('libvirtd' in getent_group) | ternary('libvirtd', 'libvirt') }}"
+  when:
+    - getent_group is defined
+    - "'libvirt' in getent_group or 'libvirtd' in getent_group"
+
+- name: config_kvm | configuring kvm
+  template:
+    src: etc/libvirt/libvirtd.conf.j2
+    dest: /etc/libvirt/libvirtd.conf
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+  become: true
+  notify: "restart libvirtd"
+  when: not ansible_check_mode
