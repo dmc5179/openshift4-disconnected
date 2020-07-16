@@ -4,6 +4,7 @@
   openssl_privatekey:
     path: "{{docker_registry_conf_dir}}/pki/registry.key"
     size: 4096
+    type: 'RSA'
   tags:
     - certificate
 
@@ -11,9 +12,19 @@
   become: "{{ run_as_root }}"
   openssl_csr:
     path: "{{docker_registry_conf_dir}}/pki/registry.csr"
+    country_name: 'US'
+    state_or_province_name: 'Virginia'
+    locality_name: 'Chantilly'
+    organization_name: 'RedHat'
+    organizational_unit_name: 'RedHat'
     privatekey_path: "{{docker_registry_conf_dir}}/pki/registry.key"
     common_name: "{{ docker_registry_hostname }}"
     subject_alt_name: '{{ docker_registry_SAN }}'
+    subject_alt_name_critical: true
+    use_common_name_for_san: true
+    basic_constraints_critical: true
+    basicConstraints: ['CA:TRUE']
+    state: present
   tags:
     - certificate
 
@@ -24,6 +35,7 @@
     privatekey_path: "{{docker_registry_conf_dir}}/pki/registry.key"
     csr_path: "{{docker_registry_conf_dir}}/pki/registry.csr"
     provider: selfsigned
+    selfsigned_version: 3
   tags:
     - certificate
 
