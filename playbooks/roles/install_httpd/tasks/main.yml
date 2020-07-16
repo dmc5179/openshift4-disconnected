@@ -23,7 +23,7 @@
 
 - name: allow connections to custom port
   seport:
-    ports: "{{ item }}"
+    ports: '{{ item }}'
     proto: tcp
     setype: http_port_t
     state: present
@@ -42,7 +42,7 @@
     permanent: true
     immediate: true
     state: enabled
-    port: "{{ item }}"
+    port: '{{ item }}/tcp'
   with_items:
     - "{{ httpd_port }}"
     - "{{ httpd_ssl_port }}"
