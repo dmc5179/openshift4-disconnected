@@ -1,5 +1,5 @@
 ---
-# defaults file for fetch_roles
+# defaults file for mirror_roles
 air_gapped: true
 
 mirror_base: '/tmp'

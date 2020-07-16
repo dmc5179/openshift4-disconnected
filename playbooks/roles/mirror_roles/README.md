@@ -1,4 +1,4 @@
-# Ansible role 'fetch_roles'
+# Ansible role 'mirror_roles'
 
 ## Requirements
 
