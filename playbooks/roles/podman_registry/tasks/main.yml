@@ -24,9 +24,9 @@
   file:
     state: directory
     dest: '{{item}}'
-#    owner: root
-#    group: root
     mode: 0755
+  tags:
+    - certificates
 
 - name: Upgrade pip
   become: true
