@@ -15,15 +15,14 @@ platform:
     vcenter: 'vcenter.example.com'
     username: 'user@vsphere.local'
     password: 'password'
-    cluster: 'cluster name'
-    datacenter: 'datacenter name'
-    defaultDatastore: 'datastore name'
+    cluster: 'Cluster Name'
+    datacenter: 'Datacenter Name'
+    defaultDatastore: 'Default Datastore'
     apiVIP: 192.168.1.47
     ingressVIP: 192.168.1.48
     network: 'VM Network'
 fips: false 
 pullSecret: '{"auths"}'
-sshKey: 'ssh-ed25519 AAA....' 
+sshKey: 'ssh-ed25519 ...'
 additionalTrustBundle: |
-< Insert VCenter Certificate Here>
-< Insert Other certificates like registry here>
+< Insert vCenter Certificate Here>
