@@ -1,0 +1,27 @@
+apiVersion: v1
+baseDomain: example.com
+compute:
+- hyperthreading: Enabled   
+  name: worker
+  replicas: 0 
+controlPlane:
+  hyperthreading: Enabled   
+  name: master
+  replicas: 3 
+metadata:
+  name: caas
+platform:
+  vsphere:
+    vcenter: 'vcenter.caas.example.com'
+    username: 'Username'
+    password: 'Password'
+    cluster: 'ClusterName'
+    datacenter: 'DataCenter Name'
+    defaultDatastore: 'Datastore Name'
+    apiVIP: 192.168.1.47 
+    ingressVIP: 192.168.1.48
+    network: 'VM Network'
+fips: false 
+pullSecret: ''
+sshKey: 'ssh-ed25519' 
+additionalTrustBundle: |
