@@ -12,16 +12,18 @@ metadata:
   name: caas
 platform:
   vsphere:
-    vcenter: 'vcenter.caas.example.com'
-    username: 'Username'
-    password: 'Password'
-    cluster: 'ClusterName'
-    datacenter: 'DataCenter Name'
-    defaultDatastore: 'Datastore Name'
-    apiVIP: 192.168.1.47 
+    vcenter: 'vcenter.example.com'
+    username: 'user@vsphere.local'
+    password: 'password'
+    cluster: 'cluster name'
+    datacenter: 'datacenter name'
+    defaultDatastore: 'datastore name'
+    apiVIP: 192.168.1.47
     ingressVIP: 192.168.1.48
     network: 'VM Network'
 fips: false 
-pullSecret: ''
-sshKey: 'ssh-ed25519' 
+pullSecret: '{"auths"}'
+sshKey: 'ssh-ed25519 AAA....' 
 additionalTrustBundle: |
+< Insert VCenter Certificate Here>
+< Insert Other certificates like registry here>
