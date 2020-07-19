@@ -2,7 +2,7 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: CatalogSource
 metadata:
-  name: community-operators-catalog
+  name: community-operators
   namespace: openshift-marketplace
 spec:
   sourceType: grpc
