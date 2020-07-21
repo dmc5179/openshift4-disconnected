@@ -13,7 +13,7 @@
 - name: Create directory for ISO extraction
   become: true
   file:
-    path: '/tmp/rhcos/{{ item.name }}'
+    path: '{{ mirror_base }}/rhcos/custom_iso/{{ item.name }}'
     state: directory
   with_items:
     - '{{ openshift_bootstrap }}'
@@ -30,7 +30,7 @@
   become: true
   mount:
     path: /mnt/rhcos
-    src: '/opt/openshift/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer.{{ arch }}.iso'
+    src: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer.{{ arch }}.iso'
     fstype: iso9660
     opts: ro,noauto
     state: mounted
@@ -38,8 +38,8 @@
 - name: Copy files from ISO
   become: true
   shell:
-    cmd: 'rsync -a /mnt/rhcos/* /tmp/rhcos/{{ item.name }}'
-    creates: '/tmp/rhcos/{{ item.name }}/README.md'
+    cmd: 'rsync -a /mnt/rhcos/* {{ mirror_base }}/rhcos/custom_iso/{{ item.name }}'
+    creates: '{{ mirror_base }}/rhcos/custom_iso/{{ item.name }}/README.md'
   with_items:
     - '{{ openshift_bootstrap }}'
     - '{{ openshift_masters }}'
@@ -49,7 +49,7 @@
   become: true
   mount:
     path: /mnt/rhcos
-    src: '/opt/openshift/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer.{{ arch }}.iso'
+    src: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer.{{ arch }}.iso'
     fstype: iso9660
     opts: ro,noauto
     state: absent
