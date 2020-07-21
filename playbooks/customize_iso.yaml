@@ -15,7 +15,7 @@
         username: '{{ vcenter_username }}'
         password: '{{ vcenter_password }}'
 #        port: '{{ vcenter_port }}'
-        src: '/tmp/rhcos/{{ item.name }}.iso'
+        src: '{{ mirror_base }}/rhcos/custom_iso/{{ item.name }}.iso'
 #        datacenter: '{{ datacenter_name }}'
         datastore: 'USB-Datastore'
         path: 'ISOs/{{ item.name }}.iso'
