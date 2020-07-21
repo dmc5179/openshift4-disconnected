@@ -28,7 +28,7 @@
       boot_firmware: "efi"
     cdrom:
       type: iso
-      iso_path: "{{ datastore_path }}/bootstrap.iso"
+      iso_path: "[{{ datastore_name }}] {{ datastore_path }}/bootstrap.iso"
       state: present
     networks:
     - name: 'openshift'
@@ -92,7 +92,7 @@
       boot_firmware: "efi"
     cdrom:
       type: iso
-      iso_path: "{{ datastore_path }}/{{ item.name }}.iso"
+      iso_path: "[{{ datastore_name }}] {{ datastore_path }}/{{ item.name }}.iso"
     networks:
     - name: 'openshift'
       device_type: vmxnet3
@@ -159,7 +159,7 @@
       boot_firmware: "efi"
     cdrom:
       type: iso
-      iso_path: "{{ datastore_path }}/{{ item.name }}.iso"
+      iso_path: "[{{ datastore_name }}] {{ datastore_path }}/{{ item.name }}.iso"
     networks:
     - name: 'openshift'
       device_type: vmxnet3
