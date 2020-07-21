@@ -1,7 +1,9 @@
 ---
 # defaults file for custom_iso
 
-tmp_dir: '/tmp/rhcos'
+mirror_base: '/opt/openshift'
+
+tmp_dir: '{{ mirror_base }}/rhcos/custom_iso'
 
 openshift_bootstrap: {}
 openshift_masters: {}

@@ -5,7 +5,7 @@ arch: 'x86_64'
 local_repo: 'ocp4/openshift4'
 product_repo: 'openshift-release-dev'
 
-mirror_base: '/tmp/'
+mirror_base: '/opt/openshift'
 
 # This needs to be a pull secret that combines the pull secret from Red Hat
 # to pull all the images down and a pull secret from your local registry so we
