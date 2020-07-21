@@ -8,7 +8,7 @@
     port: '{{ vcenter_port }}'
     validate_certs: '{{ vmware_ssl_enabled }}'
     datacenter: '{{ datacenter_name }}'
-    folder: '{{ datacenter_name }}/vm/caas/'
+    folder: '{{ datacenter_name }}/vm/{{ ocp_cluster_name }}/'
     guest_id: coreos64Guest
     name: bootstrap
     state: poweredon
@@ -28,7 +28,7 @@
       boot_firmware: "efi"
     cdrom:
       type: iso
-      iso_path: "[USB-Datastore] /ISOs/bootstrap.iso"
+      iso_path: "{{ datastore_path }}/bootstrap.iso"
       state: present
     networks:
     - name: 'openshift'
@@ -56,7 +56,7 @@
     boot_firmware: efi
     boot_order:
       - disk
-    secure_boot_enabled: False
+    secure_boot_enabled: false
     validate_certs: "{{ vmware_ssl_enabled }}"
   delegate_to: localhost
 
@@ -72,7 +72,7 @@
     port: '{{ vcenter_port }}'
     validate_certs: '{{ vmware_ssl_enabled }}'
     datacenter: '{{ datacenter_name }}'
-    folder: '{{ datacenter_name }}/vm/caas/'
+    folder: '{{ datacenter_name }}/vm/{{ ocp_cluster_name }}/'
     guest_id: coreos64Guest
     name: '{{ item.name }}'
     state: poweredon
@@ -92,7 +92,7 @@
       boot_firmware: "efi"
     cdrom:
       type: iso
-      iso_path: "[USB-Datastore] /ISOs/{{ item.name }}.iso"
+      iso_path: "{{ datastore_path }}/{{ item.name }}.iso"
     networks:
     - name: 'openshift'
       device_type: vmxnet3
@@ -121,7 +121,7 @@
     boot_firmware: efi
     boot_order:
       - disk
-    secure_boot_enabled: False
+    secure_boot_enabled: false
     validate_certs: "{{ vmware_ssl_enabled }}"
   delegate_to: localhost
   with_items:
@@ -139,7 +139,7 @@
     port: '{{ vcenter_port }}'
     validate_certs: '{{ vmware_ssl_enabled }}'
     datacenter: '{{ datacenter_name }}'
-    folder: '{{ datacenter_name }}/vm/caas/'
+    folder: '{{ datacenter_name }}/vm/{{ ocp_cluster_name }}/'
     guest_id: coreos64Guest
     name: '{{ item.name }}'
     state: poweredon
@@ -159,7 +159,7 @@
       boot_firmware: "efi"
     cdrom:
       type: iso
-      iso_path: "[USB-Datastore] /ISOs/{{ item.name }}.iso"
+      iso_path: "{{ datastore_path }}/{{ item.name }}.iso"
     networks:
     - name: 'openshift'
       device_type: vmxnet3
@@ -188,7 +188,7 @@
     boot_firmware: efi
     boot_order:
       - disk
-    secure_boot_enabled: False
+    secure_boot_enabled: false
     validate_certs: "{{ vmware_ssl_enabled }}"
   delegate_to: localhost
   with_items:
