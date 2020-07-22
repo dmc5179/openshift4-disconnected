@@ -71,12 +71,6 @@
     enabled: true
   when: nfs_exports|length
 
-- name: Include NFS Provisioner ICSP tasks
-  include_tasks: icsp.yml
-  tags:
-    - never
-    - icsp
-
 - name: Include NFS Provisioner Tasks
   import_tasks: provisioner.yml
   tags:

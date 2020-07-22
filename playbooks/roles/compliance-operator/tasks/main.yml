@@ -21,18 +21,6 @@
   tags:
     - install
 
-- name: Apply compliance operator Image Content Source Policy
-  delegate_to: localhost
-  k8s:
-    state: present
-    wait: false
-    kubeconfig: "{{ kubeconfig  }}"
-    validate_certs: '{{ kube_ssl_enabled }}'
-    definition: "{{ lookup('template', 'templates/compliance_operators_icsp.yaml.j2') }}"
-  tags:
-    - never
-    - icsp
-
 - name: Apply compliance CRDs
   delegate_to: localhost
   k8s:

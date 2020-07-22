@@ -1,12 +1,6 @@
 ---
 # tasks file for vsphere_csi_driver
 
-- name: Apply ICSP Mapping
-  include_tasks: icsp.yml
-  tags:
-    - never
-    - icsp
-
 - name: Create vsphere namespace for CSI Drivers
   delegate_to: localhost
   k8s:
