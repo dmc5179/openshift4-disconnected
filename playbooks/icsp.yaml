@@ -9,10 +9,9 @@
     - name: Apply any Image Content Source Policies
       include_role:
         name: '{{ item }}'
+        tasks_from: icsp
       with_items:
         - nvidia_gpu_operator
         - compliance-operator
         - install_nfs
         - vsphere_csi_driver
-      tags:
-        - icsp
