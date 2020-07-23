@@ -1,12 +1,11 @@
-DEFAULT menu.c32   
-PROMPT 0
-TIMEOUT 10
-ONTIMEOUT 1
-
-MENU title ######## PXE Boot Menu for Master Nodes ########  
-LABEL 1
-MENU DEFAULT
-MENU LABEL ^1) Install Master Node
-KERNEL rhcos/kernel
-APPEND initrd=rhcos/initramfs.img nomodeset rd.neednet=1 coreos.inst=yes coreos.inst.install_dev={{ disk | default('sda') }} coreos.inst.image_url={{ image_url }}/install/bios.raw.gz coreos.inst.ignition_url={{ ignition_url }}/ignition/master.ign
+default menu.c32   
+ prompt 1
+ timeout 9
+ ONTIMEOUT 1
+ menu title ######## PXE Boot Menu for Master Nodes ########  
+ label 1
+ menu label ^1) Install Master Node
+ menu default
+ kernel rhcos/kernel
+ append initrd=rhcos/initramfs.img nomodeset rd.neednet=1 coreos.inst=yes coreos.inst.install_dev={{ disk | default('sda') }} coreos.inst.image_url={{ image_url }}/install/bios.raw.gz coreos.inst.ignition_url={{ ignition_url }}/ignition/master.ign
 
