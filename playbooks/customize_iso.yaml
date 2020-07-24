@@ -7,21 +7,3 @@
     - name: Customize ISO
       include_role:
         name: custom_iso
-
-    - name: Copy RHCOS Customer ISOs to Datastore
-      vsphere_copy:
-#        hostname: '{{ vcenter_hostname }}'
-        hostname: '{{ esxi_hostname }}'
-        username: '{{ vcenter_username }}'
-        password: '{{ vcenter_password }}'
-#        port: '{{ vcenter_port }}'
-        src: '{{ mirror_base }}/rhcos/custom_iso/{{ item.name }}.iso'
-#        datacenter: '{{ datacenter_name }}'
-        datastore: 'USB-Datastore'
-        path: 'ISOs/{{ item.name }}.iso'
-        validate_certs: "{{ ssl_enabled }}"
-      delegate_to: localhost
-      with_items:
-        - '{{ openshift_hosts }}'
-      tags:
-        - upload
