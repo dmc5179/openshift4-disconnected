@@ -1,0 +1,91 @@
+---
+- hosts: helper_node
+  gather_facts: true
+  become: false
+  tasks:
+
+    - name: Customize ISO
+      include_role:
+        name: custom_iso
+      when: (network_mode is match("static"))
+      tags:
+        - iso
+
+    - name: Cleanup Custom ISO working area
+      become: true
+      file:
+        path: '/tmp/rhcos'
+        state: absent
+      when: (network_mode is match("static"))
+      tags:
+        - iso
+
+    - name: Remove old ignition configs
+      become: true
+      file:
+        path: '{{ httpd_document_root }}/ignition'
+        state: absent
+      tags:
+        - ignition
+
+    - name: Generate Ignition Files
+      import_role:
+        name: generate_ignition
+
+    - name: Modify Ignition Files
+      include_role:
+        name: modify_ignition
+      when: (network_mode is match("static"))
+
+    - name: Create Ignition staging location
+      become: true
+      file:
+        path: '{{ httpd_document_root }}/ignition'
+        state: directory
+        mode: '0755'
+        setype: 'httpd_sys_content_t'
+      tags:
+        - ignition
+
+    - name: Stage Ignition configs
+      become: true
+      copy:
+        src: "{{ item }}"
+        dest: "{{ httpd_document_root }}/ignition/"
+        mode: '0755'
+        setype: 'httpd_sys_content_t'
+      with_fileglob:
+        - '{{ ignition_configs }}/*.ign'
+      tags:
+        - ignition
+
+    - name: Copy append-bootstrap ignition
+      become: true
+      copy:
+        src: "files/append-bootstrap.ign"
+        dest: "{{ httpd_document_root }}/ignition/append-bootstrap.ign"
+        mode: '0755'
+        setype: 'httpd_sys_content_t'
+      tags:
+        - ignition
+
+    - name: Power off Dell Servers
+      include_role:
+        name: dell
+        tasks_from: poweroff
+
+    - name: Set boot order in BIOS
+      include_role:
+        name: dell
+        tasks_from: configure_bios
+
+    - name: Configure ISO boot
+      include_role:
+        name: dell
+        tasks_from: iso_boot
+
+#    - name: Power on Dell Servers
+#      include_role:
+#        name: dell
+#        tasks_from: poweron
+
