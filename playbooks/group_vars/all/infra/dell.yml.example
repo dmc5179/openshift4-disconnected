@@ -1,0 +1,27 @@
+---
+
+# Variables for Dell Server Environment
+# Default username and password from Dell
+# Change for your environment
+idrac_user: 'root'
+idrac_password: 'calvin'
+
+openshift_bootstrap_dell:
+  - name: 'bootstrap'
+    idrac_ip: ''
+
+openshift_masters_dell:
+  - name: 'master0'
+    idrac_ip: ''
+  - name: 'master1'
+    idrac_ip: ''
+  - name: 'master2'
+    idrac_ip: ''
+
+openshift_workers_dell:
+  - name: 'worker1'
+    idrac_ip: ''
+  - name: 'worker1'
+    idrac_ip: ''
+  - name: 'worker2'
+    idrac_ip: ''
