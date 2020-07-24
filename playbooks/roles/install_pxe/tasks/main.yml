@@ -69,7 +69,7 @@
     group: root
     state: link
   with_items:
-    - '{{ openshift_boostrap }}'
+    - '{{ openshift_bootstrap }}'
     - '{{ openshift_masters }}'
     - '{{ openshift_workers }}'
 
