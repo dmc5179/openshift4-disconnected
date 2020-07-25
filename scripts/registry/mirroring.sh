@@ -1,16 +1,7 @@
 #!/bin/bash
 
-export OCP_RELEASE="4.3.21-x86_64"
-export LOCAL_REG='localhost:5000'
-export LOCAL_REPO='ocp4/openshift4'
-export LOCAL_REG_INSEC='true'
-export UPSTREAM_REPO='openshift-release-dev'
-
-# This needs to be a pull secret that combines the pull secret from Red Hat
-# to pull all the images down and a pull secret from your local registry so we
-# can push to it
-export LOCAL_SECRET_JSON="${HOME}/pull-secret.json"
-export RELEASE_NAME="ocp-release"
+# Source the environment file with the default settings
+. ./env.sh
 
 /usr/local/bin/oc adm release mirror -a ${LOCAL_SECRET_JSON} \
 --insecure=${LOCAL_REG_INSEC} \
