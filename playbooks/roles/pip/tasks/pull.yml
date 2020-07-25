@@ -6,6 +6,6 @@
 
 - name: Download pip modules
   shell:
-    cmd: {{ pip_cmd }} download -d '{{ mirror_base }}/pip' "{{ item.name }}=={{ item.version }}"
+    cmd: "{{ pip_cmd }} download -d '{{ mirror_base }}/pip' '{{ item.name }}=={{ item.version }}'"
   with_items:
     - '{{ pip_modules }}'
