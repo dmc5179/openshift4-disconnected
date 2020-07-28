@@ -1,12 +1,6 @@
 ---
 # tasks file for vsphere_csi_driver
 
-- name: Apply ICSP Mapping
-  include_tasks: icsp.yml
-  tags:
-    - never
-    - icsp
-
 - name: Create vsphere namespace for CSI Drivers
   delegate_to: localhost
   k8s:
@@ -114,6 +108,8 @@
   file:
     path: /tmp/csi-vsphere.conf
     state: absent
+  tags:
+    - csi_vsphere_conf
 
 # TODO: Not actually sure how to get the cluster ID
 #       I had to get it with the VMWare PowerCLI module and commands on windows....
@@ -122,9 +118,10 @@
     path: /tmp/csi-vsphere.conf
     section: Global
     option: cluster-id
-#    value: "\"ClusterComputeResource-domain-c293\""
-    value: '42Pandas'
+    value: "\"{{ vcenter_cluster_name }}\""
     mode: '0600'
+  tags:
+    - csi_vsphere_conf
 
 - name: Set port in Global section of csi-vsphere.conf
   ini_file:
@@ -133,6 +130,8 @@
     option: port
     value: "\"{{ vcenter_port }}\""
     mode: '0600'
+  tags:
+    - csi_vsphere_conf
 
 #- name: Set secret-name in Global section of csi-vsphere.conf
 #  ini_file:
@@ -157,6 +156,8 @@
     option: insecure-flag
     value: "\"true\""
     mode: '0600'
+  tags:
+    - csi_vsphere_conf
 
 - name: Set server in Workspace section of csi-vsphere.conf
   ini_file:
@@ -165,22 +166,28 @@
     option: server
     value: "{{ vcenter_hostname }}"
     mode: '0600'
+  tags:
+    - csi_vsphere_conf
 
 - name: Set datacenter in Workspace section of csi-vsphere.conf
   ini_file:
     path: /tmp/csi-vsphere.conf
     section: Workspace
     option: datacenter
-    value: "{{ datacenter_name }}"
+    value: "\"{{ datacenter_name }}\""
     mode: '0600'
+  tags:
+    - csi_vsphere_conf
 
 - name: Set default-datastore in Workspace section of csi-vsphere.conf
   ini_file:
     path: /tmp/csi-vsphere.conf
     section: Workspace
     option: 'default-datastore'
-    value: "{{ datastore_name }}"
+    value: "\"{{ datastore_name }}\""
     mode: '0600'
+  tags:
+    - csi_vsphere_conf
 
 - name: Set folder in Workspace section of csi-vsphere.conf
   ini_file:
@@ -189,6 +196,8 @@
     option: folder
     value: "caas"
     mode: '0600'
+  tags:
+    - csi_vsphere_conf
 
 - name: Set insecure-flag in VirtualCenter section of csi-vsphere.conf
   ini_file:
@@ -197,6 +206,8 @@
     option: insecure-flag
     value: "\"true\""
     mode: '0600'
+  tags:
+    - csi_vsphere_conf
 
 # TODO: Try to use the existing cloud provider credentials instead
 - name: Set user in VirtualCenter section of csi-vsphere.conf
@@ -206,6 +217,8 @@
     option: user
     value: "\"{{ vcenter_username }}\""
     mode: '0600'
+  tags:
+    - csi_vsphere_conf
 
 # TODO: Try to use the existing cloud provider credentials instead
 - name: Set password in VirtualCenter section of csi-vsphere.conf
@@ -215,6 +228,8 @@
     option: password
     value: "\"{{ vcenter_password }}\""
     mode: '0600'
+  tags:
+    - csi_vsphere_conf
 
 - name: Set port in VirtualCenter section of csi-vsphere.conf
   ini_file:
@@ -223,6 +238,8 @@
     option: port
     value: "\"{{ vcenter_port }}\""
     mode: '0600'
+  tags:
+    - csi_vsphere_conf
 
 - name: Set datacenters in VirtualCenter section of csi-vsphere.conf
   ini_file:
@@ -231,6 +248,8 @@
     option: datacenters
     value: "\"{{ datacenter_name }}\""
     mode: '0600'
+  tags:
+    - csi_vsphere_conf
 
 #- name: Slurp the csi-vsphere.conf
 #  slurp:

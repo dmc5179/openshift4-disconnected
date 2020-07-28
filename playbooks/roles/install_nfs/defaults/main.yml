@@ -18,9 +18,6 @@ ocp_cluster_name: 'caas'
 
 nfs_namespace: 'nfs-provisioner'
 
-ssl_enabled: false
-
-nfs_server: '10.0.106.42'
-nfs_path: '/export'
+kube_ssl_enabled: false
 
 nfs_sc_default: false

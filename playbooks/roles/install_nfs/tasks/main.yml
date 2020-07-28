@@ -38,17 +38,19 @@
   notify: reload nfs
 
 - name: Create NFS export directory
+  become: true
   file:
     path: /export
     state: directory
     mode: 0777
-    owner: "{{ owner }}"
-    group: "{{ group }}"
+    owner: root
+    group: root
 
 - name: Populate service facts
   service_facts:
 
 - name: Configure firewall for NFS Server
+  become: true
   firewalld:
     permanent: true
     immediate: true
@@ -70,12 +72,6 @@
     state: restarted
     enabled: true
   when: nfs_exports|length
-
-- name: Include NFS Provisioner ICSP tasks
-  include_tasks: icsp.yml
-  tags:
-    - never
-    - icsp
 
 - name: Include NFS Provisioner Tasks
   import_tasks: provisioner.yml

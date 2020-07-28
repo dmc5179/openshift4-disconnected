@@ -11,3 +11,5 @@ govc_download_url: "https://github.com/vmware/govmomi/releases/download/v{{ govc
 
 vm_hw_ver: 15
 vmhost: ''
+
+vmware_ssl_enabled: false
