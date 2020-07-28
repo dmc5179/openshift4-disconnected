@@ -1,7 +1,11 @@
-#!/bin/bash
+#!/bin/bash -e
 
-REGISTRY_DIR="/home/danclark/registry/"
-REGISTRY_HOSTNAME="localhost"
+# Source the environment file with the default settings
+#. ./env.sh
+
+REGISTRY_DIR="${HOME}/registry/"
+REGISTRY_HOSTNAME="${HOSTNAME}"
+REGISTRY_IP="$(hostname -i)"
 REGISTRY_PORT=5000
 REGISTRY_IMG="docker.io/library/registry:2"
 
@@ -9,7 +13,14 @@ sudo yum -y install podman httpd httpd-tools firewalld skopeo
 
 mkdir -p ${REGISTRY_DIR}/{auth,certs,data}
 
-openssl req -newkey rsa:4096 -nodes -sha256 -keyout ${REGISTRY_DIR}/certs/domain.key -x509 -days 365 -out ${REGISTRY_DIR}/certs/domain.crt
+# Generate the certificate
+openssl req -newkey rsa:4096 -nodes -keyout "${REGISTRY_DIR}/certs/domain.key" \
+  -x509 -days 365 -out "${REGISTRY_DIR}/certs/domain.crt" \
+  -addext "subjectAltName = IP:${REGISTRY_IP},DNS:${HOSTNAME}" \
+  -subj "/C=US/ST=VA/L=Chantilly/O=RedHat/OU=RedHat/CN=${HOSTNAME}/"
+
+# Print the certificate
+openssl x509 -in "${REGISTRY_DIR}/certs/domain.crt" -text -noout
 
 htpasswd -bBc ${REGISTRY_DIR}/auth/htpasswd dummy dummy
 
@@ -47,7 +58,7 @@ ${REGISTRY_IMG}
 # Configure SELinux to allow containers in systemd services
 sudo setsebool -P container_manage_cgroup on
 
-cat <<EOF >> /etc/systemd/system/registry-container.service
+sudo bash -c 'cat <<EOF >> /etc/systemd/system/registry-container.service
 
 [Unit]
 Description=Container Registry
@@ -60,10 +71,14 @@ ExecStop=/usr/bin/podman stop -t 15 registry_server
 [Install]
 WantedBy=local.target
 
-EOF
+EOF'
 
 sudo systemctl daemon-reload
 sudo systemctl enable registry-container.service
 
 # Test the connection
+echo "Testing connection by hostname:"
 curl -u dummy:dummy https://${REGISTRY_HOSTNAME}:${REGISTRY_PORT}/v2/_catalog
+
+echo 'Testing connection by IP Address'
+curl -u dummy:dummy https://${REGISTRY_IP}:${REGISTRY_PORT}/v2/_catalog

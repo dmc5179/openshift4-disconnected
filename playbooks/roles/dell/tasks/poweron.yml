@@ -1,0 +1,13 @@
+---
+
+- name: Dell | Configure Server Power Setting - On
+  delegate_to: localhost
+  ignore_errors: true
+  dellemc_change_power_state:
+    idrac_ip:   "{{ item.idrac_ip }}"
+    idrac_user: "{{ idrac_user }}"
+    idrac_password:  "{{ idrac_password }}"
+    reset_type: "On"
+  with_items:
+    - '{{ openshift_masters_dell }}'
+    - '{{ openshift_workers_dell }}'

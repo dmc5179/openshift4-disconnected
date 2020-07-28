@@ -9,7 +9,7 @@ arch: 'amd64'
 
 helm_version: '3.2.1'
 
-mirror_base: '/tmp'
+mirror_base: '/opt/openshift'
 
 air_gapped: true
 

@@ -2,7 +2,7 @@
 # defaults file for mirror_roles
 air_gapped: true
 
-mirror_base: '/tmp'
+mirror_base: '/opt/openshift'
 roles_staging_dir: '{{ mirror_base }}/ansible_roles'
 collections_staging_dir: '{{ mirror_base }}/ansible_collections'
 

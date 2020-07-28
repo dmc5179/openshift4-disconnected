@@ -1,6 +1,6 @@
 ---
 # defaults file for nvidia_gpu_operator
 
-mirror_base: '/tmp'
+mirror_base: '/opt/openshift'
 
 archive: '{{ mirror_base }}/gpu-operator/gpu-operator-1.0.0.tgz'

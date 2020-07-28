@@ -1,0 +1,28 @@
+apiVersion: v1
+baseDomain: example.com
+compute:
+- hyperthreading: Enabled   
+  name: worker
+  replicas: 0 
+controlPlane:
+  hyperthreading: Enabled   
+  name: master
+  replicas: 3 
+metadata:
+  name: caas
+platform:
+  vsphere:
+    vcenter: 'vcenter.example.com'
+    username: 'user@vsphere.local'
+    password: 'password'
+    cluster: 'Cluster Name'
+    datacenter: 'Datacenter Name'
+    defaultDatastore: 'Default Datastore'
+    apiVIP: 192.168.1.47
+    ingressVIP: 192.168.1.48
+    network: 'VM Network'
+fips: false 
+pullSecret: '{"auths"}'
+sshKey: 'ssh-ed25519 ...'
+additionalTrustBundle: |
+< Insert vCenter Certificate Here>

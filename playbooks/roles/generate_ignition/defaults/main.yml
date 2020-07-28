@@ -24,7 +24,8 @@ num_masters: 3
 
 air_gapped: true
 
-mirror_registry: 'localhost:5000'
+mirror_registry: 'localhost'
+mirror_registry_port: 5000
 mirror_transport: 'https'
 
 fips_enabled: false

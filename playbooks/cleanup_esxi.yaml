@@ -43,14 +43,12 @@
         username: '{{ vcenter_username }}'
         password: '{{ vcenter_password }}'
         datacenter: '{{ datacenter_name }}'
-        datastore: 'USB-Datastore'
+        datastore: '{{ datastore_name }}'
         state: absent
-        path: 'ISOs/{{ item.name }}.iso'
+        path: '{{ datastore_path }}/{{ item.name }}.iso'
         validate_certs: "{{ vmware_ssl_enabled }}"
       delegate_to: localhost
       with_items:
         - '{{ openshift_bootstrap }}'
         - '{{ openshift_masters }}'
         - '{{ openshift_workers }}'
-      loop_control:
-        pause: 2
