@@ -19,8 +19,8 @@
 
         if test -e "{{ mirror_base }}/additional_images/{{ ( item.repo | replace('.','_') ) }}-{{ ( item.image | replace(':','_') | replace('/','-') ) }}-{{ ( item.tag | replace(':','_') | replace('/','-') ) }}.tar"
         then
-          skopeo copy --authfile "{{ pull_secret }}" \
-           "docker-archive://{{ mirror_base }}/additional_images/{{ ( item.repo | replace('.','_') ) }}-{{ ( item.image | replace(':','_') | replace('/','-') ) }}-{{ ( item.tag | replace(':','_') | replace('/','-') ) }}.tar" "docker://{{mirror_registry}}/{{item.image}}:{{item.tag}}"
+          skopeo copy --authfile "{{ pull_secret }}" "--dest-tls-verify={{ dest_tls_verify }}" \
+           "docker-archive://{{ mirror_base }}/additional_images/{{ ( item.repo | replace('.','_') ) }}-{{ ( item.image | replace(':','_') | replace('/','-') ) }}-{{ ( item.tag | replace(':','_') | replace('/','-') ) }}.tar" "docker://{{mirror_registry}}:{{mirror_registry_port}}/{{item.image}}:{{item.tag}}"
 
         fi
 
