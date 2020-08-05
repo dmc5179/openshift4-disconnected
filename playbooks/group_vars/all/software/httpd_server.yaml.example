@@ -18,9 +18,9 @@ httpd_listen: 80
 httpd_listen_ssl: 443
 
 # Relative to /etc/pki/tls/certs/
-httpd_ssl_certificate_file: 'local.crt'
+httpd_ssl_certificate_file: 'registry.crt'
 
 # Relative to /etc/pki/tls/private/
-httpd_ssl_certificate_key_file: 'local.key'
+httpd_ssl_certificate_key_file: 'registry.key'
 
 httpd_document_root: '/var/www/html'
