@@ -10,6 +10,16 @@
       - xorriso
     state: present
 
+- name: Create the iso dir and dst
+  become: true
+  file:
+    path: '{{ item }}'
+    mode: 0777
+    state: directory
+  with_items:
+    - '{{ iso_dir }}'
+    - '{{ iso_dst }}'
+
 - name: Create directory for ISO extraction
   become: true
   file:
