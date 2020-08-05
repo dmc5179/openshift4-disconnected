@@ -11,7 +11,26 @@ mirror_iso: false
 mirror_raw: false
 mirror_ova: false
 
-air_gapped: true
 
-mirror_registry: 'localhost:5000'
-mirror_transport: 'https'
+maj_ver: '4.3'
+ocp_ver: '4.3.8'
+rhcos_ver: '4.3.8'
+arch: 'x86_64'
+ssh_gen_key: true
+install_filetranspiler: false
+staticips: false
+force_ocp_download: false
+
+base_url: "https://mirror.openshift.com/pub/openshift-v4"
+ocp_bios: "{{base_url}}/dependencies/rhcos/{{maj_ver}}/{{rhcos_ver}}/rhcos-{{rhcos_ver}}-{{ arch }}-metal.{{ arch }}.raw.gz"
+ocp_initramfs: "{{base_url}}/dependencies/rhcos/{{maj_ver}}/{{rhcos_ver}}/rhcos-{{rhcos_ver}}-{{ arch }}-installer-initramfs.{{ arch }}.img"
+ocp_install_kernel: "{{base_url}}/dependencies/rhcos/{{maj_ver}}/{{rhcos_ver}}/rhcos-{{rhcos_ver}}-{{ arch }}-installer-kernel-{{ arch }}"
+ocp_client: "{{base_url}}/clients/ocp/{{ocp_ver}}/openshift-client-linux-{{ocp_ver}}.tar.gz"
+ocp_installer: "{{base_url}}/clients/ocp/{{ocp_ver}}/openshift-install-linux-{{ocp_ver}}.tar.gz"
+ocp_vmdk: "{{base_url}}/dependencies/rhcos/{{ maj_ver }}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-aws.{{ arch }}.vmdk.gz"
+ocp_azure: "{{base_url}}/dependencies/rhcos/{{ maj_ver }}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-azure.{{ arch }}.vhd.gz"
+ocp_gcp: "{{base_url}}/dependencies/rhcos/{{ maj_ver }}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-gcp.{{ arch }}.tar.gz"
+ocp_iso: "{{base_url}}/dependencies/rhcos/{{ maj_ver }}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-installer.{{ arch }}.iso"
+ocp_raw: "{{base_url}}/dependencies/rhcos/{{ maj_ver }}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz"
+ocp_ova: "{{base_url}}/dependencies/rhcos/{{ maj_ver }}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-vmware.{{ arch }}.ova"
+chars: (\\_|\\$|\\\|\\/|\\=|\\)|\\(|\\&|\\^|\\%|\\$|\\#|\\@|\\!|\\*)
