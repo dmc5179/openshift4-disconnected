@@ -1,0 +1,33 @@
+---
+
+- name: Get CAP STS API Tokens
+  shell:
+    warn: false
+    cmd: |
+      curl -X GET --cert '{{ cap_credentials_dir }}/{{ cap_username }}.cert.pem:{{ cap_password }}' \
+           --key '{{ cap_credentials_dir }}/{{ cap_username }}.key.pem' \
+           '{{ cap_url }}'
+  register: cap_token
+
+- name: Set facts from register
+  set_fact:
+    aws_access_key_id: "{{ cap_token.stdout | from_json | json_query('Credentials.AccessKeyId') }}"
+    aws_secret_access_key: "{{ cap_token.stdout | from_json | json_query('Credentials.SecretAccessKey') }}"
+    aws_session_token: "{{ cap_token.stdout | from_json | json_query('Credentials.SessionToken') }}"
+    aws_session_expiration: "{{ cap_token.stdout | from_json | json_query('Credentials.Expiration') }}"
+
+- name: Print access key id
+  debug:
+    var: aws_access_key_id
+    
+- name: Print secret access key
+  debug:
+    var: aws_secret_access_key
+
+- name: Print session token
+  debug:
+    var: aws_session_token
+
+- name: Print session expiration
+  debug:
+    var: aws_session_expiration
