@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -xe
 
 # Source the environment file with the default settings
 . ./env.sh
