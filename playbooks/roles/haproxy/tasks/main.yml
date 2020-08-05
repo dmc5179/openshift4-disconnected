@@ -8,34 +8,22 @@
 - name: Configure SELinux TCP ports for HAProxy
   become: true
   seport:
-    port: '{{ item }}'
+    ports: 80,443,22623,6443,9000
     proto: tcp
     setype: http_port_t
     state: present
   notify:
     - restart haproxy
-  with_items:
-    - 80
-    - 443
-    - 22623
-    - 6443
-    - 9000
 
 - name: Configure SELinux UDP ports for HAProxy
   become: true
   seport:
-    port: '{{ item }}'
+    ports: 80,443,22623,6443,9000
     proto: udp
     setype: http_port_t
     state: present
   notify:
     - restart haproxy
-  with_items:
-    - 80
-    - 443
-    - 22623
-    - 6443
-    - 9000
 
 - name: Copy HAProxy configuration in place.
   become: true
