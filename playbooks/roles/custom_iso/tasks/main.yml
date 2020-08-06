@@ -20,6 +20,16 @@
     - '{{ iso_dir }}'
     - '{{ iso_dst }}'
 
+- name: Remove any existing ISO extraction dirs
+  become: true
+  file:
+    path: '{{ iso_dir }}/{{ item.name }}'
+    state: absent
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
+
 - name: Create directory for ISO extraction
   become: true
   file:
