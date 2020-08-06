@@ -37,7 +37,7 @@ ssh_public_key_file: '{{ ansible_env.HOME }}/.ssh/id_rsa.pub'
 
 # Certificate bundle that will be added to the install-config.yaml
 # This generally includes a certificate for the disconnected docker registry
-certificate_bundle: '/etc/pki/ca-trust/source/anchors/registry.cert'
+certificate_bundle: '/etc/pki/ca-trust/source/anchors/registry.crt'
 
 ###############################################
 
