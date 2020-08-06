@@ -37,8 +37,10 @@ pullSecret: '{{ slurped_pull_secret_b64.content | b64decode }}'
 sshKey: '{{ slurped_key_b64.content | b64decode }}'
 additionalTrustBundle: |
 {{ slurped_registry_ca_bundle_b64.content | b64decode }}
-{% if slurped_vcenter_ca_bindle_b64 is defined %}
-{{ slurped_vcenter_ca_bindle_b64.content | b64decode }}
+{% if slurped_vcenter_ca_bundle_b64 is defined %}
+{% for cert in slurped_vcenter_ca_bundle_b64.results %}
+{{ cert.content | b64decode }}
+{% endfor %}
 {%   endif %}
 imageContentSources:
 - mirrors:

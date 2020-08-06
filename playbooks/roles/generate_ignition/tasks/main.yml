@@ -103,8 +103,11 @@
 
 - name: Slurp vCenter Root Certificates
   slurp:
-    src: "{{ lookup('fileglob', '/tmp/vcenter/certs/lin/*.0') }}"
-  register: slurped_vcenter_ca_bindle_b64
+    #src: "{{ lookup('fileglob', '/tmp/vcenter/certs/lin/*.0') }}"
+    src: '{{ item }}'
+  with_fileglob:
+    - '/tmp/vcenter/certs/lin/*.0'
+  register: slurped_vcenter_ca_bundle_b64
   when:
     - (platform is match("vmware"))
   tags:
@@ -123,6 +126,14 @@
 - name: Ensure proper spacing of additionalTrustBundle
   shell:
     cmd: awk -i inplace 'BEGIN{c=0}  /BEGIN CERTIFICATE/{c=1}  {if (c==1) print " ",$0}  {if (c==0) print $0}  /END CERTIFICATE/{c=0}' "{{ ignition_configs }}/install-config.yaml"
+  tags:
+    - manifests
+    - install-config
+
+- name: Save install-config.yaml
+  copy:
+    src: "{{ ignition_configs }}/install-config.yaml"
+    dest: '{{ mirror_base }}/install-config.yaml'
   tags:
     - manifests
     - install-config
