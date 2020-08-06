@@ -195,8 +195,7 @@
     regexp: 'insecure-flag = "1"'
     line: '    insecure-flag = "true"'
   when:
-    - (platform is match("vmware")) and
-    - (not vmware_ssl_enabled | bool)
+    - ((platform is match("vmware")) and (not vmware_ssl_enabled | bool))
   tags:
     - manifests
 
