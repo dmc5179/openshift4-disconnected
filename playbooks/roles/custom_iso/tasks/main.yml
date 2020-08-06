@@ -112,7 +112,7 @@
   replace:
     path: '{{ iso_dir }}/{{ item.name }}/isolinux/isolinux.cfg'
     regexp: 'coreos.inst=yes'
-    replace: 'coreos.inst=yes ip={{ item.ip }}::{{ item.gateway }}:{{ item.netmask }}:{{ item.hostname }}:ens192:none nameserver={{ item.nameserver }} coreos.inst.install_dev={{ disk }} coreos.inst.image_url={{ item.ignserver }}/{{ item.bios_path }} coreos.inst.ignition_url={{ item.ignserver }}/{{ item.ign_path }}'
+    replace: 'coreos.inst=yes ip={{ item.ip }}::{{ item.gateway }}:{{ item.netmask }}:{{ item.hostname }}:{{ item.device }}:none nameserver={{ item.nameserver }} coreos.inst.install_dev={{ disk }} coreos.inst.image_url={{ item.ignserver }}/{{ item.bios_path }} coreos.inst.ignition_url={{ item.ignserver }}/{{ item.ign_path }}'
   with_items:
     - '{{ openshift_bootstrap }}'
     - '{{ openshift_masters }}'
@@ -123,7 +123,7 @@
   replace:
     path: '{{ iso_dir }}/{{ item.name }}/EFI/redhat/grub.cfg'
     regexp: 'coreos.inst=yes'
-    replace: 'coreos.inst=yes ip={{ item.ip }}::{{ item.gateway }}:{{ item.netmask }}:{{ item.hostname }}:ens192:none nameserver={{ item.nameserver }} coreos.inst.install_dev={{ disk }} coreos.inst.image_url={{ item.ignserver }}/{{ item.bios_path }} coreos.inst.ignition_url={{ item.ignserver }}/{{ item.ign_path }}'
+    replace: 'coreos.inst=yes ip={{ item.ip }}::{{ item.gateway }}:{{ item.netmask }}:{{ item.hostname }}:{{ item.device }}:none nameserver={{ item.nameserver }} coreos.inst.install_dev={{ disk }} coreos.inst.image_url={{ item.ignserver }}/{{ item.bios_path }} coreos.inst.ignition_url={{ item.ignserver }}/{{ item.ign_path }}'
   with_items:
     - '{{ openshift_bootstrap }}'
     - '{{ openshift_masters }}'
