@@ -133,7 +133,7 @@
 - name: Save install-config.yaml
   copy:
     src: "{{ ignition_configs }}/install-config.yaml"
-    dest: '{{ mirror_base }}/install-config.yaml'
+    dest: '{{ mirror_base }}/{{ ocp_cluster_name }}/install-config.yaml'
   tags:
     - manifests
     - install-config
@@ -165,6 +165,7 @@
     path: "{{ ignition_configs }}/manifests/cvo-overrides.yaml"
     regexp: 'upstream:.*'
     replace: 'upstream: http://localhost:8080/graph'
+  when: ( air_gapped | bool )
   tags:
     - manifests
 
@@ -194,7 +195,8 @@
     regexp: 'insecure-flag = "1"'
     line: '    insecure-flag = "true"'
   when:
-    - (platform is match("vmware"))
+    - (platform is match("vmware")) and
+    - (not vmware_ssl_enabled | bool)
   tags:
     - manifests
 
