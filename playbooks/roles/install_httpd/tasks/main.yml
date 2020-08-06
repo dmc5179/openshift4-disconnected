@@ -120,6 +120,7 @@
   template:
     src: default_vhost.conf.j2
     dest: "{{ httpd_config_directory }}/default_vhost.conf"
+  when: ( httpd_redirect_to_ssl | bool )
   notify:
     - test httpd configuration validity
     - restart httpd
