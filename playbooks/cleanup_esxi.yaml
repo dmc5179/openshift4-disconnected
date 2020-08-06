@@ -39,7 +39,7 @@
 
     - name: Delete RHCOS custom ISOs from vsphere
       vsphere_file:
-        hostname: '{{ esxi_hostname }}'
+        hostname: '{{ vcenter_hostname }}'
         username: '{{ vcenter_username }}'
         password: '{{ vcenter_password }}'
         datacenter: '{{ datacenter_name }}'
