@@ -133,7 +133,7 @@
 - name: Save install-config.yaml
   copy:
     src: "{{ ignition_configs }}/install-config.yaml"
-    dest: '{{ mirror_base }}/{{ ocp_cluster_name }}/install-config.yaml'
+    dest: '{{ mirror_base }}/{{ ocp_cluster_name }}-install-config.yaml'
   tags:
     - manifests
     - install-config
