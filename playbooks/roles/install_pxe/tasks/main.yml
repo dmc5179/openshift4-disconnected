@@ -2,7 +2,6 @@
 # tasks file for install_pxe
 
 - name: Install tftp packages
-  become: true
   package:
     name: "{{ item }}"
     state: installed
@@ -15,27 +14,58 @@
   file:
     path: "{{ pxeserver_path }}"
     state: directory
-  tags: pxeserver
+  tags:
+    - pxeserver
 
 - name: Make Network Boot Programs for BIOS and UEFI based systems available
-  command: cp "{{ item }}" "{{ pxeserver_path }}/{{ item|regex_replace('.*/', '') }}"
-  args:
-    creates: "{{ pxeserver_path }}/{{ item|regex_replace('.*/', '') }}"
-  with_items: "{{ pxeserver_files }}"
-  tags: pxeserver
+  copy:
+    remote_src: true
+    src: '{{ item }}'
+    dest: '{{ pxeserver_path }}/'
+    owner: root
+    group: root
+    mode: '0644'
+  with_items:
+    - "{{ pxeserver_files }}"
+  tags:
+    - pxeserver
 
 - name: Create directory for PXE server configuration
   file:
     path: "{{ pxeserver_path }}/pxelinux.cfg"
     state: directory
-  tags: pxeserver
+  tags:
+    - pxeserver
 
-- name: Create directories for boot images
+- name: Create directory for boot images
   file:
-    path: "{{ pxeserver_path }}/{{ item.name }}"
+    path: "{{ pxeserver_path }}/rhcos"
     state: directory
-  with_items: "{{ pxeserver_images }}"
-  tags: pxeserver
+  tags:
+    - pxeserver
+
+  # TODO: Would prefer the destination name was unique
+- name: Copy initramfs.img
+  copy:
+    src: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer-initramfs.{{ arch }}.img'
+    dest: '{{ pxeserver_path }}/rhcos/initramfs.img'
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - pxeserver
+
+  # TODO: Would prefer the destination name was unique
+- name: Copy kernel
+  copy:
+    remote_src: true
+    src: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer-kernel-{{ arch }}'
+    dest: '{{ pxeserver_path }}/rhcos/kernel'
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - pxeserver
 
 - name: Set the default tftp file
   template:
