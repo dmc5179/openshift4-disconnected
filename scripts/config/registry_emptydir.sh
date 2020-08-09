@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -xe
 
 # Set OpenShift internal registry to use the empty dir for storage
 # Typically done in UPI installs when no default storage class is available
