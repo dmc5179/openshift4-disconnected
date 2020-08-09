@@ -1,0 +1,725 @@
+---
+apiVersion: v1
+baseDomain: example.com
+compute:
+- hyperthreading: Enabled
+  name: worker
+  replicas: 0
+controlPlane:
+  hyperthreading: Enabled
+  name: master
+  replicas: 3
+metadata:
+  name: caas
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  networkType: OpenShiftSDN
+  serviceNetwork:
+  - 172.30.0.0/16
+platform:
+  none: {}
+pullSecret: '{}'
+sshKey: ''
+additionalTrustBundle:
+imageContentSources:
+- mirrors:
+  - registry.example.com:5000/ocp4/openshift4
+  source: quay.io/openshift-release-dev/ocp-release
+- mirrors:
+  - registry.example.com:5000/ocp4/openshift4
+  source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+- mirrors:
+  - registry.example.com:5000/ocp4/support-tools
+  source: registry.redhat.io/rhel7/support-tools
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/kubevirt-cpu-model-nfd-plugin
+  source: registry.redhat.io/container-native-virtualization/kubevirt-cpu-model-nfd-plugin
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-template-service-broker
+  source: registry.redhat.io/openshift4/ose-template-service-broker
+- mirrors:
+  - registry.example.com:5000/fuse7-tech-preview/fuse-camel-k
+  source: registry.redhat.io/fuse7-tech-preview/fuse-camel-k
+- mirrors:
+  - registry.example.com:5000/rhcam-1-0/openshift-migration-velero-rhel8
+  source: registry.redhat.io/rhcam-1-0/openshift-migration-velero-rhel8
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-oauth-proxy
+  source: registry.redhat.io/openshift4/ose-oauth-proxy
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-cluster-logging-operator
+  source: registry.redhat.io/openshift4/ose-cluster-logging-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-node-feature-discovery
+  source: registry.redhat.io/openshift4/ose-node-feature-discovery
+- mirrors:
+  - registry.example.com:5000/openshift-service-mesh/istio-rhel8-operator
+  source: registry.redhat.io/openshift-service-mesh/istio-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/rhcam-1-0/openshift-migration-ui-rhel8
+  source: registry.redhat.io/rhcam-1-0/openshift-migration-ui-rhel8
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-logging-kibana5
+  source: registry.redhat.io/openshift4/ose-logging-kibana5
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/virt-api
+  source: registry.redhat.io/container-native-virtualization/virt-api
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/ovs-cni-plugin
+  source: registry.redhat.io/container-native-virtualization/ovs-cni-plugin
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-metering-hadoop
+  source: registry.redhat.io/openshift4/ose-metering-hadoop
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-cluster-logging-operator
+  source: registry.redhat.io/openshift4/ose-cluster-logging-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-logging-fluentd
+  source: registry.redhat.io/openshift4/ose-logging-fluentd
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-oauth-proxy
+  source: registry.redhat.io/openshift4/ose-oauth-proxy
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-promtail
+  source: registry.redhat.io/openshift4/ose-promtail
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-local-storage-operator
+  source: registry.redhat.io/openshift4/ose-local-storage-operator
+- mirrors:
+  - registry.example.com:5000/openshift-knative/knative-openshift-ingress
+  source: quay.io/openshift-knative/knative-openshift-ingress
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-logging-elasticsearch5
+  source: registry.redhat.io/openshift4/ose-logging-elasticsearch5
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/hyperconverged-cluster-operator
+  source: registry.redhat.io/container-native-virtualization/hyperconverged-cluster-operator
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/kubernetes-nmstate-handler-rhel8
+  source: registry.redhat.io/container-native-virtualization/kubernetes-nmstate-handler-rhel8
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/virt-cdi-controller
+  source: registry.redhat.io/container-native-virtualization/virt-cdi-controller
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-ansible-service-broker
+  source: registry.redhat.io/openshift4/ose-ansible-service-broker
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-metering-hive
+  source: registry.redhat.io/openshift4/ose-metering-hive
+- mirrors:
+  - registry.example.com:5000/openshift-knative/knative-serving-operator
+  source: quay.io/openshift-knative/knative-serving-operator
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/serving-controller-rhel8
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/serving-controller-rhel8
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-cluster-logging-operator
+  source: registry.redhat.io/openshift4/ose-cluster-logging-operator
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/virt-launcher
+  source: registry.redhat.io/container-native-virtualization/virt-launcher
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-local-storage-static-provisioner
+  source: registry.redhat.io/openshift4/ose-local-storage-static-provisioner
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-elasticsearch-operator
+  source: registry.redhat.io/openshift4/ose-elasticsearch-operator
+- mirrors:
+  - registry.example.com:5000/openshift-service-mesh/istio-rhel8-operator
+  source: registry.redhat.io/openshift-service-mesh/istio-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-sriov-cni
+  source: registry.redhat.io/openshift4/ose-sriov-cni
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-sriov-network-operator
+  source: registry.redhat.io/openshift4/ose-sriov-network-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-logging-elasticsearch5
+  source: registry.redhat.io/openshift4/ose-logging-elasticsearch5
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/ingress-rhel8-operator
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/ingress-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/openshift-service-mesh/istio-rhel8-operator
+  source: registry.redhat.io/openshift-service-mesh/istio-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/openshift-service-mesh/kiali-rhel7
+  source: registry.redhat.io/openshift-service-mesh/kiali-rhel7
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/cluster-network-addons-operator
+  source: registry.redhat.io/container-native-virtualization/cluster-network-addons-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-sriov-network-device-plugin
+  source: registry.redhat.io/openshift4/ose-sriov-network-device-plugin
+- mirrors:
+  - registry.example.com:5000/rhcam-1-1/openshift-migration-velero-rhel8
+  source: registry.redhat.io/rhcam-1-1/openshift-migration-velero-rhel8
+- mirrors:
+  - registry.example.com:5000/openshift-service-mesh/kiali-rhel7-operator
+  source: registry.redhat.io/openshift-service-mesh/kiali-rhel7-operator
+- mirrors:
+  - registry.example.com:5000/openshift-service-mesh/kiali-rhel7-operator
+  source: registry.redhat.io/openshift-service-mesh/kiali-rhel7-operator
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/cnv-must-gather-rhel8
+  source: registry.redhat.io/container-native-virtualization/cnv-must-gather-rhel8
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/knative-rhel8-operator
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/knative-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-sriov-network-config-daemon
+  source: registry.redhat.io/openshift4/ose-sriov-network-config-daemon
+- mirrors:
+  - registry.example.com:5000/rhcam-1-1/openshift-migration-velero-plugin-for-microsoft-azure-rhel8
+  source: registry.redhat.io/rhcam-1-1/openshift-migration-velero-plugin-for-microsoft-azure-rhel8
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-oauth-proxy
+  source: registry.redhat.io/openshift4/ose-oauth-proxy
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/virt-cdi-cloner
+  source: registry.redhat.io/container-native-virtualization/virt-cdi-cloner
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-sriov-network-device-plugin
+  source: registry.redhat.io/openshift4/ose-sriov-network-device-plugin
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-sriov-network-operator
+  source: registry.redhat.io/openshift4/ose-sriov-network-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-elasticsearch-operator
+  source: registry.redhat.io/openshift4/ose-elasticsearch-operator
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/kubevirt-cpu-node-labeller
+  source: registry.redhat.io/container-native-virtualization/kubevirt-cpu-node-labeller
+- mirrors:
+  - registry.example.com:5000/openshift-service-mesh/istio-rhel8-operator
+  source: registry.redhat.io/openshift-service-mesh/istio-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/virt-cdi-uploadproxy
+  source: registry.redhat.io/container-native-virtualization/virt-cdi-uploadproxy
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-ansible-service-broker
+  source: registry.redhat.io/openshift4/ose-ansible-service-broker
+- mirrors:
+  - registry.example.com:5000/openshift-service-mesh/istio-rhel8-operator
+  source: registry.redhat.io/openshift-service-mesh/istio-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/rhpam-7/rhpam74-operator
+  source: registry.redhat.io/rhpam-7/rhpam74-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-node-feature-discovery
+  source: registry.redhat.io/openshift4/ose-node-feature-discovery
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/serving-queue-rhel8
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/serving-queue-rhel8
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/cnv-containernetworking-plugins
+  source: registry.redhat.io/container-native-virtualization/cnv-containernetworking-plugins
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-sriov-cni
+  source: registry.redhat.io/openshift4/ose-sriov-cni
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-sriov-network-config-daemon
+  source: registry.redhat.io/openshift4/ose-sriov-network-config-daemon
+- mirrors:
+  - registry.example.com:5000/jboss-eap-7/eap73-rhel8-operator
+  source: registry.redhat.io/jboss-eap-7/eap73-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-elasticsearch-operator
+  source: registry.redhat.io/openshift4/ose-elasticsearch-operator
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/virt-operator
+  source: registry.redhat.io/container-native-virtualization/virt-operator
+- mirrors:
+  - registry.example.com:5000/amq7/amq-streams-operator
+  source: registry.redhat.io/amq7/amq-streams-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-logging-kibana5
+  source: registry.redhat.io/openshift4/ose-logging-kibana5
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/kubevirt-template-validator
+  source: registry.redhat.io/container-native-virtualization/kubevirt-template-validator
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/knative-serving-rhel8-operator
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/knative-serving-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/serving-activator-rhel8
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/serving-activator-rhel8
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-cluster-logging-operator
+  source: registry.redhat.io/openshift4/ose-cluster-logging-operator
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/hyperconverged-cluster-operator
+  source: registry.redhat.io/container-native-virtualization/hyperconverged-cluster-operator
+- mirrors:
+  - registry.example.com:5000/ocs4/ocs-rhel8-operator
+  source: registry.redhat.io/ocs4/ocs-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/kubevirt-vmware
+  source: registry.redhat.io/container-native-virtualization/kubevirt-vmware
+- mirrors:
+  - registry.example.com:5000/rhpam-7/rhpam-rhel8-operator
+  source: registry.redhat.io/rhpam-7/rhpam-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/openshift-service-mesh/kiali-rhel7-operator
+  source: registry.redhat.io/openshift-service-mesh/kiali-rhel7-operator
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/cluster-network-addons-operator
+  source: registry.redhat.io/container-native-virtualization/cluster-network-addons-operator
+- mirrors:
+  - registry.example.com:5000/openshift-service-mesh/istio-rhel8-operator
+  source: registry.redhat.io/openshift-service-mesh/istio-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-logging-fluentd
+  source: registry.redhat.io/openshift4/ose-logging-fluentd
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-cluster-nfd-operator
+  source: registry.redhat.io/openshift4/ose-cluster-nfd-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-ansible-service-broker-operator
+  source: registry.redhat.io/openshift4/ose-ansible-service-broker-operator
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/virt-cdi-uploadserver
+  source: registry.redhat.io/container-native-virtualization/virt-cdi-uploadserver
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/virt-cdi-operator
+  source: registry.redhat.io/container-native-virtualization/virt-cdi-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-template-service-broker
+  source: registry.redhat.io/openshift4/ose-template-service-broker
+- mirrors:
+  - registry.example.com:5000/3scale-amp2/3scale-rhel7-operator
+  source: registry.redhat.io/3scale-amp2/3scale-rhel7-operator
+- mirrors:
+  - registry.example.com:5000/rhcam-1-0/openshift-migration-plugin-rhel8
+  source: registry.redhat.io/rhcam-1-0/openshift-migration-plugin-rhel8
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-logging-fluentd
+  source: registry.redhat.io/openshift4/ose-logging-fluentd
+- mirrors:
+  - registry.example.com:5000/openshift-service-mesh/istio-rhel8-operator
+  source: registry.redhat.io/openshift-service-mesh/istio-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-sriov-dp-admission-controller
+  source: registry.redhat.io/openshift4/ose-sriov-dp-admission-controller
+- mirrors:
+  - registry.example.com:5000/openshift-service-mesh/kiali-rhel7-operator
+  source: registry.redhat.io/openshift-service-mesh/kiali-rhel7-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-local-storage-operator
+  source: registry.redhat.io/openshift4/ose-local-storage-operator
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/serving-rhel8-operator
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/serving-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/rhpam-7/rhpam74-operator
+  source: registry.redhat.io/rhpam-7/rhpam74-operator
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/ingress-rhel8-operator
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/ingress-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/serving-rhel8-operator
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/serving-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/serving-rhel8-operator
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/serving-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/serving-controller-rhel8
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/serving-controller-rhel8
+- mirrors:
+  - registry.example.com:5000/amq7/amq-interconnect-operator
+  source: registry.redhat.io/amq7/amq-interconnect-operator
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/ovs-cni-marker
+  source: registry.redhat.io/container-native-virtualization/ovs-cni-marker
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-template-service-broker-operator
+  source: registry.redhat.io/openshift4/ose-template-service-broker-operator
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/bridge-marker
+  source: registry.redhat.io/container-native-virtualization/bridge-marker
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-metering-presto
+  source: registry.redhat.io/openshift4/ose-metering-presto
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-ghostunnel
+  source: registry.redhat.io/openshift4/ose-ghostunnel
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/hostpath-provisioner-rhel8
+  source: registry.redhat.io/container-native-virtualization/hostpath-provisioner-rhel8
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-local-storage-diskmaker
+  source: registry.redhat.io/openshift4/ose-local-storage-diskmaker
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/kourier-control-rhel8
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/kourier-control-rhel8
+- mirrors:
+  - registry.example.com:5000/amq7/amq-online-1-controller-manager
+  source: registry.redhat.io/amq7/amq-online-1-controller-manager
+- mirrors:
+  - registry.example.com:5000/amq7/amq-streams-operator
+  source: registry.redhat.io/amq7/amq-streams-operator
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/node-maintenance-operator
+  source: registry.redhat.io/container-native-virtualization/node-maintenance-operator
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/kubevirt-v2v-conversion
+  source: registry.redhat.io/container-native-virtualization/kubevirt-v2v-conversion
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/knative-serving-rhel8-operator
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/knative-serving-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/amq7/amq-online-1-api-server
+  source: registry.redhat.io/amq7/amq-online-1-api-server
+- mirrors:
+  - registry.example.com:5000/rhcam-1-0/openshift-migration-velero-restic-restore-helper-rhel8
+  source: registry.redhat.io/rhcam-1-0/openshift-migration-velero-restic-restore-helper-rhel8
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/kubevirt-ssp-operator
+  source: registry.redhat.io/container-native-virtualization/kubevirt-ssp-operator
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/serving-autoscaler-hpa-rhel8
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/serving-autoscaler-hpa-rhel8
+- mirrors:
+  - registry.example.com:5000/amq7/amq-cert-manager
+  source: registry.redhat.io/amq7/amq-cert-manager
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/virt-operator
+  source: registry.redhat.io/container-native-virtualization/virt-operator
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/serving-activator-rhel8
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/serving-activator-rhel8
+- mirrors:
+  - registry.example.com:5000/openshift-service-mesh/istio-rhel8-operator
+  source: registry.redhat.io/openshift-service-mesh/istio-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/fuse7/fuse-online-operator
+  source: registry.redhat.io/fuse7/fuse-online-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-local-storage-diskmaker
+  source: registry.redhat.io/openshift4/ose-local-storage-diskmaker
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/serving-webhook-rhel8
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/serving-webhook-rhel8
+- mirrors:
+  - registry.example.com:5000/3scale-amp2/3scale-rhel7-operator
+  source: registry.redhat.io/3scale-amp2/3scale-rhel7-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-metering-ansible-operator
+  source: registry.redhat.io/openshift4/ose-metering-ansible-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-cluster-nfd-operator
+  source: registry.redhat.io/openshift4/ose-cluster-nfd-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-metering-hive
+  source: registry.redhat.io/openshift4/ose-metering-hive
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-ptp
+  source: registry.redhat.io/openshift4/ose-ptp
+- mirrors:
+  - registry.example.com:5000/ocs4/mcg-rhel8-operator
+  source: registry.redhat.io/ocs4/mcg-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/rhcam-1-1/openshift-migration-velero-plugin-for-aws-rhel8
+  source: registry.redhat.io/rhcam-1-1/openshift-migration-velero-plugin-for-aws-rhel8
+- mirrors:
+  - registry.example.com:5000/rhcam-1-1/openshift-migration-ui-rhel8
+  source: registry.redhat.io/rhcam-1-1/openshift-migration-ui-rhel8
+- mirrors:
+  - registry.example.com:5000/openshift-service-mesh/kiali-rhel7
+  source: registry.redhat.io/openshift-service-mesh/kiali-rhel7
+- mirrors:
+  - registry.example.com:5000/amq7/amq-online-1-controller-manager
+  source: registry.redhat.io/amq7/amq-online-1-controller-manager
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-local-storage-static-provisioner
+  source: registry.redhat.io/openshift4/ose-local-storage-static-provisioner
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-metering-presto
+  source: registry.redhat.io/openshift4/ose-metering-presto
+- mirrors:
+  - registry.example.com:5000/openshift-service-mesh/istio-rhel8-operator
+  source: registry.redhat.io/openshift-service-mesh/istio-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-sriov-dp-admission-controller
+  source: registry.redhat.io/openshift4/ose-sriov-dp-admission-controller
+- mirrors:
+  - registry.example.com:5000/rhpam-7/rhpam-rhel8-operator
+  source: registry.redhat.io/rhpam-7/rhpam-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/openshift-service-mesh/kiali-rhel7-operator
+  source: registry.redhat.io/openshift-service-mesh/kiali-rhel7-operator
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/kubevirt-kvm-info-nfd-plugin
+  source: registry.redhat.io/container-native-virtualization/kubevirt-kvm-info-nfd-plugin
+- mirrors:
+  - registry.example.com:5000/fuse7-tech-preview/fuse-camel-k
+  source: registry.redhat.io/fuse7-tech-preview/fuse-camel-k
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/kubevirt-ssp-operator
+  source: registry.redhat.io/container-native-virtualization/kubevirt-ssp-operator
+- mirrors:
+  - registry.example.com:5000/openshift-service-mesh/kiali-rhel7-operator
+  source: registry.redhat.io/openshift-service-mesh/kiali-rhel7-operator
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/ingress-rhel8-operator
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/ingress-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-logging-kibana5
+  source: registry.redhat.io/openshift4/ose-logging-kibana5
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-local-storage-static-provisioner
+  source: registry.redhat.io/openshift4/ose-local-storage-static-provisioner
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/ingress-rhel8-operator
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/ingress-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-logging-elasticsearch5
+  source: registry.redhat.io/openshift4/ose-logging-elasticsearch5
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-ansible-service-broker
+  source: registry.redhat.io/openshift4/ose-ansible-service-broker
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/virtio-win
+  source: registry.redhat.io/container-native-virtualization/virtio-win
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/serving-networking-istio-rhel8
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/serving-networking-istio-rhel8
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/serving-queue-rhel8
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/serving-queue-rhel8
+- mirrors:
+  - registry.example.com:5000/amq7/amq-online-1-api-server
+  source: registry.redhat.io/amq7/amq-online-1-api-server
+- mirrors:
+  - registry.example.com:5000/amq7/amq-streams-cluster-operator
+  source: registry.access.redhat.com/amq7/amq-streams-cluster-operator
+- mirrors:
+  - registry.example.com:5000/rhcam-1-1/openshift-migration-rhel7-operator
+  source: registry.redhat.io/rhcam-1-1/openshift-migration-rhel7-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-logging-curator5
+  source: registry.redhat.io/openshift4/ose-logging-curator5
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-oauth-proxy
+  source: registry.redhat.io/openshift4/ose-oauth-proxy
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/virt-cdi-importer
+  source: registry.redhat.io/container-native-virtualization/virt-cdi-importer
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-metering-reporting-operator
+  source: registry.redhat.io/openshift4/ose-metering-reporting-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-template-service-broker
+  source: registry.redhat.io/openshift4/ose-template-service-broker
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-ptp-operator
+  source: registry.redhat.io/openshift4/ose-ptp-operator
+- mirrors:
+  - registry.example.com:5000/rhcam-1-1/openshift-migration-controller-rhel8
+  source: registry.redhat.io/rhcam-1-1/openshift-migration-controller-rhel8
+- mirrors:
+  - registry.example.com:5000/rhcam-1-1/openshift-migration-velero-restic-restore-helper-rhel8
+  source: registry.redhat.io/rhcam-1-1/openshift-migration-velero-restic-restore-helper-rhel8
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-logging-fluentd
+  source: registry.redhat.io/openshift4/ose-logging-fluentd
+- mirrors:
+  - registry.example.com:5000/fuse7-tech-preview/fuse-apicurito-operator
+  source: registry.redhat.io/fuse7-tech-preview/fuse-apicurito-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-sriov-network-operator
+  source: registry.redhat.io/openshift4/ose-sriov-network-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-local-storage-diskmaker
+  source: registry.redhat.io/openshift4/ose-local-storage-diskmaker
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-ansible-service-broker-operator
+  source: registry.redhat.io/openshift4/ose-ansible-service-broker-operator
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/serving-autoscaler-rhel8
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/serving-autoscaler-rhel8
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-sriov-network-device-plugin
+  source: registry.redhat.io/openshift4/ose-sriov-network-device-plugin
+- mirrors:
+  - registry.example.com:5000/3scale-amp2/3scale-rhel7-operator
+  source: registry.redhat.io/3scale-amp2/3scale-rhel7-operator
+- mirrors:
+  - registry.example.com:5000/ocs4/rook-ceph-rhel8-operator
+  source: registry.redhat.io/ocs4/rook-ceph-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-sriov-network-config-daemon
+  source: registry.redhat.io/openshift4/ose-sriov-network-config-daemon
+- mirrors:
+  - registry.example.com:5000/distributed-tracing/jaeger-rhel7-operator
+  source: registry.redhat.io/distributed-tracing/jaeger-rhel7-operator
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/hostpath-provisioner-rhel8-operator
+  source: registry.redhat.io/container-native-virtualization/hostpath-provisioner-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/serving-autoscaler-rhel8
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/serving-autoscaler-rhel8
+- mirrors:
+  - registry.example.com:5000/amq7/amq-broker-rhel7-operator
+  source: registry.redhat.io/amq7/amq-broker-rhel7-operator
+- mirrors:
+  - registry.example.com:5000/rhcam-1-1/openshift-migration-plugin-rhel8
+  source: registry.redhat.io/rhcam-1-1/openshift-migration-plugin-rhel8
+- mirrors:
+  - registry.example.com:5000/fuse7-tech-preview/dv-rhel7-operator
+  source: registry.redhat.io/fuse7-tech-preview/dv-rhel7-operator
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/kubemacpool
+  source: registry.redhat.io/container-native-virtualization/kubemacpool
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/virt-cdi-apiserver
+  source: registry.redhat.io/container-native-virtualization/virt-cdi-apiserver
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-sriov-cni
+  source: registry.redhat.io/openshift4/ose-sriov-cni
+- mirrors:
+  - registry.example.com:5000/3scale-amp26/3scale-operator
+  source: registry.redhat.io/3scale-amp26/3scale-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-elasticsearch-operator
+  source: registry.redhat.io/openshift4/ose-elasticsearch-operator
+- mirrors:
+  - registry.example.com:5000/openshift-service-mesh/kiali-rhel7-operator
+  source: registry.redhat.io/openshift-service-mesh/kiali-rhel7-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-sriov-network-webhook
+  source: registry.redhat.io/openshift4/ose-sriov-network-webhook
+- mirrors:
+  - registry.example.com:5000/amq7/amq-online-1-address-space-controller
+  source: registry.redhat.io/amq7/amq-online-1-address-space-controller
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/virt-handler
+  source: registry.redhat.io/container-native-virtualization/virt-handler
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-local-storage-operator
+  source: registry.redhat.io/openshift4/ose-local-storage-operator
+- mirrors:
+  - registry.example.com:5000/amq7/amq-online-1-address-space-controller
+  source: registry.redhat.io/amq7/amq-online-1-address-space-controller
+- mirrors:
+  - registry.example.com:5000/rhcam-1-0/openshift-migration-rhel7-operator
+  source: registry.redhat.io/rhcam-1-0/openshift-migration-rhel7-operator
+- mirrors:
+  - registry.example.com:5000/codeready-workspaces/server-operator-rhel8
+  source: registry.redhat.io/codeready-workspaces/server-operator-rhel8
+- mirrors:
+  - registry.example.com:5000/amqstreams-1/amqstreams10-clusteroperator-openshift
+  source: registry.access.redhat.com/amqstreams-1/amqstreams10-clusteroperator-openshift
+- mirrors:
+  - registry.example.com:5000/rhcam-1-1/openshift-migration-velero-plugin-for-gcp-rhel8
+  source: registry.redhat.io/rhcam-1-1/openshift-migration-velero-plugin-for-gcp-rhel8
+- mirrors:
+  - registry.example.com:5000/jboss-datagrid-7-tech-preview/datagrid-operator
+  source: registry.redhat.io/jboss-datagrid-7-tech-preview/datagrid-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-template-service-broker
+  source: registry.redhat.io/openshift4/ose-template-service-broker
+- mirrors:
+  - registry.example.com:5000/rhcam-1-1/openshift-migration-registry-rhel8
+  source: registry.redhat.io/rhcam-1-1/openshift-migration-registry-rhel8
+- mirrors:
+  - registry.example.com:5000/codeready-workspaces/server-operator-rhel8
+  source: registry.redhat.io/codeready-workspaces/server-operator-rhel8
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/knative-rhel8-operator
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/knative-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/rhcam-1-0/openshift-migration-controller-rhel8
+  source: registry.redhat.io/rhcam-1-0/openshift-migration-controller-rhel8
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-logging-curator5
+  source: registry.redhat.io/openshift4/ose-logging-curator5
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-template-service-broker-operator
+  source: registry.redhat.io/openshift4/ose-template-service-broker-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-ansible-service-broker-operator
+  source: registry.redhat.io/openshift4/ose-ansible-service-broker-operator
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/knative-rhel8-operator
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/knative-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-logging-curator5
+  source: registry.redhat.io/openshift4/ose-logging-curator5
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/kubevirt-metrics-collector
+  source: registry.redhat.io/container-native-virtualization/kubevirt-metrics-collector
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-ghostunnel
+  source: registry.redhat.io/openshift4/ose-ghostunnel
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/serving-autoscaler-hpa-rhel8
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/serving-autoscaler-hpa-rhel8
+- mirrors:
+  - registry.example.com:5000/openshift-service-mesh/proxyv2-rhel8
+  source: registry.redhat.io/openshift-service-mesh/proxyv2-rhel8
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-sriov-dp-admission-controller
+  source: registry.redhat.io/openshift4/ose-sriov-dp-admission-controller
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-logging-elasticsearch5
+  source: registry.redhat.io/openshift4/ose-logging-elasticsearch5
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-logging-kibana5
+  source: registry.redhat.io/openshift4/ose-logging-kibana5
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/node-maintenance-operator
+  source: registry.redhat.io/container-native-virtualization/node-maintenance-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-ansible-service-broker-operator
+  source: registry.redhat.io/openshift4/ose-ansible-service-broker-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-metering-ansible-operator
+  source: registry.redhat.io/openshift4/ose-metering-ansible-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-metering-reporting-operator
+  source: registry.redhat.io/openshift4/ose-metering-reporting-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-metering-hadoop
+  source: registry.redhat.io/openshift4/ose-metering-hadoop
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/serving-webhook-rhel8
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/serving-webhook-rhel8
+- mirrors:
+  - registry.example.com:5000/rhcam-1-0/openshift-migration-rhel7-operator
+  source: registry.redhat.io/rhcam-1-0/openshift-migration-rhel7-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-logging-curator5
+  source: registry.redhat.io/openshift4/ose-logging-curator5
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-node-feature-discovery
+  source: registry.redhat.io/openshift4/ose-node-feature-discovery
+- mirrors:
+  - registry.example.com:5000/openshift-serverless-1-tech-preview/ingress-rhel8-operator
+  source: registry.redhat.io/openshift-serverless-1-tech-preview/ingress-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/rhpam-7/rhpam-rhel8-operator
+  source: registry.redhat.io/rhpam-7/rhpam-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/virt-cdi-operator
+  source: registry.redhat.io/container-native-virtualization/virt-cdi-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-template-service-broker-operator
+  source: registry.redhat.io/openshift4/ose-template-service-broker-operator
+- mirrors:
+  - registry.example.com:5000/container-native-virtualization/virt-controller
+  source: registry.redhat.io/container-native-virtualization/virt-controller
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-template-service-broker-operator
+  source: registry.redhat.io/openshift4/ose-template-service-broker-operator
+- mirrors:
+  - registry.example.com:5000/openshift-service-mesh/istio-rhel8-operator
+  source: registry.redhat.io/openshift-service-mesh/istio-rhel8-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-cluster-nfd-operator
+  source: registry.redhat.io/openshift4/ose-cluster-nfd-operator
+- mirrors:
+  - registry.example.com:5000/openshift4/ose-ansible-service-broker
+  source: registry.redhat.io/openshift4/ose-ansible-service-broker
