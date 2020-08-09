@@ -39,11 +39,13 @@ pullSecret: '{{ slurped_pull_secret_b64.content | b64decode }}'
 sshKey: '{{ slurped_key_b64.content | b64decode }}'
 additionalTrustBundle: |
 {{ slurped_registry_ca_bundle_b64.content | b64decode }}
+{% if platform == 'vmware' %}
 {% if slurped_vcenter_ca_bundle_b64 is defined %}
 {% for cert in slurped_vcenter_ca_bundle_b64.results %}
 {{ cert.content | b64decode }}
 {% endfor %}
-{%   endif %}
+{% endif %}
+{% endif %}
 imageContentSources:
 - mirrors:
   - {{ mirror_registry }}:{{ mirror_registry_port }}/ocp4/openshift4
