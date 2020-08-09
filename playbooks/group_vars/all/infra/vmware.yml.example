@@ -1,6 +1,5 @@
 ---
 
-platform: vmware
 vcenter_username: ''
 vcenter_password: ''
 vcenter_hostname: 'vcenter.example.com'
