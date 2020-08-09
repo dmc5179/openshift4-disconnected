@@ -1,7 +1,38 @@
 ---
+  
+# AWS supports jumbo frames. Some private AWS regions
+# will need a lower value here, around 8000
+mtu: 9000
+
 # 4.3 March 23, 2020 at 5:28:02 AM UTC-
-ec2_ami: 'ami-0347efb61e552e57b'
-ec2_region: 'us-east-1'
+#ec2_ami: 'ami-0347efb61e552e57b'
+
+# rhcos-45.82.202008010929-0
+ec2_ami: 'ami-08f17f5bd2210c9fa'
+
+aws_region: 'us-iso-east-1'
 ec2_endpoint: 'https://ec2.us-iso-east-1.c2s.ic.gov'
 s3_endpoint: 'https://s3.us-iso-east-1.c2s.ic.gov'
-aws_ssl: true
+route53_endpoint: 'https://route53.us-iso-east-1.c2s.ic.gov'
+elb_endpoint: 'https://elasticloadbalancing.us-iso-east-1.c2s.ic.gov'
+aws_ssl_enabled: false
+
+ec2_key_name: ''
+
+vpc_id: 'vpc-'
+subnet_id: 'subnet-'
+
+ec2_instance_type:
+  bootstrap: i3.large
+  master: m4.xlarge
+  worker: m4.xlarge
+
+ec2_volume_size_root:
+  bootstrap: 50
+  master: 50
+  worker: 50
+
+ec2_iam_role:
+  bootstrap: ''
+  master: ''
+  worker: ''
