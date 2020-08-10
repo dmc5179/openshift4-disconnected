@@ -32,7 +32,7 @@ fips_enabled: false
 
 # Certificate bundle that will be added to the install-config.yaml
 # This generally includes a certificate for the disconnected docker registry
-certificate_bundle: '/opt/openshift/etc/docker-registry/pki/registry.crt'
+certificate_bundle: '/etc/pki/tls/certs/registry.crt'
 
 # none, vmware, aws, azure, gcp
 platform: none
