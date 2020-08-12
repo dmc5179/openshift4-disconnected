@@ -6,26 +6,26 @@ metadata:
 spec:
   repositoryDigestMirrors:
   - mirrors:
-    - {{ mirror_registry }}/nvidia/gpu-operator
+    - {{ mirror_registry }}:{{ mirror_registry_port }}/nvidia/gpu-operator
     source: docker.io/nvidia/gpu-operator
   - mirrors:
-    - {{ mirror_registry }}/nvidia/driver
+    - {{ mirror_registry }}:{{ mirror_registry_port }}/nvidia/driver
     source: docker.io/nvidia/driver
   - mirrors:
-    - {{ mirror_registry }}/nvidia/container-toolkit
+    - {{ mirror_registry }}:{{ mirror_registry_port }}/nvidia/container-toolkit
     source: docker.io/nvidia/container-toolkit
   - mirrors:
-    - {{ mirror_registry }}/nvidia/k8s-device-plugin
+    - {{ mirror_registry }}:{{ mirror_registry_port }}/nvidia/k8s-device-plugin
     source: docker.io/nvidia/k8s-device-plugin
   - mirrors:
-    - {{ mirror_registry }}/nvidia/dcgm-exporter
+    - {{ mirror_registry }}:{{ mirror_registry_port }}/nvidia/dcgm-exporter
     source: docker.io/nvidia/dcgm-exporter
   - mirrors:
-    - {{ mirror_registry }}/nvidia/pod-gpu-metrics-exporter
+    - {{ mirror_registry }}:{{ mirror_registry_port }}/nvidia/pod-gpu-metrics-exporter
     source: docker.io/nvidia/pod-gpu-metrics-exporter
   - mirrors:
-    - {{ mirror_registry }}/nvidia/samples
+    - {{ mirror_registry }}:{{ mirror_registry_port }}/nvidia/samples
     source: docker.io/nvidia/samples
   - mirrors:
-    - {{ mirror_registry }}/kubernetes_incubator/node-feature-discovery
+    - {{ mirror_registry }}:{{ mirror_registry_port }}/kubernetes_incubator/node-feature-discovery
     source: quay.io/kubernetes_incubator/node-feature-discovery
