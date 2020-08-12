@@ -5,38 +5,46 @@ metadata:
   name: ocs
 spec:
   repositoryDigestMirrors:
+#  - mirrors:
+#    - {{ mirror_registry }}:{{ mirror_registry_port }}/noobaa/pause
+#    source: quay.io/noobaa/pause
+#  - mirrors:
+#    - {{ mirror_registry }}:{{ mirror_registry_port }}/rh-storage-partners/mcg-core
+#    source: quay.io/rh-storage-partners/mcg-core
+#  - mirrors:
+#    - {{ mirror_registry }}:{{ mirror_registry_port }}/rh-storage-partners/mcg-operator
+#    source: quay.io/rh-storage-partners/mcg-operator
+#  - mirrors:
+#    - {{ mirror_registry }}:{{ mirror_registry_port }}/rh-storage-partners/ocs-olm-operator
+#    source: quay.io/rh-storage-partners/ocs-olm-operator
+#  - mirrors:
+#    - {{ mirror_registry }}:{{ mirror_registry_port }}/rh-storage-partners/ocs-operator
+#    source: quay.io/rh-storage-partners/ocs-operator
+#  - mirrors:
+#    - {{ mirror_registry }}:{{ mirror_registry_port }}/rh-storage-partners/rhceph
+#    source: quay.io/rh-storage-partners/rhceph
+#  - mirrors:
+#    - {{ mirror_registry }}:{{ mirror_registry_port }}/rh-storage-partners/rook-ceph
+#    source: quay.io/rh-storage-partners/rook-ceph
+#  - mirrors:
+#    - {{ mirror_registry }}:{{ mirror_registry_port }}/openshift4/ose-csi-driver-registrar
+#    source: registry.redhat.io/openshift4/ose-csi-driver-registrar
+#  - mirrors:
+#    - {{ mirror_registry }}:{{ mirror_registry_port }}/openshift4/ose-csi-external-attacher
+#    source: registry.redhat.io/openshift4/ose-csi-external-attacher
   - mirrors:
-    - {{ mirror_registry }}/noobaa/pause
-    source: quay.io/noobaa/pause
+    - {{ mirror_registry }}:{{ mirror_registry_port }}/ocs4
+    source: registry.redhat.io/ocs4
+  - mirrors:
+    - {{ mirror_registry }}:{{ mirror_registry_port }}/rhceph
+    source: registry.redhat.io/rhceph
+  - mirrors:
+    - {{ mirror_registry }}:{{ mirror_registry_port }}/noobaa
+    source: quay.io/noobaa
+  - mirrors:
+    - {{ mirror_registry }}:{{ mirror_registry_port }}/openshift4
+    source: registry.redhat.io/openshift4
+  - mirrors:
+    - {{ mirror_registry }}:{{ mirror_registry_port }}/rhscl
+    source: registry.redhat.io/rhscl
 
-  - mirrors:
-    - {{ mirror_registry }}/rh-storage-partners/mcg-core
-    source: quay.io/rh-storage-partners/mcg-core
-
-  - mirrors:
-    - {{ mirror_registry }}/rh-storage-partners/mcg-operator
-    source: quay.io/rh-storage-partners/mcg-operator
-
-  - mirrors:
-    - {{ mirror_registry }}/rh-storage-partners/ocs-olm-operator
-    source: quay.io/rh-storage-partners/ocs-olm-operator
-
-  - mirrors:
-    - {{ mirror_registry }}/rh-storage-partners/ocs-operator
-    source: quay.io/rh-storage-partners/ocs-operator
-
-  - mirrors:
-    - {{ mirror_registry }}/rh-storage-partners/rhceph
-    source: quay.io/rh-storage-partners/rhceph
-
-  - mirrors:
-    - {{ mirror_registry }}/rh-storage-partners/rook-ceph
-    source: quay.io/rh-storage-partners/rook-ceph
-
-  - mirrors:
-    - {{ mirror_registry }}/openshift4/ose-csi-driver-registrar
-    source: registry.redhat.io/openshift4/ose-csi-driver-registrar
-
-  - mirrors:
-    - {{ mirror_registry }}/openshift4/ose-csi-external-attacher
-    source: registry.redhat.io/openshift4/ose-csi-external-attacher
