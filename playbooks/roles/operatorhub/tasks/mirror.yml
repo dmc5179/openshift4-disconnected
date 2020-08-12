@@ -10,21 +10,21 @@
 - name: Mirror redhat-operators images
   become: "{{ run_as_root }}"
   shell:
-    cmd: "{{ oc }} adm catalog mirror {{ rh_op_repo }} {{ mirror_registry }} -a {{ pull_secret }} --insecure"
+    cmd: "{{ oc }} adm catalog mirror {{ rh_op_repo }} {{ mirror_registry }}:{{ mirror_registry_port }} -a {{ pull_secret }} --insecure"
     executable: /bin/bash
   when: (redhat_operators | bool)
 
 - name: Create certified-operators catalog image
   become: "{{ run_as_root }}"
   shell:
-    cmd: "{{ oc }} adm catalog build --appregistry-org certified-operators --to={{ supp_op_repo }} --from={{ operator_registry }} --registry-config={{ pull_secret }}"
+    cmd: "{{ oc }} adm catalog build --appregistry-org certified-operators --to={{ cert_op_repo }} --from={{ operator_registry }} --registry-config={{ pull_secret }}"
     executable: /bin/bash
   when: (supported_operators | bool)
 
 - name: Mirror certified-operators images
   become: "{{ run_as_root }}"
   shell:
-    cmd: "{{ oc }} adm catalog mirror {{ supp_op_repo }} {{ mirror_registry }} -a {{ pull_secret }} --insecure"
+    cmd: "{{ oc }} adm catalog mirror {{ cert_op_repo }} {{ mirror_registry }}:{{ mirror_registry_port }} -a {{ pull_secret }} --insecure"
     executable: /bin/bash
   when: (supported_operators | bool)
 
@@ -38,6 +38,6 @@
 - name: Mirror community-operators images
   become: "{{ run_as_root }}"
   shell:
-    cmd: "{{ oc }} adm catalog mirror {{ comm_op_repo }} {{ mirror_registry }} -a {{ pull_secret }} --insecure"
+    cmd: "{{ oc }} adm catalog mirror {{ comm_op_repo }} {{ mirror_registry }}:{{ mirror_registry_port }} -a {{ pull_secret }} --insecure"
     executable: /bin/bash
   when: (community_operators | bool)

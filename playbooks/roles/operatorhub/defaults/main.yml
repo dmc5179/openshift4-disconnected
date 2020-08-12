@@ -7,12 +7,13 @@ supported_operators: false
 # TODO: community operators mirror not working yet
 community_operators: false
 
-mirror_registry: 'localhost:5000'
+mirror_registry: 'localhost'
+mirror_registry_port: 5000
 mirror_transport: 'https'
 
-rh_op_repo: "{{ mirror_registry }}/olm/redhat-operators:v1"
-supp_op_repo: "{{ mirror_registry }}/olm/certified-operators:v1"
-comm_op_repo: "{{ mirror_registry }}/olm/community-operators:v1"
+rh_op_repo: "{{ mirror_registry }}:{{ mirror_registry_port }}/olm/redhat-operators:v1"
+cert_op_repo: "{{ mirror_registry }}:{{ mirror_registry_port }}/olm/certified-operators:v1"
+comm_op_repo: "{{ mirror_registry }}:{{ mirror_registry_port }}/olm/community-operators:v1"
 
 operator_registry: 'quay.io/operator-framework/operator-registry-server:v1.6.1'
 
