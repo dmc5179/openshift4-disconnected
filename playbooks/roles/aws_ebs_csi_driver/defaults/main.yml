@@ -1,2 +1,6 @@
 ---
 # defaults file for aws_ebs_csi_driver
+
+mirror_registry: 'localhost'
+mirror_registry_port: 5000
+mirror_transport: 'https'
