@@ -1,6 +1,7 @@
 *.swp
 *.mine
 ansible.log
+inventory
 group_vars/all/infra/aws.yml
 group_vars/all/infra/vmware.yml
 group_vars/all/infra/dell.yml
