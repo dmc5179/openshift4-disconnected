@@ -4,6 +4,6 @@ mirror_registry: 'localhost'
 mirror_registry_port: 5000
 mirror_transport: 'https'
 
-kubeconfig:
+kubeconfig: '{{ ansible_env.HOME }}/.kube/config'
 
 kube_ssl_enabled: false
