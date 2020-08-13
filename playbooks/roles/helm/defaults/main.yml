@@ -3,6 +3,8 @@
 
 run_as_root: true
 
+helm: '/usr/local/bin/helm'
+
 # Note for x86_64 us arch == amd64
 # For Z use s390x
 helm_arch: 'amd64'
@@ -19,4 +21,7 @@ mirror_transport: 'https'
 
 chart_repo_root: '/var/www/html'
 
-helm_charts: {}
+helm_charts:
+  - name: 'aws-ebs-csi-driver'
+    version: 'v0.5.0'
+    url: 'https://github.com/kubernetes-sigs/aws-ebs-csi-driver/releases/download/v0.5.0/helm-chart.tgz'

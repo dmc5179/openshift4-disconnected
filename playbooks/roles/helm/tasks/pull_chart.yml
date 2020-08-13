@@ -1,0 +1,15 @@
+---
+
+- name: Pull
+  shell:
+    cmd: '{{ helm }} pull --destination {{ mirror_base }}/helm {{ chart_url }}'
+
+- name: Rename chart to include chart name and version
+  copy:
+    src: '{{ mirror_base }}/helm/helm-chart.tgz'
+    dest: '{{ mirror_base }}/helm/{{ chart_name }}-{{ chart_version }}-helm-chart.tgz'
+
+- name: Remove the original helm chart
+  file:
+    path: '{{ mirror_base }}/helm/helm-chart.tgz'
+    state: absent
