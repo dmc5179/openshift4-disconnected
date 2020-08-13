@@ -9,8 +9,8 @@
 - name: Mirror helm binary
   become: "{{ run_as_root }}"
   get_url:
-    url: "https://get.helm.sh/helm-v{{ helm_version }}-linux-{{ arch }}.tar.gz"
-    dest: "{{ mirror_base }}/helm/helm-v{{ helm_version }}-linux-{{ arch }}.tar.gz"
+    url: "https://mirror.openshift.com/pub/openshift-v4/clients/helm/{{ helm_version }}/helm-linux-{{ helm_arch }}"
+    dest: "{{ mirror_base }}/helm/helm-v{{ helm_version }}-linux-{{ helm_arch }}.tar.gz"
     mode: '0444'
 
 - name: Check for existing helm binary
@@ -30,7 +30,7 @@
     - name: Install helm
       become: "{{ run_as_root }}"
       unarchive:
-        src: "{{ mirror_base }}/helm/helm-v{{ helm_version }}-linux-{{ arch }}.tar.gz"
+        src: "{{ mirror_base }}/helm/helm-v{{ helm_version }}-linux-{{ helm_arch }}.tar.gz"
         dest: '/tmp/helm'
         remote_src: true
 
