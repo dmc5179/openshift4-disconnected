@@ -10,49 +10,31 @@
   become: "{{ run_as_root }}"
   get_url:
     url: "https://mirror.openshift.com/pub/openshift-v4/clients/helm/{{ helm_version }}/helm-linux-{{ helm_arch }}"
-    dest: "{{ mirror_base }}/helm/helm-v{{ helm_version }}-linux-{{ helm_arch }}.tar.gz"
-    mode: '0444'
+    dest: "{{ mirror_base }}/helm/helm-v{{ helm_version }}-linux-{{ helm_arch }}"
+    mode: '0755'
 
 - name: Check for existing helm binary
   stat:
-    path: '/usr/local/bin/helm'
+    path: '{{ helm }}'
   register: helm_stat
 
   # Need helm installed on this host to mirror the charts
 - name: Install helm on this host
-  block:
-    - name: Create temp directory to extract helm
-      become: "{{ run_as_root }}"
-      file:
-        path: '/tmp/helm'
-        state: directory
-
-    - name: Install helm
-      become: "{{ run_as_root }}"
-      unarchive:
-        src: "{{ mirror_base }}/helm/helm-v{{ helm_version }}-linux-{{ helm_arch }}.tar.gz"
-        dest: '/tmp/helm'
-        remote_src: true
-
-    - name: Move helm binary
-      become: "{{ run_as_root }}"
-      copy:
-        src: '/tmp/helm/linux-amd64/helm'
-        dest: '/usr/local/bin/helm'
-        owner: root
-        group: root
-        mode: '0755'
-        remote_src: true
-
-    - name: Cleanup temp helm directory
-      become: "{{ run_as_root }}"
-      file:
-        path: '/tmp/helm'
-        state: absent
+  become: "{{ run_as_root }}"
+  copy:
+    src: '{{ mirror_base }}/helm/helm-v{{ helm_version }}-linux-{{ helm_arch }}'
+    dest: '{{ helm }}'
+    owner: root
+    group: root
+    mode: '0755'
+    remote_src: true
   when: helm_stat.stat.exists == false
 
 - name: Pull helm charts
-  shell:
-    cmd: helm fetch --repo '{{ item.repo }}' --destination '{{ mirror_base }}/helm' '{{ item.chart }}'
+  include_tasks: pull_chart.yml
+  vars:
+    chart_name: '{{ item.name }}'
+    chart_version: '{{ item.version }}'
+    chart_url: '{{ item.url }}'
   with_items:
     - '{{ helm_charts }}'
