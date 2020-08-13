@@ -1,0 +1,14 @@
+---
+- hosts: helper_node
+  gather_facts: true
+  become: true
+  tasks:
+
+    # This playbook supports the following tags:
+    # mirror: pull the tools from the internet
+    # install: Install the toolls onto the helper node(s)
+
+    - name: Pull tools like openshift-install and oc
+      include_role:
+        name: tools
+        tasks_from: pull
