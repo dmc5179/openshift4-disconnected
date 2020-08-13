@@ -8,6 +8,7 @@
     # mirror: pull the tools from the internet
     # install: Install the toolls onto the helper node(s)
 
-    - name: Install tools like openshift-install and oc
+    - name: Install tools like openshift-install and oc from mirror base
       include_role:
         name: tools
+        tasks_from: install
