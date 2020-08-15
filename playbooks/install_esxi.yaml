@@ -57,9 +57,10 @@
     - name: Cleanup Custom ISO working area
       become: true
       file:
-        path: '/mnt/nfs'
+        path: '{{ item }}'
         state: absent
       when: (network_mode is match("static"))
+      with_fileglob: '/mnt/nfs/*.iso'
       tags:
         - iso
 
