@@ -6,7 +6,7 @@
     path: '{{ fake_root_base }}'
     state: absent
 
-- name: Build fakeroots directory structure
+- name: Build fakeroots directory structure for static networking config
   file:
     path: '{{ fake_root_base }}/{{ item.name }}/etc/sysconfig/network-scripts'
     state: directory
@@ -19,6 +19,25 @@
   template:
     src: 'ifcfg.j2'
     dest: '{{ fake_root_base }}/{{ item.name }}/etc/sysconfig/network-scripts/ifcfg-{{ item.device }}'
+    mode: 0640
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
+
+- name: Build fakeroots directory structure for module blacklist
+  file:
+    path: '{{ fake_root_base }}/{{ item.name }}/etc/modprobe.d'
+    state: directory
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
+
+- name: Create kernel module blacklist file
+  template:
+    src: 'ocp-ign-blacklist.conf.j2'
+    dest: '{{ fake_root_base }}/{{ item.name }}/etc/modprobe.d/ocp-ign-blacklist.conf'
     mode: 0640
   with_items:
     - '{{ openshift_bootstrap }}'
