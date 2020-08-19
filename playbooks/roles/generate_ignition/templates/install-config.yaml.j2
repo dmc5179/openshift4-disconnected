@@ -37,8 +37,8 @@ platform:
 {% endif %}
 pullSecret: '{{ slurped_pull_secret_b64.content | b64decode }}'
 sshKey: '{{ slurped_key_b64.content | b64decode }}'
-fips: '{{ fips_enabled }}'
-publish: '{{ ocp_cluster_publish }}'
+fips: {{ fips_enabled | bool | lower }}
+publish: {{ ocp_cluster_publish }}
 additionalTrustBundle: |
 {{ slurped_registry_ca_bundle_b64.content | b64decode }}
 {% if platform == 'vmware' %}
