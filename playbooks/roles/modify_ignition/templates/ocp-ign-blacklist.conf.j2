@@ -2,5 +2,6 @@
 {% if modules_blacklist is defined %}
 {% for module in modules_blacklist %}
 blacklist {{ module }}
+alias {{ module }} off
 {% endfor %}
 {% endif %}
