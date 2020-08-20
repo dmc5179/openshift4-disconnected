@@ -45,3 +45,6 @@ mtu: 1450
 vxlanPort: 4789
 
 network_policy: 'NetworkPolicy'
+
+master_kargs: ''
+worker_kargs: ''
