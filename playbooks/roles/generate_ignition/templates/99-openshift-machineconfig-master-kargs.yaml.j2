@@ -1,0 +1,14 @@
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: master
+  name: 99-openshift-machineconfig-master-kargs
+spec:
+  kernelArguments:
+    - 'mlx5_core.blacklist=1'
+    - 'mlx5_ib.blacklist=1'
+    - 'mlxfw.blacklist=1'
+    - 'ib_uverbs.blacklist=1'
+    - 'ib_core.blacklist=1'
+    - 'rd.driver.blacklist=mlx5_core,mlx5_ib,mlxfw,ib_uverbs,ib_core'
