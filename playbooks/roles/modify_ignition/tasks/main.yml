@@ -19,7 +19,7 @@
   template:
     src: 'ifcfg.j2'
     dest: '{{ fake_root_base }}/{{ item.name }}/etc/sysconfig/network-scripts/ifcfg-{{ item.device }}'
-    mode: 0640
+    mode: 0644
   with_items:
     - '{{ openshift_bootstrap }}'
     - '{{ openshift_masters }}'
@@ -38,7 +38,7 @@
   template:
     src: 'ocp-ign-blacklist.conf.j2'
     dest: '{{ fake_root_base }}/{{ item.name }}/etc/modprobe.d/ocp-ign-blacklist.conf'
-    mode: 0640
+    mode: 0644
   with_items:
     - '{{ openshift_bootstrap }}'
     - '{{ openshift_masters }}'

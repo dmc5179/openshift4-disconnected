@@ -213,7 +213,23 @@
   template:
     src: cluster-network-03-config.yml.j2
     dest: "{{ ignition_configs }}/manifests/cluster-network-03-config.yml"
-    mode: 0640
+    mode: 0644
+  tags:
+    - manifests
+
+- name: Add kernel args for master nodes
+  template:
+    src: 99-openshift-machineconfig-master-kargs.yaml.j2
+    dest: "{{ ignition_configs }}/openshift/99-openshift-machineconfig-master-kargs.yaml"
+    mode: 0644
+  tags:
+    - manifests
+
+- name: Add kernel args for worker nodes
+  template:
+    src: 99-openshift-machineconfig-worker-kargs.yaml.j2
+    dest: "{{ ignition_configs }}/openshift/99-openshift-machineconfig-worker-kargs.yaml"
+    mode: 0644
   tags:
     - manifests
 
