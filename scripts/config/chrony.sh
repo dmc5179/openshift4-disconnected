@@ -15,8 +15,8 @@ EOF
 # Read in the new chrony.conf file
 CHRONY_B64=$(cat ./chrony.conf)
 
-# Create a machine config to set the new chrony 
-cat << EOF > ./99_masters-chrony-configuration.yaml
+# Create a machine config to set chrony config on master nodes
+cat << EOF > ./99_master-chrony-configuration.yaml
 apiVersion: machineconfiguration.openshift.io/v1
 kind: MachineConfig
 metadata:
@@ -44,6 +44,36 @@ spec:
   osImageURL: ""
 EOF
 
-oc apply -f ./99_masters-chrony-configuration.yaml
+# Create a machine config to set chrony config on worker nodes
+cat << EOF > ./99_worker-chrony-configuration.yaml
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: worker
+  name: workers-chrony-configuration
+spec:
+  config:
+    ignition:
+      config: {}
+      security:
+        tls: {}
+      timeouts: {}
+      version: 2.2.0
+    networkd: {}
+    passwd: {}
+    storage:
+      files:
+      - contents:
+          source: data:text/plain;charset=utf-8;base64,${CHRONY_B64}
+          verification: {}
+        filesystem: root
+        mode: 420
+        path: /etc/chrony.conf
+  osImageURL: ""
+EOF
+
+#oc apply -f ./99_master-chrony-configuration.yaml
+#oc apply -f ./99_worker-chrony-configuration.yaml
 
 exit 0

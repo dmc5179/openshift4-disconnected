@@ -1,4 +1,5 @@
 chrony.conf
-99_masters-chrony-configuration.yaml
+99_master-chrony-configuration.yaml
+99_worker-chrony-configuration.yaml
 99_master-private-registry-configuration.yaml
 99_worker-private-registry-configuration.yaml
