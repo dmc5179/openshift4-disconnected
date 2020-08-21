@@ -7,4 +7,14 @@
     - never
     - icsp
 
-# - name: Apply helm chart
+- name: Apply helm chart
+  shell:
+    cmd: |
+
+        /usr/local/bin/helm install \
+            --namespace kube-system \
+            --name aws-ebs-csi-driver \
+            --set enableVolumeScheduling=true \
+            --set enableVolumeResizing=true \
+            --set enableVolumeSnapshot=true \
+            '{{ mirror_base }}/helm/aws-ebs-csi-driver-v0.5.0-helm-chart.tgz'
