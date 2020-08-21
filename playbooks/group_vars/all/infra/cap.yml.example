@@ -1,0 +1,9 @@
+cap_agency: ''
+cap_mission: ''
+cap_role: ''
+
+cap_url: 'https://cap.cia.ic.gov/api/v1/credentials?agency={{ cap_agency }}&mission={{ cap_mission }}&role={{ cap_role }}'
+
+cap_credentials_dir: ''
+cap_username: ''
+cap_password: ''
