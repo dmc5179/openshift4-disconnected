@@ -20,7 +20,7 @@ docker_registry_http_secret: d61605d6-63eb-11e6-a138-989096e41e7c
 docker_registry_container_name: registry-srv
 
 # Location of the docker archive tar ball of the registry image
-docker_registry_image_archive: "{{ mirror_base }}/additional_images/docker.io-library-registry_2.tar"
+docker_registry_image_archive: "{{ mirror_base }}/images/docker.io-library-registry_2.7.1.tar"
 
 docker_registry_storage_s3_enabled: false
 docker_registry_storage_s3_access_key: ''
@@ -60,8 +60,9 @@ docker_registry_ssl_standalone_key: "{{docker_registry_ssl_standalone_path}}/{{a
 
 air_gapped: true
 
-mirror_registry: 'localhost:5000'
+mirror_registry: 'localhost'
+mirror_registry_port: 5000
 mirror_transport: 'https'
 
 # Format of: DNS:hostname
-docker_registry_SAN: 'DNS:{{ ansible_fqdn }},IP:{{ansible_default_ipv4.address}}'
+docker_registry_SAN: 'DNS:{{ ansible_fqdn }},DNS:{{ mirror_registry }},IP:{{ansible_default_ipv4.address}}'

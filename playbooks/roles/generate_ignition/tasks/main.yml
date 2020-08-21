@@ -103,8 +103,11 @@
 
 - name: Slurp vCenter Root Certificates
   slurp:
-    src: "{{ lookup('fileglob', '/tmp/vcenter/certs/lin/*.0') }}"
-  register: slurped_vcenter_ca_bindle_b64
+    #src: "{{ lookup('fileglob', '/tmp/vcenter/certs/lin/*.0') }}"
+    src: '{{ item }}'
+  with_fileglob:
+    - '/tmp/vcenter/certs/lin/*.0'
+  register: slurped_vcenter_ca_bundle_b64
   when:
     - (platform is match("vmware"))
   tags:
@@ -123,6 +126,14 @@
 - name: Ensure proper spacing of additionalTrustBundle
   shell:
     cmd: awk -i inplace 'BEGIN{c=0}  /BEGIN CERTIFICATE/{c=1}  {if (c==1) print " ",$0}  {if (c==0) print $0}  /END CERTIFICATE/{c=0}' "{{ ignition_configs }}/install-config.yaml"
+  tags:
+    - manifests
+    - install-config
+
+- name: Save install-config.yaml
+  copy:
+    src: "{{ ignition_configs }}/install-config.yaml"
+    dest: '{{ mirror_base }}/{{ ocp_cluster_name }}-install-config.yaml'
   tags:
     - manifests
     - install-config
@@ -154,6 +165,7 @@
     path: "{{ ignition_configs }}/manifests/cvo-overrides.yaml"
     regexp: 'upstream:.*'
     replace: 'upstream: http://localhost:8080/graph'
+  when: ( air_gapped | bool )
   tags:
     - manifests
 
@@ -183,7 +195,7 @@
     regexp: 'insecure-flag = "1"'
     line: '    insecure-flag = "true"'
   when:
-    - (platform is match("vmware"))
+    - ((platform is match("vmware")) and (not vmware_ssl_enabled | bool))
   tags:
     - manifests
 
@@ -201,7 +213,23 @@
   template:
     src: cluster-network-03-config.yml.j2
     dest: "{{ ignition_configs }}/manifests/cluster-network-03-config.yml"
-    mode: 0640
+    mode: 0644
+  tags:
+    - manifests
+
+- name: Add kernel args for master nodes
+  template:
+    src: 99-openshift-machineconfig-master-kargs.yaml.j2
+    dest: "{{ ignition_configs }}/openshift/99-openshift-machineconfig-master-kargs.yaml"
+    mode: 0644
+  tags:
+    - manifests
+
+- name: Add kernel args for worker nodes
+  template:
+    src: 99-openshift-machineconfig-worker-kargs.yaml.j2
+    dest: "{{ ignition_configs }}/openshift/99-openshift-machineconfig-worker-kargs.yaml"
+    mode: 0644
   tags:
     - manifests
 

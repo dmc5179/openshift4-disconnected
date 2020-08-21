@@ -1,0 +1,25 @@
+---
+
+- name: Create mirror_base dir
+  become: true
+  file:
+    path: "{{ mirror_base }}"
+    state: directory
+
+- name: Downloading OCP4 client
+  become: "{{ run_as_root }}"
+  get_url:
+    url: "{{ ocp_client }}"
+    dest: "{{ mirror_base }}/openshift-client-linux.tar.gz"
+
+- name: Downloading OCP4 Installer
+  become: "{{ run_as_root }}"
+  get_url:
+    url: "{{ ocp_installer }}"
+    dest: "{{ mirror_base }}/openshift-install-linux.tar.gz"
+
+- name: Downloading filetranspiler source
+  become: "{{ run_as_root }}"
+  git:
+    repo: https://github.com/ashcrow/filetranspiler
+    dest: "{{ mirror_base }}/filetranspiler"

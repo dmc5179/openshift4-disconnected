@@ -1,0 +1,7 @@
+# List of modules to blacklist from the kernel on OCP
+{% if modules_blacklist is defined %}
+{% for module in modules_blacklist %}
+blacklist {{ module }}
+alias {{ module }} off
+{% endfor %}
+{% endif %}

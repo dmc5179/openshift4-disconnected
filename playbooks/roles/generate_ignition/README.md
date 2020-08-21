@@ -18,7 +18,7 @@
 | kubeauth                                      | ~/.kube/auth                                        | Path where the kube auth will be copied to  |
 | mirror_base                                   | /opt/openshift                                      | Path to the base mirror directory |
 | ignition_configs                              | {{ mirror_base }}/cluster                           | Subpath of the mirror directory where the manifests and ignition files will be  |
-| pull_secret                                   | {{ mirror_base }}/pull-secret.txt                   | Pull secret to add to the cluster. Should include auth for pulling from disconnected registry  |
+| pull_secret                                   | {{ mirror_base }}/pull-secret.json                   | Pull secret to add to the cluster. Should include auth for pulling from disconnected registry  |
 | master_schedulable                            | false                                               | For UPI clusters set this to false  |
 | cluster_channel                               | fast                                                | Cluster Update Channel  |
 | fips                                          | true                                                | Enable FIPS  |

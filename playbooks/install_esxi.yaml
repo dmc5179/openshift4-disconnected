@@ -7,30 +7,49 @@
     - name: Customize ISO
       include_role:
         name: custom_iso
-      with_items:
-        - '{{ openshift_bootstrap }}'
-        - '{{ openshift_masters }}'
-        - '{{ openshift_workers }}'
       when: (network_mode is match("static"))
       tags:
         - iso
 
-    - name: Copy RHCOS Customer ISOs to Datastore
-      vsphere_copy:
-        hostname: '{{ esxi_hostname }}'
+    - name: Create a folder for ISOs
+      vcenter_folder:
+        hostname: '{{ vcenter_hostname }}'
         username: '{{ vcenter_username }}'
         password: '{{ vcenter_password }}'
-        src: '/tmp/rhcos/{{ item.name }}.iso'
-        datastore: 'USB-Datastore'
-        path: 'ISOs/{{ item.name }}.iso'
+        datacenter_name: '{{ datacenter_name }}'
+        validate_certs: "{{ vmware_ssl_enabled }}"
+        folder_name: 'ISOs'
+        parent_folder: ''
+        state: present
+      delegate_to: localhost
+
+    - name: Create a folder for RHCOS ISOs
+      vcenter_folder:
+        hostname: '{{ vcenter_hostname }}'
+        username: '{{ vcenter_username }}'
+        password: '{{ vcenter_password }}'
+        datacenter_name: '{{ datacenter_name }}'
+        validate_certs: "{{ vmware_ssl_enabled }}"
+        folder_name: 'RHCOS'
+        parent_folder: 'ISOs'
+        state: present
+      delegate_to: localhost
+
+    - name: Copy RHCOS Customer ISOs to Datastore
+      vsphere_copy:
+        hostname: '{{ vcenter_hostname }}'
+        username: '{{ vcenter_username }}'
+        password: '{{ vcenter_password }}'
+        src: '/mnt/nfs/{{ item.name }}.iso'
+        datacenter: '{{ datacenter_name }}'
+        datastore: '{{ datastore_name }}'
+        path: 'ISOs/RHCOS/{{ item.name }}.iso'
         validate_certs: "{{ vmware_ssl_enabled }}"
       delegate_to: localhost
       with_items:
         - '{{ openshift_bootstrap }}'
         - '{{ openshift_masters }}'
         - '{{ openshift_workers }}'
-#      loop_control:
-#        pause: 5
       when: (network_mode is match("static"))
       tags:
         - iso
@@ -38,9 +57,10 @@
     - name: Cleanup Custom ISO working area
       become: true
       file:
-        path: '/tmp/rhcos'
+        path: '{{ item }}'
         state: absent
       when: (network_mode is match("static"))
+      with_fileglob: '/mnt/nfs/*.iso'
       tags:
         - iso
 

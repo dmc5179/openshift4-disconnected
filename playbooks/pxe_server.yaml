@@ -5,5 +5,5 @@
   tasks:
 
     - name: Install and Configure PXE TFTP Server
-      include_role:
+      import_role:
         name: install_pxe

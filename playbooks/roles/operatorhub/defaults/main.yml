@@ -7,12 +7,13 @@ supported_operators: false
 # TODO: community operators mirror not working yet
 community_operators: false
 
-mirror_registry: 'localhost:5000'
+mirror_registry: 'localhost'
+mirror_registry_port: 5000
 mirror_transport: 'https'
 
-rh_op_repo: "{{ mirror_registry }}/olm/redhat-operators:v1"
-supp_op_repo: "{{ mirror_registry }}/olm/certified-operators:v1"
-comm_op_repo: "{{ mirror_registry }}/olm/community-operators:v1"
+rh_op_repo: "{{ mirror_registry }}:{{ mirror_registry_port }}/olm/redhat-operators:v1"
+cert_op_repo: "{{ mirror_registry }}:{{ mirror_registry_port }}/olm/certified-operators:v1"
+comm_op_repo: "{{ mirror_registry }}:{{ mirror_registry_port }}/olm/community-operators:v1"
 
 operator_registry: 'quay.io/operator-framework/operator-registry-server:v1.6.1'
 
@@ -23,7 +24,7 @@ mirror_base: '/opt/openshift'
 # This needs to be a pull secret that combines the pull secret from Red Hat
 # to pull all the images down and a pull secret from your local registry so we
 # can push to it
-pull_secret: "{{ mirror_base }}/pull-secret.txt"
+pull_secret: "{{ mirror_base }}/pull-secret.json"
 
 air_gapped: true
 

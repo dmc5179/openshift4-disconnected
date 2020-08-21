@@ -2,6 +2,7 @@
 # Fully air-gap install??
 air_gapped: true
 
+platform: 'none'
 ###################################################################
 # Path to binaries
 ###################################################################
@@ -13,12 +14,13 @@ fakeroots: 'fakeroots'
 
 ###############################################
 
+maj_ver: '4.5'
 # RedHat CoreOS Version. Might not match OpenShift Version
 # 4.3.8 and 4.4.3 currently available
-rhcos_ver: '4.4.3'
+rhcos_ver: '4.5.2'
 # OpenShift Version
 # 4.3.21 and 4.4.7 currently available
-ocp_ver: '4.4.7'
+ocp_ver: '4.5.4'
 # RHCOS and OpenShift Architecture
 arch: 'x86_64'
 
@@ -30,6 +32,8 @@ worker_count: 3
 
 fips_enabled: false
 
+ocp_cluster_publish: 'Internal'
+
 ocp_base_domain: 'example.com'
 ocp_cluster_name: 'caas'
 
@@ -37,7 +41,7 @@ ssh_public_key_file: '{{ ansible_env.HOME }}/.ssh/id_rsa.pub'
 
 # Certificate bundle that will be added to the install-config.yaml
 # This generally includes a certificate for the disconnected docker registry
-certificate_bundle: '/etc/pki/ca-trust/source/anchors/quay.cert'
+certificate_bundle: '/etc/pki/ca-trust/source/anchors/registry.crt'
 
 ###############################################
 
@@ -46,15 +50,16 @@ certificate_bundle: '/etc/pki/ca-trust/source/anchors/quay.cert'
 ################################################################
 mirror_base: '/opt/openshift'
 mirror_registry: 'quay.example.com'
+mirror_registry_port: 5000
 mirror_transport: 'https'
 ignition_configs: "{{ mirror_base }}/cluster"
 # This is the secret that will be uploaded to the mirror server
 # for use in mirroring images
-local_pull_secret: '{{ ansible_env.HOME }}/Downloads/pull-secret.txt'
+local_pull_secret: '{{ ansible_env.HOME }}/Downloads/pull-secret.json'
 # This is the same secret as above but located on the mirror server
-pull_secret: '/opt/openshift/pull-secret.txt'
+pull_secret: '/opt/openshift/pull-secret.json'
 
-docker_registry_hostname: 'localhost'
+docker_registry_hostname: '{{ mirror_registry }}'
 
 
 #####################################################

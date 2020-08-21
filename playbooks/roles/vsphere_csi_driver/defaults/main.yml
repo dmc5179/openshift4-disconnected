@@ -10,4 +10,6 @@ vsphere_namespace: 'vsphere'
 
 ssl_enabled: false
 
-mirror_registry: 'localhost:5000'
+mirror_registry: 'localhost'
+mirror_registry_port: 5000
+mirror_transport: 'https'

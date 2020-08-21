@@ -1,0 +1,11 @@
+---
+
+- name: Powercycle Dell Hosts
+  become: true
+  shell:
+    cmd: |
+      '{{ racadm }}' -r '{{ item.idrac_ip }}' -u '{{ idrac_user }}' \
+                     -p '{{ idrac_password }}' serveraction powercycle
+  with_items:
+    - '{{ openshift_masters_dell }}'
+    - '{{ openshift_workers_dell }}'

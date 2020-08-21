@@ -1,0 +1,13 @@
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  name: tekton
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - {{ mirror_registry }}/ocp4/tekton-webhook
+    source: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/webhook
+  - mirrors:
+    - {{ mirror_registry }}/ocp4/tekton-controller
+    source: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/controller

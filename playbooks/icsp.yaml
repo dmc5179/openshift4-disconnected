@@ -11,7 +11,9 @@
         name: '{{ item }}'
         tasks_from: icsp
       with_items:
+        - aws_ebs_csi_driver
         - nvidia_gpu_operator
         - compliance-operator
         - install_nfs
         - vsphere_csi_driver
+        - ocs

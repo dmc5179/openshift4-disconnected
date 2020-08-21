@@ -8,6 +8,3 @@
     kubeconfig: "{{ kubeconfig  }}"
     validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/aws_ebs_csi_icsp.yaml.j2') }}"
-  tags:
-    - never
-    - icsp

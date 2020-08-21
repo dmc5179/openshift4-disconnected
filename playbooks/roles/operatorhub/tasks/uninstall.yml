@@ -15,7 +15,7 @@
         namespace: openshift-marketplace
       spec:
         sourceType: grpc
-        image: '{{ mirror_registry }}/olm/redhat-operators:v1'
+        image: '{{ rh_op_repo }}'
         displayName: RedHat Operators Catalog
         publisher: grpc
 
@@ -34,7 +34,7 @@
         namespace: openshift-marketplace
       spec:
         sourceType: grpc
-        image: '{{ mirror_registry }}/olm/certified-operators:v1'
+        image: '{{ cert_op_repo }}'
         displayName: Certified Operators Catalog
         publisher: grpc
 
@@ -53,6 +53,6 @@
         namespace: openshift-marketplace
       spec:
         sourceType: grpc
-        image: '{{ mirror_registry }}/olm/community-operators:v1'
+        image: '{{ comm_op_repo }}'
         displayName: Community Operators Catalog
         publisher: grpc
