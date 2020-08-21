@@ -16,7 +16,7 @@ Everything in this guide will use the variable names from the role which you wil
 podman ps
 ```
 
-- In a previous section a pull secret file was downloaded from the Red Hat infrastructure page. We need to add authentication tokens for the private registry to that file so that the file contains authentication tokens for both registries involved in the mirror process. Assuming that file was downloaded to $HOME/pull-secret.json run the following command
+- In a previous section a pull secret file was downloaded from the Red Hat infrastructure page. We need to add authentication tokens for the private registry to that file so that the file contains authentication tokens for both registries involved in the mirror process. Assuming that file was downloaded to $HOME/pull-secret.json run the following command. This will prompt for the username and password used when creating the private registry.
 
 ```
 podman login --authfile=$HOME/pull-secret.json < registry hostname : registry port>
