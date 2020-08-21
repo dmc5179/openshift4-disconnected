@@ -17,7 +17,7 @@ aws_ebs_csi_driver_images:
     tag: 'v1.1.0'
   - repo: 'quay.io'
     image: 'k8scsi/csi-resizer'
-    tag: 'latest'
+    tag: 'v0.3.0'
   - repo: 'quay.io'
     image: 'k8scsi/csi-node-driver-registrar'
     tag: 'v1.1.0'
