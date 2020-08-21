@@ -1,1 +1,19 @@
 ---
+- hosts: helper_node
+  gather_facts: true
+  become: false
+  tasks:
+
+    - name: AWS | Provision Load Balancers
+      import_role:
+        name: provision_aws
+        tasks_from: load_balancer
+      tags:
+        - load_balancers
+
+    - name: AWS | Configure DNS
+      import_role:
+        name: provision_aws
+        tasks_from: dns
+      tags:
+        - dns
