@@ -4,16 +4,85 @@
   become: false
   tasks:
 
-    - name: AWS | Provision Load Balancers
-      import_role:
-        name: provision_aws
-        tasks_from: load_balancer
-      tags:
-        - load_balancers
+    # Working
+#    - name: AWS | Get CAP Tokens
+#      import_role:
+#        name: cap
+#      tags:
+#        - cap
 
-    - name: AWS | Configure DNS
+#    - name: AWS | Create Security Groups
+#      import_role:
+#        name: provision_aws
+#        tasks_from: security_groups
+#      tags:
+#        - security_groups
+
+#    - name: AWS | Provision Load Balancers
+#      import_role:
+#        name: provision_aws
+#        tasks_from: load_balancer
+#      tags:
+#        - load_balancers
+
+#    - name: AWS | Configure DNS
+#      import_role:
+#        name: provision_aws
+#        tasks_from: dns
+#      tags:
+#        - dns
+
+
+    - name: Remove old ignition configs
+      become: true
+      file:
+        path: '{{ httpd_document_root }}/ignition'
+        state: absent
+      tags:
+        - ignition
+
+    - name: Generate Ignition Files
+      import_role:
+        name: generate_ignition
+
+    - name: Modify Ignition Files
+      include_role:
+        name: modify_ignition
+      when: (network_mode is match("static"))
+
+    - name: Create Ignition staging location
+      become: true
+      file:
+        path: '{{ httpd_document_root }}/ignition'
+        state: directory
+        mode: '0755'
+        setype: 'httpd_sys_content_t'
+      tags:
+        - ignition
+
+    - name: Stage Ignition configs
+      become: true
+      copy:
+        src: "{{ item }}"
+        dest: "{{ httpd_document_root }}/ignition/"
+        mode: '0755'
+        setype: 'httpd_sys_content_t'
+      with_fileglob:
+        - '{{ ignition_configs }}/*.ign'
+      tags:
+        - ignition
+
+#    - name: Create user data
+#      import_role:
+#        name: provision_aws
+#        tasks_from: create_user_data
+#      tags:
+#        - user_data
+
+    # Working
+    - name: AWS | Create Nodes
       import_role:
         name: provision_aws
-        tasks_from: dns
+        tasks_from: create_nodes
       tags:
-        - dns
+        - ec2
