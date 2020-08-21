@@ -5,26 +5,26 @@ metadata:
 spec:
   repositoryDigestMirrors:
   - mirrors:
-    - {{ mirror_registry }}/compliance-operator/ocp4
+    - {{ mirror_registry }}:{{ mirror_registry_port }}/compliance-operator/ocp4
     source: quay.io/compliance-operator/ocp4
   - mirrors:
-    - {{ mirror_registry }}/compliance-operator/compliance-operator
+    - {{ mirror_registry }}:{{ mirror_registry_port }}/compliance-operator/compliance-operator
     source: quay.io/compliance-operator/compliance-operator
   - mirrors:
-    - {{ mirror_registry }}/compliance-operator/openscap-ocp
+    - {{ mirror_registry }}:{{ mirror_registry_port }}/compliance-operator/openscap-ocp
     source: quay.io/compliance-operator/openscap-ocp
   - mirrors:
-    - {{ mirror_registry }}/compliance-operator/resultscollector
+    - {{ mirror_registry }}:{{ mirror_registry_port }}/compliance-operator/resultscollector
     source: quay.io/compliance-operator/resultscollector
   - mirrors:
-    - {{ mirror_registry }}/compliance-operator/resultserver
+    - {{ mirror_registry }}:{{ mirror_registry_port }}/compliance-operator/resultserver
     source: quay.io/compliance-operator/resultserverresultserver
   - mirrors:
-    - {{ mirror_registry }}/compliance-operator/remediation-aggregator
+    - {{ mirror_registry }}:{{ mirror_registry_port }}/compliance-operator/remediation-aggregator
     source: quay.io/compliance-operator/remediation-aggregator
   - mirrors:
-    - {{ mirror_registry }}/compliance-operator/api-resource-collector
+    - {{ mirror_registry }}:{{ mirror_registry_port }}/compliance-operator/api-resource-collector
     source: quay.io/compliance-operator/api-resource-collector
   - mirrors:
-    - {{ mirror_registry }}/complianceascode/ocp4
+    - {{ mirror_registry }}:{{ mirror_registry_port }}/complianceascode/ocp4
     source: quay.io/complianceascode/ocp4

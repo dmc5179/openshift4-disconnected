@@ -1,0 +1,10 @@
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  name: codereadyrepo
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - {{ mirror_registry }}/ocp4/server-operator-rhel8
+    source: registry.redhat.io/codeready-workspaces/server-operator-rhel8

@@ -1,16 +1,49 @@
 ---
 
-- name: Dell | Configure Boot to Network ISO
-  delegate_to: localhost
-  idrac_os_deployment:
-    idrac_ip:   "{{ item.idrac_ip }}"
-    idrac_user: "{{ idrac_user }}"
-    idrac_password:  "{{ idrac_password }}"
-    share_name: "10.15.169.49:/mnt/nfs"
-    #share_user: "share_user_name"
-    #share_password: "share_user_pwd"
-    iso_image:  "{{ item.name }}.iso"
-    expose_duration: 60
+#- name: Dell | Configure Boot to Network ISO
+#  delegate_to: localhost
+#  idrac_os_deployment:
+#    idrac_ip:   "{{ item.idrac_ip }}"
+#    idrac_user: "{{ idrac_user }}"
+#    idrac_password:  "{{ idrac_password }}"
+#    share_name: "10.15.169.49:/mnt/nfs"
+#    #share_user: "share_user_name"
+#    #share_password: "share_user_pwd"
+#    iso_image:  "{{ item.name }}.iso"
+#    expose_duration: 60
+#  with_items:
+#    - '{{ openshift_masters_dell }}'
+#    - '{{ openshift_workers_dell }}'
+
+- name: Configure Hosts to enable boot once selection
+  become: true
+  shell:
+    cmd: |
+      '{{ racadm }}' -r '{{ item.idrac_ip }}' -u '{{ idrac_user }}' \
+                     -p '{{ idrac_password }}' set \
+                     iDRAC.VirtualMedia.BootOnce 1
+  with_items:
+    - '{{ openshift_masters_dell }}'
+    - '{{ openshift_workers_dell }}'
+
+- name: Attach virtual media to hosts
+  become: true
+  shell:
+    cmd: |
+      '{{ racadm }}' -r '{{ item.idrac_ip }}' -u '{{ idrac_user }}' \
+                     -p '{{ idrac_password }}' remoteimage \
+                     -c -l '10.15.169.49:/mnt/nfs/{{ item.name }}.iso'
+  with_items:
+    - '{{ openshift_masters_dell }}'
+    - '{{ openshift_workers_dell }}'
+
+- name: Configure Hosts to boot to virtual media
+  become: true
+  shell:
+    cmd: |
+      '{{ racadm }}' -r '{{ item.idrac_ip }}' -u '{{ idrac_user }}' \
+                     -p '{{ idrac_password }}' set \
+                     iDRAC.ServerBoot.FirstBootDevice VCD-DVD
   with_items:
     - '{{ openshift_masters_dell }}'
     - '{{ openshift_workers_dell }}'

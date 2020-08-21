@@ -3,3 +3,6 @@
 filetranspiler: '/usr/local/bin/filetranspiler'
 
 fake_root_base: '/tmp/fakeroots'
+
+# List of modules to blacklist from the kernel
+modules_blacklist: {}

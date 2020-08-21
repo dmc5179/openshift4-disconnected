@@ -78,7 +78,7 @@ backend ingress-http
     balance source
     mode tcp
 {% for w in openshift_workers %}
-    server {{ w.name | lower }}-http-router{{ loop.index0 }} {{ w.ip }}:80 check
+    server {{ w.name | lower }} {{ w.ip }}:80 check
 {% endfor %}
 
 frontend ingress-https
@@ -91,7 +91,7 @@ backend ingress-https
     balance source
     mode tcp
 {% for w in openshift_workers %}
-    server {{ w.name | lower }}-https-router{{ loop.index0 }} {{ w.ip }}:443 check
+    server {{ w.name | lower }} {{ w.ip }}:443 check
 {% endfor %}
 
 #---------------------------------------------------------------------

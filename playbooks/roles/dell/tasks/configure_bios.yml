@@ -1,15 +1,35 @@
 ---
 
-- name: Dell | Configure BIOS
+#- name: Dell | Configure BIOS
+#  delegate_to: localhost
+#  dellemc_configure_bios:
+#    idrac_ip:   "{{ item.idrac_ip }}"
+#    idrac_user: "{{ idrac_user }}"
+#    idrac_password:  "{{ idrac_password }}"
+#    attributes:
+#      BootMode: 'Uefi'
+#      OsWatchdogTimer: 'Disabled'
+#      PowerSaver: 'Disabled'
+#  with_items:
+#    - '{{ openshift_masters_dell }}'
+#    - '{{ openshift_workers_dell }}'
+
+- name: Config BIOS boot mode
   delegate_to: localhost
-  dellemc_configure_bios:
-    idrac_ip:   "{{ item.idrac_ip }}"
-    idrac_user: "{{ idrac_user }}"
-    idrac_password:  "{{ idrac_password }}"
-    attributes:
-      BootMode: 'Uefi'
-      OsWatchdogTimer: 'Disabled'
-      PowerSaver: 'Disabled'
-  with_items:
-    - '{{ openshift_masters_dell }}'
-    - '{{ openshift_workers_dell }}'
+  become: true
+  shell:
+    cmd: |
+      '{{ racadm }}' -r '{{ item.idrac_ip }}' -u '{{ idrac_user }}' \
+                     -p '{{ idrac_password }}' set \
+                     BIOS.BiosBootSettings.BootMode Bios
+
+- name: Config iDRAC job to apply changes
+  delegate_to: localhost
+  become: true
+  shell:
+    cmd: |
+      '{{ racadm }}' -r '{{ item.idrac_ip }}' -u '{{ idrac_user }}' \
+                     -p '{{ idrac_password }}' \
+                     jobqueue create BIOS-Setup.1-1
+
+

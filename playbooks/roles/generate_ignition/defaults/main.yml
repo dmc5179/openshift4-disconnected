@@ -8,7 +8,7 @@ kubeauth: "~/.kube/auth"
 
 mirror_base: '/opt/openshift'
 ignition_configs: '{{ mirror_base }}/cluster'
-pull_secret: '{{ mirror_base }}/pull-secret.txt'
+pull_secret: '{{ mirror_base }}/pull-secret.json'
 
 master_schedulable: false
 cluster_channel: 'fast'
@@ -32,7 +32,7 @@ fips_enabled: false
 
 # Certificate bundle that will be added to the install-config.yaml
 # This generally includes a certificate for the disconnected docker registry
-certificate_bundle: '/opt/openshift/etc/docker-registry/pki/registry.crt'
+certificate_bundle: '/etc/pki/tls/certs/registry.crt'
 
 # none, vmware, aws, azure, gcp
 platform: none
@@ -45,3 +45,6 @@ mtu: 1450
 vxlanPort: 4789
 
 network_policy: 'NetworkPolicy'
+
+master_kargs: ''
+worker_kargs: ''
