@@ -8,7 +8,7 @@ nvidia_gpu_images:
     image: 'k8scsi/csi-provisioner'
     tag: "v1.5.0"
   - repo: 'quay.io'
-    image: 'quay.io/k8scsi/csi-attacher'
+    image: 'k8scsi/csi-attacher'
     tag: "v1.2.0"
   - repo: 'quay.io'
     image: 'k8scsi/csi-snapshotter'
