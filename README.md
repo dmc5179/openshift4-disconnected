@@ -4,6 +4,8 @@
   - [Purpose](#Purpose)
   - [Requirements](#Requirements)
   - [Dependencies](#Dependencies)
+  - [Internet Connected Side](#Internet-Connected-Side)
+  - [Air Gap Side](#Air-Gap-Side)
   - [Miscellaneous](#Miscellaneous)
   - [License](#License)
   - [Contributors](#Contributors)
@@ -23,27 +25,49 @@ These tools can also be used in semi-disconnected environments which can be reac
 
 ### Dependencies
 
-### Getting Started
+### Internet Connected Side
 
-Step 1: Create a docker registry to host the mirrored images
+  This section covers getting started on the internet connected helper node. This is where all tools and images will be downloaded to
 
-Step 2: Mirror the images into your new registry
 
-Step 3: Create a DNS server in your air-gapped environment
+- [Create main variable file](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/vars-all.md)
 
-Step 4: Install the required OpenShift clients and tools
+- [Create a docker registry for mirrored images](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/registry_server.md)
 
-Step 5: Generate Igntion Configs
+- [Mirror OpenShift Cluster Images](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/mirror_ocp_images.md)
 
-Step 6: Stage Ignition Configs
+- [Mirror Red Hat CoreOS](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/mirror_rhcos.md)
 
-Step 7: Launch Bootstrap Node
+- [Mirror Tools](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/mirror_tools.md)
 
-Step 8: Launch Master Nodes
+- [Mirror OperatorHub Images](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/mirror_operatorhub.md)
 
-Step 9: Launch Worker Nodes
+- [Mirror RPM Repositories](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/mirror_rpms.md)
 
-Step 10: Post Install
+- [Mirror Additional Container Images](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/mirror_additional_images.md)
+
+
+### Air Gap Side
+
+  This section covers setting up the infrastructure in the air gap environment and install the OpenShift 4 cluster
+
+ - [Configure Infrastructure Variable File]
+
+ - [Provision RPM Repo Mirror]
+
+ - [Install Tools]
+
+ - [Provision DNS]
+
+ - [Generate Ignition Config]
+
+ - [Launch Bootstrap Node]
+
+ - [Launch Master Nodes]
+
+ - [Launch Worker Nodes]
+
+ - [Post Install]
 
 
 ### Miscellaneous
