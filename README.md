@@ -29,8 +29,11 @@ These tools can also be used in semi-disconnected environments which can be reac
 
   This section covers getting started on the internet connected helper node. This is where all tools and images will be downloaded to
 
+- [Download Pull Secret from Red Hat](https://cloud.redhat.com/openshift/install)
 
 - [Create main variable file](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/vars-all.md)
+
+- [Create the Ansible Inventory file](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/inventory.md)
 
 - [Create a docker registry for mirrored images](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/registry_server.md)
 
@@ -42,32 +45,30 @@ These tools can also be used in semi-disconnected environments which can be reac
 
 - [Mirror OperatorHub Images](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/mirror_operatorhub.md)
 
-- [Mirror RPM Repositories](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/mirror_rpms.md)
+- [Mirror RPM Repositories](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/mirror_rpms.md)(Optional)
 
-- [Mirror Additional Container Images](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/mirror_additional_images.md)
+- [Mirror Additional Container Images](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/mirror_additional_images.md)(Optional)
+
+- [Mirror Helm and Helm Charts](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/mirror_helm.md)(Optional)
 
 
 ### Air Gap Side
 
   This section covers setting up the infrastructure in the air gap environment and install the OpenShift 4 cluster
 
- - [Configure Infrastructure Variable File]
+ - [Create main variable file](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/vars-all.md)
 
- - [Provision RPM Repo Mirror]
+ - [Create the Ansible Inventory file](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/inventory.md)
 
- - [Install Tools]
+ - [Configure AWS Infrastructure Variable File](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/vars-aws.md) (for AWS only)
 
- - [Provision DNS]
+ - [Configure AWS Infrastructure Variable File](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/vars-vmware.md) (for VMWare only)
 
- - [Generate Ignition Config]
+ - [Provision RPM Repo Mirror](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/mirror_rpms.md)
 
- - [Launch Bootstrap Node]
+ - [Install Tools](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/mirror_tools.md)
 
- - [Launch Master Nodes]
-
- - [Launch Worker Nodes]
-
- - [Post Install]
+ - [Post Install](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/post-install.md)
 
 
 ### Miscellaneous
@@ -76,13 +77,17 @@ When installing in an emulator you may require an SSH tunnel to reach the web co
 The DNS names need to be configured because the cluster's pages will redirect so using
 IPs directly won't work.
 
-ssh -L 127.0.0.2:8443:10.0.106.42:443 -L 127.0.0.2:8080:10.0.106.42:80 ec2-user@proxyhost
+```
+ssh -L 127.0.0.2:8443:<IP Address of the https load balancer>:443 -L 127.0.0.2:8080:<IP Address of the https load balancer>:80 ec2-user@proxyhost
+```
 
-Inside you local /etc/hosts:
+Inside your local /etc/hosts:
 
-127.0.0.2 console-openshift-console.apps.caas.redhatgovsa.io oauth-openshift.apps.caas.redhatgovsa.io
+```
+127.0.0.2 console-openshift-console.apps.<ocp_cluster_name>.<ocp_base_domain> oauth-openshift.apps.<ocp_cluster_name>.<ocp_base_domain>
+```
 
-Now browse to https://console-openshift-console.apps.caas.redhatgovsa.io
+Now browse to https://console-openshift-console.apps.<ocp_cluster_name>.<ocp_base_domain>
 
 ### License
 
