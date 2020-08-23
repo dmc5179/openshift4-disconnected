@@ -35,7 +35,7 @@ These tools can also be used in semi-disconnected environments which can be reac
 
 - [Create the Ansible Inventory file](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/inventory.md)
 
-- [Create a docker registry for mirrored images](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/registry_server.md)
+- [Create a docker registry for mirrored images](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/registry_server.md)(Optional)
 
 - [Mirror OpenShift Cluster Images](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/mirror_ocp_images.md)
 
