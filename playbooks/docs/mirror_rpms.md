@@ -1,0 +1,1 @@
+# Mirroring the RPM repositories for the cluster external infrastructure node(s)
