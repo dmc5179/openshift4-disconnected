@@ -1,7 +1,7 @@
 #!/bin/bash -xe
 
 # Source the environment file with the default settings
-. ./env.sh
+. ../env.sh
 
 aws --endpoint-url "${ELB_ENDPOINT}" --no-verify-ssl \
     elbv2 create-target-group \
