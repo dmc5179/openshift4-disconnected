@@ -238,6 +238,14 @@
   tags:
     - ignition
 
+- name: Patch existing igntion systemd section
+  ignition_systemd_patch:
+    src: '{{ item }}'
+    patch: lookup('file', 'nm-patch.json')
+    backup: false
+  with_fileglob:
+    - '{{ ignition_configs }}/*.ign'
+
 - name: Create kube config location
   file:
     path: "~/.kube"
