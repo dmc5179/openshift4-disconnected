@@ -1,5 +1,5 @@
 
-# Mirror from local registry to ECR
+# Mirroring OpenShift 4 Cluster Container Images to a private repository
 
 ## Variable file
 
