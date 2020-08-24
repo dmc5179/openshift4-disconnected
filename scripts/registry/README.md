@@ -5,27 +5,44 @@
 
 - Copy the env.sh.example file to env.sh and edit the variables as described below
 
-| Variable                                        | Default                                                       | Comments                        |
-| :---                                            | :---                                                          | :---                            |
-| OCP_RELEASE                                     | "4.5.1-x86_64"                                                |                                 |
-| LOCAL_REG                                       | 'localhost:5000'                                              |                                 |
-| LOCAL_REPO                                      | 'ocp4/openshift4'                                             |                                 |
-| LOCAL_REG_INSEC                                 | 'true'                                                        |                                 |
-| UPSTREAM_REPO                                   | 'openshift-release-dev'                                       |                                 |
-| OCP_ARCH                                        | "x86_64"                                                      |                                 |
-| REMOVABLE_MEDIA_PATH                            | "/tmp/ocp-${OCP_RELEASE}"                                     |                                 |
-| REMOTE_REG                                      | "localhost:5000"                                              |                                 |
-| LOCAL_SECRET_JSON                               | "${HOME}/pull-secret.json"                                    |                                 |
-| RELEASE_NAME                                    | "ocp-release"                                                 |                                 |
-| RH_OP                                           | 'true'                                                        |                                 |
-| CERT_OP                                         | 'false'                                                       |                                 |
-| COMM_OP                                         | 'false'                                                       |                                 |
-| RH_OP_REPO                                      | "${LOCAL_REG}/olm/redhat-operators:v1"                        |                                 |
-| CERT_OP_REPO                                    | "${LOCAL_REG}/olm/certified-operators:v1"                     |                                 |
-| COMM_OP_REPO                                    | "${LOCAL_REG}/olm/community-operators:v1"                     |                                 |
-| OPERATOR_REGISTRY                               | 'quay.io/operator-framework/operator-registry-server:v1.13.6' |                                 |
-| DATA_DIR                                        | "/opt/registry/data/docker/"                                  |                                 |
+| Variable                                        | Default                                                       | Comments                                                                                                 |
+| :---                                            | :---                                                          | :---                                                                                                     |
+| OCP_RELEASE                                     | "4.5.1-x86_64"                                                | OpenShift version                                                                                        |
+| LOCAL_REG                                       | 'localhost:5000'                                              | Registry where the images will be pushed to                                                              |
+| LOCAL_REPO                                      | 'ocp4/openshift4'                                             | Repository where the images will be pushed to                                                            |
+| LOCAL_REG_INSEC                                 | 'true'                                                        | SSL secure registry option                                                                               |
+| UPSTREAM_REPO                                   | 'openshift-release-dev'                                       | OpenShift release stream                                                                                 |
+| OCP_ARCH                                        | "x86_64"                                                      | OpenShift Architecture                                                                                   |
+| REMOVABLE_MEDIA_PATH                            | "/tmp/ocp-${OCP_RELEASE}"                                     | Local directory when mirroring to a directory                                                            |
+| REMOTE_REG                                      | "localhost:5000"                                              | Registry where the images will be pushed to                                                              |
+| LOCAL_SECRET_JSON                               | "${HOME}/pull-secret.json"                                    | Pull secret which contains auth tokens for both the OpenShift repos and the private repo                 |
+| RELEASE_NAME                                    | "ocp-release"                                                 | OpenShift release stream                                                                                 |
+| RH_OP                                           | 'true'                                                        | Mirror RedHat Operators                                                                                  |
+| CERT_OP                                         | 'false'                                                       | Mirror Certified Operators                                                                               |
+| COMM_OP                                         | 'false'                                                       | Mirror Community Operators                                                                               |
+| RH_OP_REPO                                      | "${LOCAL_REG}/olm/redhat-operators:v1"                        | Location in private registry for RedHat Operator Catalog Source (generally don't need to change this)    |
+| CERT_OP_REPO                                    | "${LOCAL_REG}/olm/certified-operators:v1"                     | Location in private registry for Certified Operator Catalog Source (generally don't need to change this) |
+| COMM_OP_REPO                                    | "${LOCAL_REG}/olm/community-operators:v1"                     | Location in private registry for Community Operator Catalog Source (generally don't need to change this) |
+| OPERATOR_REGISTRY                               | 'quay.io/operator-framework/operator-registry-server:v1.13.6' | Image to build the operator catalog images on top of (generally don't need to change this)               |
+| DATA_DIR                                        | "/opt/registry/data/docker/"                                  | Local directory where the registry will be installed to if installing a private registry                 |
 
+## Mirroring to a registry
+
+### Creating your own local docker registry
+
+- Create a podman registry by running the following script. (Note that this script uses sudo for some things)
+
+```
+./install_registry.sh
+```
+
+### Mirror the OpenShift Cluster Images
+
+- Mirror the OpenShift cluster images to the registry set in env.sh
+
+```
+./mirror_to_registry.sh
+```
 
 ## Helpful commands
 
