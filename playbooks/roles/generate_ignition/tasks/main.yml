@@ -245,6 +245,8 @@
     backup: false
   with_fileglob:
     - '{{ ignition_configs }}/*.ign'
+  tags:
+    - ignition
 
 - name: Create kube config location
   file:
