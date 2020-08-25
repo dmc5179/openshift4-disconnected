@@ -16,10 +16,6 @@ K8S_WORKER_SG=$(aws --endpoint-url "${EC2_ENDPOINT}" ${AWS_OPTS} ec2 describe-se
   | jq '.SecurityGroups[] | select(.GroupName == "caas-k8s-worker") | .GroupId' | tr -d '"')
 
 
-#echo "1: ${K8S_ELB_SG}"
-#echo "2: ${K8S_MASTER_SG}"
-#echo "3: ${K8S_WORKER_SG}"
-
 # If it doesn't exist, create it
 if [ -z "${K8S_ELB_SG}" ]
 then
@@ -28,6 +24,10 @@ then
       --description "Security group for (openshift-ingress/router-default)" \
       --group-name "${OCP_CLUSTER_NAME}-k8s-elb" \
       --vpc-id "${VPC_ID}"
+
+  aws --endpoint-url "${EC2_ENDPOINT}" ${AWS_OPTS} ec2 authorize-security-group-ingress \
+      --group-id ${K8S_ELB_SG} \
+      --cli-input-json "$(cat k8s-elb-sg.json)"
 
 fi
 
@@ -53,6 +53,27 @@ then
 
 fi
 
+
+rm -f /tmp/masters-sg.json
+cp masters-sg.json /tmp/masters-sg.json
+sed -i "s|MASTER_SG|${K8S_MASTER_SG}|g" /tmp/masters-sg.json
+sed -i "s|WORKER_SG|${K8S_WORKER_SG}|g" /tmp/masters-sg.json
+sed -i "s|AWS_ACCT_ID|${AWS_ACCT_ID}|g" /tmp/masters-sg.json
+
 aws --endpoint-url "${EC2_ENDPOINT}" ${AWS_OPTS} ec2 authorize-security-group-ingress \
-    --group-id ${K8S_ELB_SG} \
-    --cli-input-json "$(cat k8s-elb-sg.json)"
+    --group-id ${K8S_MASTER_SG} \
+    --cli-input-json "$(cat /tmp/masters-sg.json)"
+
+#rm -f /tmp/masters-sg.json
+
+rm -f /tmp/workers-sg.json
+cp workers-sg.json /tmp/workers-sg.json
+sed -i "s|MASTER_SG|${K8S_MASTER_SG}|g" /tmp/workers-sg.json
+sed -i "s|WORKER_SG|${K8S_WORKER_SG}|g" /tmp/workers-sg.json
+sed -i "s|AWS_ACCT_ID|${AWS_ACCT_ID}|g" /tmp/workers-sg.json
+
+aws --endpoint-url "${EC2_ENDPOINT}" ${AWS_OPTS} ec2 authorize-security-group-ingress \
+    --group-id ${K8S_WORKER_SG} \
+    --cli-input-json "$(cat /tmp/workers-sg.json)"
+
+exit 0
