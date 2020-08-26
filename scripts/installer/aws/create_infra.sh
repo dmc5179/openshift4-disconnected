@@ -83,7 +83,7 @@ then
 
   aws --endpoint-url "${ELB_ENDPOINT}" ${AWS_OPTS} \
       elbv2 create-load-balancer --name "${OCP_CLUSTER_NAME}-int" \
-      --type network --subnets "${SUBNET_ID}" --security-groups "${SG_ID}"
+      --type network --subnets "${SUBNET_ID}"
 
   INT_LB_ARN=$(aws --endpoint-url "${ELB_ENDPOINT}" ${AWS_OPTS} \
       elbv2 describe-load-balancers | jq '.LoadBalancers[] | select(.LoadBalancerName == "caas-int") | .LoadBalancerArn' | tr -d '"')
@@ -109,7 +109,7 @@ then
 
   aws --endpoint-url "${ELB_ENDPOINT}" ${AWS_OPTS} \
       elbv2 create-load-balancer --name "${OCP_CLUSTER_NAME}-ext}" \
-      --type network --subnets "${SUBNET_ID}" --security-groups "${SG_ID}"
+      --type network --subnets "${SUBNET_ID}"
 
   EXT_LB_ARN=$(aws --endpoint-url "${ELB_ENDPOINT}" ${AWS_OPTS} \
       elbv2 describe-load-balancers | jq '.LoadBalancers[] | select(.LoadBalancerName == "caas-ext") | .LoadBalancerArn' | tr -d '"')
