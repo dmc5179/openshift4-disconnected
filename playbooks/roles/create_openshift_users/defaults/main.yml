@@ -1,0 +1,7 @@
+---
+
+mirror_base: '/tmp'
+
+openshift_cluster_admin_username: 'admin'
+openshift_cluster_admin_password: 'redhat1'
+
