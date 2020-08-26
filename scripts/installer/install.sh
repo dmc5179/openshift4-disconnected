@@ -22,6 +22,7 @@ K8S_WORKER_SG=$(aws --endpoint-url "${EC2_ENDPOINT}" ${AWS_OPTS} ec2 describe-se
 BOOTSTRAP_INSTANCE_ID=$(aws --endpoint-url "${EC2_ENDPOINT}" ${AWS_OPTS} ec2 run-instances --image-id "${AMI}" --count 1 --instance-type 'i3.large' \
 --key-name 'Combine' --subnet-id "${EC2_SUBNET}" --security-group-ids "${K8S_MASTER_SG}" --ebs-optimized \
 --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=caas-bootstrap}]' --private-ip-address "${BOOTSTRAP_IP}" \
+--block-device-mapping "DeviceName=/dev/xvda,Ebs={DeleteOnTermination=true,KmsKeyId=${KMS_KEY_ID},Encrypted=true}" \
 --user-data '{"ignition":{"config":{"replace":{"source":"http://10.0.106.109:8080/ignition/bootstrap.ign","verification":{}}},"timeouts":{},"version":"2.2.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}' | jq '.Instances[0].InstanceId' | tr -d '"')
 
 aws --endpoint-url "${ELB_ENDPOINT}" ${AWS_OPTS} \
@@ -31,18 +32,21 @@ aws --endpoint-url "${ELB_ENDPOINT}" ${AWS_OPTS} \
 MASTER0_INSTANCE_ID=$(aws --endpoint-url "${EC2_ENDPOINT}" ${AWS_OPTS} ec2 run-instances --image-id "${AMI}" --count 1 --instance-type 'm5.2xlarge' \
 --key-name 'Combine' --subnet-id "${EC2_SUBNET}" --security-group-ids "${K8S_MASTER_SG}" --ebs-optimized \
 --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=caas-master0}]' --private-ip-address "${MASTER0_IP}" \
+--block-device-mapping "DeviceName=/dev/xvda,Ebs={DeleteOnTermination=true,VolumeSize=50,VolumeType=gp2,KmsKeyId=${KMS_KEY_ID},Encrypted=true}" \
 --user-data '{"ignition":{"config":{"replace":{"source":"http://10.0.106.109:8080/ignition/master0.ign","verification":{}}},"timeouts":{},"version":"2.2.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}' | jq '.Instances[0].InstanceId' | tr -d '"')
 
 # AWS CLI to launch master1
 MASTER1_INSTANCE_ID=$(aws --endpoint-url "${EC2_ENDPOINT}" ${AWS_OPTS} ec2 run-instances --image-id "${AMI}" --count 1 --instance-type 'm5.2xlarge' \
 --key-name 'Combine' --subnet-id "${EC2_SUBNET}" --security-group-ids "${K8S_MASTER_SG}" --ebs-optimized \
 --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=caas-master1}]' --private-ip-address "${MASTER1_IP}" \
+--block-device-mapping "DeviceName=/dev/xvda,Ebs={DeleteOnTermination=true,VolumeSize=50,VolumeType=gp2,KmsKeyId=${KMS_KEY_ID},Encrypted=true}" \
 --user-data '{"ignition":{"config":{"replace":{"source":"http://10.0.106.109:8080/ignition/master1.ign","verification":{}}},"timeouts":{},"version":"2.2.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}' | jq '.Instances[0].InstanceId' | tr -d '"')
 
 # AWS CLI to launch master2
 MASTER2_INSTANCE_ID=$(aws --endpoint-url "${EC2_ENDPOINT}" ${AWS_OPTS} ec2 run-instances --image-id "${AMI}" --count 1 --instance-type 'm5.2xlarge' \
 --key-name 'Combine' --subnet-id "${EC2_SUBNET}" --security-group-ids "${K8S_MASTER_SG}" --ebs-optimized \
 --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=caas-master2}]' --private-ip-address "${MASTER2_IP}" \
+--block-device-mapping "DeviceName=/dev/xvda,Ebs={DeleteOnTermination=true,VolumeSize=50,VolumeType=gp2,KmsKeyId=${KMS_KEY_ID},Encrypted=true}" \
 --user-data '{"ignition":{"config":{"replace":{"source":"http://10.0.106.109:8080/ignition/master2.ign","verification":{}}},"timeouts":{},"version":"2.2.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}' | jq '.Instances[0].InstanceId' | tr -d '"')
 
 
@@ -57,18 +61,21 @@ MASTER2_INSTANCE_ID=$(aws --endpoint-url "${EC2_ENDPOINT}" ${AWS_OPTS} ec2 run-i
 WORKER0_INSTANCE_ID=$(aws --endpoint-url "${EC2_ENDPOINT}" ${AWS_OPTS} ec2 run-instances --image-id "${AMI}" --count 1 --instance-type 'm5.2xlarge' \
 --key-name 'Combine' --subnet-id "${EC2_SUBNET}" --security-group-ids "${K8S_WORKER_SG}" --ebs-optimized \
 --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=caas-worker0}]' --private-ip-address "${WORKER0_IP}" \
+--block-device-mapping "DeviceName=/dev/xvda,Ebs={DeleteOnTermination=true,VolumeSize=50,VolumeType=gp2,KmsKeyId=${KMS_KEY_ID},Encrypted=true}" \
 --user-data '{"ignition":{"config":{"replace":{"source":"http://10.0.106.109:8080/ignition/worker0.ign","verification":{}}},"timeouts":{},"version":"2.2.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}' | jq '.Instances[0].InstanceId' | tr -d '"')
 
 # AWS CLI to launch worker1
 WORKER1_INSTANCE_ID=$(aws --endpoint-url "${EC2_ENDPOINT}" ${AWS_OPTS} ec2 run-instances --image-id "${AMI}" --count 1 --instance-type 'm5.2xlarge' \
 --key-name 'Combine' --subnet-id "${EC2_SUBNET}" --security-group-ids "${K8S_WORKER_SG}" --ebs-optimized \
 --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=caas-worker1}]' --private-ip-address "${WORKER1_IP}" \
+--block-device-mapping "DeviceName=/dev/xvda,Ebs={DeleteOnTermination=true,VolumeSize=50,VolumeType=gp2,KmsKeyId=${KMS_KEY_ID},Encrypted=true}" \
 --user-data '{"ignition":{"config":{"replace":{"source":"http://10.0.106.109:8080/ignition/worker1.ign","verification":{}}},"timeouts":{},"version":"2.2.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}' | jq '.Instances[0].InstanceId' | tr -d '"')
 
 # AWS CLI to launch worker2
 WORKER2_INSTANCE_ID=$(aws --endpoint-url "${EC2_ENDPOINT}" ${AWS_OPTS} ec2 run-instances --image-id "${AMI}" --count 1 --instance-type 'm5.2xlarge' \
 --key-name 'Combine' --subnet-id "${EC2_SUBNET}" --security-group-ids "${K8S_WORKER_SG}" --ebs-optimized \
 --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=caas-worker2}]' --private-ip-address "${WORKER2_IP}" \
+--block-device-mapping "DeviceName=/dev/xvda,Ebs={DeleteOnTermination=true,VolumeSize=50,VolumeType=gp2,KmsKeyId=${KMS_KEY_ID},Encrypted=true}" \
 --user-data '{"ignition":{"config":{"replace":{"source":"http://10.0.106.109:8080/ignition/worker2.ign","verification":{}}},"timeouts":{},"version":"2.2.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}' | jq '.Instances[0].InstanceId' | tr -d '"')
 
 aws --endpoint-url "${ELB_ENDPOINT}" ${AWS_OPTS} \
