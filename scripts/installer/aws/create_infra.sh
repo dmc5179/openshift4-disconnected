@@ -83,20 +83,20 @@ then
 
   aws --endpoint-url "${ELB_ENDPOINT}" ${AWS_OPTS} \
       elbv2 create-load-balancer --name "${OCP_CLUSTER_NAME}-int" \
-      --type network --subnets "${SUBNET_ID}"
+      --type network --subnets "${EC2_SUBNET}"
 
   INT_LB_ARN=$(aws --endpoint-url "${ELB_ENDPOINT}" ${AWS_OPTS} \
       elbv2 describe-load-balancers | jq '.LoadBalancers[] | select(.LoadBalancerName == "caas-int") | .LoadBalancerArn' | tr -d '"')
 
   # Add the target groups aint and sint
   aws --endpoint-url "${ELB_ENDPOINT}" ${AWS_OPTS} \
-      elbv2 add-listener --load-balaner-arn "${INT_LB_ARN}" \
-      --port 6443 --protocol tcp \
+      elbv2 create-listener --load-balancer-arn "${INT_LB_ARN}" \
+      --port 6443 --protocol TCP \
       --default-action "Type=forward,TargetGroupArn=${API_INT_TG_ARN}"
 
   aws --endpoint-url "${ELB_ENDPOINT}" ${AWS_OPTS} \
-      elbv2 add-listener --load-balaner-arn "${INT_LB_ARN}" \
-      --port 22623 --protocol tcp \
+      elbv2 create-listener --load-balancer-arn "${INT_LB_ARN}" \
+      --port 22623 --protocol TCP \
       --default-action "Type=forward,TargetGroupArn=${S_INT_TG_ARN}"
 fi
 
@@ -108,16 +108,16 @@ if [ -z "${EXT_LB_ARN}" ]
 then
 
   aws --endpoint-url "${ELB_ENDPOINT}" ${AWS_OPTS} \
-      elbv2 create-load-balancer --name "${OCP_CLUSTER_NAME}-ext}" \
-      --type network --subnets "${SUBNET_ID}"
+      elbv2 create-load-balancer --name "${OCP_CLUSTER_NAME}-ext" \
+      --type network --subnets "${EC2_SUBNET}"
 
   EXT_LB_ARN=$(aws --endpoint-url "${ELB_ENDPOINT}" ${AWS_OPTS} \
       elbv2 describe-load-balancers | jq '.LoadBalancers[] | select(.LoadBalancerName == "caas-ext") | .LoadBalancerArn' | tr -d '"')
 
   # Add the target group aext
   aws --endpoint-url "${ELB_ENDPOINT}" ${AWS_OPTS} \
-      elbv2 add-listener --load-balaner-arn "${EXT_LB_ARN}" \
-      --port 6443 --protocol tcp \
+      elbv2 create-listener --load-balancer-arn "${EXT_LB_ARN}" \
+      --port 6443 --protocol TCP \
       --default-action "Type=forward,TargetGroupArn=${API_EXT_TG_ARN}"
 fi
 
@@ -129,7 +129,7 @@ then
 
   aws --endpoint-url "${ELB_ENDPOINT}" ${AWS_OPTS} \
       elb create-load-balancer --load-balancer-name "${OCP_CLUSTER_NAME}-ingress" \
-      --subnets "${SUBNET_ID}" --security-groups "${K8S_ELB_SG}"
+      --subnets "${EC2_SUBNET}" --security-groups "${K8S_ELB_SG}" --listeners "$(cat ingress-listeners.json)"
 
   # TODO: Add all nodes to the ingress load balancer above. Use IPs or instance IDs?
 
