@@ -2,7 +2,7 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
   name: quay-operator
-  namespace: quay
+  namespace: {{ quay_namespace }}
 spec:
   channel: quay-v3.3
   installPlanApproval: Automatic

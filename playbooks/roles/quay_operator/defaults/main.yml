@@ -1,3 +1,7 @@
 ---
 
+quay_namespace: quay-enterprise
+
+ocp_cluster_name: 'caas'
+ocp_base_domain: 'example.com'
 

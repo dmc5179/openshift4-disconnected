@@ -1,0 +1,17 @@
+apiVersion: redhatcop.redhat.io/v1alpha1
+kind: QuayEcosystem
+metadata:
+  name: quayecosystem
+  labels: {}
+  namespace: {{ quay_namespace }}
+spec:
+  clair:
+    enabled: true
+    imagePullSecretName: redhat-pull-secret
+  quay:
+    keepConfigDeployment: true
+    externalAccess:
+      hostname: quay-enterprise.apps.{{ ocp_cluster_name }}.{{ ocp_base_domain }}
+    deploymentStrategy: Recreate
+    imagePullSecretName: redhat-pull-secret
+    skipSetup: false
