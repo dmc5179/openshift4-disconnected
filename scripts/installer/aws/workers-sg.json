@@ -1,0 +1,169 @@
+{
+  "IpPermissions": [
+    {
+      "FromPort": 30000,
+      "IpProtocol": "tcp",
+      "IpRanges": [],
+      "Ipv6Ranges": [],
+      "PrefixListIds": [],
+      "ToPort": 32767,
+      "UserIdGroupPairs": [
+        {
+          "GroupId": "MASTER_SG",
+          "UserId": "AWS_ACCT_ID"
+        },
+        {
+          "GroupId": "WORKER_SG",
+          "UserId": "AWS_ACCT_ID"
+        }
+      ]
+    },
+    {
+      "FromPort": 6081,
+      "IpProtocol": "udp",
+      "IpRanges": [],
+      "Ipv6Ranges": [],
+      "PrefixListIds": [],
+      "ToPort": 6081,
+      "UserIdGroupPairs": [
+        {
+          "GroupId": "MASTER_SG",
+          "UserId": "AWS_ACCT_ID"
+        },
+        {
+          "GroupId": "WORKER_SG",
+          "UserId": "AWS_ACCT_ID"
+        }
+      ]
+    },
+    {
+      "IpProtocol": "-1",
+      "IpRanges": [],
+      "Ipv6Ranges": [],
+      "PrefixListIds": [],
+      "UserIdGroupPairs": [
+        {
+          "GroupId": "K8S_ELB_SG",
+          "UserId": "AWS_ACCT_ID"
+        }
+      ]
+    },
+    {
+      "FromPort": 9000,
+      "IpProtocol": "udp",
+      "IpRanges": [],
+      "Ipv6Ranges": [],
+      "PrefixListIds": [],
+      "ToPort": 9999,
+      "UserIdGroupPairs": [
+        {
+          "GroupId": "MASTER_SG",
+          "UserId": "AWS_ACCT_ID"
+        },
+        {
+          "GroupId": "WORKER_SG",
+          "UserId": "AWS_ACCT_ID"
+        }
+      ]
+    },
+    {
+      "FromPort": 22,
+      "IpProtocol": "tcp",
+      "IpRanges": [
+        {
+          "CidrIp": "10.0.0.0/16"
+        }
+      ],
+      "Ipv6Ranges": [],
+      "PrefixListIds": [],
+      "ToPort": 22,
+      "UserIdGroupPairs": []
+    },
+    {
+      "FromPort": 30000,
+      "IpProtocol": "udp",
+      "IpRanges": [],
+      "Ipv6Ranges": [],
+      "PrefixListIds": [],
+      "ToPort": 32767,
+      "UserIdGroupPairs": [
+        {
+          "GroupId": "MASTER_SG",
+          "UserId": "AWS_ACCT_ID"
+        },
+        {
+          "GroupId": "WORKER_SG",
+          "UserId": "AWS_ACCT_ID"
+        }
+      ]
+    },
+    {
+      "FromPort": 9000,
+      "IpProtocol": "tcp",
+      "IpRanges": [],
+      "Ipv6Ranges": [],
+      "PrefixListIds": [],
+      "ToPort": 9999,
+      "UserIdGroupPairs": [
+        {
+          "GroupId": "MASTER_SG",
+          "UserId": "AWS_ACCT_ID"
+        },
+        {
+          "GroupId": "WORKER_SG",
+          "UserId": "AWS_ACCT_ID"
+        }
+      ]
+    },
+    {
+      "FromPort": 10250,
+      "IpProtocol": "tcp",
+      "IpRanges": [],
+      "Ipv6Ranges": [],
+      "PrefixListIds": [],
+      "ToPort": 10250,
+      "UserIdGroupPairs": [
+        {
+          "GroupId": "MASTER_SG",
+          "UserId": "AWS_ACCT_ID"
+        },
+        {
+          "GroupId": "WORKER_SG",
+          "UserId": "AWS_ACCT_ID"
+        }
+      ]
+    },
+    {
+      "FromPort": 4789,
+      "IpProtocol": "udp",
+      "IpRanges": [],
+      "Ipv6Ranges": [],
+      "PrefixListIds": [],
+      "ToPort": 4789,
+      "UserIdGroupPairs": [
+        {
+          "GroupId": "MASTER_SG",
+          "UserId": "AWS_ACCT_ID"
+        },
+        {
+          "GroupId": "WORKER_SG",
+          "UserId": "AWS_ACCT_ID"
+        }
+      ]
+    },
+    {
+      "FromPort": -1,
+      "IpProtocol": "icmp",
+      "IpRanges": [
+        {
+          "CidrIp": "10.0.0.0/16"
+        }
+      ],
+      "Ipv6Ranges": [],
+      "PrefixListIds": [],
+      "ToPort": -1,
+      "UserIdGroupPairs": []
+    }
+  ],
+  "GroupId": "WORKER_SG"
+}

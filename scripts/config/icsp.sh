@@ -12,7 +12,7 @@ kind: MachineConfig
 metadata:
   labels:
     machineconfiguration.openshift.io/role: master
-  name: masters-chrony-configuration
+  name: master-priv-reg-configuration
 spec:
   config:
     ignition:
@@ -41,7 +41,7 @@ kind: MachineConfig
 metadata:
   labels:
     machineconfiguration.openshift.io/role: worker
-  name: masters-chrony-configuration
+  name: worker-priv-reg-configuration
 spec:
   config:
     ignition:
