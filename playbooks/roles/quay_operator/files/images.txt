@@ -1,0 +1,5 @@
+registry.redhat.io/quay/quay-rhel8-operator@sha256:632f293ce63f89eddbbe4b769c3af166b72f6a0ddca66bd7a183df0f74ad9de8
+registry.access.redhat.com/rhscl/redis-32-rhel7:latest
+registry.access.redhat.com/rhscl/postgresql-96-rhel7:1
+quay.io/projectquay/quay:qui-gon
+quay.io/projectquay/clair-jwt:qui-gon
