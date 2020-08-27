@@ -12,8 +12,8 @@
     cmd: |
 
         /usr/local/bin/helm install \
+            aws-ebs-csi-driver \
             --namespace kube-system \
-            --name aws-ebs-csi-driver \
             --set enableVolumeScheduling=true \
             --set enableVolumeResizing=true \
             --set enableVolumeSnapshot=true \

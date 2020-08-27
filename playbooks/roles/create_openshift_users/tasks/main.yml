@@ -1,0 +1,84 @@
+---
+
+- name: Ensure directory exists for htpasswd file
+  delegate_to: localhost
+  file:
+    path: '{{ mirror_base }}/htpasswd'
+    state: directory
+
+- name: Install required passlib pip module
+  delegate_to: localhost
+  pip:
+    name: 'passlib'
+    executable: 'pip3'
+    extra_args: '--user'
+
+- name: generate users.htpasswd file - create admin account entry
+  delegate_to: localhost
+  htpasswd:
+    create: yes
+    path: "{{ mirror_base }}/htpasswd/users.htpasswd"
+    name: "{{ openshift_cluster_admin_username }}"
+    password: "{{ openshift_cluster_admin_password }}"
+    state: present
+
+#- name: generate users.htpasswd file - create workshop user entries
+#  htpasswd:
+#    path: "{{ openshift_build_path }}/users.htpasswd"
+#    name: "user{{ item }}"
+#    password: "{{ openshift_user_password }}"
+#  with_sequence: count="{{ openshift_user_count }}"
+
+- name: Slurp the htpasswd file into a variable
+  delegate_to: localhost
+  slurp:
+    src: "{{ mirror_base }}/htpasswd/users.htpasswd"
+  register: htpasswd_slurp
+
+- name: Create htpass-secret
+  delegate_to: localhost
+  k8s:
+    state: present
+    name: htpass-secret
+    namespace: openshift-config
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/htpass_secret.yaml.j2') }}"
+
+- name: apply htpasswd custom resource identity provider
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/htpasswd-cr.yaml.j2') }}"
+
+- name: apply htpasswd custom resource identity provider
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/defaultProject.yaml.j2') }}"
+
+#- name: add default project settings to openshift config
+#  shell: >
+#    {{ openshift_build_path }}/oc get project.config.openshift.io/cluster -o yaml
+#    | sed 's/spec: {}/spec: {"projectRequestTemplate":{"name": "project-request"}}/g'
+#    | {{ openshift_build_path }}/oc apply -f -
+
+#- name: pausing 120 seconds to allow htpasswd authentication provider to start
+#  pause:
+#    seconds: 120
+
+#- name: prime cluster_admin user and validate login
+#  shell: "{{ openshift_build_path }}/oc login https://api.{{ openshift_cluster_fqdn }}:6443 --username={{ openshift_cluster_admin_username }} --password={{ openshift_cluster_admin_password }}"
+#  ignore_errors: yes
+
+#- name: add cluster role to new admin account
+#  shell: |
+#    {{ openshift_build_path }}/oc login https://api.{{ openshift_cluster_fqdn }}:6443 --username=kubeadmin --password={{ kubeadmin_password }}
+#    {{ openshift_build_path }}/oc adm policy add-cluster-role-to-user cluster-admin {{ openshift_cluster_admin_username }}

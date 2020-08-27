@@ -1,5 +1,5 @@
 
-# Mirroring OpenShift 4 Cluster Container Images to a private repository
+# Mirror OpenShift 4 OperatorHub Container Images
 
 ## Variable file
 
@@ -42,6 +42,18 @@
 
 ```
 ./mirror_to_registry.sh
+```
+
+### Build OpenShift OperatorHub Catalog Source Images
+
+```
+
+```
+
+### Export OpenShift OperatorHub Catalog Source Images
+
+```
+
 ```
 
 ## Helpful commands
