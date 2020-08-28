@@ -21,7 +21,7 @@
     validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/quay-operator.yaml.j2') }}"
 
-- name: Slurp the htpasswd file into a variable
+- name: Slurp the pull secret file into a variable
   delegate_to: localhost
   slurp:
     src: "{{ pull_secret }}"
