@@ -8,7 +8,7 @@
     kind: Namespace
     state: present
     wait: true
-    kubeconfig: "{{ kubeconfig  }}"
+    kubeconfig: "{{ kubeconfig }}"
     validate_certs: '{{ kube_ssl_enabled }}'
 
 - name: Subscribe to the quay operator
@@ -20,6 +20,30 @@
     kubeconfig: "{{ kubeconfig }}"
     validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/quay-operator.yaml.j2') }}"
+
+- name: Create postgres credential secret
+  shell: |
+
+    oc create secret generic postgres-creds \
+      --from-literal=database-username=quay \
+      --from-literal=database-password=thisissparta \
+      --from-literal=database-root-password=thisissparta \
+      --from-literal=database-name=quay
+
+- name: Create redis credentials secret
+  shell: |
+    oc create secret generic redis-password  --from-literal=password=thisissparta
+
+- name: Create quay config secret
+  shell: |
+    oc create secret generic quay-config --from-literal=config-app-password=StrongPassword
+
+- name: Create quay admin credentials secret
+  shell: |
+    oc create secret generic quay-admin \
+      --from-literal=superuser-username=quayadmin \
+      --from-literal=superuser-password=thisissparta \
+      --from-literal=superuser-email=admin@spo.io
 
 - name: Slurp the pull secret file into a variable
   delegate_to: localhost
