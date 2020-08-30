@@ -1,0 +1,16 @@
+{
+  "ignition": {
+    "config": {
+      "replace": {
+        "source": "IGN_SERVER/IGN_PATH/HOST.ign",
+        "verification": {}
+      }
+    },
+    "timeouts": {},
+    "version": "IGN_VERSION"
+  },
+  "networkd": {},
+  "passwd": {},
+  "storage": {},
+  "systemd": {}
+}
