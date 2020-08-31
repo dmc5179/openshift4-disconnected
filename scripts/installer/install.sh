@@ -21,13 +21,13 @@ K8S_WORKER_SG=$(aws --endpoint-url "${EC2_ENDPOINT}" ${AWS_OPTS} ec2 describe-se
 USER_DATA=$(sed "s|IGN_SERVER|${IGN_SERVER}|" user-data-ign.json | sed "s|IGN_PATH|${IGN_PATH}|g" | sed "s|IGN_VERSION|${IGN_VERSION}|")
 
 # Generate the base64 encoded user data for each ec2 instance
-BOOTSTRAP_UD=$(echo "${USER_DATA}" | sed "s|HOST|bootstrap|" | base64 -w 0)
-MASTER0_UD=$(echo "${USER_DATA}" | sed "s|HOST|master0|" | base64 -w 0)
-MASTER1_UD=$(echo "${USER_DATA}" | sed "s|HOST|master1|" | base64 -w 0)
-MASTER2_UD=$(echo "${USER_DATA}" | sed "s|HOST|master2|" | base64 -w 0)
-WORKER0_UD=$(echo "${USER_DATA}" | sed "s|HOST|worker0|" | base64 -w 0)
-WORKER1_UD=$(echo "${USER_DATA}" | sed "s|HOST|worker1|" | base64 -w 0)
-WORKER2_UD=$(echo "${USER_DATA}" | sed "s|HOST|worker2|" | base64 -w 0)
+BOOTSTRAP_UD=$(echo "${USER_DATA}" | sed "s|HOST|bootstrap|")
+MASTER0_UD=$(echo "${USER_DATA}" | sed "s|HOST|master0|")
+MASTER1_UD=$(echo "${USER_DATA}" | sed "s|HOST|master1|")
+MASTER2_UD=$(echo "${USER_DATA}" | sed "s|HOST|master2|")
+WORKER0_UD=$(echo "${USER_DATA}" | sed "s|HOST|worker0|")
+WORKER1_UD=$(echo "${USER_DATA}" | sed "s|HOST|worker1|")
+WORKER2_UD=$(echo "${USER_DATA}" | sed "s|HOST|worker2|")
 
 # AWS CLI to launch bootstrap node
 BOOTSTRAP_INSTANCE_ID=$(aws --endpoint-url "${EC2_ENDPOINT}" ${AWS_OPTS} ec2 run-instances --image-id "${AMI}" --count 1 --instance-type 'i3.large' \
