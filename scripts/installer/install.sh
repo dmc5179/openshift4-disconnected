@@ -18,7 +18,7 @@ K8S_MASTER_SG=$(aws --endpoint-url "${EC2_ENDPOINT}" ${AWS_OPTS} ec2 describe-se
 K8S_WORKER_SG=$(aws --endpoint-url "${EC2_ENDPOINT}" ${AWS_OPTS} ec2 describe-security-groups \
   | jq '.SecurityGroups[] | select(.GroupName == "caas-k8s-worker") | .GroupId' | tr -d '"')
 
-USER_DATA=$(sed "s|IGN_SERVER|${IGN_SERVER}|" user-data-ign.json | sed "s|${IGN_PATH}|igntion|g" | sed "s|IGN_VER|${IGN_VERSION}|")
+USER_DATA=$(sed "s|IGN_SERVER|${IGN_SERVER}|" user-data-ign.json | sed "s|IGN_PATH|${IGN_PATH}|g" | sed "s|IGN_VERSION|${IGN_VERSION}|")
 
 # Generate the base64 encoded user data for each ec2 instance
 BOOTSTRAP_UD=$(echo "${USER_DATA}" | sed "s|HOST|bootstrap|" | base64 -w 0)
