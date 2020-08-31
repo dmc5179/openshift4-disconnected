@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -xe
 
 # Script to stage the ignition files on an http server
 
