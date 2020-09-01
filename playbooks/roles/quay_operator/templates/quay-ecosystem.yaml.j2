@@ -4,7 +4,7 @@ metadata:
   name: quay-ecosystem
 spec:
   clair:
-    enabled: true
+    enabled: {{ clair_enabled }}
     imagePullSecretName: redhat-pull-secret
     updateInterval: "60m"
   quay:

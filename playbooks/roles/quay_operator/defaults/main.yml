@@ -1,8 +1,10 @@
 ---
 
-quay_namespace: quay-enterprise
+quay_namespace: quay
 
 quay_version: '3.3.1'
+
+clair_enabled: false
 
 quay_admin_email: 'danclark@redhat.com'
 quay_admin_password:  'thisissparta'
