@@ -5,5 +5,5 @@
   tasks:
 
     - name: Deploy the quay operator
-      include_role:
+      import_role:
         name: quay_operator
