@@ -2,6 +2,21 @@
 
 quay_namespace: quay-enterprise
 
-ocp_cluster_name: 'caas'
-ocp_base_domain: 'example.com'
+quay_version: '3.3.1'
 
+quay_admin_email: 'danclark@redhat.com'
+quay_admin_password:  'thisissparta'
+quay_admin_username:  'quayadmin'
+quay_config_password:  'thisissparta'
+quay_db_name: 'quay'
+quay_db_password: 'thisissparta'
+quay_db_root_password: 'thisissparta'
+quay_db_user: 'quay'
+quay_redis_password: 'thisissparta'
+
+ocp_cluster_name: 'icsa'
+ocp_base_domain: 'iad.redhat.com'
+
+
+kubeconfig: '/home/danclark/icsa-kubeconfig'
+kube_ssl_enabled: false
