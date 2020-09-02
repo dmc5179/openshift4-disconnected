@@ -51,4 +51,3 @@
     tags:
       OpenShiftBastion: "true"
     state: present
-
