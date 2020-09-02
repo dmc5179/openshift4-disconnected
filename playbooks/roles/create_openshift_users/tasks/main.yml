@@ -30,7 +30,7 @@
 - name: generate users.htpasswd file - create admin account entry
   delegate_to: localhost
   htpasswd:
-    create: yes
+    create: true
     path: "{{ mirror_base }}/htpasswd/users.htpasswd"
     name: "{{ openshift_cluster_admin_username }}"
     password: "{{ openshift_cluster_admin_password }}"
