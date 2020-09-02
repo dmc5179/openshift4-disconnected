@@ -2,6 +2,8 @@
 apiVersion: "local.storage.openshift.io/v1"
 kind: "LocalVolume"
 metadata:
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "{{ local_storage_is_default }}"
   name: "local-disks-block"
   namespace: "{{ local_storage_namespace }}"
 spec:
@@ -11,11 +13,11 @@ spec:
         - key: kubernetes.io/hostname
           operator: In
           values:
-          - worker3.icsa.iad.redhat.com
-          - worker4.icsa.iad.redhat.com
-          - worker5.icsa.iad.redhat.com
+{% for h in local_storage_nodes %}
+          - {{ h.name }}
+{% endfor %}
   storageClassDevices:
     - storageClassName: "localblock-sc"
       volumeMode: Block  
       devicePaths: 
-        - /dev/sdb
+        - {{ device_path }}
