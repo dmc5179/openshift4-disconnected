@@ -13,6 +13,18 @@
   tags:
     - subscription
 
+- name: Create the quay operator group
+  delegate_to: localhost
+  k8s:
+    state: present
+    namespace: '{{ quay_namespace }}'
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/quay-operator-group.yaml.j2') }}"
+  tags:
+    - subscription
+
 - name: Subscribe to the quay operator
   delegate_to: localhost
   k8s:
@@ -21,7 +33,7 @@
     wait: true
     kubeconfig: "{{ kubeconfig }}"
     validate_certs: '{{ kube_ssl_enabled }}'
-    definition: "{{ lookup('template', 'templates/quay-operator.yaml.j2') }}"
+    definition: "{{ lookup('template', 'templates/quay-operator-subscription.yaml.j2') }}"
   tags:
     - subscription
 

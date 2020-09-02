@@ -2,7 +2,7 @@
 
 quay_namespace: quay
 
-quay_version: '3.3.1'
+quay_version: '3.3'
 
 clair_enabled: false
 
