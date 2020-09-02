@@ -12,4 +12,3 @@
 #     - name: Push mirrored images to repo
 #      include_role:
 #        name: mirror_images
-

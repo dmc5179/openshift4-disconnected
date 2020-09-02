@@ -17,4 +17,3 @@ pxeserver_files:
   - /usr/share/syslinux/memdisk
   - /usr/share/syslinux/menu.c32
   - /usr/share/syslinux/pxelinux.0
-
