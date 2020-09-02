@@ -1,0 +1,21 @@
+---
+apiVersion: "local.storage.openshift.io/v1"
+kind: "LocalVolume"
+metadata:
+  name: "local-disks-block"
+  namespace: "{{ local_storage_namespace }}"
+spec:
+  nodeSelector: 
+    nodeSelectorTerms:
+    - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - worker3.icsa.iad.redhat.com
+          - worker4.icsa.iad.redhat.com
+          - worker5.icsa.iad.redhat.com
+  storageClassDevices:
+    - storageClassName: "localblock-sc"
+      volumeMode: Block  
+      devicePaths: 
+        - /dev/sdb

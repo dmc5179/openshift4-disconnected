@@ -1,0 +1,13 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pvc-block-test
+spec:
+  accessModes:
+  - ReadWriteOnce
+  volumeMode: Block
+  resources:
+    requests:
+      storage: 10Gi 
+  storageClassName: localblock-sc
