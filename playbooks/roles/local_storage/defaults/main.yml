@@ -11,3 +11,7 @@ kubeconfig: '/home/danclark/icsa-kubeconfig'
 kube_ssl_enabled: false
 
 local_storage_nodes: {}
+
+device_path: '/dev/sdb'
+
+local_storage_is_default: false
