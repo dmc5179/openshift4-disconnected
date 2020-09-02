@@ -35,3 +35,15 @@
     kubeconfig: "{{ kubeconfig }}"
     validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/local-storage-operator-subscription.yaml.j2') }}"
+
+- name: Create local storage block class
+  delegate_to: localhost
+  k8s:
+    state: present
+    namespace: "{{ local_storage_namespace }}"
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/local-storage-block-class.yaml.j2') }}"
+  tags:
+    - block_sc
