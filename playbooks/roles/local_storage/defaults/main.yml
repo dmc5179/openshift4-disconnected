@@ -1,0 +1,12 @@
+---
+
+local_storage_namespace: 'local-storage'
+local_storage_operator_channel: '4.5'
+
+ocp_cluster_name: 'icsa'
+ocp_base_domain: 'iad.redhat.com'
+
+
+kubeconfig: '/home/danclark/icsa-kubeconfig'
+kube_ssl_enabled: false
+
