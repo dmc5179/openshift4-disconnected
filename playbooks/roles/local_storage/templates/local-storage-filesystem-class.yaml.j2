@@ -4,7 +4,7 @@ kind: "LocalVolume"
 metadata:
   annotations:
     storageclass.kubernetes.io/is-default-class: "{{ local_storage_is_default }}"
-  name: "local-disks-block"
+  name: "local-disks-fs"
   namespace: "{{ local_storage_namespace }}"
 spec:
   nodeSelector: 
@@ -17,7 +17,7 @@ spec:
           - {{ h.name }}
 {% endfor %}
   storageClassDevices:
-    - storageClassName: "localblock-sc"
-      volumeMode: Block  
+    - storageClassName: "localfs-sc"
+      volumeMode: Filesystem
       devicePaths: 
         - {{ device_path }}
