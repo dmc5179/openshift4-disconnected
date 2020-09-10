@@ -33,6 +33,7 @@ dnf install -y python3-yaml python3-magic
 ## Then, run Scripts in this order:
 * aws/create_sg.sh
 * aws/create_infra.sh
+* route53.sh #optional
 * create_ignition.sh  
 * stage_ignition.sh  # Optional, this assumes httpd is running locally and is accessible to the nodes
 * install.sh
