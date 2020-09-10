@@ -5,15 +5,15 @@
 
 # Check if the security group exists already.
 K8S_ELB_SG=$(aws ${EC2_ENDPOINT} ${AWS_OPTS} ec2 describe-security-groups \
-  | jq '.SecurityGroups[] | select(.GroupName == "caas-k8s-elb") | .GroupId' | tr -d '"')
+  | jq ".SecurityGroups[] | select(.GroupName == \"${OCP_CLUSTER_NAME}-k8s-elb\") | .GroupId" | tr -d '"')
 
 # Check if the security group exists already.
 K8S_MASTER_SG=$(aws ${EC2_ENDPOINT} ${AWS_OPTS} ec2 describe-security-groups \
-  | jq '.SecurityGroups[] | select(.GroupName == "caas-k8s-master") | .GroupId' | tr -d '"')
+  | jq ".SecurityGroups[] | select(.GroupName == \"${OCP_CLUSTER_NAME}-k8s-master\") | .GroupId" | tr -d '"')
 
 # Check if the security group exists already.
 K8S_WORKER_SG=$(aws ${EC2_ENDPOINT} ${AWS_OPTS} ec2 describe-security-groups \
-  | jq '.SecurityGroups[] | select(.GroupName == "caas-k8s-worker") | .GroupId' | tr -d '"')
+  | jq ".SecurityGroups[] | select(.GroupName == \"${OCP_CLUSTER_NAME}-k8s-worker\") | .GroupId" | tr -d '"')
 
 
 # If it doesn't exist, create it
@@ -26,7 +26,7 @@ then
       --vpc-id "${VPC_ID}"
 
   K8S_ELB_SG=$(aws ${EC2_ENDPOINT} ${AWS_OPTS} ec2 describe-security-groups \
-    | jq '.SecurityGroups[] | select(.GroupName == "caas-k8s-elb") | .GroupId' | tr -d '"')
+    | jq ".SecurityGroups[] | select(.GroupName == \"${OCP_CLUSTER_NAME}-k8s-elb\") | .GroupId" | tr -d '"')
 
   aws ${EC2_ENDPOINT} ${AWS_OPTS} ec2 authorize-security-group-ingress \
       --group-id ${K8S_ELB_SG} \
@@ -44,7 +44,7 @@ then
       --vpc-id "${VPC_ID}"
 
   K8S_MASTER_SG=$(aws ${EC2_ENDPOINT} ${AWS_OPTS} ec2 describe-security-groups \
-    | jq '.SecurityGroups[] | select(.GroupName == "caas-k8s-master") | .GroupId' | tr -d '"')
+    | jq ".SecurityGroups[] | select(.GroupName == \"${OCP_CLUSTER_NAME}-k8s-master\") | .GroupId" | tr -d '"')
 
 fi
 
@@ -58,7 +58,7 @@ then
       --vpc-id "${VPC_ID}"
 
   K8S_WORKER_SG=$(aws ${EC2_ENDPOINT} ${AWS_OPTS} ec2 describe-security-groups \
-    | jq '.SecurityGroups[] | select(.GroupName == "caas-k8s-worker") | .GroupId' | tr -d '"')
+    | jq ".SecurityGroups[] | select(.GroupName == \"${OCP_CLUSTER_NAME}-k8s-worker\") | .GroupId" | tr -d '"')
 
 fi
 
