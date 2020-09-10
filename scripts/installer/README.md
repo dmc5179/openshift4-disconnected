@@ -1,5 +1,5 @@
 
-## Customize the env.sh.example file and customize it for your environment:
+## Customize the env.sh.example file for your environment:
 
 ```bash
 cp env.sh.example env.sh
