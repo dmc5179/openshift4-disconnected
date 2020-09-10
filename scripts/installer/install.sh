@@ -12,11 +12,11 @@
 
 # Check if the security group exists already.
 K8S_MASTER_SG=$(aws ${EC2_ENDPOINT} ${AWS_OPTS} ec2 describe-security-groups \
-  | jq '.SecurityGroups[] | select(.GroupName == "caas-k8s-master") | .GroupId' | tr -d '"')
+  | jq ".SecurityGroups[] | select(.GroupName == \"${OCP_CLUSTER_NAME}-k8s-master\") | .GroupId" | tr -d '"')
 
 # Check if the security group exists already.
 K8S_WORKER_SG=$(aws ${EC2_ENDPOINT} ${AWS_OPTS} ec2 describe-security-groups \
-  | jq '.SecurityGroups[] | select(.GroupName == "caas-k8s-worker") | .GroupId' | tr -d '"')
+  | jq ".SecurityGroups[] | select(.GroupName == \"${OCP_CLUSTER_NAME}-k8s-worker\") | .GroupId" | tr -d '"')
 
 USER_DATA=$(sed "s|IGN_SERVER|${IGN_SERVER}|" user-data-ign.json | sed "s|IGN_PATH|${IGN_PATH}|g" | sed "s|IGN_VERSION|${IGN_VERSION}|")
 
@@ -32,7 +32,7 @@ WORKER2_UD=$(echo "${USER_DATA}" | sed "s|HOST|worker2|")
 # AWS CLI to launch bootstrap node
 BOOTSTRAP_INSTANCE_ID=$(aws ${EC2_ENDPOINT} ${AWS_OPTS} ec2 run-instances --image-id "${AMI}" --count 1 --instance-type 'i3.large' \
 --key-name 'Combine' --subnet-id "${EC2_SUBNET}" --security-group-ids "${K8S_MASTER_SG}" --ebs-optimized \
---tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=caas-bootstrap}]' --private-ip-address "${BOOTSTRAP_IP}" \
+--tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${OCP_CLUSTER_NAME}-bootstrap}]" --private-ip-address "${BOOTSTRAP_IP}" \
 --block-device-mapping "DeviceName=/dev/xvda,Ebs={DeleteOnTermination=true,KmsKeyId=${KMS_KEY_ID},Encrypted=true}" \
 --user-data "${BOOTSTRAP_UD}" | jq '.Instances[0].InstanceId' | tr -d '"')
 
@@ -42,21 +42,21 @@ aws ${ELB_ENDPOINT} ${AWS_OPTS} \
 # AWS CLI to launch master0
 MASTER0_INSTANCE_ID=$(aws ${EC2_ENDPOINT} ${AWS_OPTS} ec2 run-instances --image-id "${AMI}" --count 1 --instance-type 'm5.2xlarge' \
 --key-name 'Combine' --subnet-id "${EC2_SUBNET}" --security-group-ids "${K8S_MASTER_SG}" --ebs-optimized \
---tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=caas-master0}]' --private-ip-address "${MASTER0_IP}" \
+--tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${OCP_CLUSTER_NAME}-master0}]" --private-ip-address "${MASTER0_IP}" \
 --block-device-mapping "DeviceName=/dev/xvda,Ebs={DeleteOnTermination=true,VolumeSize=50,VolumeType=gp2,KmsKeyId=${KMS_KEY_ID},Encrypted=true}" \
 --user-data "${MASTER0_UD}" | jq '.Instances[0].InstanceId' | tr -d '"')
 
 # AWS CLI to launch master1
 MASTER1_INSTANCE_ID=$(aws ${EC2_ENDPOINT} ${AWS_OPTS} ec2 run-instances --image-id "${AMI}" --count 1 --instance-type 'm5.2xlarge' \
 --key-name 'Combine' --subnet-id "${EC2_SUBNET}" --security-group-ids "${K8S_MASTER_SG}" --ebs-optimized \
---tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=caas-master1}]' --private-ip-address "${MASTER1_IP}" \
+--tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${OCP_CLUSTER_NAME}-master1}]" --private-ip-address "${MASTER1_IP}" \
 --block-device-mapping "DeviceName=/dev/xvda,Ebs={DeleteOnTermination=true,VolumeSize=50,VolumeType=gp2,KmsKeyId=${KMS_KEY_ID},Encrypted=true}" \
 --user-data "${MASTER1_UD}" | jq '.Instances[0].InstanceId' | tr -d '"')
 
 # AWS CLI to launch master2
 MASTER2_INSTANCE_ID=$(aws ${EC2_ENDPOINT} ${AWS_OPTS} ec2 run-instances --image-id "${AMI}" --count 1 --instance-type 'm5.2xlarge' \
 --key-name 'Combine' --subnet-id "${EC2_SUBNET}" --security-group-ids "${K8S_MASTER_SG}" --ebs-optimized \
---tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=caas-master2}]' --private-ip-address "${MASTER2_IP}" \
+--tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${OCP_CLUSTER_NAME}-master2}]" --private-ip-address "${MASTER2_IP}" \
 --block-device-mapping "DeviceName=/dev/xvda,Ebs={DeleteOnTermination=true,VolumeSize=50,VolumeType=gp2,KmsKeyId=${KMS_KEY_ID},Encrypted=true}" \
 --user-data "${MASTER2_UD}" | jq '.Instances[0].InstanceId' | tr -d '"')
 
@@ -71,21 +71,21 @@ MASTER2_INSTANCE_ID=$(aws ${EC2_ENDPOINT} ${AWS_OPTS} ec2 run-instances --image-
 # AWS CLI to launch worker0
 WORKER0_INSTANCE_ID=$(aws ${EC2_ENDPOINT} ${AWS_OPTS} ec2 run-instances --image-id "${AMI}" --count 1 --instance-type 'm5.2xlarge' \
 --key-name 'Combine' --subnet-id "${EC2_SUBNET}" --security-group-ids "${K8S_WORKER_SG}" --ebs-optimized \
---tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=caas-worker0}]' --private-ip-address "${WORKER0_IP}" \
+--tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${OCP_CLUSTER_NAME}-worker0}]" --private-ip-address "${WORKER0_IP}" \
 --block-device-mapping "DeviceName=/dev/xvda,Ebs={DeleteOnTermination=true,VolumeSize=50,VolumeType=gp2,KmsKeyId=${KMS_KEY_ID},Encrypted=true}" \
 --user-data "${WORKER0_UD}" | jq '.Instances[0].InstanceId' | tr -d '"')
 
 # AWS CLI to launch worker1
 WORKER1_INSTANCE_ID=$(aws ${EC2_ENDPOINT} ${AWS_OPTS} ec2 run-instances --image-id "${AMI}" --count 1 --instance-type 'm5.2xlarge' \
 --key-name 'Combine' --subnet-id "${EC2_SUBNET}" --security-group-ids "${K8S_WORKER_SG}" --ebs-optimized \
---tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=caas-worker1}]' --private-ip-address "${WORKER1_IP}" \
+--tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${OCP_CLUSTER_NAME}-worker1}]" --private-ip-address "${WORKER1_IP}" \
 --block-device-mapping "DeviceName=/dev/xvda,Ebs={DeleteOnTermination=true,VolumeSize=50,VolumeType=gp2,KmsKeyId=${KMS_KEY_ID},Encrypted=true}" \
 --user-data "${WORKER1_UD}" | jq '.Instances[0].InstanceId' | tr -d '"')
 
 # AWS CLI to launch worker2
 WORKER2_INSTANCE_ID=$(aws ${EC2_ENDPOINT} ${AWS_OPTS} ec2 run-instances --image-id "${AMI}" --count 1 --instance-type 'm5.2xlarge' \
 --key-name 'Combine' --subnet-id "${EC2_SUBNET}" --security-group-ids "${K8S_WORKER_SG}" --ebs-optimized \
---tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=caas-worker2}]' --private-ip-address "${WORKER2_IP}" \
+--tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${OCP_CLUSTER_NAME}-worker2}]" --private-ip-address "${WORKER2_IP}" \
 --block-device-mapping "DeviceName=/dev/xvda,Ebs={DeleteOnTermination=true,VolumeSize=50,VolumeType=gp2,KmsKeyId=${KMS_KEY_ID},Encrypted=true}" \
 --user-data "${WORKER2_UD}" | jq '.Instances[0].InstanceId' | tr -d '"')
 
