@@ -1,3 +1,4 @@
 install-config.yaml
 env.sh
 openshift4
+aws/dist/*
