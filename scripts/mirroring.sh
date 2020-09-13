@@ -86,7 +86,7 @@ then
 
 # Mirror the images with multiple threads
 # This sed command is weird because the images mirrored by tag already have file in them but not the digest based ones
-  cat "${REMOVABLE_MEDIA_PATH}/operator_manifests/mapping.txt" | sed 's|=replaceme|=file://|g' | xargs -n 1 -P ${THREADS} oc image mirror --registry-config=${LOCAL_SECRET_JSON} --dir="${REMOVABLE_MEDIA_PATH}/mirror" '{}'
+  cat "${REMOVABLE_MEDIA_PATH}/operator_manifests/mapping.txt" | sed 's|=replaceme|=file://|g' | xargs -n 1 -P ${THREADS} oc image mirror --filter-by-os=.* --keep-manifest-list=true --registry-config=${LOCAL_SECRET_JSON} --dir="${REMOVABLE_MEDIA_PATH}/mirror" '{}'
 
   tar -cf "ocp-${OCP_RELEASE}-${ARCHITECTURE}-packaged.tar" "${REMOVABLE_MEDIA_PATH}"
 fi
