@@ -23,7 +23,8 @@ REMOTE_REG='registry.example.com:5000'
 
 oc image mirror --force --filter-by-os=.* --keep-manifest-list=true --registry-config ${LOCAL_SECRET_JSON} --insecure=true 'quay.io/redhat/quay@sha256:2218711b5d34b1f68ebeeb71fca76546acb9625ef8f1ad493e8dd6a8e89b9838' "${REMOTE_REG}/redhat/quay"
 
-exit 0
+oc image mirror --force --filter-by-os=.* --keep-manifest-list=true --registry-config "${LOCAL_SECRET_JSON}" --insecure=true registry.access.redhat.com/rhscl/redis-32-rhel7:latest "${REMOTE_REG}/rhscl/redis-32-rhel7:latest"
+
 oc image mirror --force --filter-by-os=.* --keep-manifest-list=true --registry-config "${LOCAL_SECRET_JSON}" --insecure=true 'registry.redhat.io/quay/quay-rhel8-operator@sha256:855743b29f8e050fb1f124b47f622b9e179998df60ad9465b51553f1c729197d' "${REMOTE_REG}/quay/quay-rhel8-operator"
 
 oc image mirror --force --filter-by-os=.* --keep-manifest-list=true --registry-config "${LOCAL_SECRET_JSON}" --insecure=true 'registry.redhat.io/rhel8/redis-5@sha256:ee07b7d2113fd819b183f01c134dff13c8cfe965669f330a6e384791f8ac3d4e' "${REMOTE_REG}/rhel8/redis-5"

@@ -1,0 +1,17 @@
+---
+
+# This must be run in a connected environment
+- name: Build upgrade graph data
+  podman_image:
+    name: graph-data-image
+    tag: latest
+    push: false
+    force: true
+    path: '{{ role_path }}/files'
+    state: build
+    build:
+      cache: false
+      format: oci
+      force_rm: true
+      rm: true
+    

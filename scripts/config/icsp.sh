@@ -3,7 +3,7 @@
 REGISTRY="registry.caas.cia.ic.gov:5000"
 
 # Read in the new chrony.conf file
-ICSP_B64=$(cat ./icsp.conf | sed "s|registry.example.com|${REGISTRY}|g" | base64 | tr -d '\n')
+ICSP_B64=$(cat ./icsp.conf | sed "s|registry.example.com|${REGISTRY}|g" | base64 -w 0)
 
 # Create a machine config to set the private registry for master nodes
 cat << EOF > ./99_master-private-registry-configuration.yaml
