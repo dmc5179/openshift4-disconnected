@@ -2,6 +2,8 @@
 # Fully air-gap install??
 air_gapped: true
 
+# Supported platforms include
+# vmware, aws, gcp, bare_metal, none
 platform: 'none'
 ###################################################################
 # Path to binaries
