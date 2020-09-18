@@ -39,7 +39,10 @@ ocp_cluster_publish: 'External'
 ocp_base_domain: 'example.com'
 ocp_cluster_name: 'caas'
 
-ssh_public_key_file: '{{ ansible_env.HOME }}/.ssh/id_rsa.pub'
+# This is the default location of the ssk key pair that will be created by the
+# generate_ignition role. You probably don't have to change this unless specifying your
+# own ssh key pair
+ssh_public_key_file: '{{ ansible_env.HOME }}/.ssh/{{ ocp_cluster_name}}_rsa.pub'
 
 # Certificate bundle that will be added to the install-config.yaml
 # This generally includes a certificate for the disconnected docker registry
