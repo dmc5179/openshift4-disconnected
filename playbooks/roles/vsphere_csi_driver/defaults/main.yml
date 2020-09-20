@@ -8,7 +8,7 @@ ocp_cluster_name: 'caas'
 
 vsphere_namespace: 'vsphere'
 
-ssl_enabled: false
+kube_ssl_enabled: false
 
 mirror_registry: 'localhost'
 mirror_registry_port: 5000
