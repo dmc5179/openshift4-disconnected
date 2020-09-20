@@ -4,7 +4,7 @@
 - name: Create vsphere namespace for CSI Drivers
   delegate_to: localhost
   k8s:
-    name: vsphere
+    name: "{{ vsphere_namespace }}"
     api_version: v1
     kind: Namespace
     state: present
