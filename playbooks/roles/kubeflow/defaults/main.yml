@@ -6,4 +6,4 @@ kf_dir: '{{ mirror_base }}/kfdef'
 
 kfctl_uri: 'https://github.com/kubeflow/kfctl/releases/download/v1.0.2/kfctl_v1.0.2-0-ga476281_linux.tar.gz'
 
-kubeconfig: '~/.kube/config'
+kubeconfig: '{{ ansible_env.HOME }}/.kube/config'

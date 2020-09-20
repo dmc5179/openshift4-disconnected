@@ -250,11 +250,11 @@
 
 - name: Create kube config location
   file:
-    path: "~/.kube"
+    path: "{{ kubeconfig }}"
     state: directory
     mode: '0755'
 
 - name: Set kube config
   copy:
     src: "{{ ignition_configs }}/auth/kubeconfig"
-    dest: "~/.kube/config"
+    dest: "{{ kubeconfig }}/config"
