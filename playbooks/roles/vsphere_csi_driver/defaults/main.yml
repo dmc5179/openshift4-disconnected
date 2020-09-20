@@ -1,7 +1,7 @@
 ---
 # defaults file for vsphere_csi_driver
 
-kubeconfig: "~/.kube/config"
+kubeconfig: "{{ ansible_env.HOME }}/.kube/config"
 
 ocp_base_domain: 'example.com'
 ocp_cluster_name: 'caas'
