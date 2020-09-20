@@ -1,0 +1,73 @@
+---
+
+- name: EFS | Create Namespace
+  delegate_to: localhost
+  k8s:
+    name: "{{ efs_namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+
+- name: EFS | Create ConfigMap
+  delegate_to: localhost
+  k8s:
+    state: present
+    namespace: '{{ efs_namespace }}'
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/efs_provisioner_configmap.yaml.j2') }}"
+
+# TODO
+- name: EFS | Create EFS Provisioner Service Account
+  delegate_to: localhost
+  k8s:
+    state: present
+    namespace: '{{ efs_namespace }}'
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/efs_provisioner_service_account.yaml.j2') }}"
+
+- name: EFS | Create Cluster Role
+  delegate_to: localhost
+  k8s:
+    state: present
+    namespace: '{{ efs_namespace }}'
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/efs_cluster_role.yaml.j2') }}"
+
+- name: EFS | Create Cluster Role Binding
+  delegate_to: localhost
+  k8s:
+    state: present
+    namespace: '{{ efs_namespace }}'
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/efs_cluster_role_binding.yaml.j2') }}"
+
+- name: EFS | Create Role
+  delegate_to: localhost
+  k8s:
+    state: present
+    namespace: '{{ efs_namespace }}'
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/efs_role.yaml.j2') }}"
+
+- name: EFS | Create Role Binding
+  delegate_to: localhost
+  k8s:
+    state: present
+    namespace: '{{ efs_namespace }}'
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/efs_role_binding.yaml.j2') }}"

@@ -1,0 +1,15 @@
+---
+
+kubeconfig: "{{ ansible_env.HOME }}/.kube/config"
+
+ocp_base_domain: 'example.com'
+ocp_cluster_name: 'caas'
+
+efs_namespace: 'efs'
+
+kube_ssl_enabled: false
+
+mirror_registry: 'localhost'
+mirror_registry_port: 5000
+mirror_transport: 'https'
+
