@@ -6,6 +6,10 @@ ocp_base_domain: 'example.com'
 ocp_cluster_name: 'caas'
 
 efs_namespace: 'efs'
+aws_efs_fs_id: ''
+aws_region: ''
+aws_efs_dns_name: ''
+aws_efs_mount_point: '/'
 
 kube_ssl_enabled: false
 
