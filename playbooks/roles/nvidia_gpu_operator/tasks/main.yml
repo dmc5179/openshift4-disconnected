@@ -1,0 +1,17 @@
+---
+
+- name: Apply nvidia gpu operator helm chart
+  shell:
+    cmd: |
+
+        /usr/local/bin/helm install \
+            nvidia-gpu-operator \
+            --namespace default \
+            --set 'platform.openshift=true,operator.defaultRuntime=crio' \
+            --set "driver.repository={{ mirror_registry }}:{{ mirror_registry_port }}/nvidia"
+            --set "driver.version=450.51.06-1.0.0-custom-rhcos-4.18.0-193.13.2.el8_2.x86_64-4.5.2"
+            --set "toolkit.repository={{ mirror_registry }}:{{ mirror_registry_port }}/nvidia"
+            --set "devicePlugin.repository={{ mirror_registry }}:{{ mirror_registry_port }}/nvidia"
+            --set "dcgmExporter.repository={{ mirror_registry }}:{{ mirror_registry_port }}/nvidia"
+            '{{ mirror_base }}/helm/gpu-operator-1.1.7.tgz'
+
