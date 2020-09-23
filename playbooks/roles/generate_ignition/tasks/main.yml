@@ -241,7 +241,7 @@
 - name: Patch existing igntion systemd section
   ignition_systemd_patch:
     src: '{{ item }}'
-    patch: lookup('file', 'nm-patch.json')
+    patch: "{{ role_path }}/files/nm-patch.json"
     backup: false
   with_fileglob:
     - '{{ ignition_configs }}/*.ign'
