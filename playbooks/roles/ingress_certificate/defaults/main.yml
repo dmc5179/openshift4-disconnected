@@ -1,0 +1,6 @@
+---
+
+# These are located under the files directory in this role
+root_ca: 'root_ca.pem'
+ingress_cert: 'ingress_cert.pem'
+ingress_key: 'ingress_cert_key.pem'
