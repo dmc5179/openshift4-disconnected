@@ -6,6 +6,7 @@ REGISTRY="registry.caas.cia.ic.gov:5000"
 ICSP_B64=$(cat ./icsp.conf | sed "s|registry.example.com|${REGISTRY}|g" | base64 -w 0)
 
 # Create a machine config to set the private registry for master nodes
+rm -f ./99_master-private-registry-configuration.yaml
 cat << EOF > ./99_master-private-registry-configuration.yaml
 apiVersion: machineconfiguration.openshift.io/v1
 kind: MachineConfig
@@ -35,6 +36,7 @@ spec:
 EOF
 
 # Create a machine config to set the private registry ICSP for worker nodes
+rm -f ./99_worker-private-registry-configuration.yaml
 cat << EOF > ./99_worker-private-registry-configuration.yaml
 apiVersion: machineconfiguration.openshift.io/v1
 kind: MachineConfig

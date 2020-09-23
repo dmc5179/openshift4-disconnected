@@ -28,4 +28,4 @@ pull_secret: "{{ mirror_base }}/pull-secret.json"
 
 air_gapped: true
 
-kubeconfig: "~/.kube/config"
+kubeconfig: "{{ ansible_env.HOME }}/.kube/config"
