@@ -1,0 +1,4 @@
+*.cert
+*.crt
+*.pem
+*.key
