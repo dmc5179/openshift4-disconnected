@@ -1,0 +1,39 @@
+---
+
+# These steps are from the official OCP documentation but the second tasks
+# rejects a cert that has the * in it. This is just for reference
+
+#- name: Create root CA Config Map
+#  shell: |
+#    oc create configmap custom-ca \
+#     "--from-file=ca-bundle.crt={{ role_path }}/files/{{ root_ca }}" \
+#     -n openshift-config
+#  tags:
+#    - root_ca
+
+#- name: Update the cluster-wide proxy configuration with the newly created ConfigMap
+#  shell: |
+#    oc patch proxy/cluster \
+#     --type=merge \
+#     --patch='{"spec":{"trustedCA":{"name":"custom-ca"}}}'
+#  tags:
+#    - config_proxy
+
+#- name: Create a secret that contains the wildcard certificate chain and key
+#  shell: |
+#    oc create secret tls custom_ingress_cert \
+#     "--cert={{ role_path }}/files/{{ ingress_cert }}" \
+#     "--key={{ role_path }}/files/{{ ingress_key }}" \
+#     -n openshift-ingress
+#  tags:
+#    - wildcard_secret
+
+#- name: Update the Ingress Controller configuration with the newly created secret
+#  shell: |
+#    oc patch ingresscontroller.operator default \
+#     --type=merge -p \
+#     '{"spec":{"defaultCertificate": {"name": "custom_ingress_cert"}}}' \
+#     -n openshift-ingress-operator
+#  tags:
+#    - update_ingress
+
