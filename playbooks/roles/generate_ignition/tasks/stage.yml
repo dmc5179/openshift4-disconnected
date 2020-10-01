@@ -1,0 +1,23 @@
+---
+
+- name: Stage Ignition configs
+  become: true
+  copy:
+    src: "{{ item }}"
+    dest: "{{ httpd_document_root }}/{{ ocp_cluster_name }}/ignition/"
+    mode: '0755'
+    setype: 'httpd_sys_content_t'
+  with_fileglob:
+    - '{{ ignition_configs }}/*.ign'
+  tags:
+    - ignition
+
+- name: Copy append-bootstrap ignition
+  become: true
+  template:
+    src: append-bootstrap.ign.j2
+    dest: "{{ httpd_document_root }}/{{ ocp_cluster_name }}/ignition/append-bootstrap.ign"
+    mode: 0664
+    setype: 'httpd_sys_content_t'
+  tags:
+    - ignition
