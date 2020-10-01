@@ -14,8 +14,6 @@ bind_zone_master_server_ip: '192.169.3.42'
 dns_zone_one: 'external.com'
 dns_zone_two: 'internal.com'
 
-ocp_cluster_name: 'caas'
-
 bind_zone_domains:
   - name: "{{ dns_zone_one }}"
     create_reverse_zones: true
