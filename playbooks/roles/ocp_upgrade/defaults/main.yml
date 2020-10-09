@@ -13,3 +13,5 @@ air_gapped: true
 mirror_registry: 'localhost'
 mirror_registry_port: 5000
 mirror_transport: 'https'
+
+dag_push: true
