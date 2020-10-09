@@ -1,0 +1,10 @@
+---
+- hosts: localhost
+  gather_facts: true
+  become: false
+  tasks:
+
+    - name: Build DAG for OCP Upgrades
+      import_role:
+        name: ocp_upgrade
+        tasks_from: init_container
