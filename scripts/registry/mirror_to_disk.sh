@@ -1,7 +1,9 @@
 #!/bin/bash -xe
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+  
 # Source the environment file with the default settings
-. ./env.sh
+source "${SCRIPT_DIR}/../env.sh"
 
 # Example to use a dir instead of a registry
 # https://github.com/openshift/oc/pull/126

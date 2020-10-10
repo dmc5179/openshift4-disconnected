@@ -1,7 +1,9 @@
 #!/bin/bash -xe
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+  
 # Source the environment file with the default settings
-. ./env.sh
+source "${SCRIPT_DIR}/../env.sh"
 
 MANIFEST_PATH="/tmp/redhat-operator-manifests"
 S3_BUCKET='mybucket'

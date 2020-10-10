@@ -1,8 +1,9 @@
 #!/bin/bash -xe
 
-# Source the environment file with the default settings
-. ./env.sh
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
+# Source the environment file with the default settings
+source "${SCRIPT_DIR}/../env.sh"
 
 # NOTE: IGNITION VERSIONS in the USER DATA
 # 4.2/4.3/4.4 = 2.1.0
