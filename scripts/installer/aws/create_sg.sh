@@ -1,7 +1,9 @@
 #!/bin/bash -xe
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
 # Source the environment file with the default settings
-. ../env.sh
+source "${SCRIPT_DIR}/../env.sh"
 
 # Check if the security group exists already.
 K8S_ELB_SG=$(aws ${EC2_ENDPOINT} ${AWS_OPTS} ec2 describe-security-groups \

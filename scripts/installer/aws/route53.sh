@@ -1,7 +1,7 @@
 #!/bin/bash -xe
 
 # Source the environment file with the default settings
-. ../env.sh
+source "${SCRIPT_DIR}/ ../env.sh"
 
 INT_LB_ARN=$(aws --endpoint-url "${ELB_ENDPOINT}" ${AWS_OPTS} \
       elbv2 describe-load-balancers | jq '.LoadBalancers[] | select(.LoadBalancerName == "caas-int") | .LoadBalancerArn' | tr -d '"')
