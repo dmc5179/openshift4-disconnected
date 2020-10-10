@@ -65,7 +65,7 @@ spec:
   osImageURL: ""
 EOF
 
-oc apply -f ./99_master-private-registry-configuration.yaml
-oc apply -f ./99_worker-private-registry-configuration.yaml
+${OC} apply -f ./99_master-private-registry-configuration.yaml
+${OC} apply -f ./99_worker-private-registry-configuration.yaml
 
 exit 0
