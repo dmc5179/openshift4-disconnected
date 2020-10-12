@@ -2,8 +2,10 @@
 
 # Script to stage the ignition files on an http server
 
-# Source env file
-. env.sh
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+  
+# Source the environment file with the default settings
+source "${SCRIPT_DIR}/../env.sh"
 
 # Copy the ignition files to their destination location
 sudo rm -rf /var/www/html/ignition/

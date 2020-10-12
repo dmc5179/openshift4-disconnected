@@ -1,0 +1,71 @@
+---
+# tasks file for service-mesh
+
+- name: Create Service Mesh Namespace
+  delegate_to: localhost
+  k8s:
+    name: "{{ servicemesh_namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+  tags:
+    - namespace
+
+- name: Install Elastic Search Operator
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: true
+    wait_timeout: 600
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/elasticsearch-operator.yml.j2') }}"
+  tags:
+    - elastic
+
+- name: Install Jaegar Operator
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/jaegar-operator.yml.j2') }}"
+  tags:
+    - jaegar
+
+- name: Install Kiali Operator
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/kiali-operator.yml.j2') }}"
+  tags:
+    - kiali
+
+- name: Install Service Mesh Operator
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/servicemesh-operator.yml.j2') }}"
+  tags:
+    - service_mesh
+
+- name: install istio service mesh control plane
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/istio-installation.yml.j2') }}"
+  tags:
+    - istio
