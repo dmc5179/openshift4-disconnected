@@ -1,11 +1,16 @@
 ---
 # defaults file for service-mesh
 
-servicemesh_operators:
-  - elasticsearch-operator
-  - jaegar-operator
-  - kiali-operator
-  - servicemesh-operator
+#servicemesh_operators:
+#  - elasticsearch-operator
+#  - jaegar-operator
+#  - kiali-operator
+#  - servicemesh-operator
 
 # servicemesh_namespace: istio-system
 servicemesh_namespace: istio-demo
+
+elasticsearch_operator_version: 'stable'
+jaegar_operator_version: 'stable'
+kiali_operator_version: 'stable'
+servicemesh_operator_version: 'stable'
