@@ -1,7 +1,9 @@
 #!/bin/bash -e
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+  
 # Source the environment file with the default settings
-#. ./env.sh
+source "${SCRIPT_DIR}/../env.sh"
 
 export REGISTRY_DIR="${HOME}/registry/"
 export REGISTRY_HOSTNAME="${HOSTNAME}"
@@ -58,6 +60,7 @@ podman run --name registry_server -p ${REGISTRY_PORT}:5000 \
 -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
 -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
 --hostname=${REGISTRY_HOSTNAME} \
+--conmon-pidfile=/tmp/podman-registry-conman.pid \
 --detach \
 ${REGISTRY_IMG}
 

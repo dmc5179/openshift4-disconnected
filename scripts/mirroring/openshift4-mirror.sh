@@ -63,7 +63,7 @@ then
   # Looks like this is working
   # Mirror the cluster images to disk
   echo "Mirroring cluster images"
-  oc adm release mirror -a ${LOCAL_SECRET_JSON} \
+  ${OC} adm release mirror -a ${LOCAL_SECRET_JSON} \
     --insecure=${LOCAL_REG_INSEC} \
     --from=quay.io/${UPSTREAM_REPO}/${RELEASE_NAME}:${OCP_RELEASE}-${ARCHITECTURE} \
     --to file://openshift/release \
@@ -72,21 +72,21 @@ then
   # Looks like this is working
   # Build the redhat-operators catalog source and mirror to disk
   echo "Building redhat-operators catalog image"
-  oc adm catalog build --insecure \
+  ${OC} adm catalog build --insecure \
     --appregistry-org redhat-operators \
     "--from=${OPERATOR_REGISTRY}" "--registry-config=${LOCAL_SECRET_JSON}" \
     --dir=${REMOVABLE_MEDIA_PATH}/mirror \
     --to=file://olm/redhat-operators:${OCP_RELEASE}
 
   # Grab the operator manifests
-  oc adm catalog mirror --manifests-only \
+  ${OC} adm catalog mirror --manifests-only \
     --registry-config "${LOCAL_SECRET_JSON}" --insecure=true \
     --to-manifests=${REMOVABLE_MEDIA_PATH}/operator_manifests \
     "quay.io/danclark/redhat-operators:v1" --dir=${REMOVABLE_MEDIA_PATH}/operators file://replaceme
 
 # Mirror the images with multiple threads
 # This sed command is weird because the images mirrored by tag already have file in them but not the digest based ones
-  cat "${REMOVABLE_MEDIA_PATH}/operator_manifests/mapping.txt" | sed 's|=replaceme|=file://|g' | xargs -n 1 -P ${THREADS} oc image mirror --filter-by-os=.* --keep-manifest-list=true --registry-config=${LOCAL_SECRET_JSON} --dir="${REMOVABLE_MEDIA_PATH}/mirror" '{}'
+  cat "${REMOVABLE_MEDIA_PATH}/operator_manifests/mapping.txt" | sed 's|=replaceme|=file://|g' | xargs -n 1 -P ${THREADS} ${OC} image mirror --filter-by-os=.* --keep-manifest-list=true --registry-config=${LOCAL_SECRET_JSON} --dir="${REMOVABLE_MEDIA_PATH}/mirror" '{}'
 
   tar -cf "ocp-${OCP_RELEASE}-${ARCHITECTURE}-packaged.tar" "${REMOVABLE_MEDIA_PATH}"
 fi
@@ -95,14 +95,14 @@ if [ "${UPLOAD}" = true ]
 then
 
   # Push the OCP release images into the remote registry
-  oc image mirror -a ${LOCAL_SECRET_JSON} \
+  ${OC} image mirror -a ${LOCAL_SECRET_JSON} \
     --insecure=${LOCAL_REG_INSEC} \
     --from-dir=${REMOVABLE_MEDIA_PATH}/mirror \
     file://openshift/release:${OCP_RELEASE}* \
     ${REMOTE_REG}/${LOCAL_REPOSITORY}
 
   # Push the redhat-operators catalog image into the remote registry
-  oc image mirror -a ${LOCAL_SECRET_JSON} \
+  ${OC} image mirror -a ${LOCAL_SECRET_JSON} \
     --insecure=${LOCAL_REG_INSEC} \
     --from-dir=${REMOVABLE_MEDIA_PATH}/mirror \
     file://olm/redhat-operators:${OCP_RELEASE} \
@@ -112,7 +112,7 @@ then
   cat "${REMOVABLE_MEDIA_PATH}/operator_manifests/mapping.txt" \
     | sed "s|=replaceme|=${REMOTE_REG}|g" \
     | sed "s|=file://|=${REMOTE_REG}|g" \
-    | xargs -n 1 -P ${THREADS} oc image mirror --registry-config=${LOCAL_SECRET_JSON} --dir="${REMOVABLE_MEDIA_PATH}/mirror" '{}'
+    | xargs -n 1 -P ${THREADS} ${OC} image mirror --registry-config=${LOCAL_SECRET_JSON} --dir="${REMOVABLE_MEDIA_PATH}/mirror" '{}'
 
 fi
 

@@ -1,7 +1,9 @@
 #!/bin/bash -xe
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+  
 # Source the environment file with the default settings
-. ./env.sh
+source "${SCRIPT_DIR}/../env.sh"
 
 # Script for mirroring the operator hub images. Using oc adm catalog mirror to do the actual image
 # mirroring is very slow. Here we grab the manifests and then use oc image mirror to multithread the copy
@@ -22,11 +24,11 @@ then
   # Edit the mirroring mappings and mirror with "oc image mirror" manually
   # Have to have a registry running somewhere just so this command can authenticate to it
   # and then do nothing
-  oc adm catalog mirror --manifests-only \
+  ${OC} adm catalog mirror --manifests-only \
     --registry-config "${LOCAL_SECRET_JSON}" \
     --insecure=true --to-manifests=${RH_OP_MANIFEST_PATH} "${RH_OP_REPO}" "${LOCAL_REG}"
 
-  cat "${RH_OP_MANIFEST_PATH}/mapping.txt" | xargs -n 1 -P ${THREADS} oc image mirror --registry-config "${LOCAL_SECRET_JSON}" --insecure=true '{}'
+  cat "${RH_OP_MANIFEST_PATH}/mapping.txt" | xargs -n 1 -P ${THREADS} ${OC} image mirror --registry-config "${LOCAL_SECRET_JSON}" --insecure=true '{}'
 
 fi
 
@@ -41,11 +43,11 @@ then
   # Edit the mirroring mappings and mirror with "oc image mirror" manually
   # Have to have a registry running somewhere just so this command can authenticate to it
   # and then do nothing
-  oc adm catalog mirror --manifests-only \
+  ${OC} adm catalog mirror --manifests-only \
     --registry-config "${LOCAL_SECRET_JSON}" \
     --insecure=true --to-manifests=${CERT_OP_MANIFEST_PATH} "${CERT_OP_REPO}" "${LOCAL_REG}"
 
-  cat "${CERT_OP_MANIFEST_PATH}/mapping.txt" | xargs -n 1 -P ${THREADS} oc image mirror --registry-config "${LOCAL_SECRET_JSON}" --insecure=true '{}'
+  cat "${CERT_OP_MANIFEST_PATH}/mapping.txt" | xargs -n 1 -P ${THREADS} ${OC} image mirror --registry-config "${LOCAL_SECRET_JSON}" --insecure=true '{}'
 
 fi
 
@@ -60,11 +62,11 @@ then
   # Edit the mirroring mappings and mirror with "oc image mirror" manually
   # Have to have a registry running somewhere just so this command can authenticate to it
   # and then do nothing
-  oc adm catalog mirror --manifests-only \
+  ${OC} adm catalog mirror --manifests-only \
     --registry-config "${LOCAL_SECRET_JSON}" \
     --insecure=true --to-manifests=${COMM_OP_MANIFEST_PATH} "${COMM_OP_REPO}" "${LOCAL_REG}"
 
-  cat "${COMM_OP_MANIFEST_PATH}/mapping.txt" | xargs -n 1 -P ${THREADS} oc image mirror --registry-config "${LOCAL_SECRET_JSON}" --insecure=true '{}'
+  cat "${COMM_OP_MANIFEST_PATH}/mapping.txt" | xargs -n 1 -P ${THREADS} ${OC} image mirror --registry-config "${LOCAL_SECRET_JSON}" --insecure=true '{}'
 
 fi
 
