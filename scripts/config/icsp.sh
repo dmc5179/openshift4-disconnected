@@ -1,6 +1,9 @@
 #!/bin/bash -xe
 
-REGISTRY="registry.caas.cia.ic.gov:5000"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+# Source the environment file with the default settings
+source "${SCRIPT_DIR}/../env.sh"
 
 # Read in the new chrony.conf file
 ICSP_B64=$(cat ./icsp.conf | sed "s|registry.example.com|${REGISTRY}|g" | base64 -w 0)
