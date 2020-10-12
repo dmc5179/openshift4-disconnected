@@ -7,4 +7,4 @@
     - name: Build DAG for OCP Upgrades
       import_role:
         name: ocp_upgrade
-        tasks_from: init_container
+        tasks_from: ocp_update_service
