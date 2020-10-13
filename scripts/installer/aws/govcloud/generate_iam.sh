@@ -53,5 +53,3 @@ EOF
 done
 
 exit 0
-
-#aws iam create-policy --policy-name openshift --policy-document "file://${PWD}/${POLICY_FILE}"
