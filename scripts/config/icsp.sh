@@ -6,7 +6,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source "${SCRIPT_DIR}/../env.sh"
 
 # Read in the new chrony.conf file
-ICSP_B64=$(cat ./icsp.conf | sed "s|registry.example.com|${REGISTRY}|g" | base64 -w 0)
+ICSP_B64=$(cat ./icsp.conf | sed "s|registry.example.com|${REMOTE_REG}|g" | sed "s|LOCAL_REPO|${LOCAL_REPO}|g" | base64 -w 0)
 
 # Create a machine config to set the private registry for master nodes
 rm -f ./99_master-private-registry-configuration.yaml

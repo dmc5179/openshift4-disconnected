@@ -2,6 +2,8 @@
 
 # This must be run in a connected environment
 - name: Build upgrade graph data
+  delegate_to: localhost
+  become: true
   podman_image:
     name: '{{ mirror_registry }}:{{ mirror_registry_port }}/graph-data-image'
     tag: latest
