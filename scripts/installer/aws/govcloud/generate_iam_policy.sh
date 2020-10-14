@@ -17,11 +17,7 @@ do
   # In all of the files now, AWS is the first one but that may not always be true
   POLICY_NAME=$(yq -r '.metadata.name' "${f}" | grep -v null | head -1)
 
-  echo "File: $f   Name: ${POLICY_NAME}"
-
   PERMS=$(awk '/action:/{flag=1; next} /resource:/{flag=0} flag' "$f" | tr -d ' ' | tr -d '-')
-
-  echo "${PERMS}"
 
 # TODO: Change the statement ID to a random number or remove
 cat << EOF > "./${POLICY_NAME}_policy.json"
