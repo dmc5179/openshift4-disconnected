@@ -41,7 +41,7 @@ do
   SECRET_NAME=$(yq -r '.spec.secretRef.name' "${f}" | grep -v null | head -1)
   SECRET_NAMESPACE=$(yq -r '.spec.secretRef.namespace' "${f}" | grep -v null | head -1)
   ACCESS_KEY=$(jq -r '.AccessKey.AccessKeyId' "${POLICY_NAME}_keys.json")
-  SECRET_KEY=$(jq -r '.AccessKey.SecretAccessKeyId' "${POLICY_NAME}_keys.json")
+  SECRET_KEY=$(jq -r '.AccessKey.SecretAccessKey' "${POLICY_NAME}_keys.json")
 
 
 cat << EOF > "${CLUSTER_DIR}/openshift/99_${POLICY_NAME}-secret.yaml"
@@ -56,3 +56,6 @@ data:
 EOF
 
 done
+
+
+echo -n "Run the following command: openshift-install create cluster --dir /home/ec2-user/workspace/openshift4-disconnected/scripts/installer/aws/govcloud/cluster/ --log-level=debug"
