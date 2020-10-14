@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# This script generates the IAM policy documents
+# They can be used to create the IAM policies
+# No calls to create the policies exist in this script
+
 rm -rf ./release-image
 oc adm release extract quay.io/openshift-release-dev/ocp-release:4.5.14-x86_64 --to ./release-image
 
