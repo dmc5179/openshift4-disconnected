@@ -45,11 +45,12 @@ do
 
 
 cat << EOF > "${CLUSTER_DIR}/openshift/99_${POLICY_NAME}-secret.yaml"
-kind: Secret
 apiVersion: v1
+kind: Secret
 metadata:
   namespace: ${SECRET_NAMESPACE}
   name: ${SECRET_NAME}
+type: Opaque
 data:
   aws_access_key_id: ${ACCESS_KEY}
   aws_secret_access_key: ${SECRET_KEY}
@@ -58,4 +59,4 @@ EOF
 done
 
 
-echo -n "Run the following command: openshift-install create cluster --dir /home/ec2-user/workspace/openshift4-disconnected/scripts/installer/aws/govcloud/cluster/ --log-level=debug"
+echo "Run the following command: openshift-install create cluster --dir /home/ec2-user/workspace/openshift4-disconnected/scripts/installer/aws/govcloud/cluster/ --log-level=debug"
