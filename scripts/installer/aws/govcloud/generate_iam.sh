@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#rm -rf ./release-image
-#oc adm release extract quay.io/openshift-release-dev/ocp-release:4.5.14-x86_64 --to ./release-image
+rm -rf ./release-image
+oc adm release extract quay.io/openshift-release-dev/ocp-release:4.5.14-x86_64 --to ./release-image
 
 IAM_FILES=$(find release-image/ -type f -exec grep -l 'AWSProviderSpec' '{}' ';')
 
