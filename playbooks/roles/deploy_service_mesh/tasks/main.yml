@@ -37,6 +37,23 @@
   tags:
     - jaegar
 
+- name: Search for all Pods labelled name=jaegar-operator
+  k8s_info:
+    kind: Pod
+    namespace: 'openshift-operators'
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    label_selectors:
+      - name = jaeger-operator
+  register: jaeger_pods
+  until: 
+    (jaeger_pods.resources | length > 0) and
+    (jaeger_pods.resources[0].status.containerStatuses[0].ready)
+  retries: 10
+  delay: 10
+  tags:
+    - jaegar
+
 - name: Install Kiali Operator
   delegate_to: localhost
   k8s:
