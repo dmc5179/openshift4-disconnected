@@ -1,0 +1,9 @@
+apiVersion: cincinnati.openshift.io/v1beta1
+kind: Cincinnati
+metadata:
+  name: example
+spec:
+  replicas: 1
+  registry: "{{ mirror_registry }}:{{ mirror_registry_port }}"
+  repository: "openshift-release-dev/ocp-release"
+  graphDataImage: "registry.example.com/graph-data-image:latest"

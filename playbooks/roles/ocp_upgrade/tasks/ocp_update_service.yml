@@ -5,7 +5,7 @@
   delegate_to: localhost
   become: true
   podman_image:
-    name: '{{ mirror_registry }}:{{ mirror_registry_port }}/graph-data-image'
+    name: '{{ mirror_registry }}:{{ mirror_registry_port }}/ocp4/graph-data-image'
     tag: latest
     push: '{{ dag_push }}'
     force: true
@@ -16,4 +16,106 @@
       format: oci
       force_rm: true
       rm: true
-    
+  when: not air_gapped
+
+- name: Pull cincinnati operator CRDs
+  delegate_to: localhost
+  git:
+    repo: https://github.com/openshift/cincinnati-operator.git
+    dest: '{{ cincinnati_code }}'
+    version: '{{ cincinnati_version }}'
+    force: true
+  when: not air_gapped
+  tags: code
+
+- name: Update OPERAND_IMAGE
+  replace:
+    path: '{{ cincinnati_code }}/deploy/operator.yaml'
+    regexp: 'quay.io/cincinnati/cincinnati:latest'
+    replace: '{{ operand_image }}'
+  tags: code
+
+#- name: Update OPERATOR_IMAGE
+#  replace:
+#    path: '{{ cincinnati_code }}/deploy/operator.yaml'
+#    regexp: '{{ default_operator_image }}'
+#    replace: '{{ operator_image }}'
+
+- name: Update CRD with DAG Image
+  replace:
+    path: '{{ cincinnati_code }}/deploy/crds/cincinnati.openshift.io_v1beta1_cincinnati_cr.yaml'
+    regexp: 'your-registry/your-repo/your-init-container'
+    replace: '{{ mirror_registry }}:{{ mirror_registry_port }}/ocp4/graph-data-image:latest'
+  tags: code
+
+- name: Cincinnati | Create Operator Namespace
+  delegate_to: localhost
+  k8s:
+    name: "{{ cincinnati_namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+
+- name: Cincinnati | Create Service Account
+  delegate_to: localhost
+  k8s:
+    state: present
+    namespace: '{{ cincinnati_namespace }}'
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('file', '{{ cincinnati_code }}/deploy/service_account.yaml') }}"
+
+- name: Cincinnati | Create Role
+  delegate_to: localhost
+  k8s:
+    state: present
+    namespace: '{{ cincinnati_namespace }}'
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('file', '{{ cincinnati_code }}/deploy/role.yaml') }}"
+
+- name: Cincinnati | Create Role Binding
+  delegate_to: localhost
+  k8s:
+    state: present
+    namespace: '{{ cincinnati_namespace }}'
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('file', '{{ cincinnati_code }}/deploy/role_binding.yaml') }}"
+
+- name: Cincinnati | Create Operator
+  delegate_to: localhost
+  k8s:
+    state: present
+    namespace: '{{ cincinnati_namespace }}'
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('file', '{{ cincinnati_code }}/deploy/operator.yaml') }}"
+
+- name: Cincinnati | Create CRDs
+  delegate_to: localhost
+  k8s:
+    state: present
+    namespace: '{{ cincinnati_namespace }}'
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('file', '{{ cincinnati_code }}/deploy/crds/cincinnati.openshift.io_cincinnatis_crd.yaml') }}"
+
+#- name: Patch the Cincinnati Operator
+#  delegate_to: localhost
+#  k8s:
+
+#- name: Patch the Cluster Version Operator    
+#  delegate_to: localhost
+#  k8s:
+
+#oc patch clusterversion version --type='json' -p='[{"op": "replace", "path": "/spec/upstream", "value": "https://osus.example.com/api/upgrades_info/v1/graph"}]'
+
