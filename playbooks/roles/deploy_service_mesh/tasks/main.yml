@@ -1,19 +1,6 @@
 ---
 # tasks file for service-mesh
 
-- name: Create Service Mesh Namespace
-  delegate_to: localhost
-  k8s:
-    name: "{{ servicemesh_namespace }}"
-    api_version: v1
-    kind: Namespace
-    state: present
-    wait: true
-    kubeconfig: "{{ kubeconfig }}"
-    validate_certs: '{{ kube_ssl_enabled }}'
-  tags:
-    - namespace
-
 - name: Install Elastic Search Operator
   delegate_to: localhost
   k8s:
@@ -65,6 +52,36 @@
   tags:
     - kiali
 
+- name: Search for all Pods labelled name=kiali-operator
+  k8s_info:
+    kind: Pod
+    namespace: 'openshift-operators'
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    label_selectors:
+      - name = kiali-operator
+  register: kiali_pods
+  until:
+    (kiali_pods.resources | length > 0) and
+    (kiali_pods.resources[0].status.containerStatuses[0].ready)
+  retries: 10
+  delay: 10
+  tags:
+    - kiali
+
+- name: Create Service Mesh Namespace
+  delegate_to: localhost
+  k8s:
+    name: "{{ servicemesh_namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+  tags:
+    - istio
+
 - name: Install Service Mesh Operator
   delegate_to: localhost
   k8s:
@@ -74,7 +91,24 @@
     validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/servicemesh-operator.yml.j2') }}"
   tags:
-    - service_mesh
+    - istio
+
+- name: Search for all Pods labelled name=istio-operator
+  k8s_info:
+    kind: Pod
+    namespace: 'openshift-operators'
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    label_selectors:
+      - name = istio-operator
+  register: istio_pods
+  until:
+    (istio_pods.resources | length > 0) and
+    (istio_pods.resources[0].status.containerStatuses[0].ready)
+  retries: 10
+  delay: 10
+  tags:
+    - istio
 
 - name: install istio service mesh control plane
   delegate_to: localhost
@@ -85,4 +119,5 @@
     validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/istio-installation.yml.j2') }}"
   tags:
+    - istio_cp
     - istio

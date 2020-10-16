@@ -2,7 +2,7 @@ apiVersion: maistra.io/v1
 kind: ServiceMeshControlPlane
 metadata:
   name: istio-demo
-  namespace: istio-system
+  namespace: {{ servicemesh_namespace }}
 spec:
 
   threeScale:
