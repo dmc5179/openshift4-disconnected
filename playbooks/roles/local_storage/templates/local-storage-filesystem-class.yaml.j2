@@ -1,0 +1,23 @@
+---
+apiVersion: "local.storage.openshift.io/v1"
+kind: "LocalVolume"
+metadata:
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "{{ local_storage_is_default }}"
+  name: "local-disks-fs"
+  namespace: "{{ local_storage_namespace }}"
+spec:
+  nodeSelector: 
+    nodeSelectorTerms:
+    - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+{% for h in local_storage_nodes %}
+          - {{ h.name }}
+{% endfor %}
+  storageClassDevices:
+    - storageClassName: "localfs-sc"
+      volumeMode: Filesystem
+      devicePaths: 
+        - {{ device_path }}

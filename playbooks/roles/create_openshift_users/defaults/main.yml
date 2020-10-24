@@ -5,3 +5,6 @@ mirror_base: '/tmp'
 openshift_cluster_admin_username: 'admin'
 openshift_cluster_admin_password: 'redhat1'
 
+openshift_users:
+  - name: danclark
+    password: 'redhat1'

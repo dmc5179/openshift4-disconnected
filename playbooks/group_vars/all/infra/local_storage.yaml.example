@@ -1,0 +1,7 @@
+---
+
+local_storage_nodes:
+  - name: ip-10-0-106-61
+  - name: ip-10-0-106-62
+  - name: ip-10-0-106-63
+

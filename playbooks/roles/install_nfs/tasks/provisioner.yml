@@ -8,7 +8,7 @@
     kind: Namespace
     state: present
     wait: true
-    kubeconfig: "{{ kubeconfig  }}"
+    kubeconfig: "{{ kubeconfig }}"
     validate_certs: '{{ kube_ssl_enabled }}'
 
 - name: Create NFS RBAC
@@ -17,7 +17,7 @@
     state: present
     namespace: '{{ nfs_namespace }}'
     wait: true
-    kubeconfig: "{{ kubeconfig  }}"
+    kubeconfig: "{{ kubeconfig }}"
     validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('file', 'files/nfs-provisioner-rbac.yaml') }}"
 
@@ -32,7 +32,7 @@
     state: present
     namespace: '{{ nfs_namespace }}'
     wait: true
-    kubeconfig: "{{ kubeconfig  }}"
+    kubeconfig: "{{ kubeconfig }}"
     validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/nfs-provisioner-deployment.yaml.j2') }}"
 
@@ -42,7 +42,7 @@
     state: present
     namespace: '{{ nfs_namespace }}'
     wait: true
-    kubeconfig: "{{ kubeconfig  }}"
+    kubeconfig: "{{ kubeconfig }}"
     validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('file', 'files/nfs-provisioner-sc.yaml') }}"
 

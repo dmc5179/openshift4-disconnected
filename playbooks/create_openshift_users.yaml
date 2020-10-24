@@ -7,5 +7,5 @@
   tasks:
 
     - name: Create OpenShift users with the htpasswd plugin
-      include_role:
+      import_role:
         name: create_openshift_users

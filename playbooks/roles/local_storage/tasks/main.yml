@@ -1,0 +1,49 @@
+---
+
+- name: Create local-storage namespace
+  delegate_to: localhost
+  k8s:
+    name: "{{ local_storage_namespace }}"
+    api_version: v1
+    kind: Namespace
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+
+#- name: Add toleration for master and infra nodes
+#  shell: |
+#    oc patch ds local-storage-local-diskmaker -n local-storage -p '{"spec": {"template": {"spec": {"tolerations":[{"operator": "Exists"}]}}}}'
+#    oc patch ds local-storage-local-provisioner -n local-storage -p '{"spec": {"template": {"spec": {"tolerations":[{"operator": "Exists"}]}}}}'
+
+- name: Create local storage operator group
+  delegate_to: localhost
+  k8s:
+    state: present
+    namespace: "{{ local_storage_namespace }}"
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/local-storage-operator-group.yaml.j2') }}"
+
+- name: Create local storage subscription
+  delegate_to: localhost
+  k8s:
+    state: present
+    namespace: "{{ local_storage_namespace }}"
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/local-storage-operator-subscription.yaml.j2') }}"
+
+- name: Create local storage block class
+  delegate_to: localhost
+  k8s:
+    state: present
+    namespace: "{{ local_storage_namespace }}"
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/local-storage-block-class.yaml.j2') }}"
+  tags:
+    - block_sc

@@ -45,7 +45,7 @@ docker_registry_activate: true
 docker_registry_pki_enabled: false
 docker_registry_pki_key_suffix: '-key.pem'
 docker_registry_pki_cert_suffix: .pem
-docker_registry_pki_dir: ~/pki
+docker_registry_pki_dir: "{{ ansible_env.HOME }}/pki"
 
 docker_registry_letsencrypt_enabled: false
 docker_registry_letsencrypt_dir: /etc/docker/registry
@@ -54,7 +54,7 @@ docker_registry_letsencrypt_email: 'fake@fake.com'
 
 docker_registry_ssl_local_standalone_enabled: true
 docker_registry_ssl_standalone_enabled: true
-docker_registry_ssl_standalone_path: "~/certs"
+docker_registry_ssl_standalone_path: "{{ ansible_env.HOME }}/certs"
 docker_registry_ssl_standalone_cert: "{{docker_registry_ssl_standalone_path}}/{{ansible_fqdn}}.crt"
 docker_registry_ssl_standalone_key: "{{docker_registry_ssl_standalone_path}}/{{ansible_fqdn}}.key"
 

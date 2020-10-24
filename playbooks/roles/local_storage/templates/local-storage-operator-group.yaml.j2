@@ -1,0 +1,9 @@
+---
+apiVersion: operators.coreos.com/v1alpha2
+kind: OperatorGroup
+metadata:
+  name: local-operator-group
+  namespace: {{ local_storage_namespace }}
+spec:
+  targetNamespaces:
+    - {{ local_storage_namespace }}

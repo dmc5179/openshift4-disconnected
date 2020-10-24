@@ -125,6 +125,8 @@
     --detach
     '{{docker_registry_container}}:{{ docker_registry_container_tag }}'
   when: docker_registry_activate
+  tags:
+    - launch
 
 - name: Install service file for podman registry
   become: true

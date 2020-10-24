@@ -20,7 +20,7 @@
         Port: 6443
     state: present
     wait_timeout: 200
-    wait: True
+    wait: true
 
 # Create a target group with IP address targets
 - elb_target_group:
@@ -42,7 +42,7 @@
         Port: 22623
     state: present
     wait_timeout: 200
-    wait: True
+    wait: true
 
 # Create a target group with IP address targets
 - elb_target_group:
@@ -62,7 +62,7 @@
         Port: 80
     state: present
     wait_timeout: 200
-    wait: True
+    wait: true
 
 # Create a target group with IP address targets
 - elb_target_group:
@@ -82,4 +82,4 @@
         Port: 443
     state: present
     wait_timeout: 200
-    wait: True
+    wait: true

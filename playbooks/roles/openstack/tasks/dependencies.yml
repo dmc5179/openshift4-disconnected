@@ -1,0 +1,7 @@
+---
+
+- name: Install required python modules
+  pip:
+    executable: '{{ pip_executable }}'
+    extra_args: '--user'
+    name: 'openstacksdk'

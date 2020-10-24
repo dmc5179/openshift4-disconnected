@@ -13,10 +13,24 @@
     executable: 'pip3'
     extra_args: '--user'
 
+- name: Install required kubernetes pip module
+  delegate_to: localhost
+  pip:
+    name: 'kubernetes'
+    executable: 'pip3'
+    extra_args: '--user'
+
+- name: Install required openshift pip module
+  delegate_to: localhost
+  pip:
+    name: 'openshift'
+    executable: 'pip3'
+    extra_args: '--user'
+
 - name: generate users.htpasswd file - create admin account entry
   delegate_to: localhost
   htpasswd:
-    create: yes
+    create: true
     path: "{{ mirror_base }}/htpasswd/users.htpasswd"
     name: "{{ openshift_cluster_admin_username }}"
     password: "{{ openshift_cluster_admin_password }}"
@@ -74,11 +88,11 @@
 #  pause:
 #    seconds: 120
 
-#- name: prime cluster_admin user and validate login
-#  shell: "{{ openshift_build_path }}/oc login https://api.{{ openshift_cluster_fqdn }}:6443 --username={{ openshift_cluster_admin_username }} --password={{ openshift_cluster_admin_password }}"
-#  ignore_errors: yes
-
-#- name: add cluster role to new admin account
-#  shell: |
-#    {{ openshift_build_path }}/oc login https://api.{{ openshift_cluster_fqdn }}:6443 --username=kubeadmin --password={{ kubeadmin_password }}
-#    {{ openshift_build_path }}/oc adm policy add-cluster-role-to-user cluster-admin {{ openshift_cluster_admin_username }}
+- name: add cluster role to new admin account
+  delegate_to: localhost
+  k8s:
+    state: present
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/cluster_admin_role_binding.yaml.j2') }}"

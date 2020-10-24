@@ -4,6 +4,7 @@ ansible.log
 inventory
 group_vars/all/infra/aws.yml
 group_vars/all/infra/cap.yml
+group_vars/all/infra/openstack.yml
 group_vars/all/infra/vmware.yml
 group_vars/all/infra/dell.yml
 group_vars/all/infra/hp.yml
@@ -11,6 +12,7 @@ group_vars/all/infra/all.yml
 group_vars/all/infra/ipa.yml
 group_vars/all/infra/cap.yml
 group_vars/all/infra/kernel.yml
+group_vars/all/infra/local_storage.yaml
 group_vars/all/software/dhcp_server.yaml
 group_vars/all/software/dns_server.yaml
 group_vars/all/software/helper_server.yaml
