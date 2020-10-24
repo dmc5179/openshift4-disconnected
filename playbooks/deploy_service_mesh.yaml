@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  gather_facts: true
+  become: false
+  tasks:
+
+    - name: Deploy Red Hat Service Mesh
+      import_role:
+        name: deploy_service_mesh

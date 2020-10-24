@@ -5,6 +5,6 @@
   k8s:
     state: present
     wait: false
-    kubeconfig: "{{ kubeconfig  }}"
-    validate_certs: '{{ ssl_enabled }}'
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/vsphere_csi_icsp.yaml.j2') }}"

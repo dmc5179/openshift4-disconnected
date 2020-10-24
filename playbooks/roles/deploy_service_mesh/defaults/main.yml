@@ -1,0 +1,9 @@
+---
+# defaults file for service-mesh
+
+servicemesh_namespace: istio-system
+
+elasticsearch_operator_version: 'stable'
+jaegar_operator_version: 'stable'
+kiali_operator_version: 'stable'
+servicemesh_operator_version: 'stable'

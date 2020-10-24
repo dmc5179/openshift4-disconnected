@@ -36,7 +36,7 @@
     properties:
        guestinfo.ignition.config.data: '{{ append_bootstrap.content }}'
        guestinfo.ignition.config.data.encoding: base64
-       disk.EnableUUID: TRUE
+       disk.EnableUUID: true
   delegate_to: localhost
   tags: deploy_ovf
 

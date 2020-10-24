@@ -31,5 +31,3 @@
       '{{ racadm }}' -r '{{ item.idrac_ip }}' -u '{{ idrac_user }}' \
                      -p '{{ idrac_password }}' \
                      jobqueue create BIOS-Setup.1-1
-
-

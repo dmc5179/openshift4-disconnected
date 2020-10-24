@@ -1,0 +1,10 @@
+---
+- hosts: helper_node
+  gather_facts: true
+  become: false
+  tasks:
+
+    - name: Install dependencies for OSP API
+      import_role:
+        name: openstack
+        tasks_from: dependencies

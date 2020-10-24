@@ -1,13 +1,19 @@
 #!/bin/bash -e
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+  
 # Source the environment file with the default settings
-#. ./env.sh
+source "${SCRIPT_DIR}/../env.sh"
 
-REGISTRY_DIR="${HOME}/registry/"
-REGISTRY_HOSTNAME="${HOSTNAME}"
-REGISTRY_IP="$(hostname -i)"
-REGISTRY_PORT=5000
-REGISTRY_IMG="docker.io/library/registry:2"
+export REGISTRY_DIR="${HOME}/registry/"
+export REGISTRY_HOSTNAME="${HOSTNAME}"
+export REGISTRY_IP="$(hostname -i)"
+export REGISTRY_PORT=5000
+export REGISTRY_IMG="docker.io/library/registry:2"
+
+# User and Group that the systemd service will run as
+export REG_USER=$(id -un)
+export REG_GROUP=$(id -gn)
 
 sudo yum -y install podman httpd httpd-tools firewalld skopeo
 
@@ -54,13 +60,14 @@ podman run --name registry_server -p ${REGISTRY_PORT}:5000 \
 -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
 -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
 --hostname=${REGISTRY_HOSTNAME} \
+--conmon-pidfile=/tmp/podman-registry-conman.pid \
 --detach \
 ${REGISTRY_IMG}
 
 # Configure SELinux to allow containers in systemd services
 sudo setsebool -P container_manage_cgroup on
 
-sudo bash -c 'cat <<EOF >> /etc/systemd/system/registry-container.service
+sudo bash -c "cat <<EOF >> /etc/systemd/system/registry-container.service
 
 [Unit]
 Description=Container Registry
@@ -69,11 +76,13 @@ Description=Container Registry
 Restart=always
 ExecStart=/usr/bin/podman start -a registry_server
 ExecStop=/usr/bin/podman stop -t 15 registry_server
+User=${REG_USER}
+Group=${REG_GROUP}
 
 [Install]
 WantedBy=local.target
 
-EOF'
+EOF"
 
 sudo systemctl daemon-reload
 sudo systemctl enable registry-container.service

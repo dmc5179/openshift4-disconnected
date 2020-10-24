@@ -1,11 +1,15 @@
 #!/bin/bash -xe
 
-REGISTRY="registry.caas.cia.ic.gov:5000"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+# Source the environment file with the default settings
+source "${SCRIPT_DIR}/../env.sh"
 
 # Read in the new chrony.conf file
-ICSP_B64=$(cat ./icsp.conf | sed "s|registry.example.com|${REGISTRY}|g" | base64 | tr -d '\n')
+ICSP_B64=$(cat ./icsp.conf | sed "s|registry.example.com|${REMOTE_REG}|g" | sed "s|LOCAL_REPO|${LOCAL_REPO}|g" | base64 -w 0)
 
 # Create a machine config to set the private registry for master nodes
+rm -f ./99_master-private-registry-configuration.yaml
 cat << EOF > ./99_master-private-registry-configuration.yaml
 apiVersion: machineconfiguration.openshift.io/v1
 kind: MachineConfig
@@ -35,6 +39,7 @@ spec:
 EOF
 
 # Create a machine config to set the private registry ICSP for worker nodes
+rm -f ./99_worker-private-registry-configuration.yaml
 cat << EOF > ./99_worker-private-registry-configuration.yaml
 apiVersion: machineconfiguration.openshift.io/v1
 kind: MachineConfig
@@ -63,7 +68,7 @@ spec:
   osImageURL: ""
 EOF
 
-oc apply -f ./99_master-private-registry-configuration.yaml
-oc apply -f ./99_worker-private-registry-configuration.yaml
+${OC} apply -f ./99_master-private-registry-configuration.yaml
+${OC} apply -f ./99_worker-private-registry-configuration.yaml
 
 exit 0

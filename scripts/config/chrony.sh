@@ -1,5 +1,10 @@
 #!/bin/bash -xe
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+# Source the environment file with the default settings
+source "${SCRIPT_DIR}/../env.sh"
+
 # Time server the OpenShift 4 cluster will use
 NTP_SERVER=10.0.255.100
 
@@ -73,7 +78,7 @@ spec:
   osImageURL: ""
 EOF
 
-#oc apply -f ./99_master-chrony-configuration.yaml
-#oc apply -f ./99_worker-chrony-configuration.yaml
+${OC} apply -f ./99_master-chrony-configuration.yaml
+${OC} apply -f ./99_worker-chrony-configuration.yaml
 
 exit 0

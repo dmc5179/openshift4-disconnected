@@ -4,26 +4,13 @@
 - name: Create vsphere namespace for CSI Drivers
   delegate_to: localhost
   k8s:
-    name: vsphere
+    name: "{{ vsphere_namespace }}"
     api_version: v1
     kind: Namespace
     state: present
     wait: true
-    kubeconfig: "{{ kubeconfig  }}"
+    kubeconfig: "{{ kubeconfig }}"
     validate_certs: '{{ kube_ssl_enabled }}'
-
-- name: Taint Worker Nodes
-  delegate_to: localhost
-  shell:
-    cmd: 'oc adm taint node --overwrite=true {{item}}.{{ocp_base_domain}} node.cloudprovider.kubernetes.io/uninitialized=true:NoSchedule'
-  with_items:
-    - 'worker0.caas'
-    - 'worker1.caas'
-    - 'worker2.caas'
-
-- name: Pause for taint to take effect
-  pause:
-    seconds: 5
 
 - name: Create cloud control config map
   delegate_to: localhost
@@ -32,7 +19,7 @@
     name: cloud-config
     namespace: '{{ vsphere_namespace }}'
     wait: true
-    kubeconfig: "{{ kubeconfig  }}"
+    kubeconfig: "{{ kubeconfig }}"
     validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/vsphere_configmap.yaml.j2') }}"
 
@@ -41,7 +28,7 @@
   k8s:
     state: present
     wait: true
-    kubeconfig: "{{ kubeconfig  }}"
+    kubeconfig: "{{ kubeconfig }}"
     validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/cpi-global-secret.yaml.j2') }}"
 
@@ -51,7 +38,7 @@
     state: present
     wait: true
     namespace: '{{ vsphere_namespace }}'
-    kubeconfig: "{{ kubeconfig  }}"
+    kubeconfig: "{{ kubeconfig }}"
     validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/cloud-controller-manager-roles.yaml.j2') }}"
 
@@ -60,7 +47,7 @@
   k8s:
     state: present
     wait: true
-    kubeconfig: "{{ kubeconfig  }}"
+    kubeconfig: "{{ kubeconfig }}"
     namespace: '{{ vsphere_namespace }}'
     validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/cloud-controller-manager-role-bindings.yaml.j2') }}"
@@ -72,7 +59,7 @@
 #    name: vsphere-cpi-kubesystem
 #    namespace: kube-system
 #    wait: true
-#    kubeconfig: "{{ kubeconfig  }}"
+#    kubeconfig: "{{ kubeconfig }}"
 #    validate_certs: '{{ kube_ssl_enabled }}'
 #    definition: "{{ lookup('template', 'templates/vsphere_cpi_kubesystem_rolebinding.yaml.j2') }}"
 
@@ -100,7 +87,7 @@
     state: present
     wait: true
     namespace: '{{ vsphere_namespace }}'
-    kubeconfig: "{{ kubeconfig  }}"
+    kubeconfig: "{{ kubeconfig }}"
     validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/vsphere_cloud_controller_manager_daemonset.yaml.j2') }}"
 
@@ -263,7 +250,7 @@
 #    wait: true
 #    name: vsphere-config-secret
 #    namespace: '{{ vsphere_namespace }}'
-#    kubeconfig: "{{ kubeconfig  }}"
+#    kubeconfig: "{{ kubeconfig }}"
 #    validate_certs: '{{ kube_ssl_enabled }}'
 #    definition: /tmp/csi-vsphere.conf
 #    definition: "{{ lookup('template', 'templates/csi-vsphere.conf.j2') }}"
@@ -287,7 +274,7 @@
     state: present
     wait: true
     namespace: '{{ vsphere_namespace }}'
-    kubeconfig: "{{ kubeconfig  }}"
+    kubeconfig: "{{ kubeconfig }}"
     validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/vsphere-csi-controller-rbac.yaml.j2') }}"
 
@@ -316,7 +303,7 @@
     state: present
     wait: true
     namespace: '{{ vsphere_namespace }}'
-    kubeconfig: "{{ kubeconfig  }}"
+    kubeconfig: "{{ kubeconfig }}"
     validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/vsphere-csi-controller-ss.yaml.j2') }}"
 
@@ -326,7 +313,7 @@
     state: present
     wait: true
     namespace: '{{ vsphere_namespace }}'
-    kubeconfig: "{{ kubeconfig  }}"
+    kubeconfig: "{{ kubeconfig }}"
     validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/vsphere-csi-node-ds.yaml.j2') }}"
 
@@ -348,6 +335,6 @@
     state: present
     wait: true
     namespace: '{{ vsphere_namespace }}'
-    kubeconfig: "{{ kubeconfig  }}"
+    kubeconfig: "{{ kubeconfig }}"
     validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/vsphere_csi_storage_class.yaml.j2') }}"

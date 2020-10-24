@@ -2,6 +2,8 @@
 # Fully air-gap install??
 air_gapped: true
 
+# Supported platforms include
+# vmware, aws, gcp, bare_metal, none
 platform: 'none'
 ###################################################################
 # Path to binaries
@@ -32,12 +34,15 @@ worker_count: 3
 
 fips_enabled: false
 
-ocp_cluster_publish: 'Internal'
+ocp_cluster_publish: 'External'
 
 ocp_base_domain: 'example.com'
 ocp_cluster_name: 'caas'
 
-ssh_public_key_file: '{{ ansible_env.HOME }}/.ssh/id_rsa.pub'
+# This is the default location of the ssk key pair that will be created by the
+# generate_ignition role. You probably don't have to change this unless specifying your
+# own ssh key pair
+ssh_public_key_file: '{{ ansible_env.HOME }}/.ssh/{{ ocp_cluster_name}}_rsa.pub'
 
 # Certificate bundle that will be added to the install-config.yaml
 # This generally includes a certificate for the disconnected docker registry
@@ -83,7 +88,7 @@ openshift_bootstrap:
     nameserver: '192.168.1.42'
     ignserver: 'http://192.168.1.42:8090'
     bios_path: 'install/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz'
-    ign_path: 'ignition/bootstrap.ign'
+    ign_path: '{{ ocp_cluster_name }}/ignition/bootstrap.ign'
     type: 'bootstrap'
 
 openshift_masters:
@@ -97,7 +102,7 @@ openshift_masters:
     nameserver: '192.168.1.42'
     ignserver: 'http://192.168.1.42:8090'
     bios_path: 'install/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz'
-    ign_path: 'ignition/master0.ign'
+    ign_path: '{{ ocp_cluster_name }}/ignition/master0.ign'
     type: 'master'
   - name: 'master1'
     ip: '192.168.1.52'
@@ -109,7 +114,7 @@ openshift_masters:
     nameserver: '192.168.1.42'
     ignserver: 'http://192.168.1.42:8090'
     bios_path: 'install/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz'
-    ign_path: 'ignition/master1.ign'
+    ign_path: '{{ ocp_cluster_name }}/ignition/master1.ign'
     type: 'master'
   - name: 'master2'
     ip: '192.168.1.53'
@@ -121,7 +126,7 @@ openshift_masters:
     nameserver: '192.168.1.42'
     ignserver: 'http://192.168.1.42:8090'
     bios_path: 'install/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz'
-    ign_path: 'ignition/master2.ign'
+    ign_path: '{{ ocp_cluster_name }}/ignition/master2.ign'
     type: 'master'
 
 
@@ -136,7 +141,7 @@ openshift_workers:
     nameserver: '192.168.1.42'
     ignserver: 'http://192.168.1.42:8090'
     bios_path: 'install/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz'
-    ign_path: 'ignition/worker0.ign'
+    ign_path: '{{ ocp_cluster_name }}/ignition/worker0.ign'
     type: 'worker'
   - name: 'worker1'
     ip: '192.168.1.62'
@@ -148,7 +153,7 @@ openshift_workers:
     nameserver: '192.168.1.42'
     ignserver: 'http://192.168.1.42:8090'
     bios_path: 'install/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz'
-    ign_path: 'ignition/worker1.ign'
+    ign_path: '{{ ocp_cluster_name }}/ignition/worker1.ign'
     type: 'worker'
   - name: 'worker2'
     ip: '192.168.1.63'
@@ -160,5 +165,5 @@ openshift_workers:
     nameserver: '192.168.1.42'
     ignserver: 'http://192.168.1.42:8090'
     bios_path: 'install/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz'
-    ign_path: 'ignition/worker2.ign'
+    ign_path: '{{ ocp_cluster_name }}/ignition/worker2.ign'
     type: 'worker'

@@ -1,0 +1,57 @@
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - worker3.icsa.iad.redhat.com
+                - worker4.icsa.iad.redhat.com
+                - worker5.icsa.iad.redhat.com
+      containers:
+      - image: docker.io/mysql:5.7
+        imagePullPolicy: Always
+        name: mysql-57
+        env:
+        - name: MYSQL_DATABASE
+          value: wordpress
+        - name: MYSQL_USER
+          value: wordpress
+        - name: MYSQL_PASSWORD
+          value: wordpress
+        - name: MYSQL_ROOT_PASSWORD
+          value: wordpress
+        - name: MYSQL_HOST
+          value: my-wordpress-site-db
+        - name: MYSQL_TABLE_PREFIX
+          value: wp_
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: wordpress-db-ps
+          mountPath: /var/lib/mysql/
+      volumes:
+      - name: wordpress-db-ps
+        persistentVolumeClaim:
+          claimName: pvc-block-test

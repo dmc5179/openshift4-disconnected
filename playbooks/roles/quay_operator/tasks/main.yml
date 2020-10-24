@@ -10,6 +10,20 @@
     wait: true
     kubeconfig: "{{ kubeconfig }}"
     validate_certs: '{{ kube_ssl_enabled }}'
+  tags:
+    - subscription
+
+- name: Create the quay operator group
+  delegate_to: localhost
+  k8s:
+    state: present
+    namespace: '{{ quay_namespace }}'
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/quay-operator-group.yaml.j2') }}"
+  tags:
+    - subscription
 
 - name: Subscribe to the quay operator
   delegate_to: localhost
@@ -19,37 +33,63 @@
     wait: true
     kubeconfig: "{{ kubeconfig }}"
     validate_certs: '{{ kube_ssl_enabled }}'
-    definition: "{{ lookup('template', 'templates/quay-operator.yaml.j2') }}"
+    definition: "{{ lookup('template', 'templates/quay-operator-subscription.yaml.j2') }}"
+  tags:
+    - subscription
 
 - name: Create postgres credential secret
-  shell: |
-
-    oc create secret generic postgres-creds \
-      --from-literal=database-username=quay \
-      --from-literal=database-password=thisissparta \
-      --from-literal=database-root-password=thisissparta \
-      --from-literal=database-name=quay
+  delegate_to: localhost
+  k8s:
+    state: present
+    namespace: '{{ quay_namespace }}'
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/quay-postgres-secret.yaml.j2') }}"
+  tags:
+    - credentials
 
 - name: Create redis credentials secret
-  shell: |
-    oc create secret generic redis-password  --from-literal=password=thisissparta
+  delegate_to: localhost
+  k8s:
+    state: present
+    namespace: '{{ quay_namespace }}'
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/quay-redis-secret.yaml.j2') }}"
+  tags:
+    - credentials
 
 - name: Create quay config secret
-  shell: |
-    oc create secret generic quay-config --from-literal=config-app-password=StrongPassword
+  delegate_to: localhost
+  k8s:
+    state: present
+    namespace: '{{ quay_namespace }}'
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/quay-config-secret.yaml.j2') }}"
+  tags:
+    - credentials
 
 - name: Create quay admin credentials secret
-  shell: |
-    oc create secret generic quay-admin \
-      --from-literal=superuser-username=quayadmin \
-      --from-literal=superuser-password=thisissparta \
-      --from-literal=superuser-email=admin@spo.io
-
-- name: Slurp the pull secret file into a variable
   delegate_to: localhost
-  slurp:
-    src: "{{ pull_secret }}"
-  register: pull_secret_slurp
+  k8s:
+    state: present
+    namespace: '{{ quay_namespace }}'
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    validate_certs: '{{ kube_ssl_enabled }}'
+    definition: "{{ lookup('template', 'templates/quay-admin-secret.yaml.j2') }}"
+  tags:
+    - credentials
+
+#- name: Slurp the pull secret file into a variable
+#  delegate_to: localhost
+#  slurp:
+#    src: "{{ pull_secret }}"
+#  register: pull_secret_slurp
 
 - name: Create Redhat pull secret
   delegate_to: localhost
@@ -60,7 +100,9 @@
     wait: true
     kubeconfig: "{{ kubeconfig }}"
     validate_certs: '{{ kube_ssl_enabled }}'
-    definition: "{{ lookup('template', 'templates/redhat_pull_secret.yaml.j2') }}"
+    definition: "{{ lookup('template', 'templates/quay-enterprise-redhat-pull-secret.yaml.j2') }}"
+  tags:
+    - credentials
 
 - name: Create Quay EcoSystem
   delegate_to: localhost
@@ -71,3 +113,5 @@
     kubeconfig: "{{ kubeconfig }}"
     validate_certs: '{{ kube_ssl_enabled }}'
     definition: "{{ lookup('template', 'templates/quay-ecosystem.yaml.j2') }}"
+  tags:
+    - ecosystem
