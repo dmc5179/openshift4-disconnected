@@ -1,0 +1,4 @@
+---
+
+provisioner_user: 'kni'
+provisioner_group: 'kni'

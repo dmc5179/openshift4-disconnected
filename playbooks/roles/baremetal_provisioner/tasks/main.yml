@@ -1,0 +1,43 @@
+---
+
+- name: Enable required repositories
+  rhsm_repository:
+    name:
+      - rhel-8-for-x86_64-appstream-rpms
+      - rhel-8-for-x86_64-baseos-rpms
+    state: enabled
+
+- name: Create group for provisioner
+  group:
+    name: '{{ provisioner_group }}'
+    state: present
+
+- name: Create user for provisioner
+  user:
+    name: '{{ provisioner_user }}'
+    group: '{{ provisioner_group }}'
+    state: present
+
+- name: Enable sudo privileges for {{ provisioner_user }}
+  template:
+    src: 'templates/kni.sudo.j2'
+    dest: '/etc/sudoers.d/kni'
+    owner: root
+    group: root
+    mode: 0440
+
+# TODO: Create SSH creds
+
+- name: Install Required Packages
+  package:
+    name:
+      - libvirt
+      - qemu-kvm
+      - mkisofs
+      - python3-devel
+      - jq
+      - ipmitool
+      - firewalld
+    state: present
+
+# TODO: Enable firewalld config

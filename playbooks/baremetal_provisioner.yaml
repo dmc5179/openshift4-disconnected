@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Configure the bare metal provisioning node
+      include_role:
+        name: baremetal_provisioner
