@@ -2,3 +2,5 @@
 
 provisioner_user: 'kni'
 provisioner_group: 'kni'
+
+virt_pool_target: '/var/lib/libvirt/images'

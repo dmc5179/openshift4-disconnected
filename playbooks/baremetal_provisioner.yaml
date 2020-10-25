@@ -5,5 +5,5 @@
   tasks:
 
     - name: Configure the bare metal provisioning node
-      include_role:
+      import_role:
         name: baremetal_provisioner

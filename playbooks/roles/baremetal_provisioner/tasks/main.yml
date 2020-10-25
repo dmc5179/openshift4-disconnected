@@ -35,6 +35,8 @@
       - qemu-kvm
       - mkisofs
       - python3-devel
+      - python3-libvirt
+      - python3-lxml
       - jq
       - ipmitool
       - firewalld
@@ -50,6 +52,8 @@
   systemd:
     name: firewalld
     state: restarted
+    enabled: true
+    masked: false
 
 - name: Enable http firewalld service
   firewalld:
@@ -71,3 +75,29 @@
     state: enabled
     permanent: true
 
+- name: Restart libvirt
+  systemd:
+    name: libvirtd
+    state: restarted
+    enabled: true
+    masked: false
+
+- name: Define libvirt storage pool
+  virt_pool:
+    command: define
+    name: default
+    state: active
+    xml: '{{ lookup("template", "templates/virt_pool.xml.j2") }}'
+  tags: pool
+    
+#- name: get
+#  virt_pool:
+#    command: get_xml
+#    name: default
+#  register: pool
+#  tags: pool
+
+#- name: print
+#  debug:
+#    var: pool
+#  tags: pool
