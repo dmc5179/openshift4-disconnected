@@ -1,0 +1,11 @@
+---
+# Playbook to apply the Image Content Source Policies
+# from all of the roles in this repo. Used for disconnected installs
+- hosts: localhost
+  gather_facts: true
+  become: false
+  tasks:
+
+    - name: Update ingress router Certificate
+      import_role:
+        name: ingress_certificate
