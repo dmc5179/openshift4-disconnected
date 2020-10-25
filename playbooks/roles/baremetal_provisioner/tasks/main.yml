@@ -40,4 +40,34 @@
       - firewalld
     state: present
 
-# TODO: Enable firewalld config
+- name: Add {{ provisioner_user }} to libvirt group
+  user:
+    name: '{{ provisioner_user }}'
+    group: libvirt
+    append: true
+
+- name: Restart firewalld
+  systemd:
+    name: firewalld
+    state: restarted
+
+- name: Enable http firewalld service
+  firewalld:
+    service: http
+    permanent: true
+    state: enabled
+
+- name: Enable firewalld ports (libvirt zone)
+  firewalld:
+    port: 5000/tcp
+    zone: libvirt
+    state: enabled
+    permanent: true
+
+- name: Enable firewalld ports (public zone)
+  firewalld:
+    port: 5000/tcp
+    zone: public
+    state: enabled
+    permanent: true
+
