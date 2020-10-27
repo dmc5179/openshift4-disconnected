@@ -1,5 +1,6 @@
 #!/bin/bash -xe
-export OCP_RELEASE="4.5.4"
+export OC="/usr/local/bin/oc-4.5.16"
+export OCP_RELEASE="4.5.16"
 export ARCHITECTURE="x86_64"
 export LOCAL_REG='localhost:5000'
 export LOCAL_REPO='ocp4/openshift4'
@@ -24,11 +25,14 @@ export RH_OP='true'
 export CERT_OP='false'
 export COMM_OP='false'
 
+export RH_OP_CATALOG="quay.io/danclark/redhat-operators:v${OCP_RELEASE}-${ARCHITECTURE}"
+
 export RH_OP_REPO="${LOCAL_REG}/olm/redhat-operators:${OCP_RELEASE}"
 export CERT_OP_REPO="${LOCAL_REG}/olm/certified-operators:${OCP_RELEASE}"
 export COMM_OP_REPO="${LOCAL_REG}/olm/community-operators:${OCP_RELEASE}"
 
-export OPERATOR_REGISTRY='quay.io/operator-framework/operator-registry-server:v1.13.6'
+export OPERATOR_REGISTRY='quay.io/operator-framework/operator-registry-server:latest'
+#export OPERATOR_REGISTRY="quay.io/openshift-release-dev/ocp-release:${OCP_RELEASE}-${ARCHITECTURE}"
 
 # This is either the directory backing the local podman registry, i.e; /opt/registry/data
 # Or this is the directory where the images will be mirrored to/from if using --to-dir
@@ -71,22 +75,29 @@ then
 
   # Looks like this is working
   # Build the redhat-operators catalog source and mirror to disk
-  echo "Building redhat-operators catalog image"
-  ${OC} adm catalog build --insecure \
+  echo "Building redhat-operators catalog image and mirror to disk"
+  ${OC} adm catalog build \
     --appregistry-org redhat-operators \
     "--from=${OPERATOR_REGISTRY}" "--registry-config=${LOCAL_SECRET_JSON}" \
     --dir=${REMOVABLE_MEDIA_PATH}/mirror \
     --to=file://olm/redhat-operators:${OCP_RELEASE}
 
+  echo "Building redhat-operators catalog image and push"
+  ${OC} adm catalog build \
+    --appregistry-org redhat-operators \
+    --registry-config=${LOCAL_SECRET_JSON} \
+    --from=${OPERATOR_REGISTRY} \
+    --to=${RH_OP_CATALOG}
+
   # Grab the operator manifests
   ${OC} adm catalog mirror --manifests-only \
-    --registry-config "${LOCAL_SECRET_JSON}" --insecure=true \
+    --registry-config ${LOCAL_SECRET_JSON} \
     --to-manifests=${REMOVABLE_MEDIA_PATH}/operator_manifests \
-    "quay.io/danclark/redhat-operators:v1" --dir=${REMOVABLE_MEDIA_PATH}/operators file://replaceme
+    ${RH_OP_CATALOG} --dir=${REMOVABLE_MEDIA_PATH}/operators file://replaceme
 
 # Mirror the images with multiple threads
 # This sed command is weird because the images mirrored by tag already have file in them but not the digest based ones
-  cat "${REMOVABLE_MEDIA_PATH}/operator_manifests/mapping.txt" | sed 's|=replaceme|=file://|g' | xargs -n 1 -P ${THREADS} ${OC} image mirror --filter-by-os=.* --keep-manifest-list=true --registry-config=${LOCAL_SECRET_JSON} --dir="${REMOVABLE_MEDIA_PATH}/mirror" '{}'
+  cat "${REMOVABLE_MEDIA_PATH}/operator_manifests/mapping.txt" | sed 's|=replaceme/|=file://|g' | xargs -n 1 -P ${THREADS} ${OC} image mirror --filter-by-os=.* --keep-manifest-list=true --registry-config=${LOCAL_SECRET_JSON} --dir="${REMOVABLE_MEDIA_PATH}/mirror" '{}'
 
   tar -cf "ocp-${OCP_RELEASE}-${ARCHITECTURE}-packaged.tar" "${REMOVABLE_MEDIA_PATH}"
 fi
