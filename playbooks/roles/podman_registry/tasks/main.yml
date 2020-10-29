@@ -103,14 +103,14 @@
 
 # Configure SELinux to allow containers in systemd services
 - name: Set container_manage_cgroup SELinux Boolean
-  become: "{{ run_as_root }}"
+  become: true
   seboolean:
     name: container_manage_cgroup
     state: true
     persistent: true
-  when:
-    (ansible_distribution == 'RedHat' or ansible_distribution == 'CentOS') and
-    (ansible_distribution_major_version == '7')
+  when:   
+    - ansible_selinux.status is defined
+    - ansible_selinux.status == "enabled"
 
 - name: launching registry container...
   become: "{{ run_as_root }}"
