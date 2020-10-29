@@ -5,6 +5,10 @@ air_gapped: true
 # Supported platforms include
 # vmware, aws, gcp, bare_metal, none
 platform: 'none'
+
+# UEFI support
+uefi_enabled: false
+
 ###################################################################
 # Path to binaries
 ###################################################################
