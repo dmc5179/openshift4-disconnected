@@ -8,12 +8,5 @@ pxeserver_packages:
   - syslinux
   - syslinux-nonlinux
 
-#pxeserver_services:
-#  - rpcbind
-#  - nfs-server
-
-pxeserver_files:
+pxeserver_efi_files:
   - /boot/efi/EFI/BOOT/BOOTX64.EFI
-  - /usr/share/syslinux/memdisk
-  - /usr/share/syslinux/menu.c32
-  - /usr/share/syslinux/pxelinux.0
