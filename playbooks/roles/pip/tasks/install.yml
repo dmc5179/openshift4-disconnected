@@ -1,6 +1,6 @@
 ---
 - name: Install mirrored pip modules
   shell:
-    cmd: "{{ pip_cmd }} install --user -d '{{ mirror_base }}/pip' '{{ item.name }}=={{ item.version }}'"
+    cmd: "{{ pip_cmd }} install --no-cache-dir --no-index --find-links 'file://{{ mirror_base }}/pip' '{{ item.name }}=={{ item.version }}'"
   with_items:
     - '{{ pip_modules }}'
