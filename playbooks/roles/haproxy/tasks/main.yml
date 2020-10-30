@@ -57,7 +57,9 @@
     - 443/tcp
     - 80/tcp
     - 8080/tcp
-  when: "'firewalld.service' in services"
+  when:
+    ('firewalld.service' in services) and
+    (ansible_facts.services["firewalld.service"].state is match("running"))
 
 - name: Ensure HAProxy is started and enabled on boot.
   become: true
