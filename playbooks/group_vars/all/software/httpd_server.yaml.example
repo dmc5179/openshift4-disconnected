@@ -14,9 +14,6 @@ httpd_ssl_port: 8443
 # Set ProxyPreserveHost
 httpd_proxy_preserve_host: true
 
-httpd_listen: 80
-httpd_listen_ssl: 443
-
 # Relative to /etc/pki/tls/certs/
 httpd_ssl_certificate_file: 'registry.crt'
 
