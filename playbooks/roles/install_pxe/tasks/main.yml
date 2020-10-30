@@ -30,7 +30,6 @@
   tags:
     - pxeserver
 
-#TODO: Add task for copying UEFI require boot files
 - name: Make Network Boot Programs for UEFI based systems available
   copy:
     remote_src: true
