@@ -28,13 +28,17 @@
   tags:
     - certificates
 
+- name: Set pip args
+  set_fact:
+    pip_args: '--user'
+  when: (not run_as_root)
+
 - name: Upgrade pip
   become: true
   pip:
     name: pip
     executable: "{{ pip_executable }}"
     state: present
-#    version: '20.0.2'
 
 - name: Install passlib for htpassword
   become: "{{ run_as_root }}"
@@ -42,8 +46,7 @@
     name: passlib
     executable: "{{ pip_executable }}"
     state: present
-#    version: '1.7.2'
-    extra_args: '--user'
+    extra_args: '{{ pip_args }}'
 
 - name: Install bcrypt for htpassword
   become: "{{ run_as_root }}"
@@ -51,8 +54,7 @@
     name: bcrypt
     executable: "{{ pip_executable }}"
     state: present
-#    version: '3.1.7'
-    extra_args: '--user'
+    extra_args: '{{ pip_args }}'
 
 - name: Install cryptography for htpassword
   become: "{{ run_as_root }}"
@@ -60,8 +62,7 @@
     name: cryptography
     executable: "{{ pip_executable }}"
     state: present
-#    version: '2.9.2'
-    extra_args: '--user'
+    extra_args: '{{ pip_args }}'
 
 - name: add passwds to auth/registry.htpasswd
   become: "{{ run_as_root }}"

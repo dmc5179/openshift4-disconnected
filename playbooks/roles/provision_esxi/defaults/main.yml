@@ -3,6 +3,10 @@
 
 mirror_base: '/opt/openshift'
 
+run_as_root: false
+pip_args: ''
+pip_cmd: pip3
+
 vmware_ssl_enabled: false
 
 vcenter_username: ''
