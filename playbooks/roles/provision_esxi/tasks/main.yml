@@ -1,14 +1,21 @@
 ---
 # tasks file for provision_esxi
 
+- name: Set pip args
+  set_fact:
+    pip_args: '--user'
+  when: (not run_as_root)
+
 - name: Install required pip packages
   delegate_to: localhost
+  become: '{{ run_as_root }}'
   pip:
     name:
       - PyVmomi
       - pyVim
-    extra_args: --user
-    executable: pip3
+    state: present
+    extra_args: '{{ pip_args }}'
+    executable: '{{ pip_cmd }}'
 
 - name: Create a VM folder on given datacenter
   vcenter_folder:
