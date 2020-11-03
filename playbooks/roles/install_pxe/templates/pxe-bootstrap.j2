@@ -6,6 +6,6 @@ default menu.c32
  label 1
  menu label ^1) Install Bootstrap Node
  menu default
- kernel rhcos/kernel
- append initrd=rhcos/initramfs.img nomodeset rd.neednet=1 coreos.inst=yes coreos.inst.install_dev={{ disk | default('sda') }} coreos.inst.image_url={{ image_url }}/install/bios.raw.gz coreos.inst.ignition_url={{ ignition_url }}/ignition/bootstrap.ign
+ kernel rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer-kernel-{{ arch }}
+ append initrd=rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer-initramfs.{{ arch }}.img nomodeset rd.neednet=1 coreos.inst=yes coreos.inst.install_dev={{ disk | default('sda') }} coreos.inst.image_url={{ image_url }}/install/bios.raw.gz coreos.inst.ignition_url={{ ignition_url }}/ignition/bootstrap.ign
 
