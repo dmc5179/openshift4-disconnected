@@ -13,7 +13,6 @@ Copy the file 'playbooks/group_vars/all/infra/all.yml.example' to 'playbooks/gro
 | kubectl                                      | '/usr/local/bin/kubectl'                            | Location of kubectl binary                                                       |
 | filetranspile                                | '/usr/local/bin/filetranspiler'                     | Location of filetranspiler binary                                                |
 | fakeroots                                    | 'fakeroots'                                         | Location of the fakeroots directory for generating igniton configs for each node |
-| maj_ver                                      | '4.5'                                               | OpenShift Major Version Number                                                   |
 | rhcos_ver                                    | '4.5.2'                                             | OpenShift RHCOS Version Number                                                   |
 | ocp_ver                                      | '4.5.4'                                             | OpenShift Version Number                                                         |
 | arch                                         | 'x86_64'                                            | OpenShift Architecture                                                           |
