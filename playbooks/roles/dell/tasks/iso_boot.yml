@@ -15,6 +15,16 @@
 #    - '{{ openshift_masters_dell }}'
 #    - '{{ openshift_workers_dell }}'
 
+- name: Disconnect any already connected virtual media
+  become: true
+  shell:
+    cmd: |
+      '{{ racadm }}' -r '{{ item.idrac_ip }}' -u '{{ idrac_user }}' \
+                     -p '{{ idrac_password }}' remoteimage -d
+  with_items:
+    - '{{ openshift_masters_dell }}'
+    - '{{ openshift_workers_dell }}'
+
 - name: Configure Hosts to enable boot once selection
   become: true
   shell:
@@ -47,3 +57,6 @@
   with_items:
     - '{{ openshift_masters_dell }}'
     - '{{ openshift_workers_dell }}'
+
+
+#"racadm set iDRAC.serverboot.firstbootdevice PXE"
