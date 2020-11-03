@@ -3,7 +3,7 @@
 - name: Unarchiving OCP4 client
   become: true
   unarchive:
-    src: "{{ mirror_base }}/openshift-client-linux.tar.gz"
+    src: "{{ mirror_base }}/openshift-client-linux-{{ ocp_ver }}.tar.gz"
     dest: /usr/local/bin
     remote_src: true
   tags:
@@ -12,11 +12,20 @@
 - name: Unarchiving OCP4 Installer
   become: true
   unarchive:
-    src: "{{ mirror_base }}/openshift-install-linux.tar.gz"
+    src: "{{ mirror_base }}/openshift-install-linux-{{ ocp_ver }}.tar.gz"
     dest: /usr/local/bin
     remote_src: true
   tags:
     - ocp_installer
+
+- name: Install core-installer
+  become: true
+  copy:
+    src: "{{ mirror_base }}/coreos-installer_amd64"
+    dest: "/usr/local/bin"
+    mode: 0755
+    remote_src: true
+  when: (arch is match("x86_64"))
 
 - name: Removing files that are not needed
   become: true

@@ -10,13 +10,20 @@
   become: "{{ run_as_root }}"
   get_url:
     url: "{{ ocp_client }}"
-    dest: "{{ mirror_base }}/openshift-client-linux.tar.gz"
+    dest: "{{ mirror_base }}/openshift-client-linux-{{ ocp_ver }}.tar.gz"
 
 - name: Downloading OCP4 Installer
   become: "{{ run_as_root }}"
   get_url:
     url: "{{ ocp_installer }}"
-    dest: "{{ mirror_base }}/openshift-install-linux.tar.gz"
+    dest: "{{ mirror_base }}/openshift-install-linux-{{ ocp_ver }}.tar.gz"
+
+- name: Download coreos-installer
+  become: "{{ run_as_root }}"
+  get_url:
+    url: "{{ coreos_installer }}"
+    dest: "{{ mirror_base }}/coreos-installer_amd64"
+  when: (arch is match("x86_64"))
 
 - name: Downloading filetranspiler source
   become: "{{ run_as_root }}"

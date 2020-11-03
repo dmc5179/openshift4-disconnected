@@ -23,7 +23,6 @@ fakeroots: 'fakeroots'
 
 ###############################################
 
-maj_ver: '4.5'
 # RedHat CoreOS Version. Might not match OpenShift Version
 # 4.3.8 and 4.4.3 currently available
 rhcos_ver: '4.5.2'
