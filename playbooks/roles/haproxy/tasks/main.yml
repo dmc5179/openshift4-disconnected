@@ -12,6 +12,9 @@
     proto: tcp
     setype: http_port_t
     state: present
+  when:   
+    - ansible_selinux.status is defined
+    - ansible_selinux.status == "enabled"
   notify:
     - restart haproxy
 
@@ -22,6 +25,9 @@
     proto: udp
     setype: http_port_t
     state: present
+  when:   
+    - ansible_selinux.status is defined
+    - ansible_selinux.status == "enabled"
   notify:
     - restart haproxy
 
@@ -51,7 +57,9 @@
     - 443/tcp
     - 80/tcp
     - 8080/tcp
-  when: "'firewalld.service' in services"
+  when:
+    ('firewalld.service' in services) and
+    (ansible_facts.services["firewalld.service"].state is match("running"))
 
 - name: Ensure HAProxy is started and enabled on boot.
   become: true

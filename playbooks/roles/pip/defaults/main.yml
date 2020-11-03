@@ -1,6 +1,8 @@
 ---
 # defaults file for pip
 
+run_as_root: false
+
 mirror_base: '/opt/openshift'
 pip_cmd: pip3
 
@@ -65,3 +67,5 @@ pip_modules:
     version: 1.23.0
   - name: pylint
     version: 2.5.3
+  - name: passlib
+    version: 1.7.4

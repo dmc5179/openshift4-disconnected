@@ -2,6 +2,7 @@
 # defaults file for podman-registry
 
 run_as_root: false
+pip_args: ''
 
 mirror_base: '/'
 
