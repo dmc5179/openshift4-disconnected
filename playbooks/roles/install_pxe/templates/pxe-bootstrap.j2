@@ -4,7 +4,7 @@ default menu.c32
  ONTIMEOUT 1
  menu title ######## PXE Boot Menu for Bootstrap Node ########  
  label 1
- menu lable ^1) Install Bootstrap Node
+ menu label ^1) Install Bootstrap Node
  menu default
  kernel rhcos/kernel
  append initrd=rhcos/initramfs.img nomodeset rd.neednet=1 coreos.inst=yes coreos.inst.install_dev={{ disk | default('sda') }} coreos.inst.image_url={{ image_url }}/install/bios.raw.gz coreos.inst.ignition_url={{ ignition_url }}/ignition/bootstrap.ign
