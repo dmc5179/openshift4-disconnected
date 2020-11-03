@@ -6,26 +6,34 @@
     path: '{{ mirror_base }}/htpasswd'
     state: directory
 
+- name: Set pip args
+  set_fact:
+    pip_args: '--user'
+  when: (not run_as_root)
+
 - name: Install required passlib pip module
   delegate_to: localhost
+  become: '{{ run_as_root }}'
   pip:
     name: 'passlib'
     executable: 'pip3'
-    extra_args: '--user'
+    extra_args: '{{ pip_args }}'
 
 - name: Install required kubernetes pip module
   delegate_to: localhost
+  become: '{{ run_as_root }}'
   pip:
     name: 'kubernetes'
     executable: 'pip3'
-    extra_args: '--user'
+    extra_args: '{{ pip_args }}'
 
 - name: Install required openshift pip module
   delegate_to: localhost
+  become: '{{ run_as_root }}'
   pip:
     name: 'openshift'
     executable: 'pip3'
-    extra_args: '--user'
+    extra_args: '{{ pip_args }}'
 
 - name: generate users.htpasswd file - create admin account entry
   delegate_to: localhost

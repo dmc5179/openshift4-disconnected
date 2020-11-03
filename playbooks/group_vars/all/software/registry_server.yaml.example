@@ -1,2 +1,4 @@
 ---
 run_as_root: false
+
+docker_registry_image_archive: "{{ mirror_base }}/images/docker.io-library-registry_2.7.1.tar"

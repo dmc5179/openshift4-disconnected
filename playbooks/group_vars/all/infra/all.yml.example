@@ -5,6 +5,13 @@ air_gapped: true
 # Supported platforms include
 # vmware, aws, gcp, bare_metal, none
 platform: 'none'
+
+# UEFI support
+uefi_enabled: false
+
+# Pip Command
+pip_cmd: pip3
+
 ###################################################################
 # Path to binaries
 ###################################################################

@@ -9,8 +9,7 @@ export UPSTREAM_REPO='openshift-release-dev'
 export OCP_ARCH="x86_64"
 # Directory where OCP images are written to or read from
 # When mirroring to disk
-export REMOVABLE_MEDIA_PATH="/home/danclark/packed/ocp-${OCP_RELEASE}"
-#export REMOVABLE_MEDIA_PATH="/opt/data/danclark/packed/ocp-${OCP_RELEASE}"
+export REMOVABLE_MEDIA_PATH="/opt/data/packed/ocp-${OCP_RELEASE}"
 
 # Registry where cluster images live for the disconnected cluster
 export REMOTE_REG="1234567890.dkr.ecr.us-east-1.amazonaws.com"
@@ -72,100 +71,99 @@ then
     --to file://openshift/release \
     --to-dir=${REMOVABLE_MEDIA_PATH}/mirror
 
-sleep 5
+  # Mirror redhat-operator index image
+  if [ "${RH_OP}" = true ]
+  then
 
-  # oc image mirror of the operator index images
-  ${OC} image mirror \
-    --dir=${REMOVABLE_MEDIA_PATH}/mirror \
-    --registry-config=${LOCAL_SECRET_JSON} \
-    --keep-manifest-list=true \
-    --filter-by-os=.* \
-    registry.redhat.io/redhat/redhat-operator-index:v${OCP_RELEASE::3} \
-    file://redhat/redhat-operator-index:v${OCP_RELEASE::3}
+    ${OC} image mirror \
+      --dir=${REMOVABLE_MEDIA_PATH}/mirror \
+      --registry-config=${LOCAL_SECRET_JSON} \
+      --keep-manifest-list=true \
+      --filter-by-os=.* \
+      registry.redhat.io/redhat/redhat-operator-index:v${OCP_RELEASE::3} \
+      file://redhat/redhat-operator-index:v${OCP_RELEASE::3}
 
-#  ${OC} image mirror \
-#    --dir=${REMOVABLE_MEDIA_PATH}/mirror \
-#    --registry-config=${LOCAL_SECRET_JSON} \
-#    --keep-manifest-list=true \
-#    --filter-by-os=.* \
-#    registry.redhat.io/redhat/certified-operator-index:v${OCP_RELEASE::3} \
-#    file://redhat/certified-operator-index:v${OCP_RELEASE::3}
+    mkdir -p "${REMOVABLE_MEDIA_PATH}/redhat_operators_manifests"
 
-#  ${OC} image mirror \
-#    --dir=${REMOVABLE_MEDIA_PATH}/mirror \
-#    --registry-config=${LOCAL_SECRET_JSON} \
-#    --keep-manifest-list=true \
-#    --filter-by-os=.* \
-#    registry.redhat.io/redhat/community-operator-index:v${OCP_RELEASE::3} \
-#    file://redhat/community-operator-index:v${OCP_RELEASE::3}
+    ${OC} adm catalog mirror --manifests-only \
+      --max-per-registry=${THREADS} \
+      --registry-config ${LOCAL_SECRET_JSON} \
+      --to-manifests=${REMOVABLE_MEDIA_PATH}/redhat_operators_manifests \
+      ${RH_OP_INDEX} replaceme
 
-  # Grab the redhat operator manifests
-  echo "Pull redhat-operator manifests"
+    sed -i 's|=replaceme/|=file://|g' ${REMOVABLE_MEDIA_PATH}/redhat_operators_manifests/mapping.txt
 
-  mkdir -p "${REMOVABLE_MEDIA_PATH}/redhat_operators_manifests"
+    ${OC} image mirror \
+      '--filter-by-os=.*' \
+      --keep-manifest-list=true \
+      --max-per-registry=6 \
+      --max-registry=4 \
+      --registry-config=${LOCAL_SECRET_JSON} \
+      --dir="${REMOVABLE_MEDIA_PATH}/mirror" \
+      --filename=${REMOVABLE_MEDIA_PATH}/redhat_operators_manifests/mapping.txt
 
-  ${OC} adm catalog mirror --manifests-only \
-    --max-per-registry=${THREADS} \
-    --registry-config ${LOCAL_SECRET_JSON} \
-    --to-manifests=${REMOVABLE_MEDIA_PATH}/redhat_operators_manifests \
-    ${RH_OP_INDEX} replaceme
+  fi
 
-  sed -i 's|=replaceme/|=file://|g' ${REMOVABLE_MEDIA_PATH}/redhat_operators_manifests/mapping.txt
+  if [ "${CERT_OP}" = true ]
+  then
+    ${OC} image mirror \
+      --dir=${REMOVABLE_MEDIA_PATH}/mirror \
+      --registry-config=${LOCAL_SECRET_JSON} \
+      --keep-manifest-list=true \
+      --filter-by-os=.* \
+      registry.redhat.io/redhat/certified-operator-index:v${OCP_RELEASE::3} \
+      file://redhat/certified-operator-index:v${OCP_RELEASE::3}
 
-  # Grab the certified operator manifests
-#  echo "Pull certified-operator manifests"
-#
-#  mkdir -p "${REMOVABLE_MEDIA_PATH}/certified_operators_manifests"
-#
-#  ${OC} adm catalog mirror --manifests-only \
-#    --max-per-registry=${THREADS} \
-#    --registry-config ${LOCAL_SECRET_JSON} \
-#    --to-manifests=${REMOVABLE_MEDIA_PATH}/certified_operators_manifests \
-#    ${CERT_OP_INDEX} replaceme
-#
-#  sed -i 's|=replaceme/|=file://|g' ${REMOVABLE_MEDIA_PATH}/certified_operators_manifests/mapping.txt
-#
-#  # Grab the community operator manifests
-#  echo "Pull community-operator manifests"
-#
-#  mkdir -p "${REMOVABLE_MEDIA_PATH}/community_operators_manifests"
-#
-#  ${OC} adm catalog mirror --manifests-only \
-#    --max-per-registry=${THREADS} \
-#    --registry-config ${LOCAL_SECRET_JSON} \
-#    --to-manifests=${REMOVABLE_MEDIA_PATH}/community_operators_manifests \
-#    ${COMM_OP_INDEX} replaceme
-#
-#  sed -i 's|=replaceme/|=file://|g' ${REMOVABLE_MEDIA_PATH}/community_operators_manifests/mapping.txt
+    mkdir -p "${REMOVABLE_MEDIA_PATH}/certified_operators_manifests"
 
-sleep 5
+    ${OC} adm catalog mirror --manifests-only \
+      --max-per-registry=${THREADS} \
+      --registry-config ${LOCAL_SECRET_JSON} \
+      --to-manifests=${REMOVABLE_MEDIA_PATH}/certified_operators_manifests \
+      ${CERT_OP_INDEX} replaceme
 
-  ${OC} image mirror \
-    '--filter-by-os=.*' \
-    --keep-manifest-list=true \
-    --max-per-registry=6 \
-    --max-registry=4 \
-    --registry-config=${LOCAL_SECRET_JSON} \
-    --dir="${REMOVABLE_MEDIA_PATH}/mirror" \
-    --filename=${REMOVABLE_MEDIA_PATH}/redhat_operators_manifests/mapping.txt
+    sed -i 's|=replaceme/|=file://|g' ${REMOVABLE_MEDIA_PATH}/certified_operators_manifests/mapping.txt
 
-#  ${OC} image mirror \
-#    --filter-by-os=.* \
-#    --keep-manifest-list=true \
-#    --max-per-registry=6 \
-#    --max-registry=4 \
-#    --registry-config=${LOCAL_SECRET_JSON} \
-#    --dir="${REMOVABLE_MEDIA_PATH}/mirror" \
-#    --filename=${REMOVABLE_MEDIA_PATH}/certified_operators_manifests/mapping.txt
-#
-#  ${OC} image mirror \
-#    --filter-by-os=.* \
-#    --keep-manifest-list=true \
-#    --max-per-registry=6 \
-#    --max-registry=4 \
-#    --registry-config=${LOCAL_SECRET_JSON} \
-#    --dir="${REMOVABLE_MEDIA_PATH}/mirror" \
-#    --filename=${REMOVABLE_MEDIA_PATH}/community_operators_manifests/mapping.txt
+    ${OC} image mirror \
+      --filter-by-os=.* \
+      --keep-manifest-list=true \
+      --max-per-registry=6 \
+      --max-registry=4 \
+      --registry-config=${LOCAL_SECRET_JSON} \
+      --dir="${REMOVABLE_MEDIA_PATH}/mirror" \
+      --filename=${REMOVABLE_MEDIA_PATH}/certified_operators_manifests/mapping.txt
+
+  fi
+
+  if [ "${COMM_OP}" = true ]
+  then
+    ${OC} image mirror \
+      --dir=${REMOVABLE_MEDIA_PATH}/mirror \
+      --registry-config=${LOCAL_SECRET_JSON} \
+      --keep-manifest-list=true \
+      --filter-by-os=.* \
+      registry.redhat.io/redhat/community-operator-index:v${OCP_RELEASE::3} \
+      file://redhat/community-operator-index:v${OCP_RELEASE::3}
+
+    mkdir -p "${REMOVABLE_MEDIA_PATH}/community_operators_manifests"
+
+    ${OC} adm catalog mirror --manifests-only \
+      --max-per-registry=${THREADS} \
+      --registry-config ${LOCAL_SECRET_JSON} \
+      --to-manifests=${REMOVABLE_MEDIA_PATH}/community_operators_manifests \
+      ${COMM_OP_INDEX} replaceme
+
+    sed -i 's|=replaceme/|=file://|g' ${REMOVABLE_MEDIA_PATH}/community_operators_manifests/mapping.txt
+
+    ${OC} image mirror \
+      --filter-by-os=.* \
+      --keep-manifest-list=true \
+      --max-per-registry=6 \
+      --max-registry=4 \
+      --registry-config=${LOCAL_SECRET_JSON} \
+      --dir="${REMOVABLE_MEDIA_PATH}/mirror" \
+      --filename=${REMOVABLE_MEDIA_PATH}/community_operators_manifests/mapping.txt
+  fi
 
 #  tar -cf "ocp-${OCP_RELEASE}-${ARCHITECTURE}-packaged.tar" "${REMOVABLE_MEDIA_PATH}"
 fi
@@ -177,21 +175,23 @@ then
   ${OC} image mirror -a ${LOCAL_SECRET_JSON} \
     --insecure=${LOCAL_REG_INSEC} \
     --from-dir=${REMOVABLE_MEDIA_PATH}/mirror \
-    file://openshift/release:${OCP_RELEASE}* \
-    ${REMOTE_REG}/${LOCAL_REPOSITORY}
+    "file://openshift/release:${OCP_RELEASE}*" \
+    ${REMOTE_REG}/${LOCAL_REPO}
+
+#oc image mirror -a ${LOCAL_SECRET_JSON} --from-dir=${REMOVABLE_MEDIA_PATH}/mirror "file://openshift/release:${OCP_RELEASE}*" ${LOCAL_REGISTRY}/${LOCAL_REPOSITORY}
 
   # Push the redhat-operators catalog image into the remote registry
-  ${OC} image mirror -a ${LOCAL_SECRET_JSON} \
-    --insecure=${LOCAL_REG_INSEC} \
-    --from-dir=${REMOVABLE_MEDIA_PATH}/mirror \
-    file://olm/redhat-operators:${OCP_RELEASE} \
-    ${REMOTE_REG}/olm/redhat-operators:${OCP_RELEASE}
+#  ${OC} image mirror -a ${LOCAL_SECRET_JSON} \
+#    --insecure=${LOCAL_REG_INSEC} \
+#    --from-dir=${REMOVABLE_MEDIA_PATH}/mirror \
+#    file://olm/redhat-operators:${OCP_RELEASE} \
+#    ${REMOTE_REG}/olm/redhat-operators:${OCP_RELEASE}
 
   # Push the redhat-operators images into the remote registry
-  cat "${REMOVABLE_MEDIA_PATH}/operator_manifests/mapping.txt" \
-    | sed "s|=replaceme|=${REMOTE_REG}|g" \
-    | sed "s|=file://|=${REMOTE_REG}|g" \
-    | xargs -n 1 -P ${THREADS} ${OC} image mirror --registry-config=${LOCAL_SECRET_JSON} --dir="${REMOVABLE_MEDIA_PATH}/mirror" '{}'
+#  cat "${REMOVABLE_MEDIA_PATH}/operator_manifests/mapping.txt" \
+#    | sed "s|=replaceme|=${REMOTE_REG}|g" \
+#    | sed "s|=file://|=${REMOTE_REG}|g" \
+#    | xargs -n 1 -P ${THREADS} ${OC} image mirror --registry-config=${LOCAL_SECRET_JSON} --dir="${REMOVABLE_MEDIA_PATH}/mirror" '{}'
 
 fi
 

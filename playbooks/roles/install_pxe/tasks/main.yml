@@ -17,7 +17,20 @@
   tags:
     - pxeserver
 
-- name: Make Network Boot Programs for BIOS and UEFI based systems available
+- name: Make Network Boot Programs for BIOS based systems available
+  copy:
+    remote_src: true
+    src: '{{ item }}'
+    dest: '{{ pxeserver_path }}/'
+    owner: root
+    group: root
+    mode: '0644'
+  with_fileglob:
+    - '/usr/share/syslinux/*'
+  tags:
+    - pxeserver
+
+- name: Make Network Boot Programs for UEFI based systems available
   copy:
     remote_src: true
     src: '{{ item }}'
@@ -26,7 +39,8 @@
     group: root
     mode: '0644'
   with_items:
-    - "{{ pxeserver_files }}"
+    - '{{ pxeserver_efi_files }}'
+  when: (uefi_enabled | bool)
   tags:
     - pxeserver
 

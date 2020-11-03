@@ -1,6 +1,15 @@
 ---
-- name: Install mirrored pip modules
+- name: Install mirrored pip modules (non-root)
   shell:
-    cmd: "{{ pip_cmd }} install --user -d '{{ mirror_base }}/pip' '{{ item.name }}=={{ item.version }}'"
+    cmd: "{{ pip_cmd }} install --user --no-cache-dir --no-index --find-links 'file://{{ mirror_base }}/pip' '{{ item.name }}=={{ item.version }}'"
+  when: (not run_as_root)
+  with_items:
+    - '{{ pip_modules }}'
+
+- name: Install mirrored pip modules (root)
+  become: true
+  shell:
+    cmd: "{{ pip_cmd }} install --no-cache-dir --no-index --find-links 'file://{{ mirror_base }}/pip' '{{ item.name }}=={{ item.version }}'"
+  when: (run_as_root)
   with_items:
     - '{{ pip_modules }}'
