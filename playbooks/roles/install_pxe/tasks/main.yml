@@ -81,7 +81,7 @@
 
 - name: Set the default tftp file
   template:
-    src: ../templates/default.j2
+    src: ../templates/pxe-default.j2
     dest: "{{ pxeserver_path }}/pxelinux.cfg/default"
     mode: 0555
 
