@@ -16,7 +16,7 @@ httpd_ssl_port: 8443
 # Set ProxyPreserveHost
 httpd_proxy_preserve_host: true
 
-pip_exec: 'pip3'
+pip_cmd: '/usr/local/bin/pip3'
 
 httpd_access_log: logs/access_log
 httpd_access_log_ssl: logs/ssl_access_log

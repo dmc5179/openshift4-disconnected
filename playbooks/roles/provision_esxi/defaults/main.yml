@@ -5,7 +5,7 @@ mirror_base: '/opt/openshift'
 
 run_as_root: false
 pip_args: ''
-pip_cmd: pip3
+pip_cmd: /usr/local/bin/pip3
 
 vmware_ssl_enabled: false
 

@@ -16,7 +16,7 @@
   become: '{{ run_as_root }}'
   pip:
     name: 'passlib'
-    executable: 'pip3'
+    executable: '{{ pip_cmd }}'
     extra_args: '{{ pip_args }}'
 
 - name: Install required kubernetes pip module
@@ -24,7 +24,7 @@
   become: '{{ run_as_root }}'
   pip:
     name: 'kubernetes'
-    executable: 'pip3'
+    executable: '{{ pip_cmd }}'
     extra_args: '{{ pip_args }}'
 
 - name: Install required openshift pip module
@@ -32,7 +32,7 @@
   become: '{{ run_as_root }}'
   pip:
     name: 'openshift'
-    executable: 'pip3'
+    executable: '{{ pip_cmd }}'
     extra_args: '{{ pip_args }}'
 
 - name: generate users.htpasswd file - create admin account entry
