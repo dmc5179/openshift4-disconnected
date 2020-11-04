@@ -4,7 +4,7 @@
   pip:
     name: "{{ httpd_requirements }}"
     state: present
-    executable: "{{ pip_exec }}"
+    executable: "{{ pip_cmd }}"
 
 - name: install apache httpd
   package:

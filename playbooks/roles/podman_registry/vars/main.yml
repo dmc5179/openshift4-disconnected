@@ -5,5 +5,3 @@ docker_registry_pki_key_src: '{{docker_registry_pki_dir}}/{{docker_registry_pki_
 
 docker_registry_pki_cert_file: '{{inventory_hostname}}{{docker_registry_pki_cert_suffix}}'
 docker_registry_pki_cert_src: '{{docker_registry_pki_dir}}/{{docker_registry_pki_cert_file}}'
-
-pip_cmd: pip3

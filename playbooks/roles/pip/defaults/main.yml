@@ -4,7 +4,7 @@
 run_as_root: false
 
 mirror_base: '/opt/openshift'
-pip_cmd: pip3
+pip_cmd: /usr/local/bin/pip3
 
 pip_modules:
   - name: kubernetes

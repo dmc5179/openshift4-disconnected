@@ -10,7 +10,7 @@ platform: 'none'
 uefi_enabled: false
 
 # Pip Command
-pip_cmd: pip3
+pip_cmd: /usr/local/bin/pip3
 
 ###################################################################
 # Path to binaries
