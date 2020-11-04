@@ -1,13 +1,13 @@
 ---
 # defaults file for mirror_rhcos
 
-run_as_root: true
+run_as_root: false
 mirror_base: '/opt/openshift'
 
 mirror_vmdk: true
 mirror_azure: false
 mirror_gcp: false
-mirror_iso: false
+mirror_iso: true
 mirror_raw: false
 mirror_ova: false
 
@@ -18,20 +18,32 @@ arch: 'x86_64'
 ssh_gen_key: true
 install_filetranspiler: false
 staticips: false
-force_ocp_download: false
+force_download: false
 
 base_url: "https://mirror.openshift.com/pub/openshift-v4"
 
 ocp_client: "{{base_url}}/clients/ocp/{{ocp_ver}}/openshift-client-linux-{{ocp_ver}}.tar.gz"
 ocp_installer: "{{base_url}}/clients/ocp/{{ocp_ver}}/openshift-install-linux-{{ocp_ver}}.tar.gz"
 
-ocp_bios: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{rhcos_ver}}/rhcos-{{rhcos_ver}}-{{ arch }}-metal.{{ arch }}.raw.gz"
-ocp_initramfs: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{rhcos_ver}}/rhcos-{{rhcos_ver}}-{{ arch }}-installer-initramfs.{{ arch }}.img"
-ocp_install_kernel: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{rhcos_ver}}/rhcos-{{rhcos_ver}}-{{ arch }}-installer-kernel-{{ arch }}"
-ocp_vmdk: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-aws.{{ arch }}.vmdk.gz"
-ocp_azure: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-azure.{{ arch }}.vhd.gz"
-ocp_gcp: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-gcp.{{ arch }}.tar.gz"
-ocp_iso: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-installer.{{ arch }}.iso"
-ocp_raw: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz"
-ocp_ova: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-vmware.{{ arch }}.ova"
+rhcos_vmdk: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-aws.{{ arch }}.vmdk.gz"
+rhcos_azure: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-azure.{{ arch }}.vhd.gz"
+rhcos_gcp: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-gcp.{{ arch }}.tar.gz"
+rhcos_legacy_iso: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-installer.{{ arch }}.iso"
+rhcos_live_iso: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-live.{{ arch }}.iso"
+rhcos_raw: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz"
+rhcos_ova: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-vmware.{{ arch }}.ova"
 chars: (\\_|\\$|\\\|\\/|\\=|\\)|\\(|\\&|\\^|\\%|\\$|\\#|\\@|\\!|\\*)
+
+rhcos_4k: false
+rhcos_live_bios: '{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{rhcos_ver}}/rhcos-{{rhcos_ver}}-{{arch}}-metal.{{arch}}.raw.gz'
+rhcos_live_4k_bios: '{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{rhcos_ver}}/rhcos-{{rhcos_ver}}-{{arch}}-metal4k.{{arch}}.raw.gz'
+
+liveos_files:
+  - '{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{rhcos_ver}}/rhcos-{{rhcos_ver}}-{{arch}}-live-initramfs.{{arch}}.img'
+  - '{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{rhcos_ver}}/rhcos-{{rhcos_ver}}-{{arch}}-live-kernel-{{arch}}'
+  - '{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{rhcos_ver}}/rhcos-{{rhcos_ver}}-{{arch}}-live-rootfs.{{arch}}.img'
+
+legacy_files:
+  - "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{rhcos_ver}}/rhcos-{{rhcos_ver}}-{{ arch }}-metal.{{ arch }}.raw.gz"
+  - "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{rhcos_ver}}/rhcos-{{rhcos_ver}}-{{ arch }}-installer-initramfs.{{ arch }}.img"
+  - "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{rhcos_ver}}/rhcos-{{rhcos_ver}}-{{ arch }}-installer-kernel-{{ arch }}"
