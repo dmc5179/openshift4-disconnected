@@ -37,14 +37,14 @@
   become: true
   pip:
     name: pip
-    executable: "{{ pip_executable }}"
+    executable: "{{ pip_cmd }}"
     state: present
 
 - name: Install passlib for htpassword
   become: "{{ run_as_root }}"
   pip:
     name: passlib
-    executable: "{{ pip_executable }}"
+    executable: "{{ pip_cmd }}"
     state: present
     extra_args: '{{ pip_args }}'
 
@@ -52,7 +52,7 @@
   become: "{{ run_as_root }}"
   pip:
     name: bcrypt
-    executable: "{{ pip_executable }}"
+    executable: "{{ pip_cmd }}"
     state: present
     extra_args: '{{ pip_args }}'
 
@@ -60,7 +60,7 @@
   become: "{{ run_as_root }}"
   pip:
     name: cryptography
-    executable: "{{ pip_executable }}"
+    executable: "{{ pip_cmd }}"
     state: present
     extra_args: '{{ pip_args }}'
 
