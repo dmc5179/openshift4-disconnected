@@ -1,11 +1,37 @@
 ---
 # tasks file for tools
+
+- name: Create temp directory for unpacking
+  become: true
+  tempfile:
+    state: directory
+    suffix: openshift
+  register: tempdir
+  tags:
+    - ocp_client
+    - ocp_installer
+
 - name: Unarchiving OCP4 client
   become: true
   unarchive:
     src: "{{ mirror_base }}/openshift-client-linux-{{ ocp_ver }}.tar.gz"
-    dest: /usr/local/bin
+    dest: '{{ tempdir.path }}'
     remote_src: true
+  tags:
+    - ocp_client
+
+- name: Move files to /usr/local/bin
+  become: true
+  copy:
+    src: '{{ tempdir.path }}/{{ item }}'
+    dest: '/usr/local/bin/{{ item }}-{{ ocp_ver }}'
+    owner: root
+    group: root
+    mode: 0755
+    remote_src: true
+  with_items:
+    - 'oc'
+    - 'kubectl'
   tags:
     - ocp_client
 
@@ -13,9 +39,49 @@
   become: true
   unarchive:
     src: "{{ mirror_base }}/openshift-install-linux-{{ ocp_ver }}.tar.gz"
-    dest: /usr/local/bin
+    dest: '{{ tempdir.path }}'
     remote_src: true
   tags:
+    - ocp_installer
+
+- name: Move files to /usr/local/bin
+  become: true
+  copy:
+    src: '{{ tempdir.path }}/openshift-install'
+    dest: '/usr/local/bin/openshift-install-{{ ocp_ver }}'
+    owner: root
+    group: root
+    mode: 0755
+    remote_src: true
+  tags:
+    - ocp_installer
+
+- name: Create symbolic links
+  become: true
+  file:
+    src: /usr/local/bin/{{ item }}-{{ ocp_ver }}
+    dest: /usr/local/bin/{{ item }}
+#    src: /usr/local/bin/oc-4.6.1
+#    dest: /usr/local/bin/oc
+    owner: root
+    group: root
+    state: link
+    force: true
+  with_items:
+    - 'oc'
+    - 'kubectl'
+    - 'openshift-install'
+  tags:
+    - ocp_client
+    - ocp_installer
+
+- name: Cleanup temp directory
+  become: true
+  file:
+    path: '{{ tempdir.path }}'
+    state: absent
+  tags:
+    - ocp_client
     - ocp_installer
 
 - name: Install core-installer
@@ -27,14 +93,14 @@
     remote_src: true
   when: (arch is match("x86_64"))
 
-- name: Removing files that are not needed
-  become: true
-  file:
-    path: /usr/local/bin/README.md
-    state: absent
-  tags: 
-    - ocp_client
-    - ocp_installer
+#- name: Removing files that are not needed
+#  become: true
+#  file:
+#    path: /usr/local/bin/README.md
+#    state: absent
+#  tags: 
+#    - ocp_client
+#    - ocp_installer
 
 - name: Make sure podman is installed
   become: true
@@ -54,8 +120,8 @@
   become: true
   copy:
     src: "{{ mirror_base }}/filetranspiler/filetranspile"
-    dest: /usr/local/bin/filetranspiler
-    mode: '0555'
+    dest: '/usr/local/bin/filetranspiler'
+    mode: 0555
     remote_src: true
   tags:
     - transpiler
