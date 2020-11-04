@@ -14,49 +14,76 @@
   tags:
     - mirror
 
-- name: Delete OCP4 files, if requested, to download again
+- name: Cleanup legacy files if force download is set
   become: "{{ run_as_root }}"
   file:
     state: absent
     path: "{{ item }}"
   with_items:
-    - "{{ mirror_base }}/var/www/html/install/rhcos-{{rhcos_ver}}-{{ arch }}-metal.{{ arch }}.raw.gz"
-    - "{{ mirror_base }}/var/lib/tftpboot/rhcos/rhcos-{{rhcos_ver}}-{{ arch }}-installer-initramfs.{{ arch }}.img"
-    - "{{ mirror_base }}/var/lib/tftpboot/rhcos/rhcos-{{rhcos_ver}}-{{ arch }}-installer-kernel-{{ arch }}"
+    - '{{ legacy_files }}'
+  when: ( force_download | bool ) and ( rhcos_ver[:3] | float < 4.6 )
   tags:
     - mirror
 
-- name: Downloading OCP4 installer Bios
+- name: Cleanup liveos files if force download is set
   become: "{{ run_as_root }}"
-  get_url:
-    url: "{{ ocp_bios }}"
-    dest: "{{ mirror_base }}/var/www/html/install/rhcos-{{rhcos_ver}}-{{ arch }}-metal.{{ arch }}.raw.gz"
-    mode: 0555
+  file:
+    state: absent
+    path: "{{ item }}"
+  with_items:
+    - '{{ liveos_files }}'
+  when: ( force_download | bool ) and ( rhcos_ver[:3] | float >= 4.6 )
   tags:
     - mirror
 
-- name: Downloading OCP4 installer initramfs
+- name: Download OpenShift 4 legacy metal files
   become: "{{ run_as_root }}"
   get_url:
-    url: "{{ ocp_initramfs }}"
-    dest: "{{ mirror_base }}/var/lib/tftpboot/rhcos/rhcos-{{rhcos_ver}}-{{ arch }}-installer-initramfs.{{ arch }}.img"
-    mode: 0555
+    url: '{{ item }}'
+    dest: "{{ mirror_base }}/var/www/html/install/{{ item }}"
+    mode: 0644
+  with_items:
+    - '{{ legacy_files }}'
+  when: ( rhcos_ver[:3] | float < 4.6 )
   tags:
     - mirror
 
-- name: Downloading OCP4 installer kernel
+- name: Download OpenShift 4 liveos files
   become: "{{ run_as_root }}"
   get_url:
-    url: "{{ ocp_install_kernel }}"
-    dest: "{{ mirror_base }}/var/lib/tftpboot/rhcos/rhcos-{{rhcos_ver}}-{{ arch }}-installer-kernel-{{ arch }}"
-    mode: 0555
+    url: '{{ item }}'
+    dest: "{{ mirror_base }}/var/www/html/install/"
+    mode: 0644
+  with_items:
+    - '{{ liveos_files }}'
+  when: ( rhcos_ver[:3] | float >= 4.6 )
+  tags:
+    - mirror
+
+- name: Download OpenShift 4 liveos bios
+  become: "{{ run_as_root }}"
+  get_url:
+    url: '{{ rhcos_live_bios }}'
+    dest: "{{ mirror_base }}/var/www/html/install/"
+    mode: 0644
+  when: ( rhcos_ver[:3] | float >= 4.6 ) and (not rhcos_4k)
+  tags:
+    - mirror
+
+- name: Download OpenShift 4 liveos 4k bios
+  become: "{{ run_as_root }}"
+  get_url:
+    url: '{{ rhcos_live_4k_bios }}'
+    dest: "{{ mirror_base }}/var/www/html/install/"
+    mode: 0644
+  when: ( rhcos_ver[:3] | float >= 4.6 ) and (rhcos_4k)
   tags:
     - mirror
 
 - name: Download RHCOS VMDK
   become: "{{ run_as_root }}"
   get_url:
-    url: "{{ ocp_vmdk }}"
+    url: "{{ rhcos_vmdk }}"
     dest: "{{ mirror_base }}/rhcos/"
     mode: '0444'
   when: (mirror_vmdk | bool)
@@ -66,7 +93,7 @@
 - name: Download RHCOS Azure
   become: "{{ run_as_root }}"
   get_url:
-    url: "{{ ocp_azure }}"
+    url: "{{ rhcos_azure }}"
     dest: "{{ mirror_base }}/rhcos/"
     mode: '0444'
   when: (mirror_azure | bool)
@@ -76,27 +103,37 @@
 - name: Download RHCOS GCP
   become: "{{ run_as_root }}"
   get_url:
-    url: "{{ ocp_gcp }}"
+    url: "{{ rhcos_gcp }}"
     dest: "{{ mirror_base }}/rhcos/"
     mode: '0444'
   when: (mirror_gcp | bool)
   tags:
     - mirror
 
-- name: Download RHCOS ISO
+- name: Download RHCOS Legacy ISO
   become: "{{ run_as_root }}"
   get_url:
-    url: "{{ ocp_iso }}"
+    url: "{{ rhcos_legacy_iso }}"
     dest: "{{ mirror_base }}/rhcos/"
     mode: '0444'
-  when: (mirror_iso | bool)
+  when: (mirror_iso | bool) and (rhcos_ver[:3] | float < 4.6)
+  tags:
+    - mirror
+
+- name: Download RHCOS Live ISO
+  become: "{{ run_as_root }}"
+  get_url:
+    url: "{{ rhcos_live_iso }}"
+    dest: "{{ mirror_base }}/rhcos/"
+    mode: '0444'
+  when: (mirror_iso | bool) and (rhcos_ver[:3] | float >= 4.6)
   tags:
     - mirror
 
 - name: Download RHCOS RAW
   become: "{{ run_as_root }}"
   get_url:
-    url: "{{ ocp_raw }}"
+    url: "{{ rhcos_raw }}"
     dest: "{{ mirror_base }}/rhcos/"
     mode: '0444'
   when: (mirror_raw | bool)

@@ -2,7 +2,7 @@
 # defaults file for tools
 
 mirror: true
-force_ocp_download: true
+force_download: false
 mirror_base: '/usr/local/src/'
 run_as_root: true
 
@@ -18,14 +18,5 @@ base_url: "https://mirror.openshift.com/pub/openshift-v4/{{ arch }}"
 ocp_client: "{{base_url}}/clients/ocp/{{ocp_ver}}/openshift-client-linux-{{ocp_ver}}.tar.gz"
 ocp_installer: "{{base_url}}/clients/ocp/{{ocp_ver}}/openshift-install-linux-{{ocp_ver}}.tar.gz"
 
-ocp_bios: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{rhcos_ver}}/rhcos-{{rhcos_ver}}-{{ arch }}-metal.{{ arch }}.raw.gz"
-ocp_initramfs: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{rhcos_ver}}/rhcos-{{rhcos_ver}}-{{ arch }}-installer-initramfs.{{ arch }}.img"
-ocp_install_kernel: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{rhcos_ver}}/rhcos-{{rhcos_ver}}-{{ arch }}-installer-kernel-{{ arch }}"
-ocp_vmdk: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-aws.{{ arch }}.vmdk.gz"
-ocp_azure: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-azure.{{ arch }}.vhd.gz"
-ocp_gcp: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-gcp.{{ arch }}.tar.gz"
-ocp_iso: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-installer.{{ arch }}.iso"
-ocp_raw: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz"
-ocp_ova: "{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{ rhcos_ver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-vmware.{{ arch }}.ova"
 coreos_installer: "{{base_url}}/clients/coreos-installer/latest/coreos-installer_amd64"
 chars: (\\_|\\$|\\\|\\/|\\=|\\)|\\(|\\&|\\^|\\%|\\$|\\#|\\@|\\!|\\*)
