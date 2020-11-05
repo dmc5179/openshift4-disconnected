@@ -31,5 +31,5 @@ spec:
       volumes:
         - name: nfs-client-root
           nfs:
-            server: {{ nfs_server | default(helper.ipaddr) }}
+            server: {{ nfs_server | default( openshift_bootstrap.ignserver ) }}
             path: {{ nfs_path | default('/export') }}
