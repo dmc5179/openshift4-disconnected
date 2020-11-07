@@ -19,7 +19,6 @@
 
 - name: Make Network Boot Programs for BIOS based systems available
   copy:
-    remote_src: true
     src: '{{ item }}'
     dest: '{{ pxeserver_path }}/'
     owner: root
@@ -32,7 +31,6 @@
 
 - name: Make Network Boot Programs for UEFI based systems available
   copy:
-    remote_src: true
     src: '{{ item }}'
     dest: '{{ pxeserver_path }}/'
     owner: root
@@ -65,17 +63,18 @@
     owner: root
     group: root
     mode: '0644'
+  when: ( rhcos_ver[:3] | float < 4.6 )
   tags:
     - pxeserver
 
 - name: Copy kernel
   copy:
-    remote_src: true
     src: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer-kernel-{{ arch }}'
     dest: '{{ pxeserver_path }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer-kernel-{{ arch }}'
     owner: root
     group: root
     mode: '0644'
+  when: ( rhcos_ver[:3] | float < 4.6 )
   tags:
     - pxeserver
 
