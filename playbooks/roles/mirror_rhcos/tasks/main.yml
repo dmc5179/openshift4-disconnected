@@ -8,8 +8,6 @@
     state: directory
   with_items:
     - "{{ mirror_base }}"
-    - "{{ mirror_base }}/var/www/html/install"
-    - "{{ mirror_base }}/var/lib/tftpboot/rhcos"
     - "{{ mirror_base }}/rhcos"
   tags:
     - mirror
@@ -40,7 +38,7 @@
   become: "{{ run_as_root }}"
   get_url:
     url: '{{ item }}'
-    dest: "{{ mirror_base }}/var/www/html/install/{{ item }}"
+    dest: "{{ mirror_base }}/rhcos/{{ item }}"
     mode: 0644
   with_items:
     - '{{ legacy_files }}'
@@ -52,7 +50,7 @@
   become: "{{ run_as_root }}"
   get_url:
     url: '{{ item }}'
-    dest: "{{ mirror_base }}/var/www/html/install/"
+    dest: "{{ mirror_base }}/rhcos/install/"
     mode: 0644
   with_items:
     - '{{ liveos_files }}'
@@ -64,7 +62,7 @@
   become: "{{ run_as_root }}"
   get_url:
     url: '{{ rhcos_live_bios }}'
-    dest: "{{ mirror_base }}/var/www/html/install/"
+    dest: "{{ mirror_base }}/rhcos/install/"
     mode: 0644
   when: ( rhcos_ver[:3] | float >= 4.6 ) and (not rhcos_4k)
   tags:
@@ -74,7 +72,7 @@
   become: "{{ run_as_root }}"
   get_url:
     url: '{{ rhcos_live_4k_bios }}'
-    dest: "{{ mirror_base }}/var/www/html/install/"
+    dest: "{{ mirror_base }}/rhcos/install/"
     mode: 0644
   when: ( rhcos_ver[:3] | float >= 4.6 ) and (rhcos_4k)
   tags:
