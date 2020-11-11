@@ -17,17 +17,17 @@
   tags:
     - pxeserver
 
-- name: Make Network Boot Programs for BIOS based systems available
-  copy:
-    src: '{{ item }}'
-    dest: '{{ pxeserver_path }}/'
-    owner: root
-    group: root
-    mode: '0644'
-  with_fileglob:
-    - '/usr/share/syslinux/*'
-  tags:
-    - pxeserver
+#- name: Make Network Boot Programs for BIOS based systems available
+#  copy:
+#    src: '{{ item }}'
+#    dest: '{{ pxeserver_path }}/'
+#    owner: root
+#    group: root
+#    mode: '0644'
+#  with_fileglob:
+#    - '/usr/share/syslinux/*'
+#  tags:
+#    - pxeserver
 
 - name: Make Network Boot Programs for UEFI based systems available
   copy:
@@ -56,7 +56,7 @@
   tags:
     - pxeserver
 
-- name: Copy initramfs.img
+- name: Copy legacy initramfs.img
   copy:
     src: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer-initramfs.{{ arch }}.img'
     dest: '{{ pxeserver_path }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer-initramfs.{{ arch }}.img'
@@ -67,7 +67,18 @@
   tags:
     - pxeserver
 
-- name: Copy kernel
+- name: Copy liveos initramfs.img
+  copy:
+    src: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-initramfs.{{ arch }}.img'
+    dest: '{{ pxeserver_path }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-initramfs.{{ arch }}.img'
+    owner: root
+    group: root
+    mode: '0644'
+  when: ( rhcos_ver[:3] | float >= 4.6 )
+  tags:
+    - pxeserver
+
+- name: Copy legacy kernel
   copy:
     src: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer-kernel-{{ arch }}'
     dest: '{{ pxeserver_path }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer-kernel-{{ arch }}'
@@ -78,9 +89,20 @@
   tags:
     - pxeserver
 
+- name: Copy liveos kernel
+  copy:
+    src: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-kernel-{{ arch }}'
+    dest: '{{ pxeserver_path }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-kernel-{{ arch }}'
+    owner: root
+    group: root
+    mode: '0644'
+  when: ( rhcos_ver[:3] | float >= 4.6 )
+  tags:
+    - pxeserver
+
 - name: Set the default tftp file
   template:
-    src: ../templates/pxe-default.j2
+    src: "templates/pxe-default.j2"
     dest: "{{ pxeserver_path }}/pxelinux.cfg/default"
     mode: 0555
 
@@ -134,4 +156,5 @@
     name: tftp
     state: started
     enabled: true
+    masked: false
     daemon_reload: true
