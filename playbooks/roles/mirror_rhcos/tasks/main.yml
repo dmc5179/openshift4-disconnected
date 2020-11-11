@@ -50,7 +50,7 @@
   become: "{{ run_as_root }}"
   get_url:
     url: '{{ item }}'
-    dest: "{{ mirror_base }}/rhcos/install/"
+    dest: "{{ mirror_base }}/rhcos/"
     mode: 0644
   with_items:
     - '{{ liveos_files }}'
@@ -62,7 +62,7 @@
   become: "{{ run_as_root }}"
   get_url:
     url: '{{ rhcos_live_bios }}'
-    dest: "{{ mirror_base }}/rhcos/install/"
+    dest: "{{ mirror_base }}/rhcos/"
     mode: 0644
   when: ( rhcos_ver[:3] | float >= 4.6 ) and (not rhcos_4k)
   tags:
@@ -72,7 +72,7 @@
   become: "{{ run_as_root }}"
   get_url:
     url: '{{ rhcos_live_4k_bios }}'
-    dest: "{{ mirror_base }}/rhcos/install/"
+    dest: "{{ mirror_base }}/rhcos/"
     mode: 0644
   when: ( rhcos_ver[:3] | float >= 4.6 ) and (rhcos_4k)
   tags:
@@ -83,7 +83,7 @@
   get_url:
     url: "{{ rhcos_vmdk }}"
     dest: "{{ mirror_base }}/rhcos/"
-    mode: '0444'
+    mode: '0644'
   when: (mirror_vmdk | bool)
   tags:
     - mirror
@@ -93,7 +93,7 @@
   get_url:
     url: "{{ rhcos_azure }}"
     dest: "{{ mirror_base }}/rhcos/"
-    mode: '0444'
+    mode: '0644'
   when: (mirror_azure | bool)
   tags:
     - mirror
@@ -103,7 +103,7 @@
   get_url:
     url: "{{ rhcos_gcp }}"
     dest: "{{ mirror_base }}/rhcos/"
-    mode: '0444'
+    mode: '0644'
   when: (mirror_gcp | bool)
   tags:
     - mirror
@@ -113,7 +113,7 @@
   get_url:
     url: "{{ rhcos_legacy_iso }}"
     dest: "{{ mirror_base }}/rhcos/"
-    mode: '0444'
+    mode: '0644'
   when: (mirror_iso | bool) and (rhcos_ver[:3] | float < 4.6)
   tags:
     - mirror
@@ -123,7 +123,7 @@
   get_url:
     url: "{{ rhcos_live_iso }}"
     dest: "{{ mirror_base }}/rhcos/"
-    mode: '0444'
+    mode: '0644'
   when: (mirror_iso | bool) and (rhcos_ver[:3] | float >= 4.6)
   tags:
     - mirror
@@ -133,7 +133,7 @@
   get_url:
     url: "{{ rhcos_raw }}"
     dest: "{{ mirror_base }}/rhcos/"
-    mode: '0444'
+    mode: '0644'
   when: (mirror_raw | bool)
   tags:
     - mirror
