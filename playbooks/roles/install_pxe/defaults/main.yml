@@ -9,8 +9,8 @@ pxeserver_images:
   - 'rhcos'
 
 # Location of the bios.raw.gz
-image_url: '{{ openshift_bootstrap.ignserver }}'
-ignition_url: '{{ openshift_bootstrap.ignserver }}'
+image_url: ''
+ignition_url: ''
 
 # This needs to be set to the disk where you are installing RHCOS
 disk: 'sda'
