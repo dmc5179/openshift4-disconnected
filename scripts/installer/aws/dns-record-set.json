@@ -1,42 +1,44 @@
 {
-  "HostedZoneId": "",
-  "ChangeBatch": {
-    "Comment": "",
-    "Changes": [
-      {
-        "Action": "UPSERT",
-        "ResourceRecordSet": [
+  "Comment": "UPSERT OpenShift Records",
+  "Changes": [
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "api-int.OCP_CLUSTER_NAME.OCP_BASE_DOMAIN.",
+        "Type": "A",
+        "AliasTarget": 
           {
-            "Name": "api-int.OCP_CLUSTER_NAME.OCP_BASE_DOMAIN.",
-            "Type": "A",
-            "TTL": 3600,
-            "ResourceRecords": [
-              {
-                "Value": "API_INT_LB_IP"
-              }
-            ]
-          },
-          {
-            "Name": "api.OCP_CLUSTER_NAME.OCP_BASE_DOMAIN.",
-            "Type": "A",
-            "TTL": 3600,
-            "ResourceRecords": [
-              {
-                "Value": "API_LB_IP"
-              }
-            ]
-          },
-          {
-            "Name": "\\052.apps.OCP_CLUSTER_NAME.OCP_BASE_DOMAIN.",
-            "Type": "A",
-            "AliasTarget": {
-              "HostedZoneId": "HOSTED_ZONE_ID",
-              "DNSName": "APPS_LB_DNS_NAME",
-              "EvaluateTargetHealth": false
-            }
+            "DNSName": "API_INT_LB_DNS",
+            "HostedZoneId": "API_INT_LB_HZ",
+            "EvaluateTargetHealth": false
           }
-        ]
       }
-    ]
-  }
+    },
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "api.OCP_CLUSTER_NAME.OCP_BASE_DOMAIN.",
+        "Type": "A",
+        "AliasTarget":
+          {
+            "DNSName": "APPS_EXT_LB_DNS",
+            "HostedZoneId": "APPS_EXT_LB_HZ",
+            "EvaluateTargetHealth": false
+          }
+      }
+    },
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "\\052.apps.OCP_CLUSTER_NAME.OCP_BASE_DOMAIN.",
+        "Type": "A",
+        "AliasTarget":
+          {
+            "DNSName": "INGRESS_LB_DNS",
+            "HostedZoneId": "INGRESS_LB_HZ",
+            "EvaluateTargetHealth": false
+          }
+      }
+    }
+  ]
 }
