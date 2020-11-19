@@ -1,0 +1,10 @@
+---
+- hosts: localhost
+  gather_facts: true
+  become: false
+  tasks:
+
+    - name: Configure NFS Storage Provider for OCP
+      import_role:
+        name: install_nfs
+        tasks_from: provisioner.yml
