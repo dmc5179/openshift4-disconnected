@@ -238,15 +238,16 @@
   tags:
     - ignition
 
-- name: Patch existing igntion systemd section
-  ignition_systemd_patch:
-    src: '{{ item }}'
-    patch: "{{ role_path }}/files/nm-patch.json"
-    backup: false
-  with_fileglob:
-    - '{{ ignition_configs }}/*.ign'
-  tags:
-    - ignition
+# TODO: This task is broken and only needed in rare cases anyway
+#- name: Patch existing igntion systemd section
+#  ignition_systemd_patch:
+#    src: '{{ item }}'
+#    patch: "{{ role_path }}/files/nm-patch.json"
+#    backup: false
+#  with_fileglob:
+#    - '{{ ignition_configs }}/*.ign'
+#  tags:
+#    - ignition
 
 - name: Create kube config location
   file:
