@@ -9,6 +9,7 @@
         name: install_bind
       when: dns_server is match("bind")
 
+# TODO: Not currently supported
 #    - name: Install and Configure IPA
 #      include_role:
 #        name: ipa
