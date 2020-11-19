@@ -51,3 +51,5 @@ network_policy: 'NetworkPolicy'
 
 master_kargs: ''
 worker_kargs: ''
+
+httpd_document_root: '/var/www/html'

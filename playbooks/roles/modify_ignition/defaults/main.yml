@@ -4,5 +4,11 @@ filetranspiler: '/usr/local/bin/filetranspiler'
 
 fake_root_base: '/tmp/fakeroots'
 
+pip_cmd: 'pip3'
+
 # List of modules to blacklist from the kernel
 modules_blacklist: {}
+
+filetranspiler_requirements:
+  - 'python-magic'
+  - 'file-magic'
