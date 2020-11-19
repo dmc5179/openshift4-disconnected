@@ -40,7 +40,9 @@ sshKey: '{{ slurped_key_b64.content | b64decode }}'
 fips: {{ fips_enabled | bool | lower }}
 publish: {{ ocp_cluster_publish }}
 additionalTrustBundle: |
+{% if private_registry %}
 {{ slurped_registry_ca_bundle_b64.content | b64decode }}
+{% endif %}
 {% if platform == 'vmware' %}
 {% if slurped_vcenter_ca_bundle_b64 is defined %}
 {% for cert in slurped_vcenter_ca_bundle_b64.results %}

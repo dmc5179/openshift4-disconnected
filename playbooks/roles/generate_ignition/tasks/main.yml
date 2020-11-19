@@ -75,6 +75,7 @@
   slurp:
     src: "{{ certificate_bundle }}"
   register: slurped_registry_ca_bundle_b64
+  when: ( private_registry | bool )
   tags:
     - manifests
     - install-config
