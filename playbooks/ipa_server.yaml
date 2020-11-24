@@ -1,9 +1,0 @@
----
-- hosts: helper_node
-  gather_facts: true
-  become: false
-  tasks:
-
-    - name: Configure IPA DNS Zone and OCP Hosts
-      include_role:
-        name: ipa
