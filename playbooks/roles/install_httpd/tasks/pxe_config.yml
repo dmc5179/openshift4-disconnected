@@ -1,0 +1,26 @@
+---
+- name: Copy RHCOS Legacy BIOS to document root
+  copy:
+    src: '{{ mirror_base }}/rhcos/rhcos-{{rhcos_ver}}-{{ arch }}-metal.{{ arch }}.raw.gz'
+    owner: root
+    group: root
+    mode: 0644
+  when: ( rhcos_ver[:3] | float < 4.6 )
+
+- name: Copy RHCOS Liveos BIOS to document root
+  copy:
+    src: '{{ mirror_base }}/rhcos/rhcos-{{rhcos_ver}}-{{arch}}-metal.{{arch}}.raw.gz'
+    dest: '{{ httpd_document_root }}/install/'
+    owner: root
+    group: root
+    mode: 0644
+  when: ( rhcos_ver[:3] | float >= 4.6 ) and (not rhcos_4k)
+
+- name: Copy RHCOS Liveos 4K BIOS to document root
+  copy:
+    src: '{{ mirror_base }}/rhcos/rhcos-{{rhcos_ver}}-{{arch}}-metal4k.{{arch}}.raw.gz'
+    dest: '{{ httpd_document_root }}/install/'
+    owner: root
+    group: root
+    mode: 0644
+  when: ( rhcos_ver[:3] | float >= 4.6 ) and (rhcos_4k)
