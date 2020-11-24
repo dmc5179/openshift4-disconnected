@@ -1,5 +1,23 @@
 ---
 
+- name: Remove old ignition configs
+  become: true
+  file:
+    path: '{{ httpd_document_root }}/{{ ocp_cluster_name }}/ignition'
+    state: absent
+  tags:
+    - ignition
+
+- name: Create Ignition staging location
+  become: true
+  file:
+    path: '{{ httpd_document_root }}/{{ ocp_cluster_name }}/ignition'
+    state: directory
+    mode: '0755'
+    setype: 'httpd_sys_content_t'
+  tags:
+    - ignition
+
 - name: Stage Ignition configs
   become: true
   copy:

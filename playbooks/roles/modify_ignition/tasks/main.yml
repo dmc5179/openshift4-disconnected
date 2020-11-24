@@ -44,6 +44,12 @@
     - '{{ openshift_masters }}'
     - '{{ openshift_workers }}'
 
+- name: Install required pip modules for filetranspiler
+  pip:
+    name: "{{ filetranspiler_requirements }}"
+    state: present
+    executable: "{{ pip_cmd }}"
+
 - name: Customize ignition
   shell:
     cmd: |
