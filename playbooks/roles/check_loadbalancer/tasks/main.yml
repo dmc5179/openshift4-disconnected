@@ -8,15 +8,15 @@
     timeout: 1
   ignore_errors: true
   with_items:
-    - host: 'api.{{ openshift_install_config.cluster_domain }}'
+    - host: 'api.{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
       port: 6443
-    - host: 'api.{{ openshift_install_config.cluster_domain }}'
+    - host: 'api.{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
       port: 22623
-    - host: 'api-int.{{ openshift_install_config.cluster_domain }}'
+    - host: 'api-int.{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
       port: 6443
-    - host: 'api-int.{{ openshift_install_config.cluster_domain }}'
+    - host: 'api-int.{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
       port: 22623
-    - host: 'myapp.apps.{{ openshift_install_config.cluster_domain }}'
+    - host: 'myapp.apps.{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
       port: 443
-    - host: 'myapp.apps.{{ openshift_install_config.cluster_domain }}'
+    - host: 'myapp.apps.{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
       port: 80
