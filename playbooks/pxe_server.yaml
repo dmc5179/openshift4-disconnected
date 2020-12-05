@@ -1,4 +1,16 @@
 ---
+
+# TODO: Not quite working yet
+#- hosts: httpd_server
+#  gather_facts: true
+#  become: true
+#  tasks:
+#
+#    - name: Configure RHCOS PXE files on httpd server
+#      import_role:
+#        name: install_httpd
+#        tasks_from: pxe_config.yml
+
 - hosts: pxe_server
   gather_facts: true
   become: true
