@@ -93,6 +93,9 @@ then
 
     sed -i 's|=replaceme/|=file://|g' ${REMOVABLE_MEDIA_PATH}/redhat_operators_manifests/mapping.txt
 
+    # Temporary fix due to a bug in the most recent redhat-operators-index image
+    sed -i -e 's/registry-proxy.engineering.redhat.com\/rh-osbs/registry.redhat.io/g' ${REMOVABLE_MEDIA_PATH}/redhat_operators_manifests/mapping.txt
+
     ${OC} image mirror \
       '--filter-by-os=.*' \
       --keep-manifest-list=true \
