@@ -17,17 +17,17 @@
   tags:
     - pxeserver
 
-#- name: Make Network Boot Programs for BIOS based systems available
-#  copy:
-#    src: '{{ item }}'
-#    dest: '{{ pxeserver_path }}/'
-#    owner: root
-#    group: root
-#    mode: '0644'
-#  with_fileglob:
-#    - '/usr/share/syslinux/*'
-#  tags:
-#    - pxeserver
+- name: Make Network Boot Programs for BIOS based systems available
+  copy:
+    src: '{{ item }}'
+    dest: '{{ pxeserver_path }}/'
+    owner: root
+    group: root
+    mode: '0644'
+  with_fileglob:
+    - '/usr/share/syslinux/*'
+  tags:
+    - pxeserver
 
 - name: Make Network Boot Programs for UEFI based systems available
   copy:
@@ -127,7 +127,7 @@
 - name: Assign hosts to a boot menu
   file:
     src: 'pxe-{{ item.type }}'
-    dest: '{{ pxeserver_path }}/pxelinux.cfg/{{ item.ip | ip4_hex }}'
+    dest: '{{ pxeserver_path }}/pxelinux.cfg/{{ item.ip | ip4_hex | upper }}'
     owner: root
     group: root
     state: link
