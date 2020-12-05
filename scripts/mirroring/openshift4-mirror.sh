@@ -78,8 +78,7 @@ then
     ${OC} image mirror \
       --dir=${REMOVABLE_MEDIA_PATH}/mirror \
       --registry-config=${LOCAL_SECRET_JSON} \
-      --keep-manifest-list=true \
-      --filter-by-os=.* \
+      '--filter-by-os=linux/amd64' \
       registry.redhat.io/redhat/redhat-operator-index:v${OCP_RELEASE::3} \
       file://redhat/redhat-operator-index:v${OCP_RELEASE::3}
 
@@ -97,8 +96,7 @@ then
     sed -i -e 's/registry-proxy.engineering.redhat.com\/rh-osbs/registry.redhat.io/g' ${REMOVABLE_MEDIA_PATH}/redhat_operators_manifests/mapping.txt
 
     ${OC} image mirror \
-      '--filter-by-os=.*' \
-      --keep-manifest-list=true \
+      '--filter-by-os=linux/amd64' \
       --max-per-registry=6 \
       --max-registry=4 \
       --registry-config=${LOCAL_SECRET_JSON} \
@@ -112,8 +110,7 @@ then
     ${OC} image mirror \
       --dir=${REMOVABLE_MEDIA_PATH}/mirror \
       --registry-config=${LOCAL_SECRET_JSON} \
-      --keep-manifest-list=true \
-      --filter-by-os=.* \
+      '--filter-by-os=linux/amd64' \
       registry.redhat.io/redhat/certified-operator-index:v${OCP_RELEASE::3} \
       file://redhat/certified-operator-index:v${OCP_RELEASE::3}
 
@@ -128,8 +125,7 @@ then
     sed -i 's|=replaceme/|=file://|g' ${REMOVABLE_MEDIA_PATH}/certified_operators_manifests/mapping.txt
 
     ${OC} image mirror \
-      --filter-by-os=.* \
-      --keep-manifest-list=true \
+      '--filter-by-os=linux/amd64' \
       --max-per-registry=6 \
       --max-registry=4 \
       --registry-config=${LOCAL_SECRET_JSON} \
@@ -143,8 +139,7 @@ then
     ${OC} image mirror \
       --dir=${REMOVABLE_MEDIA_PATH}/mirror \
       --registry-config=${LOCAL_SECRET_JSON} \
-      --keep-manifest-list=true \
-      --filter-by-os=.* \
+      '--filter-by-os=linux/amd64' \
       registry.redhat.io/redhat/community-operator-index:v${OCP_RELEASE::3} \
       file://redhat/community-operator-index:v${OCP_RELEASE::3}
 
@@ -159,8 +154,7 @@ then
     sed -i 's|=replaceme/|=file://|g' ${REMOVABLE_MEDIA_PATH}/community_operators_manifests/mapping.txt
 
     ${OC} image mirror \
-      --filter-by-os=.* \
-      --keep-manifest-list=true \
+      '--filter-by-os=linux/amd64' \
       --max-per-registry=6 \
       --max-registry=4 \
       --registry-config=${LOCAL_SECRET_JSON} \
