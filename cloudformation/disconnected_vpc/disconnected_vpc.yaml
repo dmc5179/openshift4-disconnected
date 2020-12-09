@@ -103,9 +103,10 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: !Select [0, !Cidr [!Ref VpcCidr, 6, !Ref SubnetBits]]
+      MapPublicIpOnLaunch: true
       Tags:
       - Key: Name
-        Value: 'Public Subnet - ${AWS::StackName}'
+        Value: !Sub 'Public Subnet - ${AWS::StackName}'
       AvailabilityZone: !Select
       - 0
       - Fn::GetAZs: !Ref "AWS::Region"
@@ -116,9 +117,10 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: !Select [1, !Cidr [!Ref VpcCidr, 6, !Ref SubnetBits]]
+      MapPublicIpOnLaunch: true
       Tags:
       - Key: Name
-        Value: 'Public Subnet 2 - ${AWS::StackName}'
+        Value: !Sub 'Public Subnet 2 - ${AWS::StackName}'
       AvailabilityZone: !Select
       - 1
       - Fn::GetAZs: !Ref "AWS::Region"
@@ -129,9 +131,10 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: !Select [2, !Cidr [!Ref VpcCidr, 6, !Ref SubnetBits]]
+      MapPublicIpOnLaunch: true
       Tags:
       - Key: Name
-        Value: 'Public Subnet 3 - ${AWS::StackName}'
+        Value: !Sub 'Public Subnet 3 - ${AWS::StackName}'
       AvailabilityZone: !Select
       - 2
       - Fn::GetAZs: !Ref "AWS::Region"
@@ -188,7 +191,7 @@ Resources:
       CidrBlock: !Select [3, !Cidr [!Ref VpcCidr, 6, !Ref SubnetBits]]
       Tags:
       - Key: Name
-        Value: 'Private Subnet - ${AWS::StackName}'
+        Value: !Sub 'Private Subnet - ${AWS::StackName}'
       AvailabilityZone: !Select
       - 0
       - Fn::GetAZs: !Ref "AWS::Region"
@@ -207,6 +210,15 @@ Resources:
       SubnetId: !Ref PrivateSubnet
       RouteTableId: !Ref PrivateRouteTable
 
+  PrivateSubnetNATRoute:
+    Type: AWS::EC2::Route
+    DependsOn: NATInstance
+    Properties:
+       RouteTableId:
+         Ref: PrivateRouteTable
+       DestinationCidrBlock: 0.0.0.0/0
+       InstanceId: !Ref NATInstance
+
   PrivateSubnet2:
     Type: "AWS::EC2::Subnet"
     Condition: DoAz2
@@ -215,7 +227,7 @@ Resources:
       CidrBlock: !Select [4, !Cidr [!Ref VpcCidr, 6, !Ref SubnetBits]]
       Tags:
       - Key: Name
-        Value: 'Private Subnet 2 - ${AWS::StackName}'
+        Value: !Sub 'Private Subnet 2 - ${AWS::StackName}'
       AvailabilityZone: !Select
       - 1
       - Fn::GetAZs: !Ref "AWS::Region"
@@ -236,6 +248,16 @@ Resources:
       SubnetId: !Ref PrivateSubnet2
       RouteTableId: !Ref PrivateRouteTable2
 
+  PrivateSubnetNATRoute2:
+    Type: AWS::EC2::Route
+    Condition: DoAz2
+    DependsOn: NATInstance
+    Properties:
+       RouteTableId:
+         Ref: PrivateRouteTable2
+       DestinationCidrBlock: 0.0.0.0/0
+       InstanceId: !Ref NATInstance
+
   PrivateSubnet3:
     Type: "AWS::EC2::Subnet"
     Condition: DoAz3
@@ -244,7 +266,7 @@ Resources:
       CidrBlock: !Select [5, !Cidr [!Ref VpcCidr, 6, !Ref SubnetBits]]
       Tags:
       - Key: Name
-        Value: 'Private Subnet 3 - ${AWS::StackName}'
+        Value: !Sub 'Private Subnet 3 - ${AWS::StackName}'
       AvailabilityZone: !Select
       - 2
       - Fn::GetAZs: !Ref "AWS::Region"
@@ -264,6 +286,16 @@ Resources:
     Properties:
       SubnetId: !Ref PrivateSubnet3
       RouteTableId: !Ref PrivateRouteTable3
+
+  PrivateSubnetNATRoute3:
+    Type: AWS::EC2::Route
+    Condition: DoAz3
+    DependsOn: NATInstance
+    Properties:
+       RouteTableId:
+         Ref: PrivateRouteTable3
+       DestinationCidrBlock: 0.0.0.0/0
+       InstanceId: !Ref NATInstance
 
 ##############################################################################
 #
@@ -329,26 +361,24 @@ Resources:
         FromPort: 443
         ToPort: 443
         IpProtocol: TCP
-      - CidrIp: 74.96.70.249/32
-        FromPort: 0
-        ToPort: 65535
-        IpProtocol: '-1'
       Tags:
       - Key: Name
         Value: !Sub 'NAT Instance SG - ${AWS::StackName}'
       VpcId: !Ref VPC
 
-
-  NATInstanceLC:
-    Type: AWS::AutoScaling::LaunchConfiguration
+  NATInstance:
+    Type: AWS::EC2::Instance
     Properties:
-      IamInstanceProfile: !Ref NATInstanceProfile
-      InstanceType: !Ref InstanceType
       ImageId: !Ref AmiId
+      InstanceType: !Ref InstanceType
+      IamInstanceProfile: !Ref NATInstanceProfile
       KeyName: !Ref KeyName
-      AssociatePublicIpAddress: true
-      SecurityGroups:
-      - !Ref NATInstanceSG
+      NetworkInterfaces:
+      - AssociatePublicIpAddress: "true"
+        DeviceIndex: "0"
+        GroupSet:
+        - !Ref NATInstanceSG
+        SubnetId: !Ref PublicSubnet
       UserData:
         Fn::Base64:
           !Sub |
@@ -426,168 +456,10 @@ Resources:
 
             EOF
 
-            /usr/sbin/squid -k parse && /usr/sbin/squid -k reconfigure || (cp /etc/squid/old/* /etc/squid/; exit 1)
-
-            # Install and configure the CloudWatch Agent
-            rpm -Uvh https://amazoncloudwatch-agent-${AWS::Region}.s3.${AWS::Region}.amazonaws.com/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
-            cat > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json << 'EOF'
-            {
-              "agent": {
-                "metrics_collection_interval": 10,
-                "omit_hostname": true
-              },
-              "metrics": {
-                "metrics_collected": {
-                  "procstat": [
-                    {
-                      "pid_file": "/var/run/squid.pid",
-                      "measurement": [
-                        "cpu_usage"
-                      ]
-                    }
-                  ]
-                },
-                "append_dimensions": {
-                  "AutoScalingGroupName": "${!aws:AutoScalingGroupName}"
-                },
-                "force_flush_interval": 5
-              },
-              "logs": {
-                "logs_collected": {
-                  "files": {
-                    "collect_list": [
-                      {
-                        "file_path": "/var/log/squid/access.log*",
-                        "log_group_name": "/filtering-nat-instance/access.log",
-                        "log_stream_name": "{instance_id}",
-                        "timezone": "Local"
-                      },
-                      {
-                        "file_path": "/var/log/squid/cache.log*",
-                        "log_group_name": "/filtering-nat-instance/cache.log",
-                        "log_stream_name": "{instance_id}",
-                        "timezone": "Local"
-                      }
-                    ]
-                  }
-
-                }
-              }
-            }
-            EOF
-            /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
-
-            # CloudFormation signal
-            yum update -y aws-cfn-bootstrap
-            /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource NATInstanceASG --region ${AWS::Region}
-
-  NATInstanceASG:
-    Type: AWS::AutoScaling::AutoScalingGroup
-    Properties:
-      DesiredCapacity: 1
-      HealthCheckGracePeriod: 300
-      HealthCheckType: EC2
-      LaunchConfigurationName: !Ref NATInstanceLC
-      MaxSize: 1
-      MinSize: 1
-      Tags:
-      - Key: Name
-        Value: !Sub 'NAT Instance 1 - ${AWS::StackName}'
-        PropagateAtLaunch: True
-      - Key: RouteTableIds
-        Value: !Ref PrivateRouteTable
-        PropagateAtLaunch: False
-      VPCZoneIdentifier:
-      - !Ref PublicSubnet
-    CreationPolicy:
-      ResourceSignal:
-        Count: 1
-        Timeout: PT10M
-
-  NATInstanceASGHook: 
-    Type: AWS::AutoScaling::LifecycleHook
-    Properties: 
-      AutoScalingGroupName: !Ref NATInstanceASG
-      DefaultResult: ABANDON
-      LifecycleTransition: autoscaling:EC2_INSTANCE_LAUNCHING
-      HeartbeatTimeout: 300
-
-#  NATInstanceASG2:
-#    Type: AWS::AutoScaling::AutoScalingGroup
-#    Properties:
-#      DesiredCapacity: 1
-#      HealthCheckGracePeriod: 300
-#      HealthCheckType: EC2
-#      LaunchConfigurationName: !Ref NATInstanceLC
-#      MaxSize: 1
-#      MinSize: 1
-#      Tags:
-#      - Key: Name
-#        Value: !Sub 'NAT Instance 2 - ${AWS::StackName}'
-#        PropagateAtLaunch: True
-#      - Key: RouteTableIds
-#        Value: !Ref PrivateRouteTable2
-#        PropagateAtLaunch: False
-#      VPCZoneIdentifier:
-#      - !Ref PublicSubnet2
-#
-#  NATInstanceASGHook2: 
-#    Type: AWS::AutoScaling::LifecycleHook
-#    Properties: 
-#      AutoScalingGroupName: !Ref NATInstanceASG2
-#      DefaultResult: ABANDON
-#      LifecycleTransition: autoscaling:EC2_INSTANCE_LAUNCHING
-#      HeartbeatTimeout: 300
-
+            /usr/sbin/squid -k parse && /usr/sbin/squid -k reconfigure
 
 # End Nat Instance
 ############################################################################
-
-  HomeAccessSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Allow access from home network
-      VpcId: !Ref VPC
-      SecurityGroupIngress:
-      - CidrIp: 74.96.70.249/32
-        FromPort: 0
-        ToPort: 65535
-        IpProtocol: '-1'
-
-#  PublicTestingInstance:
-#    Type: AWS::EC2::Instance
-#    DependsOn:
-#    - NATInstanceASG
-#    Properties:
-#      ImageId: !Ref AmiId
-#      InstanceType: t3.large
-#      KeyName: !Ref KeyName
-#      NetworkInterfaces: 
-#        - AssociatePublicIpAddress: "true"
-#          DeviceIndex: "0"
-#          GroupSet:
-#            - !GetAtt VPC.DefaultSecurityGroup
-#            - !Ref HomeAccessSecurityGroup
-#          SubnetId: !Ref PublicSubnet
-#      Tags:
-#      - Key: Name
-#        Value: !Sub 'Public Testing Instance - ${AWS::StackName}'
-
-#  PrivateTestingInstance:
-#    Type: AWS::EC2::Instance
-#    DependsOn:
-#    - NATInstanceASG
-#    Properties:
-#      ImageId: !Ref AmiId
-#      InstanceType: t3.large
-#      KeyName: !Ref KeyName
-#      SecurityGroupIds:
-#      - !GetAtt VPC.DefaultSecurityGroup
-#      - !Ref NATInstanceSG
-#      SubnetId: !Ref PrivateSubnet
-#      Tags:
-#      - Key: Name
-#        Value: !Sub 'Private Testing Instance - ${AWS::StackName}'
 
 Outputs:
   VpcId:
