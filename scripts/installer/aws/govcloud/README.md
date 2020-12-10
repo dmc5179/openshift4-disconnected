@@ -18,7 +18,7 @@ manual_iam_mode.sh
 
 - To generate the manifests for installing the OpenShift cluster in GovCloud run:
 ```
-manual_iam_mode
+manual_iam_mode.sh
 ```
 
 - Run the openshift-install command as normal:
