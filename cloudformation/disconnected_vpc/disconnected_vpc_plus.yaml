@@ -560,7 +560,7 @@ Resources:
       InstanceType: "m5.large"
       KeyName: !Ref KeyName
       BlockDeviceMappings: 
-      - DeviceName: "/dev/sda"
+      - DeviceName: "/dev/xvda"
         Ebs: 
           VolumeType: "gp2"
           DeleteOnTermination: "true"
@@ -609,13 +609,15 @@ Resources:
             restorecon -v /usr/local/bin/openshift-install
             rm -f README.md
 
+            /usr/local/bin/oc adm release mirror -a /tmp/pull-secret.json --from=quay.io/openshift-release-dev/ocp-release:${ocp_ver}-x86_64 --to-dir=/opt/mirror
 
-            /usr/local/bin/oc adm release mirror -a /tmp/pull-secret.json --from=quay.io/openshift-release-dev/ocp-release:4.6.7-x86_64 --to=s3://$region/${s3_bucket}/mirror
+            aws s3 sync --quiet /opt/mirror s3://${s3_bucket}/registry/
 
             # Signal to the registry node that we're done mirroring to S3
             curl -X PUT -H 'Content-Type:' --data-binary \
             '{"Status" : "SUCCESS","Reason" : "Configuration Complete","UniqueId" : "ID1234","Data" : "Application has completed configuration."}' \
             "${signal_url}"
+
 
           - pull_secret: !Ref PullSecretJson
             ocp_ver: !Ref OpenShiftVersion
@@ -672,6 +674,10 @@ Resources:
         FromPort: 22
         ToPort: 22
         IpProtocol: tcp
+      - CidrIp: 0.0.0.0/0
+        FromPort: 5000
+        ToPort: 5000
+        IpProtocol: tcp
       Tags:
       - Key: Name
         Value: !Sub 'Registry SG - ${AWS::StackName}'
@@ -687,7 +693,7 @@ Resources:
       InstanceType: "m5.large"
       KeyName: !Ref KeyName
       BlockDeviceMappings:
-      - DeviceName: "/dev/sda"
+      - DeviceName: "/dev/xvda"
         Ebs:
           VolumeType: "gp2"
           DeleteOnTermination: "true"
@@ -696,7 +702,7 @@ Resources:
       - Key: Name
         Value: !Sub 'Registry Node - ${AWS::StackName}'
       NetworkInterfaces:
-      - AssociatePublicIpAddress: "true"
+      - AssociatePublicIpAddress: false
         DeviceIndex: "0"
         GroupSet:
         - !Ref RegistryInstanceSG
@@ -727,7 +733,26 @@ Resources:
             restorecon -v /usr/local/bin/openshift-install
             rm -f README.md
 
-            aws s3 sync "s3://${s3_bucket}/mirror" /opt/registry
+            aws s3 sync "s3://${s3_bucket}/registry" /opt/registry
+
+            cat <<EOF >> /etc/systemd/system/registry.service
+
+            [Unit]
+            Description=Container Registry
+
+            [Service]
+            Restart=always
+            ExecStart=/usr/local/bin/oc image serve --dir=/opt/registry --listen=:5000
+
+            [Install]
+            WantedBy=multi-user.target
+
+            EOF
+
+            systemctl daemon-reload
+            systemctl enable --now registry
+
+            # The repo will look like this :5000/openshift/release:4.6.7-thanos
 
           - ocp_ver: !Ref OpenShiftVersion
             s3_bucket: !Ref S3Bucket
