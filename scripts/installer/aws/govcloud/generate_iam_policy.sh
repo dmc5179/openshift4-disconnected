@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -xe
 
 # This script generates the IAM policy documents
 # They can be used to create the IAM policies
@@ -7,8 +7,10 @@
 # csplit 0000_50_cloud-credential-operator_07_cred-iam-ro.yaml '/^---/' '{*}'
 # yq -r 'select(.spec.providerSpec.kind == "AWSProviderSpec") | .spec.secretRef.name' xx00
 
-#rm -rf ./release-image
-#oc adm release extract quay.io/openshift-release-dev/ocp-release:4.5.14-x86_64 --to ./release-image
+export OCP_VER="4.6.7"
+
+rm -rf ./release-image
+oc adm release extract quay.io/openshift-release-dev/ocp-release:${OCP_VER}-x86_64 --to ./release-image
 
 # Find the files with the AWS Provider Spec in them
 IAM_FILES=$(find release-image/ -type f -exec grep -l 'AWSProviderSpec' '{}' ';')
