@@ -1,14 +1,8 @@
-
-
-cleanup_iam.sh
-create_iam_roles.sh
-generate_iam_policy.sh
-manual_iam_mode.sh
-
+# Steps to manually generate AWS IAM roles and have the cluster installer use them during IPI
 
 - To generate the IAM policy files run:
 ```
-./generate_iam_policy
+./generate_iam_policy.sh
 ```
 
 - To create the IAM users, policies, attach the policies, and create API keys run:
