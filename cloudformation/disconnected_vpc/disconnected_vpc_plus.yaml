@@ -16,7 +16,7 @@ Parameters:
     ConstraintDescription: "The number of availability zones. (Min: 1, Max: 3)"
     MinValue: 1
     MaxValue: 3
-    Default: 1
+    Default: 3
     Description: "How many AZs to create VPC subnets for. (Min: 1, Max: 3)"
     Type: Number
 
