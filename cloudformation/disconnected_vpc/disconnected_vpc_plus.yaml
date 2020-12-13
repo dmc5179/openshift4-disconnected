@@ -48,9 +48,9 @@ Parameters:
     Type: String
     Default: "{}"
 
-  InstanceType:
+  NATInstanceType:
     Type: String
-    Default: t3.small
+    Default: t3.medium
     Description: Instance type to use to launch the NAT instances.
     AllowedValues:
     - t3.nano
@@ -71,6 +71,15 @@ Parameters:
     - c5.xlarge
     - c5.large
 
+  BastionInstanceType:
+    Type: String
+    Default: t3.large
+    Description: Instance type to use to launch the NAT instances.
+
+  RegistryInstanceType:
+    Type: String
+    Default: t3.large
+    Description: Instance type to use to launch the NAT instances.
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -392,7 +401,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: !Ref AmiId
-      InstanceType: !Ref InstanceType
+      InstanceType: !Ref NATInstanceType
       IamInstanceProfile: !Ref NATInstanceProfile
       KeyName: !Ref KeyName
       Tags:
@@ -557,7 +566,7 @@ Resources:
       #ImageId: !FindInMap [RHELMap, !Ref "AWS::Region", HVM64]
       ImageId: !Ref AmiId
       IamInstanceProfile: !Ref HelperInstanceProfile
-      InstanceType: "m5.large"
+      InstanceType: !Ref BastionInstanceType
       KeyName: !Ref KeyName
       BlockDeviceMappings: 
       - DeviceName: "/dev/xvda"
@@ -690,7 +699,7 @@ Resources:
       #ImageId: !FindInMap [RHELMap, !Ref "AWS::Region", HVM64]
       ImageId: !Ref AmiId
       IamInstanceProfile: !Ref RegistryInstanceProfile
-      InstanceType: "m5.large"
+      InstanceType: !Ref RegistryInstanceType
       KeyName: !Ref KeyName
       BlockDeviceMappings:
       - DeviceName: "/dev/xvda"
