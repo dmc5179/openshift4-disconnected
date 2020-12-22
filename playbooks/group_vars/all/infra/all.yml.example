@@ -34,11 +34,11 @@ arch: 'x86_64'
 
 # Ignition Config version mapped to OpenShift Major Version Number
 ign_version:
-  4.2: '2.1.0'
-  4.3: '2.1.0'
-  4.4: '2.1.0'
-  4.5: '2.2.0'
-  4.6: '3.1.0'
+  '4.2': '2.1.0'
+  '4.3': '2.1.0'
+  '4.4': '2.1.0'
+  '4.5': '2.2.0'
+  '4.6': '3.1.0'
 
 kube_ssl_enabled: false
 kubeconfig: "{{ ansible_env.HOME }}/.kube/config"
