@@ -13,6 +13,27 @@
       - libselinux-python3
     state: present
 
+- name: current local user
+  run_once: True
+  set_fact:
+    ansible_local_user: "{{ lookup('pipe', 'id -un') }}"
+  failed_when: ansible_local_user == ''
+
+- name: current local group
+  run_once: True
+  set_fact:
+    ansible_local_group: "{{ lookup('pipe', 'id -un') }}"
+  failed_when: ansible_local_group == ''
+
+- name: Create mirror base
+  become: true
+  file:
+    dest: '{{ mirror_base }}'
+    owner: '{{ ansible_local_user }}'
+    group: '{{ ansible_local_group }}'
+    mode: '0755'
+    state: directory
+
 - name: make directories
   become: "{{ run_as_root }}"
   with_items:
