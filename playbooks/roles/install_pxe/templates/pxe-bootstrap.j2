@@ -8,9 +8,9 @@ default menu.c32
  menu default
 {% if rhcos_ver[:3] | float < 4.6 %}
  kernel rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer-kernel-{{ arch }}
- append initrd=rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer-initramfs.{{ arch }}.img nomodeset rd.neednet=1 coreos.inst=yes coreos.inst.install_dev={{ disk | default('sda') }} coreos.inst.image_url={{ ignserver }}/install/bios.raw.gz coreos.inst.ignition_url={{ ignserver }}/{{ ocp_cluster_name }}/ignition/bootstrap.ign
+ append initrd=rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer-initramfs.{{ arch }}.img nomodeset rd.neednet=1 coreos.inst=yes coreos.inst.install_dev={{ disk | default('sda') }} coreos.inst.image_url={{ openshift_bootstrap[0].ignserver }}/install/bios.raw.gz coreos.inst.ignition_url={{ openshift_bootstrap[0].ignserver }}/{{ ocp_cluster_name }}/ignition/bootstrap.ign
 {% else %}
  kernel rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-kernel-{{ arch }}
- append initrd=rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-initramfs.{{ arch }}.img nomodeset rd.neednet=1 coreos.inst=yes coreos.inst.install_dev={{ disk | default('sda') }} coreos.inst.image_url={{ ignserver }}/install/bios.raw.gz coreos.inst.ignition_url={{ ignserver }}/{{ ocp_cluster_name }}/ignition/bootstrap.ign
+ append initrd=rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-initramfs.{{ arch }}.img nomodeset rd.neednet=1 coreos.inst=yes coreos.inst.install_dev={{ disk | default('sda') }} coreos.inst.image_url={{ openshift_bootstrap[0].ignserver }}/install/bios.raw.gz coreos.inst.ignition_url={{ openshift_bootstrap[0].ignserver }}/{{ ocp_cluster_name }}/ignition/bootstrap.ign
 {% endif %}
 
