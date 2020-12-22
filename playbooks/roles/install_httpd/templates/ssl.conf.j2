@@ -3,7 +3,7 @@
 # {{ ansible_managed }}
 
 # Listen on port
-Listen {{ httpd_listen_ssl }} https
+Listen {{ httpd_ssl_port }} https
 
 ## SSL Global Context
 SSLPassPhraseDialog exec:/usr/libexec/httpd-ssl-pass-dialog
@@ -14,7 +14,7 @@ SSLRandomSeed connect builtin
 SSLCryptoDevice builtin
 
 ## SSL Virtual Host Context
-<VirtualHost _default_:{{ httpd_listen_ssl }}>
+<VirtualHost _default_:{{ httpd_ssl_port }}>
 
 SSLEngine on
 
