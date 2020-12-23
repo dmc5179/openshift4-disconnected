@@ -89,6 +89,18 @@
   tags:
     - pxeserver
 
+- name: Create RHCOS directory for http server
+  become: true
+  file:
+    path: '{{ httpd_document_root }}/rhcos'
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  when: ( rhcos_ver[:3] | float >= 4.6 )
+  tags:
+    - pxeserver
+
 - name: Copy liveos kernel
   copy:
     src: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-kernel-{{ arch }}'
@@ -97,6 +109,28 @@
     group: root
     mode: '0644'
   when: ( rhcos_ver[:3] | float >= 4.6 )
+  tags:
+    - pxeserver
+
+- name: Copy liveos rootfs
+  copy:
+    src: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-rootfs.{{ arch }}.img'
+    dest: '{{ httpd_document_root }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-rootfs.{{ arch }}.img'
+    owner: root
+    group: root
+    mode: '0644'
+  when: ( rhcos_ver[:3] | float >= 4.6 )
+  tags:
+    - pxeserver
+
+- name: Copy liveos metal
+  copy:
+    src: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz'
+    dest: '{{ httpd_document_root }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz'
+    owner: root
+    group: root
+    mode: '0644'
+#  when: ( rhcos_ver[:3] | float >= 4.6 )
   tags:
     - pxeserver
 
