@@ -39,6 +39,7 @@ pullSecret: '{{ slurped_pull_secret_b64.content | b64decode }}'
 sshKey: '{{ slurped_key_b64.content | b64decode }}'
 fips: {{ fips_enabled | bool | lower }}
 publish: {{ ocp_cluster_publish }}
+{% if private_registry or platform == 'vmware' %}
 additionalTrustBundle: |
 {% if private_registry %}
 {{ slurped_registry_ca_bundle_b64.content | b64decode }}
@@ -50,6 +51,8 @@ additionalTrustBundle: |
 {% endfor %}
 {% endif %}
 {% endif %}
+{% endif %}
+{% if private_registry %}
 imageContentSources:
 - mirrors:
   - {{ mirror_registry }}:{{ mirror_registry_port }}/ocp4/openshift4
@@ -57,3 +60,4 @@ imageContentSources:
 - mirrors:
   - {{ mirror_registry }}:{{ mirror_registry_port }}/ocp4/openshift4
   source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+{% endif %}
