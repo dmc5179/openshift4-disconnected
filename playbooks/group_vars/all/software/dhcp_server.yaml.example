@@ -15,6 +15,7 @@ dhcp_global_next_server: '10.0.106.42'
 
 #dhcp_global_ntp_servers:
 
+# Default gateway
 #dhcp_global_routers:
 
 dhcp_global_domain_name: 'example.com'
