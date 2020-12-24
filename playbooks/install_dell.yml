@@ -35,13 +35,6 @@
       tags:
         - ignition
 
-    - name: Modify Ignition Files
-      import_role:
-        name: modify_ignition
-      when: (network_mode is match("static"))
-      tags:
-        - ignition
-
     - name: Create Ignition staging location
       become: true
       file:
