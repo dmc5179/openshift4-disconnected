@@ -53,3 +53,25 @@ master_kargs: ''
 worker_kargs: ''
 
 httpd_document_root: '/var/www/html'
+
+filetranspiler: '/usr/local/bin/filetranspiler'
+
+fake_root_base: '/tmp/fakeroots'
+
+pip_cmd: 'pip3'
+pip_args: ''
+
+# List of modules to blacklist from the kernel
+modules_blacklist:
+  - 'mlx5_core'
+  - 'mlx5_ib'
+  - 'mlxfw'
+  - 'ib_uverbs'
+  - 'ib_core'
+
+
+filetranspiler_pip_requirements:
+  - 'file-magic'
+filetranspiler_rpm_requirements:
+  - 'python3-magic'
+

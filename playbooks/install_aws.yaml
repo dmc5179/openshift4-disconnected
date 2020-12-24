@@ -45,11 +45,6 @@
       import_role:
         name: generate_ignition
 
-    - name: Modify Ignition Files
-      include_role:
-        name: modify_ignition
-      when: (network_mode is match("static"))
-
     - name: Create Ignition staging location
       become: true
       file:

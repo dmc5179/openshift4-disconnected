@@ -250,6 +250,80 @@
 #  tags:
 #    - ignition
 
+- name: Cleanup existing fakeroots
+  file:
+    path: '{{ fake_root_base }}'
+    state: absent
+
+- name: Build fakeroots directory structure for static networking config
+  file:
+    path: '{{ fake_root_base }}/{{ item.name }}/etc/sysconfig/network-scripts'
+    state: directory
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
+
+- name: Create static network configs
+  template:
+    src: 'ifcfg.j2'
+    dest: '{{ fake_root_base }}/{{ item.name }}/etc/sysconfig/network-scripts/ifcfg-{{ item.device }}'
+    mode: 0644
+  when:
+    - (network_mode is match("static"))
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
+
+- name: Build fakeroots directory structure for module blacklist
+  file:
+    path: '{{ fake_root_base }}/{{ item.name }}/etc/modprobe.d'
+    state: directory
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
+
+- name: Create kernel module blacklist file
+  template:
+    src: 'ocp-ign-blacklist.conf.j2'
+    dest: '{{ fake_root_base }}/{{ item.name }}/etc/modprobe.d/ocp-ign-blacklist.conf'
+    mode: 0644
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
+
+- name: Set pip args
+  set_fact:
+    pip_args: '--user'
+#  when: (not run_as_root)
+
+- name: Install required pip modules for filetranspiler
+  pip:
+    name: "{{ filetranspiler_pip_requirements }}"
+    state: present
+    executable: "{{ pip_cmd }}"
+    extra_args: '{{ pip_args }}'
+
+- name: Install required RPMs for filetranspiler
+  become: true
+  package:
+    name: '{{ filetranspiler_rpm_requirements }}'
+    state: present
+
+- name: Customize ignition
+  shell:
+    cmd: |
+
+      {{filetranspiler}} -i {{ ignition_configs }}/{{ item.type }}.ign -f {{ fake_root_base }}/{{ item.name }} --format json -o {{ ignition_configs }}/{{ item.name }}.ign
+
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
+
 - name: Create kube config location
   file:
     path: "{{ kubeconfig | dirname }}"
