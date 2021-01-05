@@ -15,9 +15,6 @@ localhost ansible_python_interpreter=auto ansible_connection=local
 [httpd_server]
 localhost ansible_python_interpreter=auto ansible_connection=local
 
-[mirror_server]
-localhost ansible_python_interpreter=auto ansible_connection=local
-
 [registry_server]
 localhost ansible_python_interpreter=auto ansible_connection=local
 
