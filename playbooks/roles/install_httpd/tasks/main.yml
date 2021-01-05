@@ -1,4 +1,10 @@
 ---
+
+- name: Install pip
+  package:
+    name: 'python3-pip'
+    state: present
+
 # tasks file for httpd
 - name: install requirements
   pip:
