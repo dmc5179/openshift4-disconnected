@@ -84,7 +84,7 @@
     url: "{{ rhcos_vmdk }}"
     dest: "{{ mirror_base }}/rhcos/"
     mode: '0644'
-  when: (mirror_vmdk | bool)
+  when: (platform is match("aws"))
   tags:
     - mirror
 
@@ -94,7 +94,7 @@
     url: "{{ rhcos_azure }}"
     dest: "{{ mirror_base }}/rhcos/"
     mode: '0644'
-  when: (mirror_azure | bool)
+  when: (platform is match("azure")))
   tags:
     - mirror
 
@@ -104,7 +104,7 @@
     url: "{{ rhcos_gcp }}"
     dest: "{{ mirror_base }}/rhcos/"
     mode: '0644'
-  when: (mirror_gcp | bool)
+  when: (platform is match("gcp"))
   tags:
     - mirror
 
@@ -114,7 +114,7 @@
     url: "{{ rhcos_legacy_iso }}"
     dest: "{{ mirror_base }}/rhcos/"
     mode: '0644'
-  when: (mirror_iso | bool) and (rhcos_ver[:3] | float < 4.6)
+  when: (platform is match("bare_metal")) and (rhcos_ver[:3] | float < 4.6)
   tags:
     - mirror
 
@@ -124,7 +124,7 @@
     url: "{{ rhcos_live_iso }}"
     dest: "{{ mirror_base }}/rhcos/"
     mode: '0644'
-  when: (mirror_iso | bool) and (rhcos_ver[:3] | float >= 4.6)
+  when: (platform is match("bare_metal")) and (rhcos_ver[:3] | float >= 4.6)
   tags:
     - mirror
 
@@ -134,6 +134,6 @@
     url: "{{ rhcos_raw }}"
     dest: "{{ mirror_base }}/rhcos/"
     mode: '0644'
-  when: (mirror_raw | bool)
+  when: (platform is match("bare_metal"))
   tags:
     - mirror
