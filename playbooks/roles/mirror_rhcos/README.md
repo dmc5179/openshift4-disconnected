@@ -17,19 +17,13 @@ Role includes variables for mirroring RHCOS as:
 
 ## Role Variables
 
-| Variable                    | Default                       | Comments                                                                                |
-| :---                        | :---                          | :---                                                                                    |
-| run_as_root                 | 
-| mirror_base                 |
-| mirror_vmdk                 |
-| mirror_azure                |
-| mirror_gcp                  |
-| mirror_iso                  |
-| mirror_raw                  |
-| mirror_ova                  |
-| air_gapped                  |
-| mirror_registry             |    
-| mirror_transport            |     
+| Variable                    | Default                       | Comments          |
+| :---                        | :---                          | :---              |
+| run_as_root                 |                               |                   |
+| mirror_base                 |                               |                   |
+| air_gapped                  |                               |                   |
+| mirror_registry             |                               |                   |
+| mirror_transport            |                               |                   |
 
 Example Playbook
 ----------------

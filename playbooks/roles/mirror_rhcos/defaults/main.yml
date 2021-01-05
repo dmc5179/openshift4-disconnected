@@ -4,14 +4,6 @@
 run_as_root: false
 mirror_base: '/opt/openshift'
 
-mirror_vmdk: true
-mirror_azure: false
-mirror_gcp: false
-mirror_iso: true
-mirror_raw: false
-mirror_ova: false
-
-
 ocp_ver: '4.3.8'
 rhcos_ver: '4.3.8'
 arch: 'x86_64'
