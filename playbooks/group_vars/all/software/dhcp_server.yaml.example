@@ -5,18 +5,18 @@ dhcp_subnets:
     netmask: 255.255.255.0
     domain_name_servers:
       - 10.0.106.42
-    range_begin: 10.0.106.200
-    range_end: 10.0.106.250
+#    range_begin: 10.0.106.200
+#    range_end: 10.0.106.250
 
 # Server where PXE is configured
 # could be TFTP, HTTP, etc...
 dhcp_pxeboot_server: '10.0.106.42'
 dhcp_global_next_server: '10.0.106.42'
 
-#dhcp_global_ntp_servers:
+dhcp_global_ntp_servers: 2.rhel.pool.ntp.org
 
 # Default gateway
-#dhcp_global_routers:
+dhcp_global_routers:
 
-dhcp_global_domain_name: 'example.com'
-dhcp_global_domain_search: 'example.com'
+dhcp_global_domain_name: '{{ ocp_base_domain }}'
+dhcp_global_domain_search: '{{ ocp_base_domain }}'
