@@ -18,4 +18,4 @@
   with_items:
     - '{{ openshift_bootstrap }}'
     - '{{ openshift_masters }}'
-#    - '{{ openshift_workers }}'
+    - '{{ openshift_workers }}'
