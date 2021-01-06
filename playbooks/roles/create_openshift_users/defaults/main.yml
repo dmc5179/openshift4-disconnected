@@ -11,6 +11,23 @@ pip_cmd: '/usr/local/bin/pip3'
 
 run_as_root: false
 
+kubeconfig: "{{ ansible_env.HOME }}/.kube/config"
+kube_ssl_enabled: false
+
 openshift_users:
   - name: danclark
-    password: 'redhat1'
+    password: 'redhat2020'
+  - name: user1
+    password: 'redhat2020'
+  - name: user2
+    password: 'redhat2020'
+  - name: user3
+    password: 'redhat2020'
+  - name: user4
+    password: 'redhat2020'
+  - name: user5
+    password: 'redhat2020'
+  - name: user6
+    password: 'redhat2020'
+  - name: user7
+    password: 'redhat2020'
