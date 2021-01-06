@@ -4,18 +4,18 @@ baseDomain: {{ ocp_base_domain }}
 compute:
 - hyperthreading: Enabled
   name: worker
-  replicas: 0
+  replicas: {{ worker_count }}
 controlPlane:
   hyperthreading: Enabled
   name: master
-  replicas: {{ num_workers }}
+  replicas: {{ master_count }}
 metadata:
   name: {{ ocp_cluster_name }}
 networking:
   clusterNetwork:
   - cidr: {{ cluster_network_cidr }}
     hostPrefix: {{ cluster_network_prefix }}
-  networkType: OpenShiftSDN
+  networkType: {{ ocp_sdn }}
   serviceNetwork:
   - {{ service_network_cidr }}
 platform:
