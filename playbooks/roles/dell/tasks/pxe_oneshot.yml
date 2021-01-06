@@ -1,0 +1,17 @@
+---
+
+- name: Dell | Configure Server Boot Once
+  delegate_to: localhost
+  command: /opt/dell/srvadmin/sbin/racadm -u {{ bmc_user }} -p {{ bmc_password }} -r {{ item.bmc }} config -g cfgServerInfo -o cfgServerBootOnce 1
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
+
+- name: Dell | Configure Server Boot Once - PXE
+  delegate_to: localhost
+  command: /opt/dell/srvadmin/sbin/racadm -u {{ bmc_user }} -p {{ bmc_password }} -r {{ item.bmc }} config -g cfgServerInfo -o cfgServerFirstBootDevice PXE
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
