@@ -9,8 +9,10 @@ spec:
   serviceNetwork:
   - {{ service_network_cidr }}
   defaultNetwork:
-    type: OpenShiftSDN
+    type: {{ ocp_sdn }}
     openshiftSDNConfig:
       mode: {{ network_policy }}
       mtu: {{ mtu }}
+{% if platform != 'bare_metal' %}
       vxlanPort: {{ vxlanPort }}
+{% endif %}
