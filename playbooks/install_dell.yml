@@ -2,89 +2,111 @@
 - hosts: helper_node
   gather_facts: true
   become: false
+  strategy: free
   tasks:
 
-    - name: Cleanup Custom ISO working area
-      become: true
-      file:
-        path: '{{ item }}'
-        state: absent
-      when: (network_mode is match("static"))
-      with_fileglob: '/mnt/nfs/*.iso'
-      tags:
-        - iso
-
-    - name: Customize ISO
-      import_role:
-        name: custom_iso
-      when: (network_mode is match("static"))
-      tags:
-        - iso
-
-    - name: Remove old ignition configs
-      become: true
-      file:
-        path: '{{ httpd_document_root }}/{{ ocp_cluster_name }}/ignition'
-        state: absent
-      tags:
-        - ignition
-
-    - name: Generate Ignition Files
-      import_role:
-        name: generate_ignition
-      tags:
-        - ignition
-
-    - name: Create Ignition staging location
-      become: true
-      file:
-        path: '{{ httpd_document_root }}/{{ ocp_cluster_name }}/ignition'
-        state: directory
-        mode: '0755'
-        setype: 'httpd_sys_content_t'
-      tags:
-        - ignition
-
-    - name: Stage Ignition configs
-      become: true
-      copy:
-        src: "{{ item }}"
-        dest: "{{ httpd_document_root }}/{{ ocp_cluster_name }}/ignition/"
-        mode: '0755'
-        setype: 'httpd_sys_content_t'
-      with_fileglob:
-        - '{{ ignition_configs }}/*.ign'
-      tags:
-        - ignition
-
-    - name: Copy append-bootstrap ignition
-      become: true
-      copy:
-        src: "files/append-bootstrap.ign"
-        dest: "{{ httpd_document_root }}/{{ ocp_cluster_name }}/ignition/append-bootstrap.ign"
-        mode: '0755'
-        setype: 'httpd_sys_content_t'
-      tags:
-        - ignition
-
-    - name: Configure servers for UEFI booting
+    - name: Power Down Dell Hosts
       import_role:
         name: dell
-        tasks_from: configure_bios
+        tasks_from: poweroff.yml
       tags:
-        - dell
+        - powerdown
 
-    - name: Configure Virtual Media
+    - name: Configure Dell PXE One Shot Boot
       import_role:
         name: dell
-        tasks_from: iso_boot
+        tasks_from: pxe_oneshot.yml
       tags:
-        - dell
+        - pxe
 
-    - name: Power cycle hosts
+    - name: Power Up Dell Hosts
       import_role:
         name: dell
-        tasks_from: powercycle
+        tasks_from: poweron.yml
       tags:
-        - dell
-        - poweron
+        - powerup
+
+#    - name: Cleanup Custom ISO working area
+#      become: true
+#      file:
+#        path: '{{ item }}'
+#        state: absent
+#      when: (network_mode is match("static"))
+#      with_fileglob: '/mnt/nfs/*.iso'
+#      tags:
+#        - iso
+
+#    - name: Customize ISO
+#      import_role:
+#        name: custom_iso
+#      when: (network_mode is match("static"))
+#      tags:
+#        - iso
+
+#    - name: Remove old ignition configs
+#      become: true
+#      file:
+#        path: '{{ httpd_document_root }}/{{ ocp_cluster_name }}/ignition'
+#        state: absent
+#      tags:
+#        - ignition
+
+#    - name: Generate Ignition Files
+#      import_role:
+#        name: generate_ignition
+#      tags:
+#        - ignition
+
+#    - name: Create Ignition staging location
+#      become: true
+#      file:
+#        path: '{{ httpd_document_root }}/{{ ocp_cluster_name }}/ignition'
+#        state: directory
+#        mode: '0755'
+#        setype: 'httpd_sys_content_t'
+#      tags:
+#        - ignition
+
+#    - name: Stage Ignition configs
+#      become: true
+#      copy:
+#        src: "{{ item }}"
+#        dest: "{{ httpd_document_root }}/{{ ocp_cluster_name }}/ignition/"
+#        mode: '0755'
+#        setype: 'httpd_sys_content_t'
+#      with_fileglob:
+#        - '{{ ignition_configs }}/*.ign'
+#      tags:
+#        - ignition
+
+#    - name: Copy append-bootstrap ignition
+#      become: true
+#      copy:
+#        src: "files/append-bootstrap.ign"
+#        dest: "{{ httpd_document_root }}/{{ ocp_cluster_name }}/ignition/append-bootstrap.ign"
+#        mode: '0755'
+#        setype: 'httpd_sys_content_t'
+#      tags:
+#        - ignition
+
+#    - name: Configure servers for UEFI booting
+#      import_role:
+#        name: dell
+#        tasks_from: configure_bios
+#      tags:
+#        - dell
+
+#    - name: Configure Virtual Media
+#      import_role:
+#        name: dell
+#        tasks_from: iso_boot
+#      tags:
+#        - dell
+
+#    - name: Power cycle hosts
+#      import_role:
+#        name: dell
+#        tasks_from: powercycle
+#      tags:
+#        - dell
+#        - poweron
