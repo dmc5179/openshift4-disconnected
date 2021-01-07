@@ -52,6 +52,13 @@ then
   exit 1
 fi
 
+# Check for racadm
+if ! test -e /opt/dell/srvadmin/sbin/racadm
+then
+  echo "racadm command required"
+  exit 1
+fi
+
 set -xe
 
 for host in ${HOSTS[@]}
