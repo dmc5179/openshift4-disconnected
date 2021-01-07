@@ -60,4 +60,7 @@ imageContentSources:
 - mirrors:
   - {{ mirror_registry }}:{{ mirror_registry_port }}/ocp4/openshift4
   source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+- mirrors:
+  - {{ mirror_registry }}:{{ mirror_registry_port }}/ocp4/openshift4
+  source: quay.io/openshift-release-dev/ocp-release-nightly
 {% endif %}
