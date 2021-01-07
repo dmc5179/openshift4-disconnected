@@ -1,5 +1,14 @@
 #!/bin/bash -xe
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+# Source the environment file with the default settings
+source "${SCRIPT_DIR}/../../../env.sh"
+
+# Make sure yq and jq are installed. These will fail if they are not
+which yq
+which jq
+
 # This script generates the IAM policy documents
 # They can be used to create the IAM policies
 # No calls to create the policies exist in this script
@@ -7,10 +16,16 @@
 # csplit 0000_50_cloud-credential-operator_07_cred-iam-ro.yaml '/^---/' '{*}'
 # yq -r 'select(.spec.providerSpec.kind == "AWSProviderSpec") | .spec.secretRef.name' xx00
 
-export OCP_VER="4.6.7"
-
 rm -rf ./release-image
-oc adm release extract quay.io/openshift-release-dev/ocp-release:${OCP_VER}-x86_64 --to ./release-image
+
+REPO="quay.io/openshift-release-dev/ocp-release:${OCP_RELEASE}-x86_64"
+if [[ ${OCP_RELEASE} =~ "nightly" ]]
+then
+  echo "Switching to nightly stream"
+  REPO="quay.io/openshift-release-dev/ocp-release-nightly:${OCP_RELEASE}"
+fi
+
+oc adm release extract --registry-config=${LOCAL_SECRET_JSON} ${REPO} --to ./release-image
 
 # Find the files with the AWS Provider Spec in them
 IAM_FILES=$(find release-image/ -type f -exec grep -l 'AWSProviderSpec' '{}' ';')
