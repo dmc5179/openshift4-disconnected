@@ -12,7 +12,7 @@
 #    group: root
 #    mode: '0755'
 
-- name: Mirror OpenShift 4 Cluster Images to Registry
+- name: Mirror OpenShift {{ ocp_ver }} Cluster Images to Registry
   shell:
     cmd: |
 
@@ -27,18 +27,35 @@
 
 - name: Create directory for OCP images
   file:
-    path: '{{ mirror_base }}/ocp_cluster_images'
+    path: '{{ mirror_base }}/ocp_{{ ocp_ver }}_cluster_images'
     state: directory
   when: (mirror_to_dir | bool)
 
-- name: Mirror OpenShift 4 Cluster Images to disk
+- name: Mirror OpenShift {{ ocp_ver }} Cluster Images to disk
   shell:
     cmd: |
 
         /usr/local/bin/oc adm release mirror -a "{{ pull_secret }}" \
-        --insecure=true \
+        "--insecure=true" \
         "--from=quay.io/{{ product_repo }}/{{ release_name }}:{{ ocp_ver }}-{{ arch }}" \
-        --to-dir={{ mirror_base }}/ocp_cluster_images
+        "--to=file://openshift/release" \
+        "--to-dir={{ mirror_base }}/ocp_{{ ocp_ver }}_cluster_images"
 
     executable: /bin/bash
   when: (mirror_to_dir | bool)
+
+- name: Tar up the OpenShift cluster images directory
+  archive:
+    path: "{{ mirror_base }}/ocp_{{ ocp_ver }}_cluster_images"
+    dest: "{{ mirror_base }}/ocp_{{ ocp_ver }}_cluster_images.tar"
+  when: (mirror_to_dir | bool)
+  tags:
+    - archive
+
+- name: Remove cluster images working directory
+  file:
+    path: '{{ mirror_base }}/ocp_{{ ocp_ver }}_cluster_images'
+    state: absent
+  when: (mirror_to_dir | bool)
+  tags:
+    - archive
