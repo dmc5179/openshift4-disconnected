@@ -10,36 +10,36 @@
 
 - name: Mirror RHEL 7 Repos
   become: "{{ run_as_root }}"
-  shell: "reposync -p {{ repo_mirror_base }} --download-metadata --arch={{ arch }} --repoid={{ item }}"
+  shell: "reposync -n -p {{ repo_mirror_base }} --download-metadata --arch={{ arch }} --repoid={{ item }}"
   with_items:
     - "{{ rhel7_repositories }}"
   when: ( rhel7_enabled | bool )
   tags:
     - mirror
 
-- name: Prune RHEL 7 Repos
-  become: "{{ run_as_root }}"
-  shell: "repomanage --old --keep {{ repo_depth }} {{ repo_mirror_base }}/{{ item }} | xargs rm -f"
-  with_items:
-    - "{{ rhel7_repositories }}"
-  when: ( rhel7_enabled | bool )
-  tags:
-    - mirror
+#- name: Prune RHEL 7 Repos
+#  become: "{{ run_as_root }}"
+#  shell: "repomanage --old --keep {{ repo_depth }} {{ repo_mirror_base }}/{{ item }} | xargs rm -f"
+#  with_items:
+#    - "{{ rhel7_repositories }}"
+#  when: ( rhel7_enabled | bool )
+#  tags:
+#    - mirror
 
 - name: Mirror EPEL 7 Repo
   become: "{{ run_as_root }}"
-  shell: "reposync -p {{ repo_mirror_base }} --download-metadata --arch={{ arch }} --repoid={{ item }}"
+  shell: "reposync -n -p {{ repo_mirror_base }} --download-metadata --arch={{ arch }} --repoid={{ item }}"
   with_items:
     - "{{ epel7_repository }}"
   when: ( epel7_enabled | bool )
   tags:
     - mirror
 
-- name: Prune EPEL 7 Repos
-  become: "{{ run_as_root }}"
-  shell: "repomanage --old --keep {{ repo_depth }} {{ repo_mirror_base }}/{{ item }} | xargs rm -f"
-  with_items:
-    - "{{ epel7_repositories }}"
-  when: ( epel7_enabled | bool )
-  tags:
-    - mirror
+#- name: Prune EPEL 7 Repos
+#  become: "{{ run_as_root }}"
+#  shell: "repomanage --old --keep {{ repo_depth }} {{ repo_mirror_base }}/{{ item }} | xargs rm -f"
+#  with_items:
+#    - "{{ epel7_repositories }}"
+#  when: ( epel7_enabled | bool )
+#  tags:
+#    - mirror
