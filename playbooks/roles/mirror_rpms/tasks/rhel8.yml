@@ -10,6 +10,28 @@
   tags:
     - mirror
 
+- name: Archive RHEL 8 Repos
+  become: "{{ run_as_root }}"
+  archive:
+    path: "{{ repo_mirror_base }}/{{ item }}"
+    dest: "{{ repo_mirror_base }}/{{ item }}.tar"
+  with_items:
+    - "{{ rhel8_repositories }}"
+  when: ( rhel8_enabled | bool )
+  tags:
+    - mirror
+
+- name: Cleanup RHEL 8 Repo Directories
+  become: "{{ run_as_root }}"
+  file:
+    path: "{{ repo_mirror_base }}/{{ item }}"
+    state: absent
+  with_items:
+    - "{{ rhel8_repositories }}"
+  when: ( rhel8_enabled | bool )
+  tags:
+    - mirror
+
 #- name: Prune RHEL 8 Repos
 #  become: "{{ run_as_root }}"
 #  shell: "repomanage --old --keep {{ repo_depth }} {{ repo_mirror_base }}/{{ item }} | xargs rm -f"
