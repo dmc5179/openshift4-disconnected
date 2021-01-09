@@ -31,8 +31,8 @@ Copy the file 'playbooks/group_vars/all/infra/all.yml.example' to 'playbooks/gro
 | mirror_registry_port                         | 5000                                                | Port for the mirror registry                                                     |
 | mirror_transport                             | 'https'                                             | Protocol to use with the mirror registry                                         |
 | ignition_configs                             | "{{ mirror_base }}/cluster"                         | Location                                                                         |
-| local_pull_secret                            | '{{ ansible_env.HOME }}/Downloads/pull-secret.json' | Pull secret for private registry                                                 |
-| pull_secret                                  | '/opt/openshift/pull-secret.json'                   | Pull secret for private registry                                                 |
+| local_pull_secret                            | '{{ ansible_env.HOME }}/Downloads/pull-secret.txt' | Pull secret for private registry                                                 |
+| pull_secret                                  | '/opt/openshift/pull-secret.txt'                   | Pull secret for private registry                                                 |
 | docker_registry_hostname                     | '{{ mirror_registry }}'                             | Hostname of the private registry (low side)                                      |
 | network_mode                                 | static                                              | static or dhcpd network config for OCP nodes                                     |
 | disk                                         | 'sda'                                               | Disk device to install RHCOS on each OCP node                                    |

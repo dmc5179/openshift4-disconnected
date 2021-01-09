@@ -8,7 +8,7 @@ kubeconfig: "{{ ansible_env.HOME }}/.kube/config"
 
 mirror_base: '/opt/openshift'
 ignition_configs: '{{ mirror_base }}/cluster'
-pull_secret: '{{ mirror_base }}/pull-secret.json'
+pull_secret: '{{ mirror_base }}/pull-secret.txt'
 
 master_schedulable: false
 cluster_channel: 'fast'

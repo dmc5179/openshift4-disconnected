@@ -24,7 +24,7 @@ mirror_base: '/opt/openshift'
 # This needs to be a pull secret that combines the pull secret from Red Hat
 # to pull all the images down and a pull secret from your local registry so we
 # can push to it
-pull_secret: "{{ mirror_base }}/pull-secret.json"
+pull_secret: "{{ mirror_base }}/pull-secret.txt"
 
 air_gapped: true
 
