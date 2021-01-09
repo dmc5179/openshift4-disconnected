@@ -30,6 +30,8 @@ rhcos_4k: false
 rhcos_live_bios: '{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{rhcos_ver}}/rhcos-{{rhcos_ver}}-{{arch}}-metal.{{arch}}.raw.gz'
 rhcos_live_4k_bios: '{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{rhcos_ver}}/rhcos-{{rhcos_ver}}-{{arch}}-metal4k.{{arch}}.raw.gz'
 
+rhcos_installer: '{{base_url}}/{{arch}}/clients/coreos-installer/latest/coreos-installer'
+
 liveos_files:
   - '{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{rhcos_ver}}/rhcos-{{rhcos_ver}}-{{arch}}-live-initramfs.{{arch}}.img'
   - '{{base_url}}/dependencies/rhcos/{{rhcos_ver[:3]}}/{{rhcos_ver}}/rhcos-{{rhcos_ver}}-{{arch}}-live-kernel-{{arch}}'
