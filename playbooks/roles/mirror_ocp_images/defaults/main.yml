@@ -13,8 +13,8 @@ mirror_base: '/opt/openshift'
 pull_secret: "{{ mirror_base }}/pull-secret.json"
 release_name: 'ocp-release'
 
-mirror_to_reg: true
-mirror_to_dir: false
+mirror_to_reg: false
+mirror_to_dir: true
 
 air_gapped: true
 
