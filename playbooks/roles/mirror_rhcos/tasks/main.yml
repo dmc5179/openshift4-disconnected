@@ -137,3 +137,13 @@
   when: (platform is match("bare_metal"))
   tags:
     - mirror
+
+- name: Download RHCOS Installer
+  become: "{{ run_as_root }}"
+  get_url:
+    url: "{{ rhcos_installer }}"
+    dest: "{{ mirror_base }}/rhcos/"
+    mode: '0644'
+  tags:
+    - mirror
+    - rhcos_installer
