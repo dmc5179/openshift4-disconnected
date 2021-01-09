@@ -5,28 +5,58 @@
   file:
     path: "{{ mirror_base }}"
     state: directory
+    owner: root
+    group: root
+    mode: 0777
+
+- name: Create tools dir
+  become: "{{ run_as_root }}"
+  file:
+    path: "{{ mirror_base }}/tools/"
+    state: directory
 
 - name: Downloading OCP4 client
   become: "{{ run_as_root }}"
   get_url:
     url: "{{ ocp_client }}"
-    dest: "{{ mirror_base }}/openshift-client-linux-{{ ocp_ver }}.tar.gz"
+    dest: "{{ mirror_base }}/tools/openshift-client-linux-{{ ocp_ver }}.tar.gz"
 
 - name: Downloading OCP4 Installer
   become: "{{ run_as_root }}"
   get_url:
     url: "{{ ocp_installer }}"
-    dest: "{{ mirror_base }}/openshift-install-linux-{{ ocp_ver }}.tar.gz"
+    dest: "{{ mirror_base }}/tools/openshift-install-linux-{{ ocp_ver }}.tar.gz"
 
-- name: Download coreos-installer
+- name: Download coreos-installer (x86_64)
   become: "{{ run_as_root }}"
   get_url:
-    url: "{{ coreos_installer }}"
-    dest: "{{ mirror_base }}/coreos-installer_amd64"
+    url: "{{ coreos_installer }}/coreos-installer_amd64"
+    dest: "{{ mirror_base }}/tools/coreos-installer_amd64"
   when: (arch is match("x86_64"))
+
+- name: Download coreos-installer (aarch64)
+  become: "{{ run_as_root }}"
+  get_url:
+    url: "{{ coreos_installer }}/coreos-installer_aarch64"
+    dest: "{{ mirror_base }}/tools/coreos-installer_aarch64"
+  when: (arch is match("aarch64"))
+
+- name: Download coreos-installer (ppc64le)
+  become: "{{ run_as_root }}"
+  get_url:
+    url: "{{ coreos_installer }}/coreos-installer_ppc64le"
+    dest: "{{ mirror_base }}/tools/coreos-installer_ppc64le"
+  when: (arch is match("ppc64le"))
+
+- name: Download coreos-installer (s390x)
+  become: "{{ run_as_root }}"
+  get_url:
+    url: "{{ coreos_installer }}/coreos-installer_s390x"
+    dest: "{{ mirror_base }}/tools/coreos-installer_s390x"
+  when: (arch is match("s390x"))
 
 - name: Downloading filetranspiler source
   become: "{{ run_as_root }}"
-  git:
-    repo: https://github.com/ashcrow/filetranspiler
-    dest: "{{ mirror_base }}/filetranspiler"
+  get_url:
+    url: "{{ filetranspiler }}"
+    dest: "{{ mirror_base }}/tools/"

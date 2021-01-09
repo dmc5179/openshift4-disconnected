@@ -18,5 +18,7 @@ base_url: "https://mirror.openshift.com/pub/openshift-v4/{{ arch }}"
 ocp_client: "{{base_url}}/clients/ocp/{{ocp_ver}}/openshift-client-linux-{{ocp_ver}}.tar.gz"
 ocp_installer: "{{base_url}}/clients/ocp/{{ocp_ver}}/openshift-install-linux-{{ocp_ver}}.tar.gz"
 
-coreos_installer: "{{base_url}}/clients/coreos-installer/latest/coreos-installer_amd64"
+filetranspiler: 'https://github.com/ashcrow/filetranspiler/archive/1.1.2.tar.gz'
+
+coreos_installer: "{{base_url}}/clients/coreos-installer/latest"
 chars: (\\_|\\$|\\\|\\/|\\=|\\)|\\(|\\&|\\^|\\%|\\$|\\#|\\@|\\!|\\*)
