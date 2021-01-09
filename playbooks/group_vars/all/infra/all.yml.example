@@ -74,9 +74,9 @@ mirror_transport: 'https'
 ignition_configs: "{{ mirror_base }}/cluster"
 # This is the secret that will be uploaded to the mirror server
 # for use in mirroring images
-local_pull_secret: '{{ ansible_env.HOME }}/Downloads/pull-secret.json'
+local_pull_secret: '{{ ansible_env.HOME }}/Downloads/pull-secret.txt'
 # This is the same secret as above but located on the mirror server
-pull_secret: '/opt/openshift/pull-secret.json'
+pull_secret: '/opt/openshift/pull-secret.txt'
 
 docker_registry_hostname: '{{ mirror_registry }}'
 
