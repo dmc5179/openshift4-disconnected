@@ -1,0 +1,48 @@
+---
+- hosts: helper_node
+  gather_facts: true
+  become: true
+  tasks:
+
+    # Working
+    - name: Pull RHCOS bits
+      import_role:
+        name: mirror_rhcos
+
+    # Working
+    - name: Pull OpenShift Cluster Images
+      import_role:
+        name: mirror_ocp_images
+
+    - name:
+      import_role:
+        name: operatorhub
+        tasks_from: mirror
+
+    # Works
+    - name: Pull RPM Repos
+      import_role:
+        name: mirror_rpms
+
+    # Works
+    - name: 
+      import_role:
+        name: pip
+        tasks_from: pull
+
+    # Works
+    - name: 
+      import_role:
+        name: tools
+        tasks_from: pull
+
+    # Works
+    - name: Pull Additional Required Images
+      import_role:
+        name: mirror_images
+        tasks_from: pull
+
+    - name: Pull Ansible Roles and Collections
+      import_role:
+        name: mirror_ansible
+        tasks_from: pull
