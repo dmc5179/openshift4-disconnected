@@ -4,7 +4,8 @@
 run_as_root: false
 
 mirror_base: '/opt/openshift'
-pip_cmd: /usr/local/bin/pip3
+pip_cmd: pip3
+ignore_version: true
 
 pip_modules:
   - name: kubernetes
@@ -69,3 +70,5 @@ pip_modules:
     version: 2.5.3
   - name: passlib
     version: 1.7.4
+  - name: file-magic
+    version: 0.3.0
