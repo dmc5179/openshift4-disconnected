@@ -4,8 +4,16 @@
     path: '{{ mirror_base }}/pip'
     state: directory
 
-- name: Download pip modules
+- name: Download pip modules (versioned)
   shell:
     cmd: "{{ pip_cmd }} download -d '{{ mirror_base }}/pip' '{{ item.name }}=={{ item.version }}'"
+  when: (not ignore_version | bool)
+  with_items:
+    - '{{ pip_modules }}'
+
+- name: Download pip modules (latest)
+  shell:
+    cmd: "{{ pip_cmd }} download -d '{{ mirror_base }}/pip' '{{ item.name }}'"
+  when: (ignore_version | bool)
   with_items:
     - '{{ pip_modules }}'
