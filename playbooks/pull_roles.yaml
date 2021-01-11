@@ -6,5 +6,5 @@
 
     - name: Mirror Ansible roles and collections
       include_role:
-        name: mirror_roles
+        name: mirror_ansible
         tasks_from: pull

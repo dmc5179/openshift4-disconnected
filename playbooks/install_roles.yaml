@@ -6,5 +6,5 @@
 
     - name: Install Ansible roles and collections from mirror
       include_role:
-        name: mirror_roles
+        name: mirror_ansible
         tasks_from: install
