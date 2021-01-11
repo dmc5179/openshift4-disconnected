@@ -39,6 +39,7 @@ ign_version:
   '4.4': '2.1.0'
   '4.5': '2.2.0'
   '4.6': '3.1.0'
+  '4.7': '3.1.0'
 
 kube_ssl_enabled: false
 kubeconfig: "{{ ansible_env.HOME }}/.kube/config"
@@ -49,6 +50,7 @@ worker_count: 3
 fips_enabled: false
 
 ocp_cluster_publish: 'External'
+ocp_sdn: 'OpenShiftSDN'
 
 ocp_base_domain: 'example.com'
 ocp_cluster_name: 'caas'
@@ -98,6 +100,7 @@ openshift_bootstrap:
     device: 'ens192'
     netmask: '255.255.255.0'
     gateway: '192.168.1.1'
+    bmc: ''
     hostname: 'bootstrap.{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
     nameserver: '192.168.1.42'
     ignserver: 'http://192.168.1.42:8090'
@@ -112,6 +115,7 @@ openshift_masters:
     mac: '00:50:56:97:7d:3c'
     netmask: '255.255.255.0'
     gateway: '192.168.1.1'
+    bmc: ''
     hostname: 'master0.{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
     nameserver: '192.168.1.42'
     ignserver: 'http://192.168.1.42:8090'
@@ -124,6 +128,7 @@ openshift_masters:
     mac: '00:50:56:97:5e:fc'
     netmask: '255.255.255.0'
     gateway: '192.168.1.1'
+    bmc: ''
     hostname: 'master1.{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
     nameserver: '192.168.1.42'
     ignserver: 'http://192.168.1.42:8090'
@@ -136,6 +141,7 @@ openshift_masters:
     mac: '00:50:56:97:1e:f8'
     netmask: '255.255.255.0'
     gateway: '192.168.1.1'
+    bmc: ''
     hostname: 'master2.{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
     nameserver: '192.168.1.42'
     ignserver: 'http://192.168.1.42:8090'
@@ -151,6 +157,7 @@ openshift_workers:
     mac: '00:50:56:97:1e:9b'
     netmask: '255.255.255.0'
     gateway: '192.168.1.1'
+    bmc: ''
     hostname: 'worker0.{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
     nameserver: '192.168.1.42'
     ignserver: 'http://192.168.1.42:8090'
@@ -163,6 +170,7 @@ openshift_workers:
     mac: '00:50:56:97:aa:49'
     netmask: '255.255.255.0'
     gateway: '192.168.1.1'
+    bmc: ''
     hostname: 'worker1.{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
     nameserver: '192.168.1.42'
     ignserver: 'http://192.168.1.42:8090'
@@ -175,6 +183,7 @@ openshift_workers:
     mac: '00:50:56:97:4c:2f'
     netmask: '255.255.255.0'
     gateway: '192.168.1.1'
+    bmc: ''
     hostname: 'worker2.{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
     nameserver: '192.168.1.42'
     ignserver: 'http://192.168.1.42:8090'
