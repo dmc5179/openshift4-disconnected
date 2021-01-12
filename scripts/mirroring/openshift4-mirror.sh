@@ -1,6 +1,6 @@
 #!/bin/bash -xe
-export OC="/usr/local/bin/oc-4.6.1"
-export OCP_RELEASE="4.6.1"
+export OC="/usr/local/bin/oc"
+export OCP_RELEASE="4.6.9"
 export ARCHITECTURE="x86_64"
 export LOCAL_REG='localhost:5000'
 export LOCAL_REPO='ocp4/openshift4'
@@ -9,7 +9,7 @@ export UPSTREAM_REPO='openshift-release-dev'
 export OCP_ARCH="x86_64"
 # Directory where OCP images are written to or read from
 # When mirroring to disk
-export REMOVABLE_MEDIA_PATH="/opt/data/packed/ocp-${OCP_RELEASE}"
+export REMOVABLE_MEDIA_PATH="/opt/data/openshift/ocp-${OCP_RELEASE}"
 
 # Registry where cluster images live for the disconnected cluster
 export REMOTE_REG="1234567890.dkr.ecr.us-east-1.amazonaws.com"
@@ -17,7 +17,7 @@ export REMOTE_REG="1234567890.dkr.ecr.us-east-1.amazonaws.com"
 # This needs to be a pull secret that combines the pull secret from Red Hat
 # to pull all the images down and a pull secret from your local registry so we
 # can push to it
-export LOCAL_SECRET_JSON="${HOME}/pull-secret.json"
+export LOCAL_SECRET_JSON="${HOME}/pull-secret.txt"
 export RELEASE_NAME="ocp-release"
 
 # Set these values to true for the catalog and miror to be created
@@ -66,7 +66,6 @@ then
   echo "Mirroring cluster images"
   ${OC} adm release mirror -a ${LOCAL_SECRET_JSON} \
     --insecure=${LOCAL_REG_INSEC} \
-    --max-per-registry=${THREADS} \
     --from=quay.io/${UPSTREAM_REPO}/${RELEASE_NAME}:${OCP_RELEASE}-${ARCHITECTURE} \
     --to file://openshift/release \
     --to-dir=${REMOVABLE_MEDIA_PATH}/mirror
@@ -95,10 +94,11 @@ then
     # Temporary fix due to a bug in the most recent redhat-operators-index image
     sed -i -e 's/registry-proxy.engineering.redhat.com\/rh-osbs/registry.redhat.io/g' ${REMOVABLE_MEDIA_PATH}/redhat_operators_manifests/mapping.txt
 
+    sed -i '/serverless-operator:v1.0.0/d' ${REMOVABLE_MEDIA_PATH}/redhat_operators_manifests/mapping.txt
+    sed -i '/sha256:473d6dfb011c69f/d' ${REMOVABLE_MEDIA_PATH}/redhat_operators_manifests/mapping.txt
+
     ${OC} image mirror \
       '--filter-by-os=linux/amd64' \
-      --max-per-registry=6 \
-      --max-registry=4 \
       --registry-config=${LOCAL_SECRET_JSON} \
       --dir="${REMOVABLE_MEDIA_PATH}/mirror" \
       --filename=${REMOVABLE_MEDIA_PATH}/redhat_operators_manifests/mapping.txt
@@ -126,8 +126,6 @@ then
 
     ${OC} image mirror \
       '--filter-by-os=linux/amd64' \
-      --max-per-registry=6 \
-      --max-registry=4 \
       --registry-config=${LOCAL_SECRET_JSON} \
       --dir="${REMOVABLE_MEDIA_PATH}/mirror" \
       --filename=${REMOVABLE_MEDIA_PATH}/certified_operators_manifests/mapping.txt
@@ -146,7 +144,6 @@ then
     mkdir -p "${REMOVABLE_MEDIA_PATH}/community_operators_manifests"
 
     ${OC} adm catalog mirror --manifests-only \
-      --max-per-registry=${THREADS} \
       --registry-config ${LOCAL_SECRET_JSON} \
       --to-manifests=${REMOVABLE_MEDIA_PATH}/community_operators_manifests \
       ${COMM_OP_INDEX} replaceme
@@ -155,8 +152,6 @@ then
 
     ${OC} image mirror \
       '--filter-by-os=linux/amd64' \
-      --max-per-registry=6 \
-      --max-registry=4 \
       --registry-config=${LOCAL_SECRET_JSON} \
       --dir="${REMOVABLE_MEDIA_PATH}/mirror" \
       --filename=${REMOVABLE_MEDIA_PATH}/community_operators_manifests/mapping.txt
