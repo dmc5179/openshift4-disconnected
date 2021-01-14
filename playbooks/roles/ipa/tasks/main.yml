@@ -9,6 +9,7 @@
     state: present
     zone_name: '{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
     dynamicupdate: true
+    validate_certs: '{{ ipa_ssl_enabled }}'
 
 - name: Create OpenShift A Records
   delegate_to: localhost
@@ -22,6 +23,7 @@
     ipa_user: '{{ ipa_user }}'
     ipa_pass: '{{ ipa_password }}'
     state: present
+    validate_certs: '{{ ipa_ssl_enabled }}'
   with_items:
     - '{{ openshift_bootstrap }}'
     - '{{ openshift_masters }}'
@@ -39,6 +41,7 @@
     ipa_user: '{{ ipa_user }}'
     ipa_pass: '{{ ipa_password }}'
     state: present
+    validate_certs: '{{ ipa_ssl_enabled }}'
   with_items:
     - '{{ openshift_masters }}'
   loop_control:
@@ -56,6 +59,7 @@
     record_name: "{{ item.ip.split('.')[-1][-2:] }}"
     record_type: 'PTR'
     record_value: '{{ item.name }}.{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
+    validate_certs: '{{ ipa_ssl_enabled }}'
   with_items:
     - '{{ openshift_bootstrap }}'
     - '{{ openshift_masters }}'
@@ -64,18 +68,18 @@
   #TODO: IPA ansible module doesn't support SRV records well. Missing Append
   # https://github.com/ansible/ansible/issues/33193
   # https://github.com/ansible/ansible/pull/66170
-- name: Create OpenShift SRV records
-  delegate_to: localhost
-  ignore_errors: true
-  ipa_dnsrecord:
-    ipa_host: '{{ ipa_host }}'
-    ipa_user: '{{ ipa_user }}'
-    ipa_pass: '{{ ipa_password }}'
-    state: append
-    zone_name: '{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
-    record_name: '_etcd-server-ssl._tcp.{{ ocp_cluster_name }}'
-    record_type: 'SRV'
-    record_value:
-      - '10 0 2380 etcd-0.{{ ocp_cluster_name }}.{{ ocp_base_domain }}.'
-      - '10 0 2380 etcd-1.{{ ocp_cluster_name }}.{{ ocp_base_domain }}.'
-      - '10 0 2380 etcd-2.{{ ocp_cluster_name }}.{{ ocp_base_domain }}.'
+#- name: Create OpenShift SRV records
+#  delegate_to: localhost
+#  ignore_errors: true
+#  ipa_dnsrecord:
+#    ipa_host: '{{ ipa_host }}'
+#    ipa_user: '{{ ipa_user }}'
+#    ipa_pass: '{{ ipa_password }}'
+#    state: append
+#    zone_name: '{{ ocp_cluster_name }}.{{ ocp_base_domain }}'
+#    record_name: '_etcd-server-ssl._tcp.{{ ocp_cluster_name }}'
+#    record_type: 'SRV'
+#    record_value:
+#      - '10 0 2380 etcd-0.{{ ocp_cluster_name }}.{{ ocp_base_domain }}.'
+#      - '10 0 2380 etcd-1.{{ ocp_cluster_name }}.{{ ocp_base_domain }}.'
+#      - '10 0 2380 etcd-2.{{ ocp_cluster_name }}.{{ ocp_base_domain }}.'
