@@ -77,14 +77,13 @@ then
     ${OC} image mirror \
       --dir=${REMOVABLE_MEDIA_PATH}/mirror \
       --registry-config=${LOCAL_SECRET_JSON} \
-      '--filter-by-os=linux/amd64' \
+      --keep-manifest-list=true --filter-by-os=".*" \
       registry.redhat.io/redhat/redhat-operator-index:v${OCP_RELEASE::3} \
       file://redhat/redhat-operator-index:v${OCP_RELEASE::3}
 
     mkdir -p "${REMOVABLE_MEDIA_PATH}/redhat_operators_manifests"
 
     ${OC} adm catalog mirror --manifests-only \
-      --max-per-registry=${THREADS} \
       --registry-config ${LOCAL_SECRET_JSON} \
       --to-manifests=${REMOVABLE_MEDIA_PATH}/redhat_operators_manifests \
       ${RH_OP_INDEX} replaceme
@@ -98,7 +97,7 @@ then
     sed -i '/sha256:473d6dfb011c69f/d' ${REMOVABLE_MEDIA_PATH}/redhat_operators_manifests/mapping.txt
 
     ${OC} image mirror \
-      '--filter-by-os=linux/amd64' \
+      --keep-manifest-list=true --filter-by-os=".*"
       --registry-config=${LOCAL_SECRET_JSON} \
       --dir="${REMOVABLE_MEDIA_PATH}/mirror" \
       --filename=${REMOVABLE_MEDIA_PATH}/redhat_operators_manifests/mapping.txt
@@ -110,14 +109,13 @@ then
     ${OC} image mirror \
       --dir=${REMOVABLE_MEDIA_PATH}/mirror \
       --registry-config=${LOCAL_SECRET_JSON} \
-      '--filter-by-os=linux/amd64' \
+      --keep-manifest-list=true --filter-by-os=".*"
       registry.redhat.io/redhat/certified-operator-index:v${OCP_RELEASE::3} \
       file://redhat/certified-operator-index:v${OCP_RELEASE::3}
 
     mkdir -p "${REMOVABLE_MEDIA_PATH}/certified_operators_manifests"
 
     ${OC} adm catalog mirror --manifests-only \
-      --max-per-registry=${THREADS} \
       --registry-config ${LOCAL_SECRET_JSON} \
       --to-manifests=${REMOVABLE_MEDIA_PATH}/certified_operators_manifests \
       ${CERT_OP_INDEX} replaceme
@@ -125,7 +123,7 @@ then
     sed -i 's|=replaceme/|=file://|g' ${REMOVABLE_MEDIA_PATH}/certified_operators_manifests/mapping.txt
 
     ${OC} image mirror \
-      '--filter-by-os=linux/amd64' \
+      --keep-manifest-list=true --filter-by-os=".*"
       --registry-config=${LOCAL_SECRET_JSON} \
       --dir="${REMOVABLE_MEDIA_PATH}/mirror" \
       --filename=${REMOVABLE_MEDIA_PATH}/certified_operators_manifests/mapping.txt
@@ -137,7 +135,7 @@ then
     ${OC} image mirror \
       --dir=${REMOVABLE_MEDIA_PATH}/mirror \
       --registry-config=${LOCAL_SECRET_JSON} \
-      '--filter-by-os=linux/amd64' \
+      --keep-manifest-list=true --filter-by-os=".*"
       registry.redhat.io/redhat/community-operator-index:v${OCP_RELEASE::3} \
       file://redhat/community-operator-index:v${OCP_RELEASE::3}
 
@@ -151,7 +149,7 @@ then
     sed -i 's|=replaceme/|=file://|g' ${REMOVABLE_MEDIA_PATH}/community_operators_manifests/mapping.txt
 
     ${OC} image mirror \
-      '--filter-by-os=linux/amd64' \
+      --keep-manifest-list=true --filter-by-os=".*"
       --registry-config=${LOCAL_SECRET_JSON} \
       --dir="${REMOVABLE_MEDIA_PATH}/mirror" \
       --filename=${REMOVABLE_MEDIA_PATH}/community_operators_manifests/mapping.txt
