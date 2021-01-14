@@ -22,10 +22,17 @@ mkdir -p ${REGISTRY_DIR}/{auth,certs,data}
 # Generate the certificate
 # TODO: -addext appears not to work on RHEL 7. Works on RHEL 8 and Fedora 31+
 #       If SAN is not needed, comment out the -addext line
-openssl req -newkey rsa:4096 -nodes -keyout "${REGISTRY_DIR}/certs/domain.key" \
-  -x509 -days 365 -out "${REGISTRY_DIR}/certs/domain.crt" \
-  -addext "subjectAltName = IP:${REGISTRY_IP},DNS:${HOSTNAME}" \
-  -subj "/C=US/ST=VA/L=Chantilly/O=RedHat/OU=RedHat/CN=${HOSTNAME}/"
+if openssl req --help 2>&1 | grep -q addext
+then
+  openssl req -newkey rsa:4096 -nodes -keyout "${REGISTRY_DIR}/certs/domain.key" \
+    -x509 -days 365 -out "${REGISTRY_DIR}/certs/domain.crt" \
+    -addext "subjectAltName = IP:${REGISTRY_IP},DNS:${HOSTNAME}" \
+    -subj "/C=US/ST=VA/L=Chantilly/O=RedHat/OU=RedHat/CN=${HOSTNAME}/"
+else
+  openssl req -newkey rsa:4096 -nodes -keyout "${REGISTRY_DIR}/certs/domain.key" \
+    -x509 -days 365 -out "${REGISTRY_DIR}/certs/domain.crt" \
+    -subj "/C=US/ST=VA/L=Chantilly/O=RedHat/OU=RedHat/CN=${HOSTNAME}/"
+fi
 
 # Print the certificate
 openssl x509 -in "${REGISTRY_DIR}/certs/domain.crt" -text -noout
