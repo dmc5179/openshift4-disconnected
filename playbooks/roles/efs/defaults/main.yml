@@ -5,10 +5,10 @@ kubeconfig: "{{ ansible_env.HOME }}/.kube/config"
 ocp_base_domain: 'example.com'
 ocp_cluster_name: 'caas'
 
-efs_namespace: 'efs'
-aws_efs_fs_id: ''
-aws_region: ''
-aws_efs_dns_name: ''
+efs_namespace: 'openshift'
+aws_efs_fs_id: 'fs-9a254ee2'
+aws_region: 'us-east-1'
+aws_efs_dns_name: '{{ aws_efs_fs_id }}.efs.{{ aws_region }}.amazonaws.com'
 aws_efs_mount_point: '/'
 
 kube_ssl_enabled: false
