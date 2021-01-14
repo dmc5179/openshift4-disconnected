@@ -7,4 +7,4 @@ data:
   file.system.id: "{{ aws_efs_fs_id }}"
   aws.region: "{{ aws_region }}"
   provisioner.name: "openshift.org/aws-efs"
-  dns.name: "{{ aws_efs_dns_name }}"
+  dns.name: "{{ aws_efs_fs_id }}.efs.{{ aws_region }}.amazonaws.com"
