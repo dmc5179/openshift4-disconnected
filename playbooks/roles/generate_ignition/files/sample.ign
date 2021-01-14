@@ -1,0 +1,20 @@
+{
+  "ignition": {
+    "config": {},
+    "timeouts": {},
+    "version": "3.1.0"
+  },
+  "networkd": {},
+  "passwd": {
+    "users": [
+      {
+        "name": "core",
+        "sshAuthorizedKeys": [
+          "ssh-rsa ....."
+        ]
+      }
+    ]
+  },
+  "storage": {},
+  "systemd": {}
+}
