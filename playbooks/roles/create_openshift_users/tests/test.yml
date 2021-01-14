@@ -1,0 +1,4 @@
+---
+- hosts: localhost
+  roles:
+    - ../../create_openshift_users
