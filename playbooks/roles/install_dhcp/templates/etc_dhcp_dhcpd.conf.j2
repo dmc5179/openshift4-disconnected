@@ -231,6 +231,55 @@ option ntp-servers {{ subnet.ntp_servers|join(', ') }};
 {% if subnet.booting is defined %}
 {{ subnet.booting }} booting;
 {% endif %}
+
+
+{% if openshift_bootstrap is defined %}
+
+#
+# Host declaration for OpenShift Bootstrap Node
+#
+{% for host in openshift_bootstrap %}
+host {{ host.name | replace (" ","_") | replace ("'","_") | replace (":","_") }} {
+  hardware ethernet {{ host.mac }};
+{% if host.ip is defined %}
+  fixed-address {{ host.ip }};
+{% endif %}
+}
+{% endfor %}
+{% endif %}
+
+{% if openshift_masters is defined %}
+
+#
+# Host declarations for OpenShift Master Nodes
+#
+{% for host in openshift_masters %}
+host {{ host.name | replace (" ","_") | replace ("'","_") | replace (":","_") }} {
+  hardware ethernet {{ host.mac }};
+{% if host.ip is defined %}
+  fixed-address {{ host.ip }};
+{% endif %}
+}
+{% endfor %}
+{% endif %}
+
+{% if openshift_workers is defined %}
+
+#
+# Host declarations for OpenShift Worker Nodes
+#
+{% for host in openshift_workers %}
+host {{ host.name | replace (" ","_") | replace ("'","_") | replace (":","_") }} {
+  hardware ethernet {{ host.mac }};
+{% if host.ip is defined %}
+  fixed-address {{ host.ip }};
+{% endif %}
+}
+{% endfor %}
+{% endif %}
+
+
+
 {% if subnet.hosts is defined %}
 {% for host in subnet.hosts %}
   host {{ host.name }} {
@@ -282,50 +331,6 @@ option ntp-servers {{ subnet.ntp_servers|join(', ') }};
 {% endif %}
 }
 {% endfor %}
-{% if openshift_bootstrap is defined %}
-
-#
-# Host declaration for OpenShift Bootstrap Node
-#
-{% for host in openshift_bootstrap %}
-host {{ host.name | replace (" ","_") | replace ("'","_") | replace (":","_") }} {
-  hardware ethernet {{ host.mac }};
-{% if host.ip is defined %}
-  fixed-address {{ host.ip }};
-{% endif %}
-}
-{% endfor %}
-{% endif %}
-
-{% if openshift_masters is defined %}
-
-#
-# Host declarations for OpenShift Master Nodes
-#
-{% for host in openshift_masters %}
-host {{ host.name | replace (" ","_") | replace ("'","_") | replace (":","_") }} {
-  hardware ethernet {{ host.mac }};
-{% if host.ip is defined %}
-  fixed-address {{ host.ip }};
-{% endif %}
-}
-{% endfor %}
-{% endif %}
-
-{% if openshift_workers is defined %}
-
-#
-# Host declarations for OpenShift Worker Nodes
-#
-{% for host in openshift_workers %}
-host {{ host.name | replace (" ","_") | replace ("'","_") | replace (":","_") }} {
-  hardware ethernet {{ host.mac }};
-{% if host.ip is defined %}
-  fixed-address {{ host.ip }};
-{% endif %}
-}
-{% endfor %}
-{% endif %}
 
 {% if dhcp_pxeboot_server is defined %}
 
