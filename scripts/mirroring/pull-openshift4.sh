@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -xe
 export OC="oc"
 export COREOS_INSTALLER="coreos-installer"
 export OCP_RELEASE="4.6.9"
@@ -65,6 +65,7 @@ then
     registry.redhat.io/redhat/redhat-operator-index:v${OCP_RELEASE::3} \
     file://redhat/redhat-operator-index:v${OCP_RELEASE::3}
 
+  rm -rf "${OCP_MEDIA_PATH}/redhat_operators_manifests"
   mkdir -p "${OCP_MEDIA_PATH}/redhat_operators_manifests"
 
   ${OC} adm catalog mirror --manifests-only \
@@ -81,7 +82,7 @@ then
   sed -i '/sha256:473d6dfb011c69f/d' ${OCP_MEDIA_PATH}/redhat_operators_manifests/mapping.txt
 
   ${OC} image mirror \
-    --keep-manifest-list=true --filter-by-os=".*"
+    --keep-manifest-list=true --filter-by-os=".*" \
     --registry-config=${LOCAL_SECRET_JSON} \
     --dir="${OCP_MEDIA_PATH}/mirror" \
     --filename=${OCP_MEDIA_PATH}/redhat_operators_manifests/mapping.txt
