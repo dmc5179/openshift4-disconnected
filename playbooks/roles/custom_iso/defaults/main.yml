@@ -8,6 +8,10 @@ iso_dir: '{{ mirror_base }}/rhcos/custom_iso'
 # Destination directory where the ISO files will end up
 iso_dst: '/mnt/nfs/'
 
+# Set true when using the Live OS RHCOS installer
+# available for PXE and Custom ISO builds in OCP 4.6+
+live_environment: false
+
 openshift_bootstrap: {}
 openshift_masters: {}
 openshift_workers: {}
