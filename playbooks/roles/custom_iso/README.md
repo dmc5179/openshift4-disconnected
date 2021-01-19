@@ -2,6 +2,8 @@
 
 A simple role for creating a custom Red Hat CoreOS (RHCOS) ISO for use with static IP based OpenShift clusters. Specific responsibilities of this role:
 
+- https://dustymabe.com/2020/04/04/automating-a-custom-install-of-fedora-coreos/
+
 - Install necessary packages for creating an ISO image file
 - Setting the kernel and boot loader options for each custom_iso
 - Creating an ISO image for each host in the OpenShift cluster
