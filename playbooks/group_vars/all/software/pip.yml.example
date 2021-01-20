@@ -1,0 +1,5 @@
+---
+
+# Configurations for pip
+#
+pip_args: '--no-index --find-links {{ mirror_base }}/pip'
