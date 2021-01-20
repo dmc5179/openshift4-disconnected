@@ -297,7 +297,7 @@
 
 - name: Set pip args
   set_fact:
-    pip_args: '--user'
+    pip_args: '{{ pip_args }} --user'
 #  when: (not run_as_root)
 
 - name: Install required pip modules for filetranspiler

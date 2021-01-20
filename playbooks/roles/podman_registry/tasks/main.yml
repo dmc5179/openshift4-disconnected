@@ -51,15 +51,8 @@
 
 - name: Set pip args
   set_fact:
-    pip_args: '--user'
+    pip_args: '{{ pip_args }} --user'
   when: (not run_as_root)
-
-- name: Upgrade pip
-  become: true
-  pip:
-    name: pip
-    executable: "{{ pip_cmd }}"
-    state: present
 
 - name: Install passlib for htpassword
   become: "{{ run_as_root }}"
@@ -133,6 +126,13 @@
   when:   
     - ansible_selinux.status is defined
     - ansible_selinux.status == "enabled"
+
+# TODO: This requires the podman ansible collection
+#- name: Removing existing container
+#  become: "{{ run_as_root }}"
+#  podman_container:
+#    name: '{{docker_registry_container_name}}'
+#    state: absent
 
 - name: launching registry container...
   become: "{{ run_as_root }}"
