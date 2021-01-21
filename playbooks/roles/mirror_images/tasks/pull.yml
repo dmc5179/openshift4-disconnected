@@ -16,7 +16,7 @@
 - name: Create additional image directory
   become: true
   file:
-    path: "{{ mirror_base }}/additional_images"
+    path: "{{ mirror_base }}/images"
     state: directory
 
 # Must contain tokens for both OCP image registry
@@ -35,10 +35,10 @@
   shell:
     cmd: |
 
-        if ! test -e "{{ mirror_base }}/additional_images/{{ ( item.repo | replace('.','_') ) }}-{{ ( item.image | replace(':','_') | replace('/','-') ) }}-{{ ( item.tag | replace(':','_') | replace('/','-') ) }}.tar"
+        if ! test -e "{{ mirror_base }}/images/{{ ( item.repo | replace('.','_') ) }}-{{ ( item.image | replace(':','_') | replace('/','-') ) }}-{{ ( item.tag | replace(':','_') | replace('/','-') ) }}.tar"
         then
           skopeo copy --authfile "{{ pull_secret }}" \
-            "docker://{{ item.repo }}/{{item.image}}:{{item.tag}}" "docker-archive://{{ mirror_base }}/additional_images/{{ ( item.repo | replace('.','_') ) }}-{{ ( item.image | replace(':','_') | replace('/','-') ) }}-{{ ( item.tag | replace(':','_') | replace('/','-') ) }}.tar"
+            "docker://{{ item.repo }}/{{item.image}}:{{item.tag}}" "docker-archive://{{ mirror_base }}/images/{{ ( item.repo | replace('.','_') ) }}-{{ ( item.image | replace(':','_') | replace('/','-') ) }}-{{ ( item.tag | replace(':','_') | replace('/','-') ) }}.tar"
 
         fi
 
