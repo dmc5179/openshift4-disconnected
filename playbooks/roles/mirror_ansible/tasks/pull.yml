@@ -11,14 +11,14 @@
 
 - name: Download Ansible Roles
   shell:
-    cmd: 'ansible-galaxy install --roles-path {{ roles_staging_dir }} {{ item }}'
+    cmd: 'ansible-galaxy install --force-with-deps --roles-path {{ roles_staging_dir }} {{ item }}'
     creates: '{{ roles_staging_dir }}/{{ item }}'
   with_items:
     - "{{ ansible_roles }}"
 
 - name: Fetch Anisble Collections
   shell:
-    cmd: 'ansible-galaxy collection install  --collections-path {{ collections_staging_dir }} {{ item }}'
+    cmd: 'ansible-galaxy collection install --force-with-deps --collections-path {{ collections_staging_dir }} {{ item }}'
     creates: "{{ collections_staging_dir }}/{{ item | replace('.','/') }}"
   with_items:
     - '{{ ansible_collections }}'
