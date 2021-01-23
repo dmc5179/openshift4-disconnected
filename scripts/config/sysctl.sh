@@ -141,6 +141,11 @@ spec:
   osImageURL: ""
 EOF
 
+oc apply -f ./99_master-sysctl-system-configuration.yaml
+oc apply -f ./99_master-sysctl-user-configuration.yaml
+oc apply -f ./99_worker-sysctl-system-configuration.yaml
+oc apply -f ./99_worker-sysctl-user-configuration.yaml
+
 rm -f /tmp/sysctl-system.conf
 rm -f /tmp/sysctl-user.conf
 
