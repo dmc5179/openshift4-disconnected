@@ -1,0 +1,24 @@
+---
+
+- name: Create custom iso directory
+  file:
+    path: '{{ mirror_base }}/custom_isos'
+    state: directory
+
+- name: Copy template ISO
+  copy:
+    src: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live.{{ arch }}.iso'
+    dest: '{{ mirror_base }}/custom_isos/rhcos-{{ rhcos_ver }}-{{ arch }}-live.{{ arch }}.{{ item.name }}.iso'
+    remote_src: true
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
+
+- name: Embed Ignition config into ISO
+  command: "{{ coreos_installer }} iso ignition embed -i {{ ignition_configs }}/{{ item.name }}.ign {{ mirror_base }}/custom_isos/rhcos-{{ rhcos_ver }}-{{ arch }}-live.{{ arch }}.{{ item.name }}.iso"
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
+
