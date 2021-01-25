@@ -80,6 +80,9 @@ backend ingress-http
 {% for w in openshift_workers %}
     server {{ w.name | lower }} {{ w.ip }}:80 check
 {% endfor %}
+{% for m in openshift_masters %}
+    server {{ m.name | lower }} {{ m.ip }}:80 check
+{% endfor %}
 
 frontend ingress-https
     bind *:443
@@ -93,5 +96,9 @@ backend ingress-https
 {% for w in openshift_workers %}
     server {{ w.name | lower }} {{ w.ip }}:443 check
 {% endfor %}
+{% for m in openshift_masters %}
+    server {{ m.name | lower }} {{ m.ip }}:443 check
+{% endfor %}
+
 
 #---------------------------------------------------------------------
