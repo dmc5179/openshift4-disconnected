@@ -303,12 +303,12 @@
 
 - name: check for filetranspiler
   stat:
-    path: '{{ filetranspile }}'
+    path: '{{ filetranspiler }}'
   register: filetranspiler_stat
 
 - name: fail if filetranspiler not present
   fail:
-    msg: "{{ filetranspile }} not found. Make sure to install it"
+    msg: "{{ filetranspiler }} not found. Make sure to install it"
   when: ( not filetranspiler_stat.stat.exists | bool )
 
 - name: Install required pip modules for filetranspiler
