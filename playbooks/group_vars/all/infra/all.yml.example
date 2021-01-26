@@ -19,7 +19,7 @@ pip_cmd: pip3
 openshift_install: '/usr/local/bin/openshift-install'
 openshift_client: '/usr/local/bin/oc'
 kubectl: '/usr/local/bin/kubectl'
-filetranspile: '/usr/local/bin/filetranspiler'
+filetranspiler: '/usr/local/bin/filetranspiler'
 coreos_installer: '/usr/local/bin/coreos-installer'
 fakeroots: 'fakeroots'
 
