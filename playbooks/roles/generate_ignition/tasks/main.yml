@@ -135,6 +135,7 @@
   copy:
     src: "{{ ignition_configs }}/install-config.yaml"
     dest: '{{ mirror_base }}/{{ ocp_cluster_name }}-install-config.yaml'
+    remote_src: true
   tags:
     - manifests
     - install-config
@@ -300,6 +301,16 @@
     pip_args: '{{ pip_args }} --user'
 #  when: (not run_as_root)
 
+- name: check for filetranspiler
+  stat:
+    path: '{{ filetranspile }}'
+  register: filetranspiler_stat
+
+- name: fail if filetranspiler not present
+  fail:
+    msg: "{{ filetranspile }} not found. Make sure to install it"
+  when: ( not filetranspiler_stat.stat.exists | bool )
+
 - name: Install required pip modules for filetranspiler
   pip:
     name: "{{ filetranspiler_pip_requirements }}"
@@ -334,3 +345,4 @@
   copy:
     src: "{{ ignition_configs }}/auth/kubeconfig"
     dest: "{{ kubeconfig }}"
+    remote_src: true
