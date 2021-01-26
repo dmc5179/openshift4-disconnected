@@ -5,6 +5,16 @@
     name: haproxy
     state: present
 
+- name: Install dependencies
+  package:
+    name: '{{ haproxy_rhel8_deps }}'
+    state: present
+  when: >
+    (ansible_distribution == "CentOS" and
+    ansible_distribution_major_version >= '8') or
+    (ansible_distribution == "RedHat" and
+    ansible_distribution_major_version >= '8')
+
 - name: Configure SELinux TCP ports for HAProxy
   become: true
   seport:
