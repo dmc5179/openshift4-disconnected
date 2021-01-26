@@ -1,0 +1,60 @@
+---
+- hosts: helper_node
+  gather_facts: true
+  become: false
+  tasks:
+
+    - name: Cleanup VM
+      ovirt.ovirt.ovirt_vm:
+        name: '{{ ocp_cluster_name }}-{{ item.name }}'
+        cluster: Default
+        boot_menu: false
+        storage_domain: data
+        memory: 16GiB
+        state: absent
+        wait: true
+        #operating_system:
+        nics:
+          - name: nic1
+            interface: virtio
+        disks:
+          - name: '{{ ocp_cluster_name }}_{{ item.name }}_disk'
+            bootable: true
+        graphical_console:
+          protocol:
+            - spice
+        boot_devices:
+          - hd
+          - cdrom
+        auth:
+          hostname: '{{ ovirt_hostname }}'
+          insecure: '{{ ovirt_insecure }}'
+          username: '{{ ovirt_username }}'
+          password: '{{ ovirt_password }}'
+      with_items:
+        - '{{ openshift_bootstrap }}'
+        - '{{ openshift_masters }}'
+      tags:
+        - ovirt_cleanup_vms
+
+    - name: Cleanup disks
+      ovirt.ovirt.ovirt_disk:
+        name: '{{ ocp_cluster_name }}_{{ item.name }}_disk'
+        size: 50GiB
+        format: cow
+        interface: virtio
+        storage_domain: data
+        wait: true
+        bootable: true
+        state: absent
+        auth:
+          hostname: '{{ ovirt_hostname }}'
+          insecure: '{{ ovirt_insecure }}'
+          username: '{{ ovirt_username }}'
+          password: '{{ ovirt_password }}'
+      with_items:
+        - '{{ openshift_bootstrap }}'
+        - '{{ openshift_masters }}'
+      tags:
+        - ovirt_cleanup_disks
+

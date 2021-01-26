@@ -1,0 +1,151 @@
+---
+- hosts: helper_node
+  gather_facts: true
+  become: false
+  tasks:
+
+    - name: Generate Ignition Configs
+      import_role:
+        name: generate_ignition
+      tags:
+        - dan_ignition
+
+    - name: Create custom ISOs for Control Plane
+      import_role:
+        name: custom_iso
+        tasks_from: liveos.yml
+
+    - name: Install required ovirt packages
+      become: true
+      package:
+        name: 'qemu-img'
+        state: present
+
+    - name: Remove existing control plane ISOs in RHV
+      ovirt.ovirt.ovirt_disk:
+        name: '{{ ocp_cluster_name }}_{{ item.name }}_rhcos.iso'
+        storage_domain: data
+        force: true
+        wait: true
+        format: raw
+        content_type: iso
+        state: absent
+        auth:
+          hostname: '{{ ovirt_hostname }}'
+          insecure: '{{ ovirt_insecure }}'
+          username: '{{ ovirt_username }}'
+          password: '{{ ovirt_password }}'
+      with_items:
+        - '{{ openshift_bootstrap }}'
+        - '{{ openshift_masters }}'
+
+    - name: Upload control plane ISOs to RHV
+      ovirt.ovirt.ovirt_disk:
+        name: '{{ ocp_cluster_name }}_{{ item.name }}_rhcos.iso'
+        upload_image_path: "{{ mirror_base }}/custom_isos/rhcos-{{ rhcos_ver }}-{{ arch }}-live.{{ arch }}.{{ item.name }}.iso"
+        storage_domain: data
+        size: 900MiB
+        force: true
+        wait: true
+        bootable: true
+        format: raw
+        content_type: iso
+        auth:
+          hostname: '{{ ovirt_hostname }}'
+          insecure: '{{ ovirt_insecure }}'
+          username: '{{ ovirt_username }}'
+          password: '{{ ovirt_password }}'
+      with_items:
+        - '{{ openshift_bootstrap }}'
+        - '{{ openshift_masters }}'
+
+    - name: Create bootstrap and control plane disks
+      ovirt.ovirt.ovirt_disk:
+        name: '{{ ocp_cluster_name }}_{{ item.name }}_disk'
+        size: 50GiB
+        format: cow
+        interface: virtio
+        storage_domain: data
+        wait: true
+        bootable: true
+        state: present
+        auth:
+          hostname: '{{ ovirt_hostname }}'
+          insecure: '{{ ovirt_insecure }}'
+          username: '{{ ovirt_username }}'
+          password: '{{ ovirt_password }}'
+      with_items:
+        - '{{ openshift_bootstrap }}'
+        - '{{ openshift_masters }}'
+      tags:
+        - ovirt_disks
+
+    - name: Create bootstrap VM
+      ovirt.ovirt.ovirt_vm:
+        name: '{{ ocp_cluster_name }}-bootstrap'
+        cluster: Default
+        #bios_type: 
+        boot_menu: false
+        cd_iso: '{{ ocp_cluster_name }}_bootstrap_rhcos.iso'
+        storage_domain: data
+        memory: 16GiB
+        state: running
+        wait: true
+        #operating_system:
+        nics:
+          - name: nic1
+            interface: virtio
+            profile_name: 'ovirtmgmt'
+        disks:
+          - name: '{{ ocp_cluster_name }}_bootstrap_disk'
+            bootable: true
+        graphical_console:
+          protocol:
+            - spice
+        boot_devices:
+          - hd
+          - cdrom
+        auth:
+          hostname: '{{ ovirt_hostname }}'
+          insecure: '{{ ovirt_insecure }}'
+          username: '{{ ovirt_username }}'
+          password: '{{ ovirt_password }}'
+      tags:
+        - ovirt_bootstrap
+        - ovirt_bootstrap_vm
+
+    - name: Create controlplane VMs
+      ovirt.ovirt.ovirt_vm:
+        name: '{{ ocp_cluster_name }}-{{ item.name }}'
+        cluster: Default
+        #bios_type: 
+        boot_menu: false
+        cd_iso: '{{ ocp_cluster_name }}_{{ item.name }}_rhcos.iso'
+        storage_domain: data
+        memory: 16GiB
+        state: running
+        wait: true
+        #operating_system:
+        nics:
+          - name: nic1
+            interface: virtio
+            profile_name: 'ovirtmgmt'
+        disks:
+          - name: '{{ ocp_cluster_name }}_{{ item.name }}_disk'
+            bootable: true
+        graphical_console:
+          protocol:
+            - spice
+        boot_devices:
+          - hd
+          - cdrom
+        auth:
+          hostname: '{{ ovirt_hostname }}'
+          insecure: '{{ ovirt_insecure }}'
+          username: '{{ ovirt_username }}'
+          password: '{{ ovirt_password }}'
+      with_items:
+        - '{{ openshift_masters }}'
+      tags:
+        - ovirt_masters
+        - ovirt_masters_vm
