@@ -12,3 +12,4 @@
       import_role:
         name: generate_ignition
         tasks_from: stage.yml
+      when: ( stage_ignition | bool )
