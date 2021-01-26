@@ -1,6 +1,6 @@
 ---
 
-hostname: ''
-insecure: false
-username: ''
-password: ''
+ovirt_hostname: ''
+ovirt_insecure: false
+ovirt_username: ''
+ovirt_password: ''
