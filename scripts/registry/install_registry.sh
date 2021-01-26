@@ -24,23 +24,23 @@ mkdir -p ${REGISTRY_DIR}/{auth,certs,data}
 #       If SAN is not needed, comment out the -addext line
 if openssl req --help 2>&1 | grep -q addext
 then
-  openssl req -newkey rsa:4096 -nodes -keyout "${REGISTRY_DIR}/certs/domain.key" \
-    -x509 -days 365 -out "${REGISTRY_DIR}/certs/domain.crt" \
+  openssl req -newkey rsa:4096 -nodes -keyout "${REGISTRY_DIR}/certs/registry.key" \
+    -x509 -days 365 -out "${REGISTRY_DIR}/certs/registry.crt" \
     -addext "subjectAltName = IP:${REGISTRY_IP},DNS:${HOSTNAME}" \
     -subj "/C=US/ST=VA/L=Chantilly/O=RedHat/OU=RedHat/CN=${HOSTNAME}/"
 else
-  openssl req -newkey rsa:4096 -nodes -keyout "${REGISTRY_DIR}/certs/domain.key" \
-    -x509 -days 365 -out "${REGISTRY_DIR}/certs/domain.crt" \
+  openssl req -newkey rsa:4096 -nodes -keyout "${REGISTRY_DIR}/certs/registry.key" \
+    -x509 -days 365 -out "${REGISTRY_DIR}/certs/registry.crt" \
     -subj "/C=US/ST=VA/L=Chantilly/O=RedHat/OU=RedHat/CN=${HOSTNAME}/"
 fi
 
 # Print the certificate
-openssl x509 -in "${REGISTRY_DIR}/certs/domain.crt" -text -noout
+openssl x509 -in "${REGISTRY_DIR}/certs/registry.crt" -text -noout
 
 htpasswd -bBc ${REGISTRY_DIR}/auth/htpasswd dummy dummy
 
 #Make sure to trust the self signed cert we just made
-sudo cp -f ${REGISTRY_DIR}/certs/domain.crt /etc/pki/ca-trust/source/anchors/
+sudo cp -f ${REGISTRY_DIR}/certs/registry.crt /etc/pki/ca-trust/source/anchors/
 sudo update-ca-trust extract
 
 sudo firewall-cmd --add-port=${REGISTRY_PORT}/tcp --zone=internal --permanent
@@ -64,8 +64,8 @@ podman run --name registry_server -p ${REGISTRY_PORT}:5000 \
 -e "REGISTRY_HTTP_SECRET=ALongRandomSecretForRegistry" \
 -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
 -v ${REGISTRY_DIR}/certs:/certs:z \
--e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
--e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
+-e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/registry.crt \
+-e REGISTRY_HTTP_TLS_KEY=/certs/registry.key \
 --hostname=${REGISTRY_HOSTNAME} \
 --conmon-pidfile=/tmp/podman-registry-conman.pid \
 --detach \
