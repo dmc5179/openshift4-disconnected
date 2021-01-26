@@ -1,2 +1,5 @@
 ---
 # vars file for haproxy
+
+haproxy_rhel8_deps:
+  - 'python3-policycoreutils'
