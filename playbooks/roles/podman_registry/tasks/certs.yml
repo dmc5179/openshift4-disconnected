@@ -5,6 +5,7 @@
     path: "{{docker_registry_conf_dir}}/pki/registry.key"
     size: 4096
     type: 'RSA'
+    mode: 0600
   tags:
     - certificate
 
@@ -25,6 +26,7 @@
     basic_constraints_critical: true
     basicConstraints: ['CA:TRUE']
     state: present
+    mode: 0600
   tags:
     - certificate
 
@@ -36,11 +38,21 @@
     csr_path: "{{docker_registry_conf_dir}}/pki/registry.csr"
     provider: selfsigned
     selfsigned_version: 3
+    mode: 0644
   tags:
     - certificate
 
+- name: Remove existing certificate copies
+  become: true
+  file:
+    path: '{{ item }}'
+    state: absent
+  with_items:
+    - '/etc/pki/ca-trust/source/anchors/registry.crt'
+    - '/etc/pki/tls/private/registry.key'
+    
 # Make sure to trust the self signed cert we just made
-- name: Copy self signed cert to local PKI trust
+- name: Copy self signed cert to registry's PKI trust
   become: true
   copy:
     src: "{{docker_registry_conf_dir}}/pki/registry.crt"
@@ -49,7 +61,7 @@
   tags:
     - certificate
 
-- name: Copy private key to host tls directory
+- name: Copy private key to registry's host tls directory
   become: true
   copy:
     src: "{{docker_registry_conf_dir}}/pki/registry.key"
@@ -57,22 +69,37 @@
     owner: root
     group: root
     mode: '0660'
+    remote_src: true
   tags:
     - certificate
 
-- name: Copy certificate to host tls directory
-  become: true
-  copy:
+- name: Copy certificate to local temp location
+  fetch:
     src: "{{docker_registry_conf_dir}}/pki/registry.crt"
-    dest: '/etc/pki/tls/certs/registry.crt'
-    owner: root
-    group: root
-    mode: '0664'
+    dest: '/tmp/registry.crt'
+    flat: true
   tags:
     - certificate
 
-- name: update trusted ca
+- name: Move registry.crt to local trust store
   become: true
+  command:
+    cmd: mv -f /tmp/registry.crt /etc/pki/ca-trust/source/anchors/registry.crt
+    creates: /etc/pki/ca-trust/source/anchors/registry.crt
+
+- name: update registry trusted ca
+  become: true
+  command: update-ca-trust extract
+  when:
+    (ansible_distribution == "RedHat") or
+    (ansible_distribution == "CentOS") or
+    (ansible_distribution == "Fedora")
+  tags:
+    - certificate
+
+- name: update local trusted ca
+  become: true
+  delegate_to: localhost
   command: update-ca-trust extract
   when:
     (ansible_distribution == "RedHat") or

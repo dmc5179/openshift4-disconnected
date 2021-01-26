@@ -127,12 +127,25 @@
     - ansible_selinux.status is defined
     - ansible_selinux.status == "enabled"
 
-# TODO: This requires the podman ansible collection
 #- name: Removing existing container
 #  become: "{{ run_as_root }}"
 #  podman_container:
 #    name: '{{docker_registry_container_name}}'
 #    state: absent
+
+# Stop existing container, ignore error if not present
+- name: Stop existing registry container
+  become: "{{ run_as_root }}"
+  command: >
+    podman stop '{{docker_registry_container_name}}'
+  ignore_errors: true
+
+# Removing existing container, ignore error if not present
+- name: Remove existing registry container
+  become: "{{ run_as_root }}"
+  command: >
+    podman rm '{{docker_registry_container_name}}'
+  ignore_errors: true
 
 - name: launching registry container...
   become: "{{ run_as_root }}"
