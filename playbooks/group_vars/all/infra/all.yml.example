@@ -84,6 +84,9 @@ pull_secret: '{{ mirror_base }}/pull-secret.txt'
 
 docker_registry_hostname: '{{ mirror_registry }}'
 
+# Change this to true if ignition should be staged on an httpd server
+# after it is generated with the generate_ignition playbook
+stage_ignition: false
 
 #####################################################
 # OpenShift Hosts
