@@ -63,7 +63,15 @@ then
     --registry-config=${LOCAL_SECRET_JSON} \
     --keep-manifest-list=true --filter-by-os=".*" \
     registry.redhat.io/redhat/redhat-operator-index:v${OCP_RELEASE::3} \
-    file://redhat/redhat-operator-index:v${OCP_RELEASE::3}
+    file://redhat/redhat-operator-index
+
+  ${OC} image mirror \
+    --dir=${OCP_MEDIA_PATH}/mirror \
+    --registry-config=${LOCAL_SECRET_JSON} \
+    --keep-manifest-list=true --filter-by-os=".*" \
+    registry.redhat.io/redhat/redhat-marketplace-index:v${OCP_RELEASE::3} \
+    file://redhat/redhat-marketplace-index
+
 
   rm -rf "${OCP_MEDIA_PATH}/redhat_operators_manifests"
   mkdir -p "${OCP_MEDIA_PATH}/redhat_operators_manifests"
