@@ -103,9 +103,9 @@ then
   ${OC} image mirror \
     --dir=${OCP_MEDIA_PATH}/mirror \
     --registry-config=${LOCAL_SECRET_JSON} \
-    --keep-manifest-list=true --filter-by-os=".*"
+    --keep-manifest-list=true --filter-by-os=".*" \
     registry.redhat.io/redhat/certified-operator-index:v${OCP_RELEASE::3} \
-    file://redhat/certified-operator-index:v${OCP_RELEASE::3}
+    file://redhat/certified-operator-index
 
   mkdir -p "${OCP_MEDIA_PATH}/certified_operators_manifests"
 
@@ -130,9 +130,9 @@ then
   ${OC} image mirror \
     --dir=${OCP_MEDIA_PATH}/mirror \
     --registry-config=${LOCAL_SECRET_JSON} \
-    --keep-manifest-list=true --filter-by-os=".*"
+    --keep-manifest-list=true --filter-by-os=".*" \
     registry.redhat.io/redhat/community-operator-index:v${OCP_RELEASE::3} \
-    file://redhat/community-operator-index:v${OCP_RELEASE::3}
+    file://redhat/community-operator-index
 
   mkdir -p "${OCP_MEDIA_PATH}/community_operators_manifests"
 
