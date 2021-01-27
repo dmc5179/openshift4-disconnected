@@ -1,0 +1,48 @@
+{
+  "ignition": {
+    "config": {
+      "replace": {
+        "source": null,
+        "verification": {}
+      }
+    },
+    "security": {
+      "tls": {}
+    },
+    "timeouts": {},
+    "version": "3.0.0"
+  },
+  "passwd": {},
+  "storage": {
+    "files": [
+      {
+        "group": {},
+        "path": "/usr/local/bin/run-coreos-installer",
+        "user": {},
+        "contents": {
+          "source": "data:,%23!%2Fusr%2Fbin%2Fbash%0Aset%20-x%0Apoststatus()%20%7B%0A%20%20%20%20status%3D%241%0A%20%20%20%20curl%20-X%20POST%20%22https%3A%2F%2Fhttpbin.org%2Fanything%2Finstall%3D%24%7Bstatus%7D%22%0A%7D%0Amain()%20%7B%0A%20%20%20%20%23%20Hardcoded%20values%20the%20config.ign%20file%20is%20written%20out%0A%20%20%20%20%23%20by%20the%20Ignition%20run%20when%20the%20Live%20environment%20is%20booted%0A%20%20%20%20ignition_file%3D'%2Fhome%2Fcore%2Fconfig.ign'%0A%20%20%20%20%23%20Image%20url%20should%20be%20wherever%20our%20FCOS%20image%20is%20stored%20%0A%20%20%20%20%23%20Note%20you'll%20want%20to%20use%20https%20and%20also%20copy%20the%20image%20.sig%0A%20%20%20%20%23%20to%20the%20appropriate%20place.%20Otherwise%20you'll%20need%20to%20%60--insecure%60%0A%20%20%20%20image_url%3D'https%3A%2F%2Fbuilds.coreos.fedoraproject.org%2Fprod%2Fstreams%2Fstable%2Fbuilds%2F31.20200310.3.0%2Fx86_64%2Ffedora-coreos-31.20200310.3.0-metal.x86_64.raw.xz'%0A%20%20%20%20%23%20Some%20custom%20arguments%20for%20firstboot%0A%20%20%20%20firstboot_args%3D'console%3Dtty0'%0A%20%20%20%20%23%20Dynamically%20detect%20which%20device%20to%20install%20to.%0A%20%20%20%20%23%20This%20represents%20something%20an%20admin%20may%20want%20to%20do%20to%20share%20the%0A%20%20%20%20%23%20same%20installer%20automation%20across%20various%20hardware.%0A%20%20%20%20if%20%5B%20-b%20%2Fdev%2Fsda%20%5D%3B%20then%0A%20%20%20%20%20%20%20%20install_device%3D'%2Fdev%2Fsda'%0A%20%20%20%20elif%20%5B%20-b%20%2Fdev%2Fnvme0%20%5D%3B%20then%0A%20%20%20%20%20%20%20%20install_device%3D'%2Fdev%2Fnvme0'%0A%20%20%20%20else%0A%20%20%20%20%20%20%20%20echo%20%22Can't%20find%20appropriate%20device%20to%20install%20to%22%201%3E%262%0A%20%20%20%20%20%20%20%20poststatus%20'failure'%0A%20%20%20%20%20%20%20%20return%201%0A%20%20%20%20fi%0A%20%20%20%20%23%20Call%20out%20to%20the%20installer%20and%20use%20curl%20to%20ping%20a%20URL%0A%20%20%20%20%23%20In%20some%20provisioning%20environments%20it%20can%20be%20useful%20to%0A%20%20%20%20%23%20post%20some%20status%20information%20to%20the%20environment%20to%20let%0A%20%20%20%20%23%20it%20know%20the%20install%20completed%20successfully.%0A%20%20%20%20cmd%3D%22coreos-installer%20install%20--firstboot-args%3D%24%7Bfirstboot_args%7D%22%0A%20%20%20%20cmd%2B%3D%22%20--image-url%20%24%7Bimage_url%7D%20--ignition%3D%24%7Bignition_file%7D%22%0A%20%20%20%20cmd%2B%3D%22%20%24%7Binstall_device%7D%22%0A%20%20%20%20if%20%24cmd%3B%20then%0A%20%20%20%20%20%20%20%20echo%20%22Install%20Succeeded!%22%0A%20%20%20%20%20%20%20%20poststatus%20'success'%0A%20%20%20%20%20%20%20%20return%200%0A%20%20%20%20else%0A%20%20%20%20%20%20%20%20echo%20%22Install%20Failed!%22%0A%20%20%20%20%20%20%20%20poststatus%20'failure'%0A%20%20%20%20%20%20%20%20return%201%0A%20%20%20%20fi%0A%7D%0Amain%0A",
+          "verification": {}
+        },
+        "mode": 493
+      },
+      {
+        "group": {},
+        "path": "/home/core/config.ign",
+        "user": {},
+        "contents": {
+          "source": "data:,%7B%0A%20%20%22ignition%22%3A%20%7B%0A%20%20%20%20%22config%22%3A%20%7B%0A%20%20%20%20%20%20%22replace%22%3A%20%7B%0A%20%20%20%20%20%20%20%20%22source%22%3A%20null%2C%0A%20%20%20%20%20%20%20%20%22verification%22%3A%20%7B%7D%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%2C%0A%20%20%20%20%22security%22%3A%20%7B%0A%20%20%20%20%20%20%22tls%22%3A%20%7B%7D%0A%20%20%20%20%7D%2C%0A%20%20%20%20%22timeouts%22%3A%20%7B%7D%2C%0A%20%20%20%20%22version%22%3A%20%223.0.0%22%0A%20%20%7D%2C%0A%20%20%22passwd%22%3A%20%7B%7D%2C%0A%20%20%22storage%22%3A%20%7B%7D%2C%0A%20%20%22systemd%22%3A%20%7B%0A%20%20%20%20%22units%22%3A%20%5B%0A%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20%22dropins%22%3A%20%5B%0A%20%20%20%20%20%20%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%22contents%22%3A%20%22%5BService%5D%5Cn%23%20Override%20Execstart%20in%20main%20unit%5CnExecStart%3D%5Cn%23%20Add%20new%20Execstart%20with%20%60-%60%20prefix%20to%20ignore%20failure%5CnExecStart%3D-%2Fusr%2Fsbin%2Fagetty%20--autologin%20core%20--noclear%20%25I%20%24TERM%5CnTTYVTDisallocate%3Dno%5Cn%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22name%22%3A%20%22autologin-core.conf%22%0A%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%5D%2C%0A%20%20%20%20%20%20%20%20%22name%22%3A%20%22getty%40tty1.service%22%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%5D%0A%20%20%7D%0A%7D%0A",
+          "verification": {}
+        }
+      }
+    ]
+  },
+  "systemd": {
+    "units": [
+      {
+        "contents": "[Unit]\nAfter=network-online.target\nWants=network-online.target\nBefore=systemd-user-sessions.service\nOnFailure=emergency.target\nOnFailureJobMode=replace-irreversibly\n[Service]\nRemainAfterExit=yes\nType=oneshot\nExecStart=/usr/local/bin/run-coreos-installer\nExecStartPost=/usr/bin/systemctl --no-block reboot\nStandardOutput=kmsg+console\nStandardError=kmsg+console\n[Install]\nWantedBy=multi-user.target\n",
+        "enabled": true,
+        "name": "run-coreos-installer.service"
+      }
+    ]
+  }
+}
