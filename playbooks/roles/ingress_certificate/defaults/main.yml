@@ -5,3 +5,6 @@ root_ca: 'root_ca.pem'
 ingress_cert: 'ingress_cert.pem'
 full_chain: 'full_chain.pem'
 ingress_key: 'ingress_cert_key.pem'
+
+kubeconfig: "{{ ansible_env.HOME }}/.kube/config"
+kube_ssl_enabled: false
