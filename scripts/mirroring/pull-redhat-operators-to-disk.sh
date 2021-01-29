@@ -1,23 +1,53 @@
-#!/bin/bash -xe
+#!/bin/bash -e
 
-mkdir -p "${OCP_MEDIA_PATH}/redhat_operators_opm"
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-opm index export \
-    --index=registry.redhat.io/redhat/redhat-operator-index:v4.6 \
-    --download-folder "${OCP_MEDIA_PATH}/redhat_operators_opm"
+# Source the environment file with the default settings
+source "${SCRIPT_DIR}/../env.sh"
 
-for o in $(find "${OCP_MEDIA_PATH}/redhat_operators_opm" -maxdepth 1 -type d | tail -n +2)
-do
+set -x
 
-  CHANNEL=$(yq -r '.defaultChannel' "${o}/package.yaml")
-  VER=$(yq -r ".channels[] | select(.name==\"${CHANNEL}\") | .currentCSV" "${o}/package.yaml")
+#############################################################
 
-  for f in $(find "${o}" -name "*clusterserviceversion.yaml")
-  do
-    if [[ $(yq -r ".metadata.name" "${f}") == "${VER}" ]]
-    then
-      yq -r '.spec.relatedImages[] | .image' "${f}"
-    fi
-  done
-done
+mkdir -p "${OCP_MEDIA_PATH}/mirror"
+mkdir -p "${RHCOS_MEDIA_PATH}"
 
+# Mirror redhat-operator index image
+
+${OC} image mirror \
+  --dir=${OCP_MEDIA_PATH}/mirror \
+  --registry-config=${LOCAL_SECRET_JSON} \
+  --keep-manifest-list=true --filter-by-os=".*" \
+  registry.redhat.io/redhat/redhat-operator-index:v${OCP_RELEASE::3} \
+  file://redhat/redhat-operator-index
+
+${OC} image mirror \
+  --dir=${OCP_MEDIA_PATH}/mirror \
+  --registry-config=${LOCAL_SECRET_JSON} \
+  --keep-manifest-list=true --filter-by-os=".*" \
+  registry.redhat.io/redhat/redhat-marketplace-index:v${OCP_RELEASE::3} \
+  file://redhat/redhat-marketplace-index
+
+rm -rf "${OCP_MEDIA_PATH}/redhat_operators_manifests"
+mkdir -p "${OCP_MEDIA_PATH}/redhat_operators_manifests"
+
+${OC} adm catalog mirror --manifests-only \
+  --registry-config ${LOCAL_SECRET_JSON} \
+  --to-manifests=${OCP_MEDIA_PATH}/redhat_operators_manifests \
+  ${RH_OP_INDEX} replaceme
+
+sed -i 's|=replaceme/|=file://|g' ${OCP_MEDIA_PATH}/redhat_operators_manifests/mapping.txt
+
+# Temporary fix due to a bug in the most recent redhat-operators-index image
+sed -i -e 's/registry-proxy.engineering.redhat.com\/rh-osbs/registry.redhat.io/g' ${OCP_MEDIA_PATH}/redhat_operators_manifests/mapping.txt
+
+sed -i '/serverless-operator:v1.0.0/d' ${OCP_MEDIA_PATH}/redhat_operators_manifests/mapping.txt
+sed -i '/sha256:473d6dfb011c69f/d' ${OCP_MEDIA_PATH}/redhat_operators_manifests/mapping.txt
+
+${OC} image mirror \
+  --keep-manifest-list=true --filter-by-os=".*" \
+  --registry-config=${LOCAL_SECRET_JSON} \
+  --dir="${OCP_MEDIA_PATH}/mirror" \
+  --filename=${OCP_MEDIA_PATH}/redhat_operators_manifests/mapping.txt
+
+exit 0
