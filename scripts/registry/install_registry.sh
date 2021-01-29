@@ -19,9 +19,7 @@ sudo yum -y install podman httpd httpd-tools firewalld skopeo
 
 mkdir -p ${REGISTRY_DIR}/{auth,certs,data}
 
-# Generate the certificate
-# TODO: -addext appears not to work on RHEL 7. Works on RHEL 8 and Fedora 31+
-#       If SAN is not needed, comment out the -addext line
+# Not all version of openssl support the addext option for SANs
 if openssl req --help 2>&1 | grep -q addext
 then
   openssl req -newkey rsa:4096 -nodes -keyout "${REGISTRY_DIR}/certs/registry.key" \
@@ -48,13 +46,9 @@ sudo firewall-cmd --add-port=${REGISTRY_PORT}/tcp --zone=public   --permanent
 sudo firewall-cmd --add-service=http  --permanent
 sudo firewall-cmd --reload
 
-# Pull down the docker registry image from s3
-# and import it into the local container storage
-#cd
-#mkdir docker-registry
-#aws s3 cp --recursive 's3://ocp-4.2.0/images/docker-registry/' docker-registry/
-#skopeo copy dir://home/ec2-user/docker-registry/ containers-storage:docker.io/library/registry:2
-#rm -rf docker-registry
+# Stop and remove existing container. Ignore errors if it is not running or not there
+podman stop registry_server || true
+podman rm registry_server || true
 
 podman run --name registry_server -p ${REGISTRY_PORT}:5000 \
 -v ${REGISTRY_DIR}/data:/var/lib/registry:z \
@@ -69,7 +63,7 @@ podman run --name registry_server -p ${REGISTRY_PORT}:5000 \
 --hostname=${REGISTRY_HOSTNAME} \
 --conmon-pidfile=/tmp/podman-registry-conman.pid \
 --detach \
-${REGISTRY_IMG}
+"${REGISTRY_IMG}"
 
 # Configure SELinux to allow containers in systemd services
 sudo setsebool -P container_manage_cgroup on
