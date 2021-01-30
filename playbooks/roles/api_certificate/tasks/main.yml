@@ -1,0 +1,20 @@
+---
+
+- name: Create a secret that contains the certificate chain and private key
+  shell:
+    cmd: |
+         oc create secret tls {{ api_cert_secret_name }} \
+         --cert={{ api_cert }} \
+         --key={{ api_key }} \
+         -n openshift-config
+  tags: api_sec
+
+- name: Update the API server to reference the created secret.
+  shell:
+    cmd: |
+         oc patch apiserver cluster \
+         --type=merge -p \
+         '{"spec":{"servingCerts": {"namedCertificates": 
+         [{"names": ["api.{{ ocp_cluster_name }}.{{ ocp_base_domain }}"], 
+         "servingCertificate": {"name": "{{ api_cert_secret_name }}"}}]}}}' 
+  tags: api_patch
