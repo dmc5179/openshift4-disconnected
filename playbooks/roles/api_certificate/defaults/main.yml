@@ -1,0 +1,11 @@
+---
+
+# These are located under the files directory in this role
+api_cert: '/tmp/api.crt'
+api_key: '/tmp/api.key'
+
+kubeconfig: "{{ ansible_env.HOME }}/.kube/config"
+kube_ssl_enabled: false
+
+ocp_base_domain: 'example.com'
+ocp_cluster_name: 'mycluster'
