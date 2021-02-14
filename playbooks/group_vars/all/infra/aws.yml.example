@@ -4,6 +4,8 @@
 # will need a lower value here, around 8000
 mtu: 9000
 
+aws_region: 'us-east-1'
+
 # 4.3 March 23, 2020 at 5:28:02 AM UTC-
 #ec2_ami: 'ami-0347efb61e552e57b'
 
