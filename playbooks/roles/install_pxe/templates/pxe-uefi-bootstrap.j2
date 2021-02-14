@@ -1,0 +1,26 @@
+set default="0"
+function load_video {
+  insmod efi_gop
+  insmod efi_uga
+  insmod video_bochs
+  insmod video_cirrus
+  insmod all_video
+}
+load_video
+set gfxpayload=keep
+insmod gzio
+insmod part_gpt
+insmod ext2
+set timeout=10
+menuentry 'Red Hat CoreOS {{ rhcos_ver }} bootstrap' --class fedora --class gnu-linux --class gnu --class os {
+    linuxefi /rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-kernel-{{ arch }} coreos.live.rootfs_url={{ openshift_bootstrap[0].ignserver }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-rootfs.{{ arch }}.img nomodeset rd.neednet=1 coreos.inst=yes coreos.inst.install_dev={{ item.disk | default('sda') }} coreos.inst.ignition_url={{ openshift_bootstrap[0].ignserver }}/{{ ocp_cluster_name }}/ignition/bootstrap.ign coreos.inst.platform_id=metal
+    initrdefi /rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-initramfs.{{ arch }}.img
+}
+
+menuentry 'Local Boot' --class fedora --class gnu-linux --class gnu --class os {
+
+    set root=(hd0,gpt1)
+
+    chainloader /efi/redhat/grubx64.efi
+
+}
