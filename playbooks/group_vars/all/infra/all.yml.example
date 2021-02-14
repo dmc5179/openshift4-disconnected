@@ -47,7 +47,8 @@ kube_ssl_enabled: false
 kubeconfig: "{{ ansible_env.HOME }}/.kube/config"
 
 master_count: 3
-worker_count: 3
+# Worker count should be 0 for bare metal / UPI installs
+worker_count: 0
 
 fips_enabled: false
 
