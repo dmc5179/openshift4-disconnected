@@ -39,6 +39,7 @@ htpasswd -bBc ${REGISTRY_DIR}/auth/htpasswd dummy dummy
 
 #Make sure to trust the self signed cert we just made
 sudo cp -f ${REGISTRY_DIR}/certs/registry.crt /etc/pki/ca-trust/source/anchors/
+sudo update-ca-trust
 sudo update-ca-trust extract
 
 sudo firewall-cmd --add-port=${REGISTRY_PORT}/tcp --zone=internal --permanent
