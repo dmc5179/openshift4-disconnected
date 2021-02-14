@@ -16,12 +16,13 @@
     state: directory
   tags:
     - pxeserver
+    - pxedir
 
 # TODO: with_fileglob is a local operation so this doesn't work right
 - name: Make Network Boot Programs for BIOS based systems available
   copy:
     src: '{{ item }}'
-    dest: '{{ pxeserver_path }}/'
+    dest: '{{ pxeserver_path }}'
     owner: root
     group: root
     mode: '0644'
@@ -34,7 +35,7 @@
 - name: Make Network Boot Programs for UEFI based systems available
   copy:
     src: '{{ item }}'
-    dest: '{{ pxeserver_path }}/'
+    dest: '{{ pxeserver_path }}'
     owner: root
     group: root
     mode: '0644'
@@ -47,7 +48,7 @@
 
 - name: Create directory for PXE server configuration
   file:
-    path: "{{ pxeserver_path }}/pxelinux.cfg"
+    path: "{{ pxeserver_path }}"
     state: directory
   tags:
     - pxeserver
@@ -95,17 +96,17 @@
   tags:
     - pxeserver
 
-- name: Create RHCOS directory for http server
-  become: true
-  file:
-    path: '{{ httpd_document_root }}/rhcos'
-    state: directory
-    owner: root
-    group: root
-    mode: 0755
-  when: ( rhcos_ver[:3] | float >= 4.6 )
-  tags:
-    - pxeserver
+#- name: Create RHCOS directory for http server
+#  become: true
+#  file:
+#    path: '{{ httpd_document_root }}/rhcos'
+#    state: directory
+#    owner: root
+#    group: root
+#    mode: 0755
+#  when: ( rhcos_ver[:3] | float >= 4.6 )
+#  tags:
+#    - pxeserver
 
 - name: Copy liveos kernel
   copy:
@@ -119,61 +120,83 @@
   tags:
     - pxeserver
 
-- name: Copy liveos rootfs
-  copy:
-    src: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-rootfs.{{ arch }}.img'
-    dest: '{{ httpd_document_root }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-rootfs.{{ arch }}.img'
-    owner: root
-    group: root
-    mode: '0644'
-    remote_src: true
-  when: ( rhcos_ver[:3] | float >= 4.6 )
-  tags:
-    - pxeserver
-
-- name: Copy liveos metal
-  copy:
-    src: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz'
-    dest: '{{ httpd_document_root }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz'
-    owner: root
-    group: root
-    mode: '0644'
-    remote_src: true
+#- name: Copy liveos rootfs
+#  copy:
+#    src: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-rootfs.{{ arch }}.img'
+#    dest: '{{ httpd_document_root }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-rootfs.{{ arch }}.img'
+#    owner: root
+#    group: root
+#    mode: '0644'
+#    remote_src: true
 #  when: ( rhcos_ver[:3] | float >= 4.6 )
-  tags:
-    - pxeserver
+#  tags:
+#    - pxeserver
 
-- name: Set the default tftp file
+#- name: Copy liveos metal
+#  copy:
+#    src: '{{ mirror_base }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz'
+#    dest: '{{ httpd_document_root }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz'
+#    owner: root
+#    group: root
+#    mode: '0644'
+#    remote_src: true
+##  when: ( rhcos_ver[:3] | float >= 4.6 )
+#  tags:
+#    - pxeserver
+
+#- name: Set the default tftp file
+#  template:
+#    src: "templates/pxe-default.j2"
+#    dest: "{{ pxeserver_path }}/default"
+#    mode: 0555
+
+#- name: Set the bootstrap specific tftp file
+#  template:
+#    src: "templates/pxe-bootstrap.j2"
+#    dest: "{{ pxeserver_path }}/pxe-bootstrap"
+#    mode: 0555
+
+#- name: Set the master specific tftp files
+#  template:
+#    src: "templates/pxe-master.j2"
+#    dest: "{{ pxeserver_path }}/pxe-master"
+#    mode: 0555
+
+#- name: Set the worker specific tftp files
+#  template:
+#    src: "templates/pxe-worker.j2"
+#    dest: "{{ pxeserver_path }}/pxe-worker"
+#    mode: 0555
+
+#- name: Assign hosts to a boot menu
+#  file:
+#    src: 'pxe-{{ item.type }}'
+#    dest: '{{ pxeserver_path }}/{{ item.ip | ip4_hex | upper }}'
+#    owner: root
+#    group: root
+#    state: link
+#  with_items:
+#    - '{{ openshift_bootstrap }}'
+#    - '{{ openshift_masters }}'
+#    - '{{ openshift_workers }}'
+
+- name: Set the pxe specific tftp files
   template:
-    src: "templates/pxe-default.j2"
-    dest: "{{ pxeserver_path }}/pxelinux.cfg/default"
+    src: "templates/pxe-{{ item.type }}.j2"
+    dest: "{{ tftp_root_directory }}/pxelinux.cfg/01-{{ item.mac | regex_replace(':','-') }}"
     mode: 0555
+  when: ( not uefi_enabled | bool )
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
 
-- name: Set the bootstrap specific tftp file
+- name: Set the pxe specific tftp files
   template:
-    src: "templates/pxe-bootstrap.j2"
-    dest: "{{ pxeserver_path }}/pxelinux.cfg/pxe-bootstrap"
+    src: "templates/pxe-uefi-{{ item.type }}.j2"
+    dest: "{{ tftp_root_directory }}/grub.cfg-01-{{ item.mac | regex_replace(':','-') }}"
     mode: 0555
-
-- name: Set the master specific tftp files
-  template:
-    src: "templates/pxe-master.j2"
-    dest: "{{ pxeserver_path }}/pxelinux.cfg/pxe-master"
-    mode: 0555
-
-- name: Set the worker specific tftp files
-  template:
-    src: "templates/pxe-worker.j2"
-    dest: "{{ pxeserver_path }}/pxelinux.cfg/pxe-worker"
-    mode: 0555
-
-- name: Assign hosts to a boot menu
-  file:
-    src: 'pxe-{{ item.type }}'
-    dest: '{{ pxeserver_path }}/pxelinux.cfg/{{ item.ip | ip4_hex | upper }}'
-    owner: root
-    group: root
-    state: link
+  when: ( uefi_enabled | bool )
   with_items:
     - '{{ openshift_bootstrap }}'
     - '{{ openshift_masters }}'
