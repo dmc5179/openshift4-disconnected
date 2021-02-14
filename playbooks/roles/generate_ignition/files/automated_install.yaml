@@ -1,0 +1,108 @@
+variant: fcos
+version: 1.0.0
+systemd:
+  units:
+  - name: run-coreos-installer.service
+    enabled: true
+    contents: |
+      [Unit]
+      After=network-online.target
+      Wants=network-online.target
+      Before=systemd-user-sessions.service
+      OnFailure=emergency.target
+      OnFailureJobMode=replace-irreversibly
+      [Service]
+      RemainAfterExit=yes
+      Type=oneshot
+      ExecStart=/usr/local/bin/run-coreos-installer
+      ExecStartPost=/usr/bin/systemctl --no-block reboot
+      StandardOutput=kmsg+console
+      StandardError=kmsg+console
+      [Install]
+      WantedBy=multi-user.target
+storage:
+  files:
+    - path: /usr/local/bin/run-coreos-installer
+      mode: 0755
+      contents:
+        inline: |
+          #!/usr/bin/bash
+          set -x
+          poststatus() {
+              status=$1
+              curl -X POST "https://httpbin.org/anything/install=${status}"
+          }
+          main() {
+              # Hardcoded values the config.ign file is written out
+              # by the Ignition run when the Live environment is booted
+              ignition_file='/home/core/config.ign'
+              # Image url should be wherever our FCOS image is stored 
+              # Note you'll want to use https and also copy the image .sig
+              # to the appropriate place. Otherwise you'll need to `--insecure`
+              image_url='https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/31.20200310.3.0/x86_64/fedora-coreos-31.20200310.3.0-metal.x86_64.raw.xz'
+              # Some custom arguments for firstboot
+              firstboot_args='console=tty0'
+              # Dynamically detect which device to install to.
+              # This represents something an admin may want to do to share the
+              # same installer automation across various hardware.
+              if [ -b /dev/sda ]; then
+                  install_device='/dev/sda'
+              elif [ -b /dev/nvme0 ]; then
+                  install_device='/dev/nvme0'
+              else
+                  echo "Can't find appropriate device to install to" 1>&2
+                  poststatus 'failure'
+                  return 1
+              fi
+              # Call out to the installer and use curl to ping a URL
+              # In some provisioning environments it can be useful to
+              # post some status information to the environment to let
+              # it know the install completed successfully.
+              cmd="coreos-installer install --firstboot-args=${firstboot_args}"
+              cmd+=" --image-url ${image_url} --ignition=${ignition_file}"
+              cmd+=" ${install_device}"
+              if $cmd; then
+                  echo "Install Succeeded!"
+                  poststatus 'success'
+                  return 0
+              else
+                  echo "Install Failed!"
+                  poststatus 'failure'
+                  return 1
+              fi
+          }
+          main
+    - path: /home/core/config.ign
+      # A basic Ignition config that will enable autologin on tty1
+      contents:
+        inline: |
+          {
+            "ignition": {
+              "config": {
+                "replace": {
+                  "source": null,
+                  "verification": {}
+                }
+              },
+              "security": {
+                "tls": {}
+              },
+              "timeouts": {},
+              "version": "3.0.0"
+            },
+            "passwd": {},
+            "storage": {},
+            "systemd": {
+              "units": [
+                {
+                  "dropins": [
+                    {
+                      "contents": "[Service]\n# Override Execstart in main unit\nExecStart=\n# Add new Execstart with `-` prefix to ignore failure\nExecStart=-/usr/sbin/agetty --autologin core --noclear %I $TERM\nTTYVTDisallocate=no\n",
+                      "name": "autologin-core.conf"
+                    }
+                  ],
+                  "name": "getty@tty1.service"
+                }
+              ]
+            }
+          }

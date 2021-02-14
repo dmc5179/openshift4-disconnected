@@ -62,7 +62,7 @@ pip_modules:
     version: 7.0
   - name: PyYAML
     version: 5.3.1
-  - name: pyOpenSSl
+  - name: pyOpenSSL
     version: 18.0.0
   - name: yamllint
     version: 1.23.0

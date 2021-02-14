@@ -1,9 +1,61 @@
 ---
 
+- name: slurp CA used to sign wildcard cert
+  slurp:
+    src: '{{ root_ca }}'
+  register: root_ca_encoded
+  tags: always
+
+#$ oc create configmap custom-ca \
+#     --from-file=ca-bundle.crt=</path/to/example-ca.crt> \
+#     -n openshift-config
+- name: Create config map from CA used to sign wildcard cert
+  k8s:
+    kubeconfig: '{{ kubeconfig }}'
+    validate_certs: '{{ kube_ssl_enabled }}'
+    state: present
+    wait: true
+    namespace: openshift-config
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: custom-ca
+      data:
+        foo: "{{ root_ca_encoded.content | b64decode }}"
+
+#$ oc patch proxy/cluster \
+#     --type=merge \
+#     --patch='{"spec":{"trustedCA":{"name":"custom-ca"}}}'
+- name: Update the cluster-wide proxy configuration with the newly created config map
+  shell:
+    cmd: |
+         oc patch proxy/cluster \
+         --type=merge \
+         --patch='{"spec":{"trustedCA":{"name":"custom-ca"}}}'
+#  k8s:
+#    kubeconfig: '{{ kubeconfig }}'
+#    validate_certs: '{{ kube_ssl_enabled }}'
+#    wait: true
+#    api_version: 'config.openshift.io/v1'
+#    kind: Proxy
+#    name: cluster
+#    merge_type: merge
+#    definition:
+#    - op: add
+#      path: '/spec/trustedCA/name'
+#      value: 'custom-ca'
+
+#$ oc create secret tls <secret> \
+#     --cert=</path/to/cert.crt> \
+#     --key=</path/to/cert.key> \
+#     -n openshift-ingress
 - name: Create the new TLS secrets
   k8s:
     state: present
     kubeconfig: '{{ kubeconfig }}'
+    validate_certs: '{{ kube_ssl_enabled }}'
+    wait: true
     namespace: openshift-ingress
     definition:
       apiVersion: v1
@@ -13,19 +65,25 @@
       type: kubernetes.io/tls
       stringData:
         tls.crt: |
-          {{ lookup("file", 'files/full_chain.pem') }}
+          {{ lookup("file", '{{ full_chain }}') }}
         tls.key: |
-          {{ lookup("file", 'files/ingress_cert_key.pem') }}
+          {{ lookup("file", '{{ ingress_key }}') }}
 
+#$ oc patch ingresscontroller.operator default \
+#     --type=merge -p \
+#     '{"spec":{"defaultCertificate": {"name": "<secret>"}}}' \
+#     -n openshift-ingress-operator
 - name: Update ingress controller to use new certs
-  k8s:
-    kubeconfig: '{{ kubeconfig }}'
-    namespace: openshift-ingress-operator
-    merge_type: merge
-    definition:
-      kind: IngressController
-      metadata:
-        name: default
-      spec:
-        defaultCertificate:
-          name: router-certs
+  shell:
+    cmd: |
+         oc patch ingresscontroller.operator default \
+         --type=merge -p \
+         '{"spec":{"defaultCertificate": {"name": "router-certs"}}}' \
+         -n openshift-ingress-operator
+#  k8s:
+#    kubeconfig: '{{ kubeconfig }}'
+#    validate_certs: '{{ kube_ssl_enabled }}'
+#    wait: true
+#    namespace: openshift-ingress-operator
+#    merge_type: merge
+#    definition:

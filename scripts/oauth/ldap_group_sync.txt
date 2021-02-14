@@ -1,0 +1,30 @@
+---
+kind: LDAPSyncConfig
+apiVersion: v1
+url: ldap://enterprise.icsa.iad.redhat.com
+insecure: true
+bindDN: "uid=admin,cn=users,cn=compat,dc=icsa,dc=iad,dc=redhat,dc=com"
+bindPassword: ""
+rfc2307:
+    groupsQuery:
+        baseDN: "cn=groups,cn=accounts,dc=icsa,dc=iad,dc=redhat,dc=com"
+        derefAliases: never
+        scope: sub
+        filter: "(objectClass=groupofnames)"
+    groupUIDAttribute: "dn"
+    groupNameAttributes: [ "cn" ]
+    groupMembershipAttributes: [ "member" ]
+    usersQuery:
+        baseDN: "cn=users,cn=accounts,dc=icsa,dc=iad,dc=redhat,dc=com"
+        derefAliases: never
+        scope: sub
+    userNameAttributes: [ "uid" ]
+    userUIDAttribute: "dn"
+
+
+whitelist.txt contains
+cn=ocp-admins,cn=groups,cn=accounts,dc=icsa,dc=iad,dc=redhat,dc=com
+
+
+oc adm groups sync --sync-config=groupsync.yaml --whitelist=whitelist.txt --confirm
+
