@@ -14,7 +14,7 @@
 
 - name: Dell | Configure Server Power Setting - On
   delegate_to: localhost
-  command: /opt/dell/srvadmin/sbin/racadm -u {{ bmc_user }} -p {{ bmc_password }} -r {{ item.bmc }} serveraction powerup
+  command: /opt/dell/srvadmin/sbin/racadm -u {{ item.bmc.username }} -p {{ item.bmc.password }} -r {{ item.bmc.ip }} serveraction powerup
   with_items:
     - '{{ openshift_bootstrap }}'
     - '{{ openshift_masters }}'
