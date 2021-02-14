@@ -12,7 +12,7 @@ source "${SCRIPT_DIR}/../env.sh"
 #    --realm=${OCP_DOMAIN_UPPER}
 #ipa dnsrecord-add "${BASE_DOMAIN}" ipa-master.${OCP_CLUSTER_NAME} --a-rec
 
-set -x
+#set -x
 
 CLUSTER_ZONE="${OCP_CLUSTER_NAME}.${OCP_BASE_DOMAIN}"
 
@@ -39,9 +39,13 @@ ipa dnsrecord-add "${CLUSTER_ZONE}" worker1 --a-rec "${WORKER1_IP}"
 ipa dnsrecord-add "${CLUSTER_ZONE}" worker2 --a-rec "${WORKER2_IP}"
 
 # The ETCd cluster lives on the masters...so point these to the IP of the masters
-ipa dnsrecord-add "${CLUSTER_ZONE}" etcd-0 --a-rec "${MASTER0_IP}"
-ipa dnsrecord-add "${CLUSTER_ZONE}" etcd-1 --a-rec "${MASTER1_IP}"
-ipa dnsrecord-add "${CLUSTER_ZONE}" etcd-2 --a-rec "${MASTER2_IP}"
+#ipa dnsrecord-add "${CLUSTER_ZONE}" etcd-0 --a-rec "${MASTER0_IP}"
+ipa dnsrecord-add "${CLUSTER_ZONE}" etcd-0 --cname-rec="master0.${OCP_CLUSTER_NAME}.${OCP_BASE_DOMAIN}."
+#ipa dnsrecord-add "${CLUSTER_ZONE}" etcd-1 --a-rec "${MASTER1_IP}"
+ipa dnsrecord-add "${CLUSTER_ZONE}" etcd-1 --cname-rec="master1.${OCP_CLUSTER_NAME}.${OCP_BASE_DOMAIN}."
+#ipa dnsrecord-add "${CLUSTER_ZONE}" etcd-2 --a-rec "${MASTER2_IP}"
+ipa dnsrecord-add "${CLUSTER_ZONE}" etcd-2 --cname-rec="master2.${OCP_CLUSTER_NAME}.${OCP_BASE_DOMAIN}."
+
 
 # The SRV records ...note the trailing dot at the end.
 # Not required since OpenShift 4.3
