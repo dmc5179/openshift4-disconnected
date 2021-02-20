@@ -14,3 +14,5 @@ ansible_roles:
 
 ansible_collections:
   - freeipa.ansible_freeipa
+  - containers.podman
+  - community.general
