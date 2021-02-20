@@ -1,0 +1,10 @@
+---
+- hosts: dhcp_server
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Insert DHCP config into existing server
+      include_role:
+        name: install_dhcp
+        tasks_from: insert.yml
