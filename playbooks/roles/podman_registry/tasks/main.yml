@@ -13,24 +13,30 @@
       - libselinux-python3
     state: present
 
-- name: current local user
-  run_once: True
-  set_fact:
-    ansible_local_user: "{{ lookup('pipe', 'id -un') }}"
-  failed_when: ansible_local_user == ''
+- name: Target User ID
+  #become: "{{ run_as_root }}"
+  command: 'id -u'
+  register: registry_user
 
-- name: current local group
-  run_once: True
-  set_fact:
-    ansible_local_group: "{{ lookup('pipe', 'id -un') }}"
-  failed_when: ansible_local_group == ''
+- name: show user
+  debug:
+    var: registry_user
+
+- name: Target Group ID
+  #become: "{{ run_as_root }}"
+  command: 'id -g'
+  register: registry_group
+
+- name: show group
+  debug:
+    var: registry_group
 
 - name: Create mirror base
   become: true
   file:
     dest: '{{ mirror_base }}'
-    owner: '{{ ansible_local_user }}'
-    group: '{{ ansible_local_group }}'
+    owner: '{{ registry_user.stdout | int }}'
+    group: '{{ registry_group.stdout | int }}'
     mode: '0755'
     state: directory
 
@@ -127,25 +133,11 @@
     - ansible_selinux.status is defined
     - ansible_selinux.status == "enabled"
 
-#- name: Removing existing container
-#  become: "{{ run_as_root }}"
-#  podman_container:
-#    name: '{{docker_registry_container_name}}'
-#    state: absent
-
-# Stop existing container, ignore error if not present
-- name: Stop existing registry container
+- name: Removing existing container
   become: "{{ run_as_root }}"
-  command: >
-    podman stop '{{docker_registry_container_name}}'
-  ignore_errors: true
-
-# Removing existing container, ignore error if not present
-- name: Remove existing registry container
-  become: "{{ run_as_root }}"
-  command: >
-    podman rm '{{docker_registry_container_name}}'
-  ignore_errors: true
+  containers.podman.podman_container:
+    name: '{{docker_registry_container_name}}'
+    state: absent
 
 - name: launching registry container...
   become: "{{ run_as_root }}"
