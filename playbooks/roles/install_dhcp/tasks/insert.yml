@@ -22,14 +22,3 @@
   service:
     name: dhcpd
     state: restarted
-
-#host poc-openshiftworker-dal13-01-b {
-#        hardware ethernet     3c:fd:fe:83:5d:88;
-#        fixed-address         10.220.246.159;
-#}
-
-#host poc-openshiftworker-dal13-01-c {
-#        hardware ethernet    3c:fd:fe:6b:b2:00;
-#        fixed-address        10.220.246.160;
-#}
-
