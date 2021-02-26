@@ -8,8 +8,14 @@
       import_role:
         name: generate_ignition
 
-    - name: Stage Ignition configs
+- hosts: httpd_server
+  gather_facts: true
+  become: false
+  tasks:
+
+    - name: Stage Ignition Configs
       import_role:
         name: generate_ignition
         tasks_from: stage.yml
       when: ( stage_ignition | bool )
+
