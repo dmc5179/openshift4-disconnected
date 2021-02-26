@@ -22,8 +22,8 @@ menuentry 'Red Hat CoreOS {{ rhcos_ver }} master' --class fedora --class gnu-lin
 
 menuentry 'Local Boot' --class fedora --class gnu-linux --class gnu --class os {
 
-    set root=(hd0,gpt1)
+    set root=(hd0,gpt2)
 
-    chainloader /efi/redhat/grubx64.efi
+    chainloader /EFI/redhat/grubx64.efi
 
 }
