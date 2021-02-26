@@ -10,7 +10,7 @@
   - [License](#License)
   - [Contributors](#Contributors)
 
-### Purpose 
+### Purpose
 
 This repository contains scripts, ansible roles, and other toosl for deploying an OpenShift 4 cluster in an air-gapped environment.
 
@@ -51,18 +51,94 @@ These tools can also be used in semi-disconnected environments which can be reac
 
 - [Mirror Helm and Helm Charts](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/mirror_helm.md)(Optional)
 
+configure_repos.yaml
+filetranspiler.yaml
+govc.yaml
+helm_server.yaml
+icsp.yaml
+install_ansible_roles.yaml
 
-### Air Gap Side
+
+install_helm.yaml
+
+
+install_openvswitch.yaml
+install_operatorhub.yaml
+install_pip.yaml
+install_roles.yaml
+install_tools.yaml
+
+
+
+mirror_helm.yaml
+mirror_ocp_images.yaml
+mirror_operatorhub.yaml
+mirror_rhcos.yaml
+mirror_rpms.yaml
+pull_additional_images.yaml
+pull_ansible_roles.yaml
+pull_pip.yaml
+pull_roles.yaml
+pull_tools.yaml
+push_additional_images.yaml
+
+
+
+
+### Air Gap Side Infrastructure Prep/Setup
 
   This section covers setting up the infrastructure in the air gap environment and install the OpenShift 4 cluster
 
+  Note that not all of these roles may be required for your air-gapped environment.
+
  - [Create main variable file](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/vars-all.md)
+
+    Note: If the "Internet Connected Host" is the same host as the "Air Gap Host", as in a jump host, you can reuse the main variable file.
 
  - [Create the Ansible Inventory file](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/inventory.md)
 
- - [Configure AWS Infrastructure Variable File](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/vars-aws.md) (for AWS only)
+baremetal_provisioner.yaml
 
- - [Configure AWS Infrastructure Variable File](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/vars-vmware.md) (for VMWare only)
+ - [Configure Hosts with yum mirror](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/) configure_repos.yaml
+ - [Install and Configure DHCP Server ](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/dhcp_server.md) dhcp_server.yaml
+ - [Install and Configure DNS Server](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/dns_server.md) dns_server.yaml
+ - [Install and Configure Load Balancer](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/load_balancer.md) load_balancer.yaml
+- httpd_server.yaml
+- ntp_server.yaml
+- pxe_server.yaml
+- registry_server.yaml
+
+- customize_iso.yaml
+- generate_ignition.yaml
+- govc.yaml
+- helm_server.yaml
+
+- icsp.yaml
+- install_ansible_roles.yaml
+- install_helm.yaml
+- install_pip.yaml
+- install_roles.yaml
+- install_tools.yaml
+- mirror_helm.yaml
+- mirror_ocp_images.yaml
+- mirror_operatorhub.yaml
+- mirror_rhcos.yaml
+- mirror_rpms.yaml
+- pull_additional_images.yaml
+- pull_ansible_roles.yaml
+- pull_pip.yaml
+- pull_roles.yaml
+- pull_tools.yaml
+- push_additional_images.yaml
+
+
+
+
+
+
+
+
+
 
  - [Provision RPM Repo Mirror](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/mirror_rpms.md)
 
@@ -70,6 +146,30 @@ These tools can also be used in semi-disconnected environments which can be reac
 
  - [Post Install](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/post-install.md)
 
+### AWS Specific Instructions
+
+ - [Configure AWS Infrastructure Variable File](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/vars-aws.md) (for AWS only)
+
+ - [Configure AWS Infrastructure Variable File](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/vars-vmware.md) (for VMWare only)
+ - aws_ebs_csi.yaml
+ - install_aws.yaml
+
+### VMWare Specific Instructions
+
+ - powerdown_esxi.yaml
+ - poweron_esxi.yaml
+ - install_esxi.yaml
+
+### Bare Metal Specific Instructions
+
+### Storage Documentation
+
+ - [NFS and Local Storage](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/storage.md)
+
+### Check Playbooks
+
+  - check_dns.yaml
+  - check_loadbalancer.yaml
 
 ### Miscellaneous
 
