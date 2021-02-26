@@ -2,7 +2,7 @@
 
 - name: Create DNS Zone
   delegate_to: localhost
-  ipa_dnszone:
+  community.general.ipa_dnszone:
     ipa_host: '{{ ipa_host }}'
     ipa_user: '{{ ipa_user }}'
     ipa_pass: '{{ ipa_password }}'
@@ -65,6 +65,7 @@
     - '{{ openshift_masters }}'
     - '{{ openshift_workers }}'
 
+  # OpenShift 4 no longer requires the SRV records since 4.4
   #TODO: IPA ansible module doesn't support SRV records well. Missing Append
   # https://github.com/ansible/ansible/issues/33193
   # https://github.com/ansible/ansible/pull/66170
