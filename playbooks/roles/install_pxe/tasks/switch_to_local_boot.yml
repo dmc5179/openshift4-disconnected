@@ -1,0 +1,13 @@
+---
+
+- name: Switch default boot to local boot
+  become: true
+  ansible.builtin.lineinfile:
+    path: "{{ tftp_root_directory }}/grub.cfg-01-{{ item.mac | regex_replace(':','-') }}"
+    regexp: '^set default="0"'
+    line: set default="1"
+  when: ( uefi_enabled | bool )
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'

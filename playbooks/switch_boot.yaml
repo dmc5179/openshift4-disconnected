@@ -1,0 +1,9 @@
+- hosts: pxe_server
+  gather_facts: true
+  become: true
+  tasks:
+
+    - name: Switch to local boot
+      import_role:
+        name: install_pxe
+        tasks_from: switch_to_local_boot.yml
