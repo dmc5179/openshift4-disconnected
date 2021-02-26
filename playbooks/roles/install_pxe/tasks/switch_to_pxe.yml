@@ -1,0 +1,13 @@
+---
+
+- name: Switch default boot to PXE
+  become: true
+  ansible.builtin.lineinfile:
+    path: "{{ tftp_root_directory }}/grub.cfg-01-{{ item.mac | regex_replace(':','-') }}"
+    regexp: '^set default="1"'
+    line: set default="0"
+  when: ( uefi_enabled | bool )
+  with_items:
+    - '{{ openshift_bootstrap }}'
+    - '{{ openshift_masters }}'
+    - '{{ openshift_workers }}'
