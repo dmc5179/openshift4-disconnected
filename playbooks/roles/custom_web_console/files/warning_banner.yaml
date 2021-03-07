@@ -1,0 +1,12 @@
+---
+apiVersion: console.openshift.io/v1
+kind: ConsoleNotification
+metadata:
+  name: warning-banner
+spec:
+  scope: Cluster
+  backgroundColor: '#7FFF00'
+  color: '#000000'
+  location: BannerTop
+  text: 'Highest Classification Level: Unclassified'
+
