@@ -12,3 +12,8 @@ This doc contains steps to perform simple actions in OpenShift 4
 ```
 oc patch --type=merge --patch='{"spec":{"mastersSchedulable": false}}' schedulers.config.openshift.io cluster
 ```
+
+#### Disable OperatorHub
+```
+oc patch OperatorHub cluster --type json -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]'
+```
