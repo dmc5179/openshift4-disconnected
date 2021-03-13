@@ -3,6 +3,7 @@ apiVersion: console.openshift.io/v1
 kind: ConsoleNotification
 metadata:
   name: warning-banner
+  namespace: openshift-config
 spec:
   scope: Cluster
   backgroundColor: '#7FFF00'
