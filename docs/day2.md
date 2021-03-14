@@ -54,3 +54,32 @@ oc patch configs.samples.operator.openshift.io cluster --type merge \
   --patch "{\"spec\":{\"samplesRegistry\": \"${REMOTE_REG}\", \"managementState\": \"Managed\"}}"
 ```
 
+### API Custom SSL Certificate
+
+Create a new secret composed of the crt and the key within OpenShift.
+
+```
+oc create secret tls api-cert --cert=<path-to-crt> --key=<path-to-key> -n openshift-config
+```
+
+The next step is to update apiserver object to reference the SSL secret and add the hostname
+
+```
+oc patch apiserver cluster --type=merge -p '{"spec":{"servingCerts": {"namedCertificates":[{"names": ["api.<cluster-name>.<base-domain>"], "servingCertificate": {"name": "api-cert"}}]}}}'
+```
+
+### Ingres Custom SSL Certificate
+
+Create a new secret composed of the crt and the key within OpenShift.
+
+```
+oc create secret tls apps-cert --cert=<path-to-crt> --key=<path-to-crt> -n openshift-ingress
+```
+
+The next step is to update the default ingress controller operator to reference the SSL secret
+
+```
+oc patch ingresscontroller.operator default  --type=merge -p  '{"spec":{"defaultCertificate": {"name": "apps-cert"}}}'  -n openshift-ingress-operator
+```
+
+
