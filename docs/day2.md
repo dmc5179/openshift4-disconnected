@@ -84,6 +84,33 @@ oc patch ingresscontroller.operator default  --type=merge \
    -p  '{"spec":{"defaultCertificate": {"name": "apps-cert"}}}'  -n openshift-ingress-operator
 ```
 
+### Warning Banner (Everywhere except the login screen)
+
+Create the warning banner template (update settings for color and text as needed)
+
+```
+cat << EOF > warning_banner.yaml
+---
+apiVersion: console.openshift.io/v1
+kind: ConsoleNotification
+metadata:
+  name: warning-banner
+  namespace: openshift-config
+spec:
+  scope: Cluster
+  backgroundColor: '#7FFF00'
+  color: '#000000'
+  location: BannerTop
+  text: 'Highest Classification Level: Unclassified'
+EOF
+```
+
+Apply the warning banner config to the cluster
+
+```
+oc create -f warning_banner.yaml
+```
+
 ### Warning Banner (Login Screen, multiple identity providers)
 
 Curl the login template from the existing cluser
