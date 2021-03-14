@@ -65,7 +65,8 @@ oc create secret tls api-cert --cert=<path-to-crt> --key=<path-to-key> -n opensh
 The next step is to update apiserver object to reference the SSL secret and add the hostname
 
 ```
-oc patch apiserver cluster --type=merge -p '{"spec":{"servingCerts": {"namedCertificates":[{"names": ["api.<cluster-name>.<base-domain>"], "servingCertificate": {"name": "api-cert"}}]}}}'
+oc patch apiserver cluster --type=merge 
+  -p '{"spec":{"servingCerts": {"namedCertificates":[{"names": ["api.<cluster-name>.<base-domain>"], "servingCertificate": {"name": "api-cert"}}]}}}'
 ```
 
 ### Ingres Custom SSL Certificate
@@ -79,7 +80,56 @@ oc create secret tls apps-cert --cert=<path-to-crt> --key=<path-to-crt> -n opens
 The next step is to update the default ingress controller operator to reference the SSL secret
 
 ```
-oc patch ingresscontroller.operator default  --type=merge -p  '{"spec":{"defaultCertificate": {"name": "apps-cert"}}}'  -n openshift-ingress-operator
+oc patch ingresscontroller.operator default  --type=merge \
+   -p  '{"spec":{"defaultCertificate": {"name": "apps-cert"}}}'  -n openshift-ingress-operator
 ```
 
+### Warning Banner (Login Screen, multiple identity providers)
+
+Curl the login template from the existing cluser
+
+```
+curl -sLk https://console-openshift-console.apps.mycluster.mydomain.com/auth/login > providers.html
+```
+
+Create the warning banner CSS and HTML
+
+```
+cat << EOF > warningbanner.css
+      .warningbanner {
+         overflow: hidden;
+         background-color: #7FFF00;
+         position: fixed; /* Set the navbar to fixed position, should this be absolute????? */
+         top: 0; /* Position the navbar at the top of the page */
+         left: 0;
+         width: 100%; /* Full width */
+         text-align: center;
+       }
+EOF
+
+cat << EOF > warningbanner.html
+    <div class="warningbanner">
+      Highest Classification Level: Unclassified
+    </div>
+EOF
+```
+
+Add the warning banner CSS/HTML to the providers page
+
+```
+sed -i $'/\/style/{e cat warningbanner.css\n}' providers.html
+sed -i '/<body>/ r warningbanner.html' providers.html
+```
+
+Create a secret for the new providers page
+
+```
+oc create secret generic providers-template --from-file=providers.html -n openshift-config
+```
+
+Patch the cluster oauth config to use the new provider template
+
+```
+oc patch oauth.config.openshift.io cluster --type='json' -p='{"spec":{"templates":{"providerSelection":{"name":"providers-template"}}}}' --type=merge
+```
 
