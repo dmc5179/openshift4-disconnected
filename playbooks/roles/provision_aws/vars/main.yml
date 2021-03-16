@@ -1,2 +1,7 @@
 ---
 # vars file for provision_aws
+
+pip_deps:
+  - 'boto'
+  - 'botocore'
+  - 'boto3'
