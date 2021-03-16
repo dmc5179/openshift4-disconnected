@@ -1,0 +1,50 @@
+---
+
+- name: Create master security group
+  amazon.aws.ec2_group:
+    name: "{{ ocp_cluster_name }}-master"
+    description: master node security group
+    vpc_id: '{{ vpc_id }}'
+    #ec2_url: '{{ ec2_endpoint }}'
+    validate_certs: '{{ aws_ssl_enabled }}'
+    #region: '{{ aws_region }}'
+    tags:
+      Name: '{{ ocp_cluster_name }}-master'
+    rules:
+      - proto: -1
+        from_port: 1
+        to_port: 65534
+        cidr_ip: 0.0.0.0/0
+
+- name: Create worker security group
+  amazon.aws.ec2_group:
+    name: "{{ ocp_cluster_name }}-worker"
+    description: worker node security group
+    vpc_id: '{{ vpc_id }}'
+    #ec2_url: '{{ ec2_endpoint }}'
+    validate_certs: '{{ aws_ssl_enabled }}'
+    #region: '{{ aws_region }}'
+    tags:
+      Name: "{{ ocp_cluster_name }}-worker"
+    rules:
+      - proto: -1
+        from_port: 1
+        to_port: 65534
+        cidr_ip: 0.0.0.0/0
+
+- name: Create elb security group
+  amazon.aws.ec2_group:
+    name: "{{ ocp_cluster_name }}-elb"
+    description: elb security group
+    vpc_id: '{{ vpc_id }}'
+    #ec2_url: '{{ ec2_endpoint }}'
+    validate_certs: '{{ aws_ssl_enabled }}'
+    #region: '{{ aws_region }}'
+    tags:
+      Name: "{{ ocp_cluster_name }}-elb"
+    rules:
+      - proto: -1
+        from_port: 1
+        to_port: 65534
+        cidr_ip: 0.0.0.0/0
+
