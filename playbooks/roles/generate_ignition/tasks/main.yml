@@ -28,9 +28,8 @@
 
 - name: Generate SSH keypair for cluster nodes
   openssh_keypair:
-   path: "{{ ansible_env.HOME }}/.ssh/{{ ocp_cluster_name}}_rsa"
+   path: "{{ ssh_key_file }}"
    size: 4096
-   comment: "Key for {{ ocp_cluster_name}} OpenShift 4 Cluster"
    state: present
   tags:
     - manifests
@@ -38,8 +37,7 @@
 
 - name: Fetch public key
   slurp:
-#    src: "{{ ssh_public_key_file }}"
-    src: '{{ ansible_env.HOME }}/.ssh/{{ ocp_cluster_name}}_rsa.pub'
+    src: '{{ ssh_key_file }}.pub'
   register: slurped_key_b64
   tags:
     - manifests
@@ -125,11 +123,22 @@
     - install-config
 
 - name: Ensure proper spacing of additionalTrustBundle
-  shell:
-    cmd: awk -i inplace 'BEGIN{c=0}  /BEGIN CERTIFICATE/{c=1}  {if (c==1) print " ",$0}  {if (c==0) print $0}  /END CERTIFICATE/{c=0}' "{{ ignition_configs }}/install-config.yaml"
+  shell: awk 'BEGIN{c=0}  /BEGIN CERTIFICATE/{c=1}  {if (c==1) print " ",$0}  {if (c==0) print $0}  /END CERTIFICATE/{c=0}' '{{ ignition_configs }}/install-config.yaml'
+  register: install_config_spaced
   tags:
     - manifests
     - install-config
+
+- name: Replace install-config with correctly spaced install-config
+  copy:
+    content: "{{ install_config_spaced.stdout }}"
+    dest: '{{ ignition_configs }}/install-config.yaml'
+    force: true
+
+- name: Remove existing install-config.yaml save
+  file:
+    path: '{{ mirror_base }}/{{ ocp_cluster_name }}-install-config.yaml'
+    state: absent
 
 - name: Save install-config.yaml
   copy:
@@ -201,7 +210,7 @@
   tags:
     - manifests
 
-- name: Fix line due to ansible bug
+- name: Fix line due to ansible bug (vmware)
   lineinfile:
     path: "{{ ignition_configs }}/manifests/cloud-provider-config.yaml"
     regexp: 'report = \"{{ vcenter_port }}\"'
@@ -211,29 +220,34 @@
   tags:
     - manifests
 
-- name: Customize MTU and vxlanPort
-  template:
-    src: cluster-network-03-config.yml.j2
-    dest: "{{ ignition_configs }}/manifests/cluster-network-03-config.yml"
-    mode: 0644
+- name: Set ingress router to HostNetwork
+  shell: "sed -i '/domain:/a \ \ endpointPublishingStrategy: HostNetwork' {{ ignition_configs }}/manifests/cluster-ingress-02-config.yml"
   tags:
     - manifests
 
-- name: Add kernel args for master nodes
-  template:
-    src: 99-openshift-machineconfig-master-kargs.yaml.j2
-    dest: "{{ ignition_configs }}/openshift/99-openshift-machineconfig-master-kargs.yaml"
-    mode: 0644
-  tags:
-    - manifests
+#- name: Customize MTU and vxlanPort
+#  template:
+#    src: cluster-network-03-config.yml.j2
+#    dest: "{{ ignition_configs }}/manifests/cluster-network-03-config.yml"
+#    mode: 0644
+#  tags:
+#    - manifests
 
-- name: Add kernel args for worker nodes
-  template:
-    src: 99-openshift-machineconfig-worker-kargs.yaml.j2
-    dest: "{{ ignition_configs }}/openshift/99-openshift-machineconfig-worker-kargs.yaml"
-    mode: 0644
-  tags:
-    - manifests
+#- name: Add kernel args for master nodes
+#  template:
+#    src: 99-openshift-machineconfig-master-kargs.yaml.j2
+#    dest: "{{ ignition_configs }}/openshift/99-openshift-machineconfig-master-kargs.yaml"
+#    mode: 0644
+#  tags:
+#    - manifests
+
+#- name: Add kernel args for worker nodes
+#  template:
+#    src: 99-openshift-machineconfig-worker-kargs.yaml.j2
+#    dest: "{{ ignition_configs }}/openshift/99-openshift-machineconfig-worker-kargs.yaml"
+#    mode: 0644
+#  tags:
+#    - manifests
 
 - name: Create ignition configs
   shell: "{{ openshift_install }} create ignition-configs --dir={{ ignition_configs }}"
@@ -299,7 +313,6 @@
 - name: Set pip args
   set_fact:
     pip_args: '{{ pip_args }} --user'
-#  when: (not run_as_root)
 
 - name: check for filetranspiler
   stat:
@@ -318,28 +331,49 @@
     executable: "{{ pip_cmd }}"
     extra_args: '{{ pip_args }}'
 
-- name: Install required RPMs for filetranspiler
+- name: Install required RPMs for filetranspiler (RHEL 7)
   become: true
+  vars:
+    ansible_python_interpreter: '/usr/bin/python2'
   package:
     name: '{{ filetranspiler_rpm_requirements }}'
     state: present
+  when: >
+    (ansible_distribution == "RHEL" and
+    ansible_distribution_major_version < '8') 
 
-- name: Customize ignition
-  shell:
-    cmd: |
+- name: Install required RPMs for filetranspiler (RHEL 8)
+  become: true
+  vars:
+    ansible_python_interpreter: '/usr/bin/python2'
+  package:
+    name: '{{ filetranspiler_rpm_requirements }}'
+    state: present
+  when: >
+    (ansible_distribution == "RHEL" and
+    ansible_distribution_major_version >= '8')
 
-      {{filetranspiler}} -i {{ ignition_configs }}/{{ item.type }}.ign -f {{ fake_root_base }}/{{ item.name }} --format json -o {{ ignition_configs }}/{{ item.name }}.ign
-
-  with_items:
-    - '{{ openshift_bootstrap }}'
-    - '{{ openshift_masters }}'
-    - '{{ openshift_workers }}'
+#- name: Customize ignition
+#  shell:
+#    cmd: |
+#
+#      {{filetranspiler}} -i {{ ignition_configs }}/{{ item.type }}.ign -f {{ fake_root_base }}/{{ item.name }} --format json -o {{ ignition_configs }}/{{ item.name }}.ign
+#
+#  with_items:
+#    - '{{ openshift_bootstrap }}'
+#    - '{{ openshift_masters }}'
+#    - '{{ openshift_workers }}'
 
 - name: Create kube config location
   file:
     path: "{{ kubeconfig | dirname }}"
     state: directory
     mode: '0755'
+
+- name: Remove existing kube config
+  file:
+    path: "{{ kubeconfig }}"
+    state: absent
 
 - name: Set kube config
   copy:
