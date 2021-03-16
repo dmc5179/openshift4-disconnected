@@ -1,30 +1,69 @@
 ---
 
-- name: Create master instance(s)
-  ec2:
-    region: "{{ aws_region }}"
-    instance_type: "{{ ec2_instance_type_master }}"
-    image: "{{ ec2_ami_ids[aws_region][ec2_ami_type] }}"
+- name: Create bootstrap instance
+  amazon.aws.ec2:
+    #region: "{{ aws_region }}"
+    instance_type: "{{ openshift_aws.bootstrap.instance_type }}"
+    image: "{{ ec2_ami }}"
     key_name: "{{ ec2_key_name }}"
-    user_data: "{{ lookup('template', 'user_data/master.yml.j2') }}"
-    vpc_subnet_id: "{{ ec2_public_subnet_id }}"
-    group_id:
-      - "{{ ec2_create_security_group_ssh.group_id }}"
-      - "{{ ec2_create_security_group_cluster.group_id }}"
-      - "{{ ec2_create_security_group_master.group_id }}"
+    user_data: '{"ignition":{"config":{"replace":{"source":"http://10.0.255.100:80/caas/ignition/bootstrap.ign"}},"version":"3.1.0"}}'
+    vpc_subnet_id: "{{ subnet_id }}"
+    group:
+      - "{{ ocp_cluster_name }}-master"
+      - "{{ ocp_cluster_name }}-worker"
+      - "{{ ocp_cluster_name }}-elb"
     volumes:
-      - device_name: /dev/sda1
+      - device_name: /dev/xvda
         volume_type: gp2
-        volume_size: "{{ ec2_volume_size_master_root }}"
+        volume_size: "{{ openshift_aws.bootstrap.root_vol_size }}"
         delete_on_termination: true
     instance_tags:
-      OpenShiftClusterName: "{{ cluster_name }}"
-      OpenShiftClusterNameVerbose: "{{ cluster_name_verbose }}"
-      OpenShiftRole: master
-    exact_count: "{{ master_node_count }}"
+      OpenShiftClusterName: "{{ ocp_cluster_name }}"
+      OpenShiftClusterNameVerbose: "{{ ocp_cluster_name }}.{{ ocp_base_domain }}"
+      OpenShiftRole: bootstrap
+      Name: '{{ ocp_cluster_name }}-bootstrap'
+      CLAP_ON: 'NEVER'
+      CLAP_OFF: 'NEVER'
+    exact_count: "1"
     count_tag:
-      OpenShiftClusterName: "{{ cluster_name }}"
-      OpenShiftClusterNameVerbose: "{{ cluster_name_verbose }}"
+      OpenShiftClusterName: "{{ ocp_cluster_name }}"
+      OpenShiftClusterNameVerbose: "{{ ocp_cluster_name }}.{{ ocp_base_domain }}"
+      OpenShiftRole: bootstrap
+    wait: true
+  register: ec2_create_bootstrap_instance
+
+- name: Get list of master instance(s) IDs
+  set_fact:
+    ec2_create_bootstrap_instance_ids: "{{ ec2_create_bootstrap_instance.tagged_instances | map(attribute='id') | list | sort }}"
+
+- name: Create master instance(s)
+  amazon.aws.ec2:
+    #region: "{{ aws_region }}"
+    instance_type: "{{ openshift_aws.master.instance_type }}"
+    image: "{{ ec2_ami }}"
+    key_name: "{{ ec2_key_name }}"
+    user_data: '{"ignition":{"config":{"replace":{"source":"http://10.0.255.100:80/caas/ignition/master.ign"}},"version":"3.1.0"}}'
+    vpc_subnet_id: "{{ subnet_id }}"
+    group:
+      - "{{ ocp_cluster_name }}-master"
+      - "{{ ocp_cluster_name }}-worker"
+      - "{{ ocp_cluster_name }}-elb"
+    volumes:
+      - device_name: /dev/xvda
+        volume_type: gp2
+        volume_size: "{{ openshift_aws.master.root_vol_size }}"
+        delete_on_termination: true
+    instance_tags:
+      OpenShiftClusterName: "{{ ocp_cluster_name }}"
+      OpenShiftClusterNameVerbose: "{{ ocp_cluster_name }}.{{ ocp_base_domain }}"
+      OpenShiftRole: master
+      Name: '{{ ocp_cluster_name }}-master'
+      CLAP_ON: 'NEVER'
+      CLAP_OFF: 'NEVER'
+    exact_count: "{{ master_count }}"
+    count_tag:
+      OpenShiftClusterName: "{{ ocp_cluster_name }}"
+      OpenShiftClusterNameVerbose: "{{ ocp_cluster_name }}.{{ ocp_base_domain }}"
       OpenShiftRole: master
     wait: true
   register: ec2_create_master_instances
@@ -33,21 +72,160 @@
   set_fact:
     ec2_create_master_instance_ids: "{{ ec2_create_master_instances.tagged_instances | map(attribute='id') | list | sort }}"
 
-- name: Tag master instance(s)
-  ec2_tag:
-    region: "{{ aws_region }}"
-    resource: "{{ item }}"
-    tags:
-      Name: "{{ cluster_name_verbose }}-master{{ '%02d' | format(idx + 1) }}"
-    state: present
-  loop: "{{ ec2_create_master_instance_ids }}"
-  loop_control:
-    index_var: idx
+- name: Create worker instance(s)
+  amazon.aws.ec2:
+    #region: "{{ aws_region }}"
+    instance_type: "{{ openshift_aws.worker.instance_type }}"
+    image: "{{ ec2_ami }}"
+    key_name: "{{ ec2_key_name }}"
+    user_data: '{"ignition":{"config":{"replace":{"source":"http://10.0.255.100:80/caas/ignition/worker.ign"}},"version":"3.1.0"}}'
+    vpc_subnet_id: "{{ subnet_id }}"
+    group:
+      - "{{ ocp_cluster_name }}-master"
+      - "{{ ocp_cluster_name }}-worker"
+      - "{{ ocp_cluster_name }}-elb"
+    volumes:
+      - device_name: /dev/xvda
+        volume_type: gp2
+        volume_size: "{{ openshift_aws.worker.root_vol_size }}"
+        delete_on_termination: true
+    instance_tags:
+      OpenShiftClusterName: "{{ ocp_cluster_name }}"
+      OpenShiftClusterNameVerbose: "{{ ocp_cluster_name }}.{{ ocp_base_domain }}"
+      OpenShiftRole: worker
+      Name: '{{ ocp_cluster_name }}-worker'
+      CLAP_ON: 'NEVER'
+      CLAP_OFF: 'NEVER'
+    exact_count: "{{ worker_count }}"
+    count_tag:
+      OpenShiftClusterName: "{{ ocp_cluster_name }}"
+      OpenShiftClusterNameVerbose: "{{ ocp_cluster_name }}.{{ ocp_base_domain }}"
+      OpenShiftRole: worker
+    wait: true
+  register: ec2_create_worker_instances
 
-- name: Tag first master instance as the bastion
-  ec2_tag:
-    region: "{{ aws_region }}"
-    resource: "{{ ec2_create_master_instance_ids[0] }}"
-    tags:
-      OpenShiftBastion: "true"
+- name: Get list of master instance(s) IDs
+  set_fact:
+    ec2_create_worker_instance_ids: "{{ ec2_create_worker_instances.tagged_instances | map(attribute='id') | list | sort }}"
+
+
+- name: show
+  debug:
+    var: ec2_create_worker_instance_ids
+
+
+# Create a target group with IP address targets
+- name: API Internal Target Group
+  elb_target_group:
+    name: "{{ ocp_cluster_name }}-api-int"
+    protocol: tcp
+    port: 6443
+    vpc_id: '{{ vpc_id }}'
+    validate_certs: '{{ aws_ssl_enabled }}'
+    target_type: instance
+    stickiness_enabled: false
+    stickiness_type: 'source_ip'
+    health_check_protocol: https
+    health_check_path: /readyz
+    health_check_port: 6443
+    health_check_interval: 10
+    healthy_threshold_count: 2
+    unhealthy_threshold_count: 2
     state: present
+    wait_timeout: 300
+    wait: false
+    targets:
+      - Id: '{{ ec2_create_bootstrap_instance_ids[0] }}'
+        Port: 6443
+      - Id: '{{ ec2_create_master_instance_ids[0] }}'
+        Port: 6443
+      - Id: '{{ ec2_create_master_instance_ids[1] }}'
+        Port: 6443
+      - Id: '{{ ec2_create_master_instance_ids[2] }}'
+        Port: 6443
+
+# Create a target group with IP address targets
+- name: Machine Config Internal Target Group
+  elb_target_group:
+    name: "{{ ocp_cluster_name }}-mc-server"
+    protocol: tcp
+    port: 22623
+    vpc_id: '{{ vpc_id }}'
+    validate_certs: '{{ aws_ssl_enabled }}'
+    target_type: instance
+    stickiness_enabled: false
+    stickiness_type: 'source_ip'
+    health_check_protocol: https
+    health_check_path: /healthz
+    health_check_port: 22623
+    health_check_interval: 10
+    healthy_threshold_count: 2
+    unhealthy_threshold_count: 2
+    state: present
+    wait_timeout: 300
+    wait: false
+    targets:
+      - Id: '{{ ec2_create_bootstrap_instance_ids[0] }}'
+        Port: 22623
+      - Id: '{{ ec2_create_master_instance_ids[0] }}'
+        Port: 22623
+      - Id: '{{ ec2_create_master_instance_ids[1] }}'
+        Port: 22623
+      - Id: '{{ ec2_create_master_instance_ids[2] }}'
+        Port: 22623
+
+# Create a target group with IP address targets
+- name: Ingress HTTP Target Group
+  elb_target_group:
+    name: "{{ ocp_cluster_name }}-http"
+    protocol: tcp
+    port: 80
+    vpc_id: '{{ vpc_id }}'
+    validate_certs: '{{ aws_ssl_enabled }}'
+    target_type: instance
+    stickiness_enabled: false
+    stickiness_type: 'source_ip'
+    health_check_protocol: http
+    health_check_path: /healthz
+    health_check_port: 1936
+    health_check_interval: 10
+    healthy_threshold_count: 2
+    unhealthy_threshold_count: 2
+    state: present
+    wait_timeout: 300
+    wait: false
+    targets:
+      - Id: '{{ ec2_create_worker_instance_ids[0] }}'
+        Port: 80
+      - Id: '{{ ec2_create_worker_instance_ids[1] }}'
+        Port: 80
+      - Id: '{{ ec2_create_worker_instance_ids[2] }}'
+        Port: 80
+
+# Create a target group with IP address targets
+- name: Ingress HTTPS Target Group
+  elb_target_group:
+    name: "{{ ocp_cluster_name }}-https"
+    protocol: tcp
+    port: 443
+    vpc_id: '{{ vpc_id }}'
+    validate_certs: '{{ aws_ssl_enabled }}'
+    target_type: instance
+    stickiness_enabled: false
+    stickiness_type: 'source_ip'
+    health_check_protocol: http
+    health_check_path: /healthz
+    health_check_port: 1936
+    health_check_interval: 10
+    healthy_threshold_count: 2
+    unhealthy_threshold_count: 2
+    state: present
+    wait_timeout: 300
+    wait: false
+    targets:
+      - Id: '{{ ec2_create_worker_instance_ids[0] }}'
+        Port: 443
+      - Id: '{{ ec2_create_worker_instance_ids[1] }}'
+        Port: 443
+      - Id: '{{ ec2_create_worker_instance_ids[2] }}'
+        Port: 443
