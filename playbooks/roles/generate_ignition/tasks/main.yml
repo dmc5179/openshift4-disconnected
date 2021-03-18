@@ -18,7 +18,8 @@
     - manifests
     - install-config
 
-- file:
+- name: Create path for SSH Keys
+  file:
     path: "{{ ansible_env.HOME }}/.ssh"
     state: directory
     mode: 0700
@@ -176,7 +177,7 @@
     path: "{{ ignition_configs }}/manifests/cvo-overrides.yaml"
     regexp: 'upstream:.*'
     replace: 'upstream: http://localhost:8080/graph'
-  when: ( air_gapped | bool )
+#  when: ( air_gapped | bool )
   tags:
     - manifests
 
@@ -220,8 +221,16 @@
   tags:
     - manifests
 
-- name: Set ingress router to HostNetwork
-  shell: "sed -i '/domain:/a \ \ endpointPublishingStrategy: HostNetwork' {{ ignition_configs }}/manifests/cluster-ingress-02-config.yml"
+- name: Remove default Ingress Controller config
+  file:
+    path: "{{ ignition_configs }}/manifests/cluster-ingress-default-ingresscontroller.yaml"
+    state: absent
+
+- name: Configure Ingress Controller for HostNetwork
+  template:
+    src: cluster-ingress-default-ingresscontroller.yaml.j2
+    dest: "{{ ignition_configs }}/manifests/cluster-ingress-default-ingresscontroller.yaml"
+    mode: 0644
   tags:
     - manifests
 
@@ -265,93 +274,93 @@
 #  tags:
 #    - ignition
 
-- name: Cleanup existing fakeroots
-  file:
-    path: '{{ fake_root_base }}'
-    state: absent
+#- name: Cleanup existing fakeroots
+#  file:
+#    path: '{{ fake_root_base }}'
+#    state: absent
 
-- name: Build fakeroots directory structure for static networking config
-  file:
-    path: '{{ fake_root_base }}/{{ item.name }}/etc/sysconfig/network-scripts'
-    state: directory
-  with_items:
-    - '{{ openshift_bootstrap }}'
-    - '{{ openshift_masters }}'
-    - '{{ openshift_workers }}'
+#- name: Build fakeroots directory structure for static networking config
+#  file:
+#    path: '{{ fake_root_base }}/{{ item.name }}/etc/sysconfig/network-scripts'
+#    state: directory
+#  with_items:
+#    - '{{ openshift_bootstrap }}'
+#    - '{{ openshift_masters }}'
+#    - '{{ openshift_workers }}'
 
-- name: Create static network configs
-  template:
-    src: 'ifcfg.j2'
-    dest: '{{ fake_root_base }}/{{ item.name }}/etc/sysconfig/network-scripts/ifcfg-{{ item.device }}'
-    mode: 0644
-  when:
-    - (network_mode is match("static"))
-  with_items:
-    - '{{ openshift_bootstrap }}'
-    - '{{ openshift_masters }}'
-    - '{{ openshift_workers }}'
+#- name: Create static network configs
+#  template:
+#    src: 'ifcfg.j2'
+#    dest: '{{ fake_root_base }}/{{ item.name }}/etc/sysconfig/network-scripts/ifcfg-{{ item.device }}'
+#    mode: 0644
+#  when:
+#    - (network_mode is match("static"))
+#  with_items:
+#    - '{{ openshift_bootstrap }}'
+#    - '{{ openshift_masters }}'
+#    - '{{ openshift_workers }}'
 
-- name: Build fakeroots directory structure for module blacklist
-  file:
-    path: '{{ fake_root_base }}/{{ item.name }}/etc/modprobe.d'
-    state: directory
-  with_items:
-    - '{{ openshift_bootstrap }}'
-    - '{{ openshift_masters }}'
-    - '{{ openshift_workers }}'
+#- name: Build fakeroots directory structure for module blacklist
+#  file:
+#    path: '{{ fake_root_base }}/{{ item.name }}/etc/modprobe.d'
+#    state: directory
+#  with_items:
+#    - '{{ openshift_bootstrap }}'
+#    - '{{ openshift_masters }}'
+#    - '{{ openshift_workers }}'
 
-- name: Create kernel module blacklist file
-  template:
-    src: 'ocp-ign-blacklist.conf.j2'
-    dest: '{{ fake_root_base }}/{{ item.name }}/etc/modprobe.d/ocp-ign-blacklist.conf'
-    mode: 0644
-  with_items:
-    - '{{ openshift_bootstrap }}'
-    - '{{ openshift_masters }}'
-    - '{{ openshift_workers }}'
+#- name: Create kernel module blacklist file
+#  template:
+#    src: 'ocp-ign-blacklist.conf.j2'
+#    dest: '{{ fake_root_base }}/{{ item.name }}/etc/modprobe.d/ocp-ign-blacklist.conf'
+#    mode: 0644
+#  with_items:
+#    - '{{ openshift_bootstrap }}'
+#    - '{{ openshift_masters }}'
+#    - '{{ openshift_workers }}'
 
-- name: Set pip args
-  set_fact:
-    pip_args: '{{ pip_args }} --user'
+#- name: Set pip args
+#  set_fact:
+#    pip_args: '{{ pip_args }} --user'
 
-- name: check for filetranspiler
-  stat:
-    path: '{{ filetranspiler }}'
-  register: filetranspiler_stat
+#- name: check for filetranspiler
+#  stat:
+#    path: '{{ filetranspiler }}'
+#  register: filetranspiler_stat
 
-- name: fail if filetranspiler not present
-  fail:
-    msg: "{{ filetranspiler }} not found. Make sure to install it"
-  when: ( not filetranspiler_stat.stat.exists | bool )
+#- name: fail if filetranspiler not present
+#  fail:
+#    msg: "{{ filetranspiler }} not found. Make sure to install it"
+#  when: ( not filetranspiler_stat.stat.exists | bool )
 
-- name: Install required pip modules for filetranspiler
-  pip:
-    name: "{{ filetranspiler_pip_requirements }}"
-    state: present
-    executable: "{{ pip_cmd }}"
-    extra_args: '{{ pip_args }}'
+#- name: Install required pip modules for filetranspiler
+#  pip:
+#    name: "{{ filetranspiler_pip_requirements }}"
+#    state: present
+#    executable: "{{ pip_cmd }}"
+#    extra_args: '{{ pip_args }}'
 
-- name: Install required RPMs for filetranspiler (RHEL 7)
-  become: true
-  vars:
-    ansible_python_interpreter: '/usr/bin/python2'
-  package:
-    name: '{{ filetranspiler_rpm_requirements }}'
-    state: present
-  when: >
-    (ansible_distribution == "RHEL" and
-    ansible_distribution_major_version < '8') 
+#- name: Install required RPMs for filetranspiler (RHEL 7)
+#  become: true
+#  vars:
+#    ansible_python_interpreter: '/usr/bin/python2'
+#  package:
+#    name: '{{ filetranspiler_rpm_requirements }}'
+#    state: present
+#  when: >
+#    (ansible_distribution == "RHEL" and
+#    ansible_distribution_major_version < '8') 
 
-- name: Install required RPMs for filetranspiler (RHEL 8)
-  become: true
-  vars:
-    ansible_python_interpreter: '/usr/bin/python2'
-  package:
-    name: '{{ filetranspiler_rpm_requirements }}'
-    state: present
-  when: >
-    (ansible_distribution == "RHEL" and
-    ansible_distribution_major_version >= '8')
+#- name: Install required RPMs for filetranspiler (RHEL 8)
+#  become: true
+#  vars:
+#    ansible_python_interpreter: '/usr/bin/python2'
+#  package:
+#    name: '{{ filetranspiler_rpm_requirements }}'
+#    state: present
+#  when: >
+#    (ansible_distribution == "RHEL" and
+#    ansible_distribution_major_version >= '8')
 
 #- name: Customize ignition
 #  shell:
