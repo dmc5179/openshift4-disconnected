@@ -2,9 +2,8 @@
 
 - name: Create bootstrap instance
   amazon.aws.ec2:
-    #region: "{{ aws_region }}"
     instance_type: "{{ openshift_aws.bootstrap.instance_type }}"
-    image: "{{ ec2_ami }}"
+    image: "{{ rhcos_ami[ rhcos_ver ] }}"
     key_name: "{{ ec2_key_name }}"
     user_data: '{"ignition":{"config":{"replace":{"source":"http://10.0.255.100:80/caas/ignition/bootstrap.ign"}},"version":"3.1.0"}}'
     vpc_subnet_id: "{{ subnet_id }}"
@@ -12,6 +11,7 @@
       - "{{ ocp_cluster_name }}-master"
       - "{{ ocp_cluster_name }}-worker"
       - "{{ ocp_cluster_name }}-elb"
+      - "default"
     volumes:
       - device_name: /dev/xvda
         volume_type: gp2
@@ -32,7 +32,7 @@
     wait: true
   register: ec2_create_bootstrap_instance
 
-- name: Get list of master instance(s) IDs
+- name: Set Bootstrap instance ID
   set_fact:
     ec2_create_bootstrap_instance_ids: "{{ ec2_create_bootstrap_instance.tagged_instances | map(attribute='id') | list | sort }}"
 
@@ -40,7 +40,7 @@
   amazon.aws.ec2:
     #region: "{{ aws_region }}"
     instance_type: "{{ openshift_aws.master.instance_type }}"
-    image: "{{ ec2_ami }}"
+    image: "{{ rhcos_ami[ rhcos_ver ] }}"
     key_name: "{{ ec2_key_name }}"
     user_data: '{"ignition":{"config":{"replace":{"source":"http://10.0.255.100:80/caas/ignition/master.ign"}},"version":"3.1.0"}}'
     vpc_subnet_id: "{{ subnet_id }}"
@@ -48,6 +48,7 @@
       - "{{ ocp_cluster_name }}-master"
       - "{{ ocp_cluster_name }}-worker"
       - "{{ ocp_cluster_name }}-elb"
+      - "default"
     volumes:
       - device_name: /dev/xvda
         volume_type: gp2
@@ -68,15 +69,14 @@
     wait: true
   register: ec2_create_master_instances
 
-- name: Get list of master instance(s) IDs
+- name: Set master instance IDs
   set_fact:
     ec2_create_master_instance_ids: "{{ ec2_create_master_instances.tagged_instances | map(attribute='id') | list | sort }}"
 
 - name: Create worker instance(s)
   amazon.aws.ec2:
-    #region: "{{ aws_region }}"
     instance_type: "{{ openshift_aws.worker.instance_type }}"
-    image: "{{ ec2_ami }}"
+    image: "{{ rhcos_ami[ rhcos_ver ] }}"
     key_name: "{{ ec2_key_name }}"
     user_data: '{"ignition":{"config":{"replace":{"source":"http://10.0.255.100:80/caas/ignition/worker.ign"}},"version":"3.1.0"}}'
     vpc_subnet_id: "{{ subnet_id }}"
@@ -84,6 +84,7 @@
       - "{{ ocp_cluster_name }}-master"
       - "{{ ocp_cluster_name }}-worker"
       - "{{ ocp_cluster_name }}-elb"
+      - "default"
     volumes:
       - device_name: /dev/xvda
         volume_type: gp2
@@ -96,7 +97,8 @@
       Name: '{{ ocp_cluster_name }}-worker'
       CLAP_ON: 'NEVER'
       CLAP_OFF: 'NEVER'
-    exact_count: "{{ worker_count }}"
+    #exact_count: "{{ worker_count }}"
+    exact_count: 3
     count_tag:
       OpenShiftClusterName: "{{ ocp_cluster_name }}"
       OpenShiftClusterNameVerbose: "{{ ocp_cluster_name }}.{{ ocp_base_domain }}"
@@ -104,20 +106,13 @@
     wait: true
   register: ec2_create_worker_instances
 
-- name: Get list of master instance(s) IDs
+- name: Set worker instance(s) IDs
   set_fact:
     ec2_create_worker_instance_ids: "{{ ec2_create_worker_instances.tagged_instances | map(attribute='id') | list | sort }}"
 
-
-- name: show
-  debug:
-    var: ec2_create_worker_instance_ids
-
-
-# Create a target group with IP address targets
 - name: API Internal Target Group
   elb_target_group:
-    name: "{{ ocp_cluster_name }}-api-int"
+    name: "{{ ocp_cluster_name }}-aint"
     protocol: tcp
     port: 6443
     vpc_id: '{{ vpc_id }}'
@@ -144,10 +139,39 @@
       - Id: '{{ ec2_create_master_instance_ids[2] }}'
         Port: 6443
 
-# Create a target group with IP address targets
+- name: API Internal Target Group
+  elb_target_group:
+    name: "{{ ocp_cluster_name }}-aext"
+    protocol: tcp
+    port: 6443
+    vpc_id: '{{ vpc_id }}'
+    validate_certs: '{{ aws_ssl_enabled }}'
+    target_type: instance
+    stickiness_enabled: false
+    stickiness_type: 'source_ip'
+    health_check_protocol: https
+    health_check_path: /readyz
+    health_check_port: 6443
+    health_check_interval: 10
+    healthy_threshold_count: 2
+    unhealthy_threshold_count: 2
+    state: present
+    wait_timeout: 300
+    wait: false
+    targets:
+      - Id: '{{ ec2_create_bootstrap_instance_ids[0] }}'
+        Port: 6443
+      - Id: '{{ ec2_create_master_instance_ids[0] }}'
+        Port: 6443
+      - Id: '{{ ec2_create_master_instance_ids[1] }}'
+        Port: 6443
+      - Id: '{{ ec2_create_master_instance_ids[2] }}'
+        Port: 6443
+  when: ( ocp_cluster_publish is match('External') )
+
 - name: Machine Config Internal Target Group
   elb_target_group:
-    name: "{{ ocp_cluster_name }}-mc-server"
+    name: "{{ ocp_cluster_name }}-sint"
     protocol: tcp
     port: 22623
     vpc_id: '{{ vpc_id }}'
@@ -174,58 +198,86 @@
       - Id: '{{ ec2_create_master_instance_ids[2] }}'
         Port: 22623
 
-# Create a target group with IP address targets
-- name: Ingress HTTP Target Group
-  elb_target_group:
-    name: "{{ ocp_cluster_name }}-http"
-    protocol: tcp
-    port: 80
-    vpc_id: '{{ vpc_id }}'
-    validate_certs: '{{ aws_ssl_enabled }}'
-    target_type: instance
-    stickiness_enabled: false
-    stickiness_type: 'source_ip'
-    health_check_protocol: http
-    health_check_path: /healthz
-    health_check_port: 1936
-    health_check_interval: 10
-    healthy_threshold_count: 2
-    unhealthy_threshold_count: 2
+- name: Ingress Classic Load Balancer
+  amazon.aws.ec2_elb_lb:
+    name: "{{ ocp_cluster_name }}-ingress"
     state: present
-    wait_timeout: 300
-    wait: false
-    targets:
-      - Id: '{{ ec2_create_worker_instance_ids[0] }}'
-        Port: 80
-      - Id: '{{ ec2_create_worker_instance_ids[1] }}'
-        Port: 80
-      - Id: '{{ ec2_create_worker_instance_ids[2] }}'
-        Port: 80
+    validate_certs: '{{ aws_ssl_enabled }}'
+    scheme: 'internal'
+    subnets:
+      - '{{ subnet_id }}'
+    listeners:
+      - protocol: tcp
+        load_balancer_port: 80
+        instance_port: 80
+      - protocol: tcp
+        load_balancer_port: 443
+        instance_port: 443
+    health_check:
+        ping_protocol: http 
+        ping_port: 1936
+        ping_path: "/healthz"
+        response_timeout: 4
+        interval: 5
+        unhealthy_threshold: 2
+        healthy_threshold: 2
+    instance_ids:
+      - '{{ ec2_create_worker_instance_ids[0] }}'
+      - '{{ ec2_create_worker_instance_ids[1] }}'
+      - '{{ ec2_create_worker_instance_ids[2] }}'
 
 # Create a target group with IP address targets
-- name: Ingress HTTPS Target Group
-  elb_target_group:
-    name: "{{ ocp_cluster_name }}-https"
-    protocol: tcp
-    port: 443
-    vpc_id: '{{ vpc_id }}'
-    validate_certs: '{{ aws_ssl_enabled }}'
-    target_type: instance
-    stickiness_enabled: false
-    stickiness_type: 'source_ip'
-    health_check_protocol: http
-    health_check_path: /healthz
-    health_check_port: 1936
-    health_check_interval: 10
-    healthy_threshold_count: 2
-    unhealthy_threshold_count: 2
-    state: present
-    wait_timeout: 300
-    wait: false
-    targets:
-      - Id: '{{ ec2_create_worker_instance_ids[0] }}'
-        Port: 443
-      - Id: '{{ ec2_create_worker_instance_ids[1] }}'
-        Port: 443
-      - Id: '{{ ec2_create_worker_instance_ids[2] }}'
-        Port: 443
+#- name: Ingress HTTP Target Group
+#  elb_target_group:
+#    name: "{{ ocp_cluster_name }}-http"
+#    protocol: tcp
+#    port: 80
+#    vpc_id: '{{ vpc_id }}'
+#    validate_certs: '{{ aws_ssl_enabled }}'
+#    target_type: instance
+#    stickiness_enabled: false
+#    stickiness_type: 'source_ip'
+#    health_check_protocol: http
+#    health_check_path: /healthz
+#    health_check_port: 1936
+#    health_check_interval: 10
+#    healthy_threshold_count: 2
+#    unhealthy_threshold_count: 2
+#    state: present
+#    wait_timeout: 300
+#    wait: false
+#    targets:
+#      - Id: '{{ ec2_create_worker_instance_ids[0] }}'
+#        Port: 80
+#      - Id: '{{ ec2_create_worker_instance_ids[1] }}'
+#        Port: 80
+#      - Id: '{{ ec2_create_worker_instance_ids[2] }}'
+#        Port: 80
+
+# Create a target group with IP address targets
+#- name: Ingress HTTPS Target Group
+#  elb_target_group:
+#    name: "{{ ocp_cluster_name }}-https"
+#    protocol: tcp
+#    port: 443
+#    vpc_id: '{{ vpc_id }}'
+#    validate_certs: '{{ aws_ssl_enabled }}'
+#    target_type: instance
+#    stickiness_enabled: false
+#    stickiness_type: 'source_ip'
+#    health_check_protocol: http
+#    health_check_path: /healthz
+#    health_check_port: 1936
+#    health_check_interval: 10
+#    healthy_threshold_count: 2
+#    unhealthy_threshold_count: 2
+#    state: present
+#    wait_timeout: 300
+#    wait: false
+#    targets:
+#      - Id: '{{ ec2_create_worker_instance_ids[0] }}'
+#        Port: 443
+#      - Id: '{{ ec2_create_worker_instance_ids[1] }}'
+#        Port: 443
+#      - Id: '{{ ec2_create_worker_instance_ids[2] }}'
+#        Port: 443

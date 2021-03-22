@@ -1,9 +1,8 @@
 ---
 
-# Create a target group with IP address targets
 - name: API Internal Target Group
   elb_target_group:
-    name: "{{ ocp_cluster_name }}-api-int"
+    name: "{{ ocp_cluster_name }}-aint"
     protocol: tcp
     port: 6443
     vpc_id: '{{ vpc_id }}'
@@ -21,10 +20,30 @@
     wait_timeout: 300
     wait: true
 
-# Create a target group with IP address targets
+- name: API External Target Group
+  elb_target_group:
+    name: "{{ ocp_cluster_name }}-aext"
+    protocol: tcp
+    port: 6443
+    vpc_id: '{{ vpc_id }}'
+    validate_certs: '{{ aws_ssl_enabled }}'
+    target_type: instance
+    stickiness_enabled: false
+    stickiness_type: 'source_ip'
+    health_check_protocol: https
+    health_check_path: /readyz
+    health_check_port: 6443
+    health_check_interval: 10
+    healthy_threshold_count: 2
+    unhealthy_threshold_count: 2
+    state: present
+    wait_timeout: 300
+    wait: true
+  when: ( ocp_cluster_publish is match('External') )
+
 - name: Machine Config Internal Target Group
   elb_target_group:
-    name: "{{ ocp_cluster_name }}-mc-server"
+    name: "{{ ocp_cluster_name }}-sint"
     protocol: tcp
     port: 22623
     vpc_id: '{{ vpc_id }}'
@@ -42,51 +61,49 @@
     wait_timeout: 300
     wait: true
 
-# Create a target group with IP address targets
-- name: Ingress HTTP Target Group
-  elb_target_group:
-    name: "{{ ocp_cluster_name }}-http"
-    protocol: tcp
-    port: 80
-    vpc_id: '{{ vpc_id }}'
-    validate_certs: '{{ aws_ssl_enabled }}'
-    target_type: instance
-    stickiness_enabled: false
-    stickiness_type: 'source_ip'
-    health_check_protocol: http
-    health_check_path: /healthz
-    health_check_port: 1936
-    health_check_interval: 10
-    healthy_threshold_count: 2
-    unhealthy_threshold_count: 2
-    state: present
-    wait_timeout: 300
-    wait: true
+#- name: Ingress HTTP Target Group
+#  elb_target_group:
+#    name: "{{ ocp_cluster_name }}-http"
+#    protocol: tcp
+#    port: 80
+#    vpc_id: '{{ vpc_id }}'
+#    validate_certs: '{{ aws_ssl_enabled }}'
+#    target_type: instance
+#    stickiness_enabled: false
+#    stickiness_type: 'source_ip'
+#    health_check_protocol: http
+#    health_check_path: /healthz
+#    health_check_port: 1936
+#    health_check_interval: 10
+#    healthy_threshold_count: 2
+#    unhealthy_threshold_count: 2
+#    state: present
+#    wait_timeout: 300
+#    wait: true
 
-# Create a target group with IP address targets
-- name: Ingress HTTPS Target Group
-  elb_target_group:
-    name: "{{ ocp_cluster_name }}-https"
-    protocol: tcp
-    port: 443
-    vpc_id: '{{ vpc_id }}'
-    validate_certs: '{{ aws_ssl_enabled }}'
-    target_type: instance
-    stickiness_enabled: false
-    stickiness_type: 'source_ip'
-    health_check_protocol: http
-    health_check_path: /healthz
-    health_check_port: 1936
-    health_check_interval: 10
-    healthy_threshold_count: 2
-    unhealthy_threshold_count: 2
-    state: present
-    wait_timeout: 300
-    wait: true
+#- name: Ingress HTTPS Target Group
+#  elb_target_group:
+#    name: "{{ ocp_cluster_name }}-https"
+#    protocol: tcp
+#    port: 443
+#    vpc_id: '{{ vpc_id }}'
+#    validate_certs: '{{ aws_ssl_enabled }}'
+#    target_type: instance
+#    stickiness_enabled: false
+#    stickiness_type: 'source_ip'
+#    health_check_protocol: http
+#    health_check_path: /healthz
+#    health_check_port: 1936
+#    health_check_interval: 10
+#    healthy_threshold_count: 2
+#    unhealthy_threshold_count: 2
+#    state: present
+#    wait_timeout: 300
+#    wait: true
 
 - name: API and MC Internal Load Balancer
   community.aws.elb_network_lb:
-    name: "{{ ocp_cluster_name }}-api-int"
+    name: "{{ ocp_cluster_name }}-int"
     state: present
     validate_certs: '{{ aws_ssl_enabled }}'
     purge_listeners: false
@@ -98,27 +115,16 @@
         Port: 6443
         DefaultActions:
           - Type: forward
-            TargetGroupName: "{{ ocp_cluster_name }}-api-int"
+            TargetGroupName: "{{ ocp_cluster_name }}-aint"
       - Protocol: TCP
         Port: 22623
         DefaultActions:
           - Type: forward 
-            TargetGroupName: "{{ ocp_cluster_name }}-mc-server"
+            TargetGroupName: "{{ ocp_cluster_name }}-sint"
 
 - name: API External Load Balancer
   community.aws.elb_network_lb:
-    name: "{{ ocp_cluster_name }}-api-ext"
-    state: present
-    validate_certs: '{{ aws_ssl_enabled }}'
-    purge_listeners: false  
-    scheme: 'internet-facing'
-    subnets:
-      - '{{ subnet_id }}'
-  when: ( ocp_cluster_publish is match('External') )
-
-- name: Ingress Load Balancer
-  community.aws.elb_network_lb:
-    name: "{{ ocp_cluster_name }}-ingress"
+    name: "{{ ocp_cluster_name }}-ext"
     state: present
     validate_certs: '{{ aws_ssl_enabled }}'
     purge_listeners: false  
@@ -127,12 +133,56 @@
       - '{{ subnet_id }}'
     listeners:
       - Protocol: TCP
-        Port: 443
+        Port: 6443
         DefaultActions:
           - Type: forward
-            TargetGroupName: "{{ ocp_cluster_name }}-https"
-      - Protocol: TCP
-        Port: 80
-        DefaultActions:
-          - Type: forward
-            TargetGroupName: "{{ ocp_cluster_name }}-http"
+            TargetGroupName: "{{ ocp_cluster_name }}-aext"
+  when: ( ocp_cluster_publish is match('External') )
+
+#- name: Ingress Load Balancer
+#  community.aws.elb_network_lb:
+#    name: "{{ ocp_cluster_name }}-ingress"
+#    state: present
+#    validate_certs: '{{ aws_ssl_enabled }}'
+#    purge_listeners: false  
+#    scheme: 'internal'
+#    subnets:
+#      - '{{ subnet_id }}'
+#    listeners:
+#      - Protocol: TCP
+#        Port: 443
+#        DefaultActions:
+#          - Type: forward
+#            TargetGroupName: "{{ ocp_cluster_name }}-https"
+#      - Protocol: TCP
+#        Port: 80
+#        DefaultActions:
+#          - Type: forward
+#            TargetGroupName: "{{ ocp_cluster_name }}-http"
+
+#- name: Ingress Classic Load Balancer
+#  amazon.aws.ec2_elb_lb:
+#    name: "{{ ocp_cluster_name }}-ingress"
+#    state: present
+#    validate_certs: '{{ aws_ssl_enabled }}'
+#    subnets:
+#      - '{{ subnet_id }}'
+#    listeners:
+#      - protocol: tcp
+#        load_balancer_port: 80
+#        instance_port: 80
+#      - protocol: tcp
+#        load_balancer_port: 443
+#        instance_port: 443
+#    health_check:
+#        ping_protocol: http
+#        ping_port: 80
+#        ping_path: "/healthz"
+#        response_timeout: 4
+#        interval: 5
+#        unhealthy_threshold: 2
+#        healthy_threshold: 2
+#    instance_ids:
+#      - ''
+#      - ''
+#      - ''
