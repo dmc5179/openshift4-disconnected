@@ -27,7 +27,20 @@ platform:
     datacenter: {{ datacenter_name }}
     defaultDatastore: {{ datastore_name }}
 {% elif platform == 'aws' %}
-  none: {}
+  aws:
+    region: '{{ aws_region }}'
+    amiID: {{ rhcos_ami[ rhcos_ver ] }}
+    serviceEndpoints:
+      - name: ec2
+        url: 'https://ec2.us-iso-east-1.c2s.ic.gov'
+      - name: s3
+        url: 'https://s3.us-iso-east-1.c2s.ic.gov'
+      - name: elb
+        url: 'https://elasticloadbalancing.us-iso-east-1.c2s.ic.gov'
+      - name: iam
+        url: 'https://iam.us-iso-east-1.c2s.ic.gov'
+      - name: route53
+        url: 'https://route53.us-iso-east-1.c2s.ic.gov'
 {% elif platform == 'gcp' %}
   none: {}
 {% elif platform == 'bare_metal' %}
