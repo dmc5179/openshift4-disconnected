@@ -234,6 +234,50 @@
   tags:
     - manifests
 
+- name: Set access key fact
+  set_fact:
+    aws_access_key_id: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+  when:
+    - (platform is match("aws"))
+
+- name: Set secret access key fact
+  set_fact:
+    aws_secret_access_key_id: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+  when:
+    - (platform is match("aws"))
+
+- name: Set session token fact
+  set_fact:
+    aws_session_token: "{{ lookup('env', 'AWS_SESSION_TOKEN') }}"
+  when:
+    - (platform is match("aws"))
+
+- name: Remove existing cloud credentials config
+  file:
+    path: ""
+    state: absent
+
+- name: Add STS AWS API cloud credentials config
+  template:
+    src: 99_cloud-creds-secret.yaml.j2
+    dest: "{{ ignition_configs }}/openshift/99_cloud-creds-secret.yaml"
+    mode: 0644
+  tags:
+    - manifests
+
+- name: Remove DNS operator config
+  file:
+    path: "{{ ignition_configs }}/openshift/caas/manifests/cluster-dns-02-config.yml"
+    state: absent
+
+- name: Add custom DNS operator config
+  template:
+    src: cluster-dns-02-config.yml.j2
+    dest: "{{ ignition_configs }}/manifests/cluster-dns-02-config.yml"
+    mode: 0644
+  tags:
+    - manifests
+
 #- name: Customize MTU and vxlanPort
 #  template:
 #    src: cluster-network-03-config.yml.j2
@@ -257,6 +301,47 @@
 #    mode: 0644
 #  tags:
 #    - manifests
+
+- name: Add Combine Metadata interceptor for master nodes
+  template:
+    src: c2s-instance-metadata-machineconfig.yaml.j2
+    dest: "{{ ignition_configs }}/manifests/c2s-instance-metadata-master-machineconfig.yaml"
+    mode: 0644
+  vars:
+    node_role: 'master'
+  when: ( combine | bool )
+  tags:
+    - manifests
+
+- name: Add Combine Metadata interceptor for worker nodes
+  template:
+    src: c2s-instance-metadata-machineconfig.yaml.j2
+    dest: "{{ ignition_configs }}/manifests/c2s-instance-metadata-worker-machineconfig.yaml"
+    mode: 0644
+  vars:
+    node_role: 'worker'
+  when: ( combine | bool )
+  tags:
+    - manifests
+
+- name: Slurp json state
+  shell: grep -A 2 'ClusterID' {{ ignition_configs }}/.openshift_install_state.json | grep InfraID | awk '{print $2}' | tr -d \"
+  register: cluster_state
+
+- name: Set cluster infra name
+  set_fact:
+    random_infra_id: '{{ cluster_state.stdout }}'
+
+- name: Show infra name
+  debug:
+    var: random_infra_id
+
+- name: Change random infrastructure name to configured name
+  shell: sed -i 's|{{ random_infra_id }}|{{ infrastructure_id }}|g' '{{ item }}'
+  with_fileglob:
+    - '{{ ignition_configs }}/manifests/*.yaml'
+    - '{{ ignition_configs }}/openshift/*.yaml'
+    - '{{ ignition_configs }}/.openshift*'
 
 - name: Create ignition configs
   shell: "{{ openshift_install }} create ignition-configs --dir={{ ignition_configs }}"
