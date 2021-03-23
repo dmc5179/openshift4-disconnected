@@ -11,6 +11,7 @@ Parameters:
       A short, representative cluster name to use for host names and other identifying names. You should use the value
       specified when generating the install-config.yaml file using `openshift-install create install-config`.
     Type: String
+    Default: "caas"
 
   InfrastructureName:
     AllowedPattern: ^([a-zA-Z][a-zA-Z0-9\-]{0,26})$
@@ -22,6 +23,7 @@ Parameters:
       A short, unique cluster ID used to tag cloud resources and identify items owned or used by the cluster. You should
       use the value generated when creating the manifest files using `openshift-install create manifests`.
     Type: String
+    Default: "abc123"
 
 #  HostedZoneId:
 #    Description: The Route53 public zone ID to register the targets with, such as Z21IXYZABCZ2A4.
@@ -31,9 +33,9 @@ Parameters:
 #    Description: The Route53 zone to register the targets with, such as "example.com".
 #    Type: String
 
-  PublicSubnets:
-    Description: The internet-facing subnets.
-    Type: List<AWS::EC2::Subnet::Id>
+#  PublicSubnets:
+#    Description: The internet-facing subnets.
+#    Type: List<AWS::EC2::Subnet::Id>
 
   PrivateSubnets:
     Description: The internal subnets.
@@ -55,7 +57,7 @@ Metadata:
         default: "Network Configuration"
       Parameters:
       - VpcId
-      - PublicSubnets
+#      - PublicSubnets
       - PrivateSubnets
 #    - Label:
 #        default: "DNS"
@@ -69,8 +71,8 @@ Metadata:
         default: "Infrastructure Name"
       VpcId:
         default: "VPC ID"
-      PublicSubnets:
-        default: "Public Subnets"
+#      PublicSubnets:
+#        default: "Public Subnets"
       PrivateSubnets:
         default: "Private Subnets"
 #      HostedZoneName:
@@ -79,18 +81,18 @@ Metadata:
 #        default: "Public Hosted Zone ID"
 
 Resources:
-  ExtApiElb:
-    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
-    Properties:
-      Name: !Join ["-", [!Ref InfrastructureName, "ext"]]
-      IpAddressType: ipv4
-      Subnets: !Ref PublicSubnets
-      Type: network
-      Tags:
-      - Key: "Name"
-        Value: !Join ["-", [!Ref InfrastructureName, "ext"]]
-      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
-        Value: owned
+#  ExtApiElb:
+#    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+#    Properties:
+#      Name: !Join ["-", [!Ref InfrastructureName, "ext"]]
+#      IpAddressType: ipv4
+#      Subnets: !Ref PublicSubnets
+#      Type: network
+#      Tags:
+#      - Key: "Name"
+#        Value: !Join ["-", [!Ref InfrastructureName, "ext"]]
+#      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
+#        Value: owned
 
   IntApiElb:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
@@ -174,17 +176,17 @@ Resources:
 #          HostedZoneId: !GetAtt IntApiElb.CanonicalHostedZoneID
 #          DNSName: !GetAtt IntApiElb.DNSName
 
-  ExternalApiListener:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      DefaultActions:
-      - Type: forward
-        TargetGroupArn:
-          Ref: ExternalApiTargetGroup
-      LoadBalancerArn:
-        Ref: ExtApiElb
-      Port: 6443
-      Protocol: TCP
+#  ExternalApiListener:
+#    Type: AWS::ElasticLoadBalancingV2::Listener
+#    Properties:
+#      DefaultActions:
+#      - Type: forward
+#        TargetGroupArn:
+#          Ref: ExternalApiTargetGroup
+#      LoadBalancerArn:
+#        Ref: ExtApiElb
+#      Port: 6443
+#      Protocol: TCP
 
   ExternalApiTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -471,9 +473,9 @@ Outputs:
 #    Description: Hosted zone ID for the private DNS, which is required for private records.
 #    Value: !Ref IntDns
 
-  ExternalApiLoadBalancerName:
-    Description: Full name of the external API load balancer.
-    Value: !GetAtt ExtApiElb.LoadBalancerFullName
+#  ExternalApiLoadBalancerName:
+#    Description: Full name of the external API load balancer.
+#    Value: !GetAtt ExtApiElb.LoadBalancerFullName
 
   InternalApiLoadBalancerName:
     Description: Full name of the internal API load balancer.
