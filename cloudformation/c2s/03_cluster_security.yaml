@@ -12,6 +12,7 @@ Parameters:
       A short, unique cluster ID used to tag cloud resources and identify items owned or used by the cluster. You should
       use the value generated when creating the manifest files using `openshift-install create manifests`.
     Type: String
+    Default: "abc123"
 
   VpcCidr:
     AllowedPattern: >-
