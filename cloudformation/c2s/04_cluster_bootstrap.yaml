@@ -12,10 +12,12 @@ Parameters:
       A short, unique cluster ID used to tag cloud resources and identify items owned or used by the cluster. You should
       use the value generated when creating the manifest files using `openshift-install create manifests`.
     Type: String
+    Default: "abc123"
 
   RhcosAmi:
     Description: Current Red Hat Enterprise Linux CoreOS AMI to use for bootstrap.
     Type: AWS::EC2::Image::Id
+    Default: "ami-01c8b6b6082a42b91"
 
   AllowedBootstrapSshCidr:
     AllowedPattern: >-
@@ -41,6 +43,7 @@ Parameters:
     Description: >-
       Ignition config file location. (Ex: s3://my-s3-bucket/bootstrap.ign)
     Type: String
+    Default: "s3://dan/bootstrap.ign"
 
 #  AutoRegisterELB:
 #    AllowedValues:
@@ -54,17 +57,19 @@ Parameters:
 #    Description: ARN for NLB IP target registration lambda.
 #    Type: String
 
-  ExternalApiTargetGroupArn:
-    Description: ARN for external API load balancer target group.
-    Type: String
+#  ExternalApiTargetGroupArn:
+#    Description: ARN for external API load balancer target group.
+#    Type: String
 
   InternalApiTargetGroupArn:
     Description: ARN for internal API load balancer target group.
     Type: String
+    Default: ""
 
   InternalServiceTargetGroupArn:
     Description: ARN for internal service load balancer target group.
     Type: String
+    Default: ""
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -90,7 +95,7 @@ Metadata:
       Parameters:
 #      - AutoRegisterELB
 #      - RegisterNlbIpTargetsLambdaArn
-      - ExternalApiTargetGroupArn
+#      - ExternalApiTargetGroupArn
       - InternalApiTargetGroupArn
       - InternalServiceTargetGroupArn
     ParameterLabels:
@@ -180,10 +185,11 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: !Ref RhcosAmi
-      IamInstanceProfile: !Ref BootstrapInstanceProfile
+      #IamInstanceProfile: !Ref BootstrapInstanceProfile
+      IamInstanceProfile: ''
       InstanceType: "i3.large"
       NetworkInterfaces:
-      - AssociatePublicIpAddress: "true"
+      - AssociatePublicIpAddress: "false"
         DeviceIndex: "0"
         GroupSet:
         - !Ref "BootstrapSecurityGroup"
