@@ -1,0 +1,74 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: etcd-backup
+  namespace: etcd-infra
+  labels:
+    app: etcd-infra
+spec:
+  schedule: '*/10 * * * *'
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        parallelism: 1
+        backoffLimit: 0
+        metadata:
+          generateName: etcd-backup-
+          namespace: etcd-infra
+          labels:
+            app: etcd-infra
+          annotations:
+            openshift.io/scc: node-exporter
+        spec:
+          containers:
+            - name: etcd-backup
+              stdin: true
+              tty: true
+              env:
+                - name: BACKUP_PATH
+                  value: /tmp/etcd_backup/assets
+                - name: BACKUP_SCRIPT
+                  value: /usr/local/bin/cluster-backup.sh
+              image: registry.redhat.io/rhel7/support-tools
+              command:
+                - /usr/bin/bash
+                - '-c'
+                - '/tmp/backup-scripts/manage-backup'
+              securityContext:
+                privileged: true
+                runAsUser: 0
+              volumeMounts:
+                - name: etcd-backup-scripts
+                  mountPath: /tmp/backup-scripts/
+                  readOnly: true
+                  #subPath: run-backup
+                - name: host
+                  mountPath: /host
+                - name: etcd-backup-data
+                  mountPath: /tmp/etcd_backup/assets
+              imagePullPolicy: IfNotPresent
+          nodeSelector:
+            node-role.kubernetes.io/master: ''
+          restartPolicy: Never
+          serviceAccountName: etcd-backup
+          volumes:
+            - name: etcd-backup-scripts
+              configMap:
+                defaultMode: 0777
+                name: etcd-backup-scripts
+            - name: host
+              hostPath:
+                path: /
+                type: Directory
+            # - name: etcd-backup-data
+            #   persistentVolumeClaim:
+            #     claimName: etcd-backup
+            - name: etcd-backup-data
+              emptydir: {}
+          tolerations:
+            - key: node-role.kubernetes.io/master
+              operator: Exists
+              effect: NoSchedule

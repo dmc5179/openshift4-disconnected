@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: etcd-backup-scripts
+  namespace: etcd-infra
+  labels:
+    app: etcd-infra
+data:
+  manage-backup: |-
+    #!/usr/bin/bash
+
+    echo "beginning backup process to $BACKUP_PATH"
+    cd /tmp
+    mkdir -p $BACKUP_PATH
+    export DATESTRING=$(date "+%F_%H%M%S")
+    
+    mkdir /host/tmp/backup-scripts
+    cp /tmp/backup-scripts/create-backup /host/tmp/backup-scripts/
+
+    echo entering host
+    chroot /host /tmp/backup-scripts/create-backup
+    if [ $? -eq 0 ]; then
+      echo Backup was success
+      # clean up previous backups to keep the last 5
+      ls -d -1tr  ${BACKUP_PATH}/* | head -n -4 | xargs -d '\n' rm -f
+      
+      cp -r /host/tmp/${DATESTRING}/assets/backup/*  $BACKUP_PATH
+      echo "Backup copied to $BACKUP_PATH"
+    else
+      echo Backup Failed
+    fi
+    ls -l /host/tmp/${DATESTRING}/assets/backup
+
+    echo Clean up host
+    rm -rf /host/tmp/backup-scripts /host/tmp/${DATESTRING}
+
+    echo "Completed backup"
+
+    echo Show all backups in storage
+    ls -l $BACKUP_PATH
+  create-backup: |-
+    #!/usr/bin/bash
+
+    echo "beginning backup process in host mount"
+
+    mkdir /tmp/${DATESTRING}
+    cd /tmp/${DATESTRING}
+
+    echo "Run the backup on the host"
+    ${BACKUP_SCRIPT} ./assets/backup
+    
+    exit $?
