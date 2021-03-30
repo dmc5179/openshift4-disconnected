@@ -2,7 +2,7 @@
 
 mirror_base: '/tmp'
 
-openshift_cluster_admin_username: 'admin'
+openshift_cluster_admin_username: 'fakeadmin'
 openshift_cluster_admin_password: 'redhat1'
 
 # This will get set by a check on the user
@@ -15,19 +15,5 @@ kubeconfig: "{{ ansible_env.HOME }}/.kube/config"
 kube_ssl_enabled: false
 
 openshift_users:
-  - name: danclark
-    password: 'redhat2020'
-  - name: user1
-    password: 'redhat2020'
-  - name: user2
-    password: 'redhat2020'
-  - name: user3
-    password: 'redhat2020'
-  - name: user4
-    password: 'redhat2020'
-  - name: user5
-    password: 'redhat2020'
-  - name: user6
-    password: 'redhat2020'
-  - name: user7
+  - name: fakeuser
     password: 'redhat2020'
