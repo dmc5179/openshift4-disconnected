@@ -19,6 +19,7 @@ do
 
   NAME=$(basename "${d}")
 
+  #TODO: This pattern is ugly and there are a couple of operators that don't follow it....
   DIR=$(echo "${VER}" | cut -d '.' -f2- | tr -d 'v')
 
   echo "channel: $CHANNEL, ver: $VER, name: $NAME, dir: $DIR"
