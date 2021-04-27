@@ -1,0 +1,21 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: InstallPlan
+metadata:
+  generateName: install-
+  generation: 1
+  labels:
+    operators.coreos.com/gpu-operator-certified.openshift-operators: ""
+  name: install-xlt9g
+  namespace: openshift-operators
+  ownerReferences:
+  - apiVersion: operators.coreos.com/v1alpha1
+    blockOwnerDeletion: false
+    controller: false
+    kind: Subscription
+    name: gpu-operator-certified
+    uid: e2e79a9a-28d1-4ed7-ac5a-279bfd30612f
+spec:
+  approval: Automatic
+  approved: true
+  clusterServiceVersionNames:
+  - gpu-operator-certified.v1.6.2
