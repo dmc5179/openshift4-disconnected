@@ -1,0 +1,41 @@
+apiVersion: v1
+baseDomain: <cluster base domain>
+compute:
+- architecture: amd64
+  hyperthreading: Enabled
+  name: worker
+  platform: {}
+  replicas: 3
+controlPlane:
+  architecture: amd64
+  hyperthreading: Enabled
+  name: master
+  platform: {}
+  replicas: 3
+metadata:
+  creationTimestamp: null
+  name: <cluster name>
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  machineNetwork:
+  - cidr: <private subnet a CIDR>
+  - cidr: <private subnet b CIDR>
+  - cidr: <private subnet c CIDR>
+  networkType: OpenShiftSDN
+  serviceNetwork:
+  - 172.30.0.0/16
+platform:
+  aws:
+    region: us-gov-west-1
+    amiID: ami-9dd4ecfc
+    subnets:
+      - <private subnet a>
+      - <private subnet b>
+      - <private subnet c>
+publish: Internal
+fips: false
+pullSecret: ''
+sshKey: |
+  <ssh rsa public key>

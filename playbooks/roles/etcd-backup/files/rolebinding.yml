@@ -1,0 +1,14 @@
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: etcd-privileged
+  labels:
+    app: etcd-infra
+subjects:
+  - kind: ServiceAccount
+    name: etcd-backup
+    namespace: etcd-infra
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: etcd-privileged
