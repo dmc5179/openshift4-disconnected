@@ -155,20 +155,9 @@
   tags:
     - launch
 
-- name: Install service file for podman registry
+- name: Create systemd service for registry container
   become: true
-  template:
-    src: 'podman-registry.service.j2'
-    dest: '/usr/lib/systemd/system/podman-registry.service'
-    mode: '0644'
-
-- name: Enable podman registry systemd service
-  become: true
-  systemd:
-    name: podman-registry
-    daemon-reload: true
-    enabled: true
-    state: started
+  shell: 'podman generate systemd --container-prefix=registry --name --restart-policy always {{docker_registry_container_name}}'
 
 # TODO: This test is not working
 #- name: Test the registry connection
