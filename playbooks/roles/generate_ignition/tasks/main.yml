@@ -254,7 +254,7 @@
 
 - name: Remove existing cloud credentials config
   file:
-    path: ""
+    path: "{{ ignition_configs }}/openshift/99_cloud-creds-secret.yaml"
     state: absent
 
 - name: Add STS AWS API cloud credentials config
@@ -265,18 +265,18 @@
   tags:
     - manifests
 
-- name: Remove DNS operator config
-  file:
-    path: "{{ ignition_configs }}/openshift/caas/manifests/cluster-dns-02-config.yml"
-    state: absent
+#- name: Remove DNS operator config
+#  file:
+#    path: "{{ ignition_configs }}/manifests/cluster-dns-02-config.yml"
+#    state: absent
 
-- name: Add custom DNS operator config
-  template:
-    src: cluster-dns-02-config.yml.j2
-    dest: "{{ ignition_configs }}/manifests/cluster-dns-02-config.yml"
-    mode: 0644
-  tags:
-    - manifests
+#- name: Add custom DNS operator config
+#  template:
+#    src: cluster-dns-02-config.yml.j2
+#    dest: "{{ ignition_configs }}/manifests/cluster-dns-02-config.yml"
+#    mode: 0644
+#  tags:
+#    - manifests
 
 #- name: Customize MTU and vxlanPort
 #  template:
