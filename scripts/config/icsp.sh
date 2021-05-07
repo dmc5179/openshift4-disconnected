@@ -1,12 +1,13 @@
 #!/bin/bash -xe
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-
-# Source the environment file with the default settings
-source "${SCRIPT_DIR}/../env.sh"
+##########################
+# This should be the location where you mirrored the OpenShift 4 images used to build the cluster
+# like myregistry.mydomain.com:5000/ocp4/openshift4
+PRIVATE_REGISTRY="myregistry.mydomain.com:5000"
+PRIVATE_REPO="ocp4/openshift4"
 
 # Read in the new chrony.conf file
-ICSP_B64=$(cat ./icsp.conf | sed "s|registry.example.com|${REMOTE_REG}|g" | sed "s|LOCAL_REPO|${LOCAL_REPO}|g" | base64 -w 0)
+ICSP_B64=$(cat ./icsp.conf | sed "s|registry.example.com|${PRIVATE_REGISTRY}|g" | sed "s|LOCAL_REPO|${PRIVATE_REPO}|g" | base64 -w 0)
 
 # Create a machine config to set the private registry for master nodes
 rm -f ./99_master-private-registry-configuration.yaml
@@ -68,7 +69,7 @@ spec:
   osImageURL: ""
 EOF
 
-${OC} apply -f ./99_master-private-registry-configuration.yaml
-${OC} apply -f ./99_worker-private-registry-configuration.yaml
+oc apply -f ./99_master-private-registry-configuration.yaml
+oc apply -f ./99_worker-private-registry-configuration.yaml
 
 exit 0
