@@ -2,15 +2,15 @@
 
 **Table of Contents**
   - [Purpose](#Purpose)
-  - [Disable Master Scheduling](#Disable Master Scheduling)
-  - [Disable OperatorHub](#Disable OperatorHub)
-  - [Disable Telemetry](#Disable Telemetry)
-  - [Configure Ingress Replicas](#Configure Ingress Replicas)
-  - [Registry EmptyDir](#Registry EmptyDir)
-  - [Sample Operator Patch](#Sample Operator Patch)
-  - [API Custom SSL Certificate](#API Custom SSL Certificate)
-  - [Ingres Custom SSL Certificate](#Ingres Custom SSL Certificate)
-  - [Warning Banner](#Warning Banner)
+  - [Disable Master Scheduling](#Disable-Master-Scheduling)
+  - [Disable OperatorHub](#Disable-OperatorHub)
+  - [Disable Telemetry](#Disable-Telemetry)
+  - [Configure Ingress Replicas](#Configure-Ingress-Replicas)
+  - [Registry EmptyDir](#Registry-EmptyDir)
+  - [Sample Operator Patch](#Sample-Operator-Patch)
+  - [API Custom SSL Certificate](#API-Custom-SSL-Certificate)
+  - [Ingres Custom SSL Certificate](#Ingres-Custom-SSL-Certificate)
+  - [Warning Banner](#Warning-Banner)
 
 ### Purpose
 
