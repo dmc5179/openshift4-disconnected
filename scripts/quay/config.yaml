@@ -1,0 +1,13 @@
+DISTRIBUTED_STORAGE_CONFIG:
+  default:
+    - RHOCSStorage
+    - access_key: 
+      bucket_name: bucket
+      hostname: s3.openshift-storage.svc
+      is_secure: true
+      port: "443"
+      secret_key: 
+      storage_path: /datastorage/registry
+DISTRIBUTED_STORAGE_DEFAULT_LOCATIONS: []
+DISTRIBUTED_STORAGE_PREFERENCE:
+  - default
