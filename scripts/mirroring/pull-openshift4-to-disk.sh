@@ -1,16 +1,16 @@
 #!/bin/bash -e
 
-export OCP_RELEASE="4.6.9"
+export OCP_RELEASE="4.8.7"
 export OCP_ARCH="x86_64"
 
 # Directory where OCP images are written to or read from
 # When mirroring to disk
-export OCP_MEDIA_PATH="/opt/ocp-${OCP_RELEASE}"
+export OCP_MEDIA_PATH="/opt/openshift/ocp-${OCP_RELEASE}"
 
 # This needs to be a pull secret that combines the pull secret from Red Hat
 # to pull all the images down and a pull secret from your local registry so we
 # can push to it
-export LOCAL_SECRET_JSON="${HOME}/pull-secret.json"
+export LOCAL_SECRET_JSON="${HOME}/pull-secret.txt"
 
 ######
 # Unlikely that these need to be changed
