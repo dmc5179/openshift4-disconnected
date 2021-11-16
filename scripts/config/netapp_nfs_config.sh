@@ -1,7 +1,7 @@
 #!/bin/bash -xe
 
 NFS3=$(echo 'options tcp_max_slot_table_entries=128' | base64 -w 0)  # sunrpc
-NFS4=$(echo 'options nfs max_session_slots=180' | base64 -w 0)  #cfsclient.conf
+NFS4=$(echo 'options nfs max_session_slots=180' | base64 -w 0)  #nfsclient.conf
 
 rm -f ./99_master-nfsv3-config.yaml
 cat << EOF > ./99_master-nfsv3-config.yaml
@@ -89,7 +89,7 @@ spec:
           verification: {}
         filesystem: root
         mode: 420
-        path: /etc/modprobe.d/sunrpc.conf
+        path: /etc/modprobe.d/nfsclient.conf
   osImageURL: ""
 EOF
 
@@ -118,13 +118,13 @@ spec:
           verification: {}
         filesystem: root
         mode: 420
-        path: /etc/modprobe.d/sunrpc.conf
+        path: /etc/modprobe.d/nfsclient.conf
   osImageURL: ""
 EOF
 
-#oc apply -f ./99_master-nfsv3-config.yaml
-#oc apply -f ./99_worker-nfsv3-config.yaml
-#oc apply -f ./99_master-nfsv4-config.yaml
-#oc apply -f ./99_worker-nfsv4-config.yaml
+oc apply -f ./99_master-nfsv3-config.yaml
+oc apply -f ./99_worker-nfsv3-config.yaml
+oc apply -f ./99_master-nfsv4-config.yaml
+oc apply -f ./99_worker-nfsv4-config.yaml
 
 exit 0
