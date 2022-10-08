@@ -102,13 +102,13 @@ Metadata:
 Mappings:
   RHELMap:
     us-east-1:
-      "HVM64": "ami-096fda3c22c1c990a"
+      HVM64: ami-06640050dc3f556bb
     us-east-2:
-      "HVM64": ""
+      HVM64: ami-092b43193629811af
     us-west-1:
-      "HVM64": ""
+      HVM64: ami-0186e3fec9b0283ee
     eu-west-1:
-      "HVM64": ""
+      HVM64: ami-08970fb2e5767e3b8
 
 
 Conditions:
@@ -398,7 +398,7 @@ Resources:
   NATInstance:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: !Ref AmiId
+      ImageId: !FindInMap [RHELMap, !Ref "AWS::Region", HVM64]
       InstanceType: !Ref NATInstanceType
       IamInstanceProfile: !Ref NATInstanceProfile
       KeyName: !Ref KeyName
@@ -561,8 +561,7 @@ Resources:
   HelperInstance:
     Type: AWS::EC2::Instance
     Properties:
-      #ImageId: !FindInMap [RHELMap, !Ref "AWS::Region", HVM64]
-      ImageId: !Ref AmiId
+      ImageId: !FindInMap [RHELMap, !Ref "AWS::Region", HVM64]
       IamInstanceProfile: !Ref HelperInstanceProfile
       InstanceType: !Ref BastionInstanceType
       KeyName: !Ref KeyName
@@ -584,27 +583,67 @@ Resources:
       UserData:
         Fn::Base64: !Sub
           - |
-            #!/bin/bash -xe
+            #!/bin/bash -x
+
+            yum update -y --security
+
             cd /tmp
 
             region=${AWS::Region}
 
             echo '${pull_secret}' > /tmp/pull-secret.json
+            echo '${pull_secret}' > /home/ec2-user/pull-secret.json
 
             wget -q https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${ocp_ver}/openshift-client-linux-${ocp_ver}.tar.gz
             wget -q https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${ocp_ver}/openshift-install-linux-${ocp_ver}.tar.gz
+
+            wget -q https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/latest-4.11/oc-mirror.tar.gz
 
             aws s3 cp openshift-client-linux-${ocp_ver}.tar.gz "s3://${s3_bucket}/"
             aws s3 cp openshift-install-linux-${ocp_ver}.tar.gz "s3://${s3_bucket}/"
 
             tar -xzf openshift-client-linux-${ocp_ver}.tar.gz
             tar -xzf openshift-install-linux-${ocp_ver}.tar.gz
+            tar -xzf oc-mirror.tar.gz
             rm -f README.md
 
-            mv oc openshift-install kubectl /usr/local/bin
-            chown root.root /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install
-            chmod 0755 /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install
-            restorecon -v /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install
+            mv oc openshift-install kubectl oc-mirror /usr/local/bin
+            chown root.root /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install /usr/local/bin/oc-mirror
+            chmod 0755 /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install /usr/local/bin/oc-mirror
+            restorecon -v /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install /usr/local/bin/oc-mirror
+
+            cat <<EOF >> /home/ec2-user/imageset-config.yaml
+            apiVersion: mirror.openshift.io/v1alpha2
+            kind: ImageSetConfiguration
+            storageConfig:
+              local:
+                path: /opt/mirror
+            mirror:
+              platform:
+                channels:
+                  - name: stable-${ocp_ver}
+                graph: true
+              operators:
+                - catalog: registry.redhat.io/redhat/redhat-operator-index:v${ocp_ver}
+                  packages:
+                    - name: advanced-cluster-management
+                    - name: ansible-automation-platform-operator
+                    - name: cincinnati-operator
+                    - name: compliance-operator
+                    - name: file-integrity-operator
+                    - name: rhacs-operator
+            EOF
+
+            echo "Mirroring cluster images"
+            export XDG_RUNTIME_DIR="/run/user/0/containers"
+            mkdir -p ${!XDG_RUNTIME_DIR}
+            cat /tmp/pull-secret.json > ${!XDG_RUNTIME_DIR}/auth.json
+            mkdir -p /opt/mirror/
+            pushd /opt/mirror
+            /usr/local/bin/oc-mirror --continue-on-error --config /home/ec2-user/imageset-config.yaml file://archives
+
+            echo "Uploading oc mirror archive to S3"
+            aws s3 cp ./archives/*.tar "s3://${s3_bucket}/"
 
             # Signal to the registry node that we're done mirroring to S3
             curl -X PUT -H 'Content-Type:' --data-binary \
@@ -680,8 +719,7 @@ Resources:
     Type: AWS::EC2::Instance
     DependsOn: HelperInstanceWaitCondition
     Properties:
-      #ImageId: !FindInMap [RHELMap, !Ref "AWS::Region", HVM64]
-      ImageId: !Ref AmiId
+      ImageId: !FindInMap [RHELMap, !Ref "AWS::Region", HVM64]
       IamInstanceProfile: !Ref RegistryInstanceProfile
       InstanceType: !Ref RegistryInstanceType
       KeyName: !Ref KeyName
@@ -703,7 +741,7 @@ Resources:
       UserData:
         Fn::Base64: !Sub
           - |
-            #!/bin/bash -xe
+            #!/bin/bash -x
             cd /tmp
 
             region=${AWS::Region}
@@ -712,38 +750,40 @@ Resources:
             aws s3 cp "s3://${s3_bucket}/openshift-install-linux-${ocp_ver}.tar.gz" .
 
             tar -xzf openshift-client-linux-${ocp_ver}.tar.gz
-            mv oc kubectl /usr/local/bin
-            chown root.root /usr/local/bin/oc /usr/local/bin/kubectl
-            chmod 0755 /usr/local/bin/oc /usr/local/bin/kubectl
-            restorecon -v /usr/local/bin/oc /usr/local/bin/kubectl
-
-            rm -f README.md
-
             tar -xzf openshift-install-linux-${ocp_ver}.tar.gz
-            mv openshift-install /usr/local/bin/
-            chown root.root /usr/local/bin/openshift-install
-            chmod 0755 /usr/local/bin/openshift-install
-            restorecon -v /usr/local/bin/openshift-install
             rm -f README.md
 
-            aws s3 sync "s3://${s3_bucket}/registry" /opt/registry
+            mv oc openshift-install kubectl /usr/local/bin
+            chown root.root /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install
+            chmod 0755 /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install
+            restorecon -v /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install
 
-            cat <<EOF >> /etc/systemd/system/registry.service
+            mkdir -p /home/ec2-user/certs
+            export REGISTRY_IP=$(hostname -i | awk '{print $NF}')
+            openssl req -newkey rsa:4096 -nodes -keyout "/home/ec2-user/certs/registry.key" \
+              -x509 -days 365 -out "/home/ec2-user/certs/registry.crt" \
+              -addext "subjectAltName = IP:${!REGISTRY_IP},DNS:${!HOSTNAME}" \
+              -subj "/C=US/ST=VA/L=Chantilly/O=RedHat/OU=RedHat/CN=${!HOSTNAME}/"
 
-            [Unit]
-            Description=Container Registry
 
-            [Service]
-            Restart=always
-            ExecStart=/usr/local/bin/oc image serve --dir=/opt/registry --listen=:5000
+            #aws s3 sync "s3://${s3_bucket}/registry" /opt/registry
 
-            [Install]
-            WantedBy=multi-user.target
+            #cat <<EOF >> /etc/systemd/system/registry.service
 
-            EOF
+            #[Unit]
+            #Description=Container Registry
 
-            systemctl daemon-reload
-            systemctl enable --now registry
+            #[Service]
+            #Restart=always
+            #ExecStart=/usr/local/bin/oc image serve --dir=/opt/registry --listen=:5000
+
+            #[Install]
+            #WantedBy=multi-user.target
+
+            #EOF
+
+            #systemctl daemon-reload
+            #systemctl enable --now registry
 
             # The repo will look like this :5000/openshift/release:4.6.7-thanos
 
