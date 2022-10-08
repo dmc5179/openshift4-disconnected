@@ -1,8 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: Template for creating a disconnected VPC in up to 3 AZs
 
-# 192.168.0.0/16
-
 Parameters:
 
   VpcCidr:
@@ -593,34 +591,20 @@ Resources:
 
             echo '${pull_secret}' > /tmp/pull-secret.json
 
-            #yum -y install vim python3 python3-pip
-            #python3 -m pip install --upgrade pip
-            #python3 -m pip install awscli
-
-            curl -O https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${ocp_ver}/openshift-client-linux-${ocp_ver}.tar.gz
-            curl -O https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${ocp_ver}/openshift-install-linux-${ocp_ver}.tar.gz
+            wget -q https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${ocp_ver}/openshift-client-linux-${ocp_ver}.tar.gz
+            wget -q https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${ocp_ver}/openshift-install-linux-${ocp_ver}.tar.gz
 
             aws s3 cp openshift-client-linux-${ocp_ver}.tar.gz "s3://${s3_bucket}/"
-            aws s3 cp  openshift-install-linux-${ocp_ver}.tar.gz "s3://${s3_bucket}/"
+            aws s3 cp openshift-install-linux-${ocp_ver}.tar.gz "s3://${s3_bucket}/"
 
             tar -xzf openshift-client-linux-${ocp_ver}.tar.gz
-            mv oc kubectl /usr/local/bin
-            chown root.root /usr/local/bin/oc /usr/local/bin/kubectl
-            chmod 0755 /usr/local/bin/oc /usr/local/bin/kubectl
-            restorecon -v /usr/local/bin/oc /usr/local/bin/kubectl
-
-            rm -f README.md
-
             tar -xzf openshift-install-linux-${ocp_ver}.tar.gz
-            mv openshift-install /usr/local/bin/
-            chown root.root /usr/local/bin/openshift-install
-            chmod 0755 /usr/local/bin/openshift-install
-            restorecon -v /usr/local/bin/openshift-install
             rm -f README.md
 
-            /usr/local/bin/oc adm release mirror -a /tmp/pull-secret.json --from=quay.io/openshift-release-dev/ocp-release:${ocp_ver}-x86_64 --to-dir=/opt/mirror
-
-            aws s3 sync --quiet /opt/mirror s3://${s3_bucket}/registry/
+            mv oc openshift-install kubectl /usr/local/bin
+            chown root.root /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install
+            chmod 0755 /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install
+            restorecon -v /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install
 
             # Signal to the registry node that we're done mirroring to S3
             curl -X PUT -H 'Content-Type:' --data-binary \
