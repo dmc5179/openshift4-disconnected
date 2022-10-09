@@ -102,9 +102,9 @@ Metadata:
 Mappings:
   RHELMap:
     us-east-1:
-      HVM64: ami-06640050dc3f556bb
+      HVM64: ami-063851ca4aec10974
     us-east-2:
-      HVM64: ami-092b43193629811af
+      HVM64: ami-0c2aa890fe59b7998
     us-west-1:
       HVM64: ami-0186e3fec9b0283ee
     eu-west-1:
@@ -599,8 +599,8 @@ Resources:
 
             wget -q https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/latest-4.11/oc-mirror.tar.gz
 
-            aws s3 cp openshift-client-linux-${ocp_ver}.tar.gz "s3://${s3_bucket}/"
-            aws s3 cp openshift-install-linux-${ocp_ver}.tar.gz "s3://${s3_bucket}/"
+            aws s3 cp --quiet openshift-client-linux-${ocp_ver}.tar.gz "s3://${s3_bucket}/"
+            aws s3 cp --quiet openshift-install-linux-${ocp_ver}.tar.gz "s3://${s3_bucket}/"
 
             tar -xzf openshift-client-linux-${ocp_ver}.tar.gz
             tar -xzf openshift-install-linux-${ocp_ver}.tar.gz
@@ -612,6 +612,9 @@ Resources:
             chmod 0755 /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install /usr/local/bin/oc-mirror
             restorecon -v /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install /usr/local/bin/oc-mirror
 
+            #Need just the 4.9 or 4.10 part
+            export OCP_MAJ_VER="4.$(echo ${ocp_ver} | awk -F\. '{print $2}')"
+
             cat <<EOF >> /home/ec2-user/imageset-config.yaml
             apiVersion: mirror.openshift.io/v1alpha2
             kind: ImageSetConfiguration
@@ -621,10 +624,10 @@ Resources:
             mirror:
               platform:
                 channels:
-                  - name: stable-${ocp_ver}
+                  - name: stable-${!OCP_MAJ_VER}
                 graph: true
               operators:
-                - catalog: registry.redhat.io/redhat/redhat-operator-index:v${ocp_ver}
+                - catalog: registry.redhat.io/redhat/redhat-operator-index:v${!OCP_MAJ_VER}
                   packages:
                     - name: advanced-cluster-management
                     - name: ansible-automation-platform-operator
@@ -635,15 +638,14 @@ Resources:
             EOF
 
             echo "Mirroring cluster images"
-            export XDG_RUNTIME_DIR="/run/user/0/containers"
-            mkdir -p ${!XDG_RUNTIME_DIR}
-            cat /tmp/pull-secret.json > ${!XDG_RUNTIME_DIR}/auth.json
+            mkdir -p ~/.docker
+            cat /tmp/pull-secret.json > ~/.docker/config.json
             mkdir -p /opt/mirror/
             pushd /opt/mirror
             /usr/local/bin/oc-mirror --continue-on-error --config /home/ec2-user/imageset-config.yaml file://archives
 
             echo "Uploading oc mirror archive to S3"
-            aws s3 cp ./archives/*.tar "s3://${s3_bucket}/"
+            aws s3 cp --quiet ./archives/*.tar "s3://${s3_bucket}/"
 
             # Signal to the registry node that we're done mirroring to S3
             curl -X PUT -H 'Content-Type:' --data-binary \
@@ -746,8 +748,8 @@ Resources:
 
             region=${AWS::Region}
 
-            aws s3 cp "s3://${s3_bucket}/openshift-client-linux-${ocp_ver}.tar.gz" .
-            aws s3 cp "s3://${s3_bucket}/openshift-install-linux-${ocp_ver}.tar.gz" .
+            aws s3 cp --quiet "s3://${s3_bucket}/openshift-client-linux-${ocp_ver}.tar.gz" .
+            aws s3 cp --quiet "s3://${s3_bucket}/openshift-install-linux-${ocp_ver}.tar.gz" .
 
             tar -xzf openshift-client-linux-${ocp_ver}.tar.gz
             tar -xzf openshift-install-linux-${ocp_ver}.tar.gz
