@@ -570,7 +570,7 @@ Resources:
         Ebs: 
           VolumeType: "gp2"
           DeleteOnTermination: "true"
-          VolumeSize: "50"
+          VolumeSize: "150"
       Tags:
       - Key: Name
         Value: !Sub 'Bastion Node - ${AWS::StackName}'
@@ -730,7 +730,7 @@ Resources:
         Ebs:
           VolumeType: "gp2"
           DeleteOnTermination: "true"
-          VolumeSize: "50"
+          VolumeSize: "150"
       Tags:
       - Key: Name
         Value: !Sub 'Registry Node - ${AWS::StackName}'
@@ -767,6 +767,7 @@ Resources:
               -addext "subjectAltName = IP:${!REGISTRY_IP},DNS:${!HOSTNAME}" \
               -subj "/C=US/ST=VA/L=Chantilly/O=RedHat/OU=RedHat/CN=${!HOSTNAME}/"
 
+            #oc adm catalog mirror file://redhat/redhat-operator-index:v4.10 REGISTRY/REPOSITORY
 
             #aws s3 sync "s3://${s3_bucket}/registry" /opt/registry
 
