@@ -375,6 +375,10 @@ Resources:
       GroupDescription: Allows HTTP and HTTPS from private instances to NAT instances
       SecurityGroupIngress:
       - CidrIp: !Ref VpcCidr
+        FromPort: 22
+        ToPort: 22
+        IpProtocol: tcp
+      - CidrIp: !Ref VpcCidr
         FromPort: 80
         ToPort: 80
         IpProtocol: TCP
@@ -382,14 +386,14 @@ Resources:
         FromPort: 443
         ToPort: 443
         IpProtocol: TCP
-      - CidrIp: '10.0.0.0/25'
-        FromPort: 80
-        ToPort: 80
-        IpProtocol: TCP
-      - CidrIp: '10.0.0.0/25'
-        FromPort: 443
-        ToPort: 443
-        IpProtocol: TCP
+#      - CidrIp: '10.0.0.0/25'
+#        FromPort: 80
+#        ToPort: 80
+#        IpProtocol: TCP
+#      - CidrIp: '10.0.0.0/25'
+#        FromPort: 443
+#        ToPort: 443
+#        IpProtocol: TCP
       Tags:
       - Key: Name
         Value: !Sub 'NAT Instance SG - ${AWS::StackName}'
@@ -427,11 +431,7 @@ Resources:
             aws ec2 modify-instance-attribute --no-source-dest-check --instance-id $instanceid --region $region
 
             # Install and start Squid
-            yum install -y squid
-            systemctl enable --now squid
-            sleep 5
-            iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 3129
-            iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-port 3130
+            yum install -y squid net-tools
 
             cp -a /etc/squid /etc/squid_orig
 
@@ -489,6 +489,14 @@ Resources:
             EOF
 
             /usr/sbin/squid -k parse && /usr/sbin/squid -k reconfigure
+
+            /usr/lib64/squid/security_file_certgen -c -s /var/spool/squid/ssl_db -M 4MB
+
+            systemctl enable --now squid
+            sleep 5
+            iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 3129
+            iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-port 3130
+
 
 # End Nat Instance
 ############################################################################
@@ -566,7 +574,7 @@ Resources:
       InstanceType: !Ref BastionInstanceType
       KeyName: !Ref KeyName
       BlockDeviceMappings: 
-      - DeviceName: "/dev/xvda"
+      - DeviceName: "/dev/sda1"
         Ebs: 
           VolumeType: "gp2"
           DeleteOnTermination: "true"
@@ -599,8 +607,13 @@ Resources:
 
             wget -q https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/latest-4.11/oc-mirror.tar.gz
 
+            podman pull docker.io/library/registry:2
+            podman save > docker_registry.tar docker.io/library/registry:2
+
             aws s3 cp --quiet openshift-client-linux-${ocp_ver}.tar.gz "s3://${s3_bucket}/"
             aws s3 cp --quiet openshift-install-linux-${ocp_ver}.tar.gz "s3://${s3_bucket}/"
+            aws s3 cp --quiet oc-mirror.tar.gz "s3://${s3_bucket}/"
+            aws s3 cp --quiet docker_registry.tar "s3://${s3_bucket}/"
 
             tar -xzf openshift-client-linux-${ocp_ver}.tar.gz
             tar -xzf openshift-install-linux-${ocp_ver}.tar.gz
@@ -611,41 +624,6 @@ Resources:
             chown root.root /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install /usr/local/bin/oc-mirror
             chmod 0755 /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install /usr/local/bin/oc-mirror
             restorecon -v /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install /usr/local/bin/oc-mirror
-
-            #Need just the 4.9 or 4.10 part
-            export OCP_MAJ_VER="4.$(echo ${ocp_ver} | awk -F\. '{print $2}')"
-
-            cat <<EOF >> /home/ec2-user/imageset-config.yaml
-            apiVersion: mirror.openshift.io/v1alpha2
-            kind: ImageSetConfiguration
-            storageConfig:
-              local:
-                path: /opt/mirror
-            mirror:
-              platform:
-                channels:
-                  - name: stable-${!OCP_MAJ_VER}
-                graph: true
-              operators:
-                - catalog: registry.redhat.io/redhat/redhat-operator-index:v${!OCP_MAJ_VER}
-                  packages:
-                    - name: advanced-cluster-management
-                    - name: ansible-automation-platform-operator
-                    - name: cincinnati-operator
-                    - name: compliance-operator
-                    - name: file-integrity-operator
-                    - name: rhacs-operator
-            EOF
-
-            echo "Mirroring cluster images"
-            mkdir -p ~/.docker
-            cat /tmp/pull-secret.json > ~/.docker/config.json
-            mkdir -p /opt/mirror/
-            pushd /opt/mirror
-            /usr/local/bin/oc-mirror --continue-on-error --config /home/ec2-user/imageset-config.yaml file://archives
-
-            echo "Uploading oc mirror archive to S3"
-            aws s3 cp --quiet ./archives/*.tar "s3://${s3_bucket}/"
 
             # Signal to the registry node that we're done mirroring to S3
             curl -X PUT -H 'Content-Type:' --data-binary \
@@ -704,11 +682,11 @@ Resources:
     Properties:
       GroupDescription: Allows SSH connections to the registry node
       SecurityGroupIngress:
-      - CidrIp: 0.0.0.0/0
+      - CidrIp: 0.0.0.0/0  # TODO: VPC Cidr??
         FromPort: 22
         ToPort: 22
         IpProtocol: tcp
-      - CidrIp: 0.0.0.0/0
+      - CidrIp: 0.0.0.0/0  # TODO: VPC Cidr??
         FromPort: 5000
         ToPort: 5000
         IpProtocol: tcp
@@ -726,7 +704,7 @@ Resources:
       InstanceType: !Ref RegistryInstanceType
       KeyName: !Ref KeyName
       BlockDeviceMappings:
-      - DeviceName: "/dev/xvda"
+      - DeviceName: "/dev/sda1"
         Ebs:
           VolumeType: "gp2"
           DeleteOnTermination: "true"
@@ -750,6 +728,7 @@ Resources:
 
             aws s3 cp --quiet "s3://${s3_bucket}/openshift-client-linux-${ocp_ver}.tar.gz" .
             aws s3 cp --quiet "s3://${s3_bucket}/openshift-install-linux-${ocp_ver}.tar.gz" .
+            aws s3 cp --quiet "s3://${s3_bucket}/docker_registry.tar" .
 
             tar -xzf openshift-client-linux-${ocp_ver}.tar.gz
             tar -xzf openshift-install-linux-${ocp_ver}.tar.gz
@@ -760,35 +739,57 @@ Resources:
             chmod 0755 /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install
             restorecon -v /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install
 
-            mkdir -p /home/ec2-user/certs
-            export REGISTRY_IP=$(hostname -i | awk '{print $NF}')
-            openssl req -newkey rsa:4096 -nodes -keyout "/home/ec2-user/certs/registry.key" \
-              -x509 -days 365 -out "/home/ec2-user/certs/registry.crt" \
+            podman load < docker_registry.tar
+
+            REGISTRY_DIR="/home/ec2-user/registry"
+            mkdir -p ${REGISTRY_DIR}/{auth,certs,data}
+            export REGISTRY_IP=$(hostname -I | awk '{print $NF}')
+            openssl req -newkey rsa:4096 -nodes -keyout "$!REGISTRY_DIR}/certs/registry.key" \
+              -x509 -days 365 -out "${!REGISTRY_DIR}/certs/registry.crt" \
               -addext "subjectAltName = IP:${!REGISTRY_IP},DNS:${!HOSTNAME}" \
               -subj "/C=US/ST=VA/L=Chantilly/O=RedHat/OU=RedHat/CN=${!HOSTNAME}/"
 
-            #oc adm catalog mirror file://redhat/redhat-operator-index:v4.10 REGISTRY/REPOSITORY
+            # Generate the registry htpasswd file
+            #htpasswd -bBc ${REGISTRY_DIR}/auth/htpasswd "${REG_USERNAME}" "${REG_PASSWORD}"
+            #dummy:$2y$05$pUhcEFsOgS3iMO0hvkSFNeuFkzeXcTqVeO/QPNZEjn3FR1V2KeuG2
+            
+            #Make sure to trust the self signed cert we just made
+            sudo cp -f ${REGISTRY_DIR}/certs/registry.crt /etc/pki/ca-trust/source/anchors/
+            sudo update-ca-trust
+            sudo update-ca-trust extract
+            
+            # Configure the firewall
+            sudo systemctl enable --now firewalld
+            sudo firewall-cmd --add-port=5000/tcp --zone=internal --permanent
+            sudo firewall-cmd --add-port=5000/tcp --zone=public   --permanent
+            sudo firewall-cmd --add-service=http  --permanent
+            sudo firewall-cmd --reload
 
-            #aws s3 sync "s3://${s3_bucket}/registry" /opt/registry
+            # Configure SELinux to allow containers in systemd services
+            setsebool -P container_manage_cgroup on
 
-            #cat <<EOF >> /etc/systemd/system/registry.service
-
-            #[Unit]
-            #Description=Container Registry
-
-            #[Service]
-            #Restart=always
-            #ExecStart=/usr/local/bin/oc image serve --dir=/opt/registry --listen=:5000
-
-            #[Install]
-            #WantedBy=multi-user.target
-
-            #EOF
-
-            #systemctl daemon-reload
-            #systemctl enable --now registry
-
-            # The repo will look like this :5000/openshift/release:4.6.7-thanos
+            podman run --name registry_server -p 5000:5000 \
+            -v ${!REGISTRY_DIR}/data:/var/lib/registry:z \
+            -v ${!REGISTRY_DIR}/auth:/auth:z \
+            -e "REGISTRY_AUTH=htpasswd" \
+            -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry" \
+            -e "REGISTRY_HTTP_SECRET=ALongRandomSecretForRegistry" \
+            -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
+            -v ${!REGISTRY_DIR}/certs:/certs:z \
+            -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/registry.crt \
+            -e REGISTRY_HTTP_TLS_KEY=/certs/registry.key \
+            -e REGISTRY_STORAGE=s3 \
+            -e REGISTRY_STORAGE_S3_REGION=us-east-2 \
+            -e REGISTRY_STORAGE_S3_BUCKET=danregistry \
+            -e REGISTRY_STORAGE_S3_ENCRYPT=false \
+            -e REGISTRY_STORAGE_S3_SECURE=true \
+            -e REGISTRY_STORAGE_S3_V4AUTH=true \
+            -e REGISTRY_STORAGE_S3_CHUNKSIZE=5242880 \
+            -e REGISTRY_STORAGE_S3_ROOTDIRECTORY=/image-registry \
+            --hostname=${!HOSTNAME} \
+            --conmon-pidfile=/tmp/podman-registry-conman.pid \
+            --detach \
+            docker.io/library/registry:2
 
           - ocp_ver: !Ref OpenShiftVersion
             s3_bucket: !Ref S3Bucket
