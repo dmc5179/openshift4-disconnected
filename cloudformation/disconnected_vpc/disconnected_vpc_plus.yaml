@@ -426,6 +426,11 @@ Resources:
             yum update -y --security
             yum install -y unzip vim wget firewalld
 
+            # Trust the RHUI certs
+            cp /etc/pki/rhui/cdn.redhat.com-chain.crt /etc/pki/ca-trust/source/anchors/cdn.redhat.com-chain.crt
+            update-ca-trust extract
+            update-ca-trust
+
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             ./aws/install
@@ -450,6 +455,7 @@ Resources:
 
             echo '.amazonaws.com' > /etc/squid/whitelist.txt
             echo '.cloudfront.net' >> /etc/squid/whitelist.txt
+            echo '.ce.redhat.com' >> /etc/squid/whitelist.txt
 
             cat > /etc/squid/squid.conf << 'EOF'
 
