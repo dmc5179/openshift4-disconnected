@@ -49,7 +49,7 @@ Parameters:
   NATInstanceType:
     Type: String
     Default: t3.large
-    Description: Instance type to use to launch the NAT instances.
+    Description: Instance type to use to launch the NAT instance.
     AllowedValues:
     - t3.nano
     - t3.micro
@@ -72,12 +72,12 @@ Parameters:
   BastionInstanceType:
     Type: String
     Default: t3.large
-    Description: Instance type to use to launch the NAT instances.
+    Description: Instance type to use to launch the Bastion Instance.
 
   RegistryInstanceType:
     Type: String
     Default: t3.large
-    Description: Instance type to use to launch the NAT instances.
+    Description: Instance type to use to launch the Registry instance.
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -424,11 +424,16 @@ Resources:
 
             # Apply the latest security patches
             yum update -y --security
+            yum install -y unzip vim wget firewalld
+
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            ./aws/install
 
             # Disable source / destination check. It cannot be disabled from the launch configuration
             region=${AWS::Region}
             instanceid=`curl -s http://169.254.169.254/latest/meta-data/instance-id`
-            aws ec2 modify-instance-attribute --no-source-dest-check --instance-id $instanceid --region $region
+            /usr/local/bin/aws ec2 modify-instance-attribute --no-source-dest-check --instance-id $instanceid --region $region
 
             # Install and start Squid
             yum install -y squid net-tools
@@ -488,12 +493,14 @@ Resources:
 
             EOF
 
-            /usr/sbin/squid -k parse && /usr/sbin/squid -k reconfigure
-
             /usr/lib64/squid/security_file_certgen -c -s /var/spool/squid/ssl_db -M 4MB
 
             systemctl enable --now squid
+
+            /usr/sbin/squid -k parse && /usr/sbin/squid -k reconfigure
+
             sleep 5
+
             iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 3129
             iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-port 3130
 
