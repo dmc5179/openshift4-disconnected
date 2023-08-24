@@ -37,7 +37,7 @@ Parameters:
     Description: Name of RSA key for EC2 access for testing and troubleshooting.
 
   OpenShiftVersion:
-    Default: "4.6.7"
+    Default: "4.12.27"
     Description: OpenShift Version Number
     Type: String
 
@@ -48,7 +48,7 @@ Parameters:
 
   NATInstanceType:
     Type: String
-    Default: t3.medium
+    Default: t3.large
     Description: Instance type to use to launch the NAT instances.
     AllowedValues:
     - t3.nano
@@ -102,13 +102,13 @@ Metadata:
 Mappings:
   RHELMap:
     us-east-1:
-      HVM64: ami-063851ca4aec10974
+      HVM64: ami-0b4466ff0aec45222
     us-east-2:
-      HVM64: ami-0c2aa890fe59b7998
+      HVM64: ami-04496256d38fad452
     us-west-1:
-      HVM64: ami-0186e3fec9b0283ee
+      HVM64: ami-02bfa5a117cd76b94
     eu-west-1:
-      HVM64: ami-08970fb2e5767e3b8
+      HVM64: ami-01810eb03ac7f790c
 
 
 Conditions:
