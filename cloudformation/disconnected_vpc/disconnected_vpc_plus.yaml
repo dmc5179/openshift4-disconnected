@@ -742,19 +742,19 @@ Resources:
             podman load < docker_registry.tar
 
             REGISTRY_DIR="/home/ec2-user/registry"
-            mkdir -p ${REGISTRY_DIR}/{auth,certs,data}
+            mkdir -p ${!REGISTRY_DIR}/{auth,certs,data}
             export REGISTRY_IP=$(hostname -I | awk '{print $NF}')
-            openssl req -newkey rsa:4096 -nodes -keyout "$!REGISTRY_DIR}/certs/registry.key" \
+            openssl req -newkey rsa:4096 -nodes -keyout "${!REGISTRY_DIR}/certs/registry.key" \
               -x509 -days 365 -out "${!REGISTRY_DIR}/certs/registry.crt" \
               -addext "subjectAltName = IP:${!REGISTRY_IP},DNS:${!HOSTNAME}" \
               -subj "/C=US/ST=VA/L=Chantilly/O=RedHat/OU=RedHat/CN=${!HOSTNAME}/"
 
             # Generate the registry htpasswd file
-            #htpasswd -bBc ${REGISTRY_DIR}/auth/htpasswd "${REG_USERNAME}" "${REG_PASSWORD}"
+            htpasswd -bBc ${!REGISTRY_DIR}/auth/htpasswd "dummy" "dummy"
             #dummy:$2y$05$pUhcEFsOgS3iMO0hvkSFNeuFkzeXcTqVeO/QPNZEjn3FR1V2KeuG2
             
             #Make sure to trust the self signed cert we just made
-            sudo cp -f ${REGISTRY_DIR}/certs/registry.crt /etc/pki/ca-trust/source/anchors/
+            sudo cp -f ${!REGISTRY_DIR}/certs/registry.crt /etc/pki/ca-trust/source/anchors/
             sudo update-ca-trust
             sudo update-ca-trust extract
             
