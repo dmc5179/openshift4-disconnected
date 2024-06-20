@@ -6,7 +6,7 @@ Everything in this guide will use the variable names from the role which you wil
 
 If you need to override something very specific to the role take a look at the role's README
 
-- [Podman registry role README](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/rolss/podman_registry/README.md)
+- [Podman registry role README](../roles/podman_registry/README.md)
 
 By default the registry will be created with the following SAN
 ```
