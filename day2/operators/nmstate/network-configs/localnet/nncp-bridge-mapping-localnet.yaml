@@ -1,0 +1,11 @@
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: vm-localnet
+spec:
+  desiredState:
+    ovn:
+      bridge-mappings:
+      - localnet: vm-localnet
+        bridge: br-ex
+        state: present
