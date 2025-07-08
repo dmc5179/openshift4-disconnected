@@ -40,6 +40,7 @@ Parameters:
   MasterSecurityGroupId:
     Description: The master security group ID.
     Type: AWS::EC2::SecurityGroup::Id
+    Default: "s3://dan-combine/master.ign"
 
   IgnitionLocation:
     Description: Ignition config file location, such as https://api-int.$CLUSTER_NAME.$DOMAIN:22623/config/master
@@ -206,7 +207,7 @@ Resources:
         Ebs:
           VolumeSize: "120"
           VolumeType: "gp2"
-      IamInstanceProfile: !Ref MasterInstanceProfileName
+      IamInstanceProfile: "Combine-TS-WLDEVELOPER-EC2"
       InstanceType: !Ref MasterInstanceType
       NetworkInterfaces:
       - AssociatePublicIpAddress: "false"
@@ -261,7 +262,7 @@ Resources:
         Ebs:
           VolumeSize: "120"
           VolumeType: "gp2"
-      IamInstanceProfile: !Ref MasterInstanceProfileName
+      IamInstanceProfile: "Combine-TS-WLDEVELOPER-EC2"
       InstanceType: !Ref MasterInstanceType
       NetworkInterfaces:
       - AssociatePublicIpAddress: "false"
@@ -316,7 +317,7 @@ Resources:
         Ebs:
           VolumeSize: "120"
           VolumeType: "gp2"
-      IamInstanceProfile: !Ref MasterInstanceProfileName
+      IamInstanceProfile: "Combine-TS-WLDEVELOPER-EC2"
       InstanceType: !Ref MasterInstanceType
       NetworkInterfaces:
       - AssociatePublicIpAddress: "false"
