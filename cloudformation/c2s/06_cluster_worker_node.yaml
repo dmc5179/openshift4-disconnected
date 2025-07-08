@@ -39,6 +39,7 @@ Parameters:
   WorkerInstanceProfileName:
     Description: IAM profile to associate with worker nodes.
     Type: String
+    Default: "s3://dan-combine/worker.ign"
 
   WorkerInstanceType:
     AllowedValues:

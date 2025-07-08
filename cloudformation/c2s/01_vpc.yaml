@@ -43,6 +43,14 @@ Parameters:
     Default: 12
     Type: Number
 
+  Publish:
+    AllowedValues:
+    - "internal"
+    - "external"
+    Description: Allow external API access to the cluster
+    Default: "internal"
+    Type: String
+
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
@@ -51,6 +59,7 @@ Metadata:
       Parameters:
       - VpcCidr
       - SubnetBits
+      - Publish
     - Label:
         default: "Availability Zones"
       Parameters:
@@ -62,8 +71,11 @@ Metadata:
         default: "VPC CIDR"
       SubnetBits:
         default: "Bits Per Subnet"
+      Publish:
+        default: "Internal or External"
 
 Conditions:
+  DoExternal: !Equals ['external', !Ref Publish]
   DoAz3: !Equals [3, !Ref AvailabilityZoneCount]
   DoAz2: !Or [!Equals [2, !Ref AvailabilityZoneCount], Condition: DoAz3]
 

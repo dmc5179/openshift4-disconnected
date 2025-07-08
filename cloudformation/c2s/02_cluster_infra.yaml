@@ -36,6 +36,7 @@ Parameters:
 #  PublicSubnets:
 #    Description: The internet-facing subnets.
 #    Type: List<AWS::EC2::Subnet::Id>
+#    Default: ""
 
   PrivateSubnets:
     Description: The internal subnets.
@@ -44,6 +45,14 @@ Parameters:
   VpcId:
     Description: The VPC-scoped resources will belong to this VPC.
     Type: AWS::EC2::VPC::Id
+
+  Publish:
+    AllowedValues:
+    - "internal"
+    - "external"
+    Description: Allow external API access to the cluster
+    Default: "internal"
+    Type: String
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -59,6 +68,7 @@ Metadata:
       - VpcId
 #      - PublicSubnets
       - PrivateSubnets
+      - Publish
 #    - Label:
 #        default: "DNS"
 #      Parameters:
@@ -75,13 +85,20 @@ Metadata:
 #        default: "Public Subnets"
       PrivateSubnets:
         default: "Private Subnets"
+      Publish:
+        default: "Internal vs External"
 #      HostedZoneName:
 #        default: "Public Hosted Zone Name"
 #      HostedZoneId:
 #        default: "Public Hosted Zone ID"
 
+Conditions:
+  DoExternal: !Equals ['external', !Ref Publish]
+
 Resources:
+
 #  ExtApiElb:
+#    Condition: DoExternal
 #    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
 #    Properties:
 #      Name: !Join ["-", [!Ref InfrastructureName, "ext"]]
@@ -177,6 +194,7 @@ Resources:
 #          DNSName: !GetAtt IntApiElb.DNSName
 
 #  ExternalApiListener:
+#    Condition: DoExternal
 #    Type: AWS::ElasticLoadBalancingV2::Listener
 #    Properties:
 #      DefaultActions:
@@ -188,29 +206,30 @@ Resources:
 #      Port: 6443
 #      Protocol: TCP
 
-  ExternalApiTargetGroup:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-    Properties:
-      Name: !Join ["-", [!Ref InfrastructureName, "aext"]]
-      HealthCheckIntervalSeconds: 10
-      HealthCheckPath: "/readyz"
-      HealthCheckPort: 6443
-      HealthCheckProtocol: HTTPS
-      HealthyThresholdCount: 2
-      UnhealthyThresholdCount: 2
-      Port: 6443
-      Protocol: TCP
-      TargetType: ip
-      VpcId:
-        Ref: VpcId
-      TargetGroupAttributes:
-      - Key: deregistration_delay.timeout_seconds
-        Value: 60
-      Tags:
-      - Key: "Name"
-        Value: !Join ["-", [!Ref InfrastructureName, "aext"]]
-      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
-        Value: owned
+#  ExternalApiTargetGroup:
+#    Condition: DoExternal
+#    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+#    Properties:
+#      Name: !Join ["-", [!Ref InfrastructureName, "aext"]]
+#      HealthCheckIntervalSeconds: 10
+#      HealthCheckPath: "/readyz"
+#      HealthCheckPort: 6443
+#      HealthCheckProtocol: HTTPS
+#      HealthyThresholdCount: 2
+#      UnhealthyThresholdCount: 2
+#      Port: 6443
+#      Protocol: TCP
+#      TargetType: instance
+#      VpcId:
+#        Ref: VpcId
+#      TargetGroupAttributes:
+#      - Key: deregistration_delay.timeout_seconds
+#        Value: 60
+#      Tags:
+#      - Key: "Name"
+#        Value: !Join ["-", [!Ref InfrastructureName, "aext"]]
+#      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
+#        Value: owned
 
   InternalApiListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -236,7 +255,7 @@ Resources:
       UnhealthyThresholdCount: 2
       Port: 6443
       Protocol: TCP
-      TargetType: ip
+      TargetType: instance
       VpcId:
         Ref: VpcId
       TargetGroupAttributes:
@@ -272,7 +291,7 @@ Resources:
       UnhealthyThresholdCount: 2
       Port: 22623
       Protocol: TCP
-      TargetType: ip
+      TargetType: instance
       VpcId:
         Ref: VpcId
       TargetGroupAttributes:
@@ -489,9 +508,9 @@ Outputs:
 #    Description: Lambda ARN useful to help register or deregister IP targets for the load balancers.
 #    Value: !GetAtt RegisterNlbIpTargets.Arn
 
-  ExternalApiTargetGroupArn:
-    Description: ARN of the external API target group.
-    Value: !Ref ExternalApiTargetGroup
+#  ExternalApiTargetGroupArn:
+#    Description: ARN of the external API target group.
+#    Value: !Ref ExternalApiTargetGroup
 
   InternalApiTargetGroupArn:
     Description: ARN of the internal API target group.

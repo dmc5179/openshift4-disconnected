@@ -39,11 +39,19 @@ Parameters:
     Description: The VPC-scoped resources will belong to this VPC.
     Type: AWS::EC2::VPC::Id
 
-  BootstrapIgnitionLocation:
+  IgnitionLocation:
     Description: >-
       Ignition config file location. (Ex: s3://my-s3-bucket/bootstrap.ign)
     Type: String
-    Default: "s3://dan/bootstrap.ign"
+    Default: "s3://dan-combine/bootstrap.ign"
+
+  CertificateAuthorities:
+    Description: >-
+      Base64 encoded certificate authority string to use, such as data:text/plain;charset=utf-8;base64,ABC...xYz==.
+      You should use the value generated when creating the ignition config files using
+      `openshift-install create ignition-configs`.
+    Type: String
+    Default: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUQxRENDQXJ5Z0F3SUJBZ0lEQTlqek1BMEdDU3FHU0liM0RRRUJDd1VBTUhveEN6QUpCZ05WQkFZVEFsVlQKTVFzd0NRWURWUVFJREFKV1FURVBNQTBHQTFVRUJ3d0dVbVZ6ZEc5dU1SMHdHd1lEVlFRS0RCUlRaWEYxYjJsaApJRWh2YkdScGJtZHpJRWx1WXpFUU1BNEdBMVVFQ3d3SFEyOXRZbWx1WlRFY01Cb0dBMVVFQXd3VFEyOXRZbWx1ClpTQkRRU0F0SUZKbFpFaGhkREFlRncweE9UQTRNVFl3TkRBd01EQmFGdzB5T0RBNE1UWXdOREF3TURCYU1Ib3gKQ3pBSkJnTlZCQVlUQWxWVE1Rc3dDUVlEVlFRSURBSldRVEVQTUEwR0ExVUVCd3dHVW1WemRHOXVNUjB3R3dZRApWUVFLREJSVFpYRjFiMmxoSUVodmJHUnBibWR6SUVsdVl6RVFNQTRHQTFVRUN3d0hRMjl0WW1sdVpURWNNQm9HCkExVUVBd3dUUTI5dFltbHVaU0JEUVNBdElGSmxaRWhoZERDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVAKQURDQ0FRb0NnZ0VCQUpXM3FDNnNDTkY1OFA1ZnoyUDF1bXErSlo2elU5UjJicFJWWHlEb3MxajQ1MHlnT2ZYcwp5eTVkelo0Yk93N0d5S1ZaeXZUOGdkR1lVQWowMnFzYzZXdzQxNjFKQWJYWHdnUTF0clNmakg1eGVLMEV5ajhqCjJlanhvZUc1UVJCZG1WaDVaQXhxMk9VSTV0RERGRlQ4ZFUrRE5sSVl6YlZhQ0ZmZzdjN1dQQXNTZkZYeFFKV24Kb1U4NW10Z3FLR2kvL0lhZXJOSkFrTys5MDB1R24zcVkwc0d6YkZQb292OU8rQmEzaDFVOHk4dVJXdGEwODBvOQpBNXp2NzRTNXJHYVBuaUl3YzlKNmx2S2JmZVhyL0NZcXlsb0hKc0Fhek5XeXVGOWZpTU5GODdRZ3dsaWhibFhyClhyTm9iN05hajBIdHFTeCtvVHdvdk51SWFZVXpYN212MTNrQ0F3RUFBYU5qTUdFd0RnWURWUjBQQVFIL0JBUUQKQWdHR01BOEdBMVVkRXdFQi93UUZNQU1CQWY4d0hRWURWUjBPQkJZRUZCakMwdnR4cDFBc01ma2RjaHhWTWlvOQp6WUEzTUI4R0ExVWRJd1FZTUJhQUZCakMwdnR4cDFBc01ma2RjaHhWTWlvOXpZQTNNQTBHQ1NxR1NJYjNEUUVCCkN3VUFBNElCQVFBdjdZbkNORkdNZjZrWkdVOVFWdlRiNWRiT3FqdElsTEFGYkM1a0NkUktyYzZ6M2NyQlU2K0QKZWpxRUxmdnVTN1RiaHByREkrelRVVjF4bC9PcXU4Y3NiQWREVjBMSVYxa0MvM3F4ZkorYWhubGtQUkJQZm03Rgoxano1akNvaHdDbWk0RXdOc3BHNVlpZ3M2VUQzNVE4RTZqT1ZKSkZXOVdjT2hUVDJOSU9kbDM3czA1eE5YRnVLCjYxc0k5bzk4N1d5UzFld0JWNHFDUVU2OXprRG9GU0RReWJQUkhkQlU4SGxJNFUyWGl6Q3FaU0dNRGIwUG9yQUwKTEZYbUphQk4zWm5GNmdHNHBpT3M5eHY3ZC96SllyK2N2TDhqdlh2RFhwelRzampWcCs0aEhJckM5SlJZU2dZRgowclFBU3g3UFlWY1UrRWV6NkZ2MXJORXJEWU1FZnpheQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCi0tLS0tQkVHSU4gQ0VSVElGSUNBVEUtLS0tLQpNSUlENERDQ0FzaWdBd0lCQWdJRVRyWG5vakFOQmdrcWhraUc5dzBCQVFzRkFEQjZNUXN3Q1FZRFZRUUdFd0pWClV6RUxNQWtHQTFVRUNBd0NWa0V4RHpBTkJnTlZCQWNNQmxKbGMzUnZiakVkTUJzR0ExVUVDZ3dVVTJWeGRXOXAKWVNCSWIyeGthVzVuY3lCSmJtTXhFREFPQmdOVkJBc01CME52YldKcGJtVXhIREFhQmdOVkJBTU1FME52YldKcApibVVnUTBFZ0xTQlNaV1JJWVhRd0hoY05NVGt3T0RFMk1EUXdNREF3V2hjTk1qWXdPREUyTURRd01EQXdXakNCCmdURUxNQWtHQTFVRUJoTUNWVk14Q3pBSkJnTlZCQWdNQWxaQk1ROHdEUVlEVlFRSERBWlNaWE4wYjI0eEhUQWIKQmdOVkJBb01GRk5sY1hWdmFXRWdTRzlzWkdsdVozTWdTVzVqTVJBd0RnWURWUVFMREFkRGIyMWlhVzVsTVNNdwpJUVlEVlFRRERCcERiMjFpYVc1bElFTkJJRk5wWjI1bGNpQXRJRkpsWkVoaGREQ0NBU0l3RFFZSktvWklodmNOCkFRRUJCUUFEZ2dFUEFEQ0NBUW9DZ2dFQkFJTFBvMjJqOTB0TldPNEhuVFF5TFRRcnRZVkpVWCsxanl0MFMvR0sKR1Y2SStWZVZkK3ZwYVpOVzIzYk5WSTBwdmdRU0p2RzZidzdIV0hGTGMxZ2ZBcmhxV2RXdzRnOU9oVWI0bVF3cAp2Z0hNQ2huRVhBZ0h0L3JhL1lybFp3c2U5NXR3Y0ZPTExQWWtrelA3eGgzSTFYN2VoZkc4bDJFOExnUGNkbTJxCkhUWFBjUER0U1J1ZHlqTTBEbXhQWFhCMlR2b3dxdytoUTQzNGd2N0pyd0hTVDhBTm84YVA2ay9PMkJNaDBxVzUKdTlPU2N3NnNlRWxYelF4RTYwcU56bjVDRkRkbWQzUEh4S2tCckwyemM2SVRLMGYwTDdmcXdQT09xdEZjSmxjegpkK1pubmlPZHlHYk9OZEpNVktjd3hHdUtyYWUzbXI2RzAxdDU1YXVoNG9XWkhzc0NBd0VBQWFObU1HUXdEZ1lEClZSMFBBUUgvQkFRREFnR0dNQklHQTFVZEV3RUIvd1FJTUFZQkFmOENBUUF3SFFZRFZSME9CQllFRkNScWlTQU8KTG8rSTVrbGNNc3ZDSmhIUy9EaWhNQjhHQTFVZEl3UVlNQmFBRkJqQzB2dHhwMUFzTWZrZGNoeFZNaW85ellBMwpNQTBHQ1NxR1NJYjNEUUVCQ3dVQUE0SUJBUUJUVzFVTWloTWZ1QkVEUVdqWExrM0N4WjRydmFhSGcvU2dIZElGCnpsb3krUVJ2aXlPWXBuOWFLdDNtb1ZOeTE4QTFHcVRKYWhNWmJmc1FadFFlUlpIRzBrK0JkUXpESStGSFVjK1QKMEJnSGFRYUFlZXdxempERFF2WFMrdVpsMWZueXluU2Q0L1lJWEdmRDFvUk1SWFMyQURJOE9sNlZ5ZUpudk5JQgpvSkp3ZHpVVnIwYnRsVCtpVXF0SUxWQkZGcUNzZjZOTVFXNThsWVJBT3AxMDNJelQ0cU05MXFLTGRYalFUdGxpCnliLy9iODU4ZU5waWhla3N4V3hydndveldSUjlhRFdWRnRPQ29ucmk2Uzlrek9RUWI4SlJTRTlCOHVJNXg5Wk4KS09EYmoxRWxTY0VGNHBQMXFMaXB3Yi9lMThyNkF5R0FwZjlZcEtGWHRDUE9Yd2V2Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K"
 
 #  AutoRegisterELB:
 #    AllowedValues:
@@ -64,12 +72,12 @@ Parameters:
   InternalApiTargetGroupArn:
     Description: ARN for internal API load balancer target group.
     Type: String
-    Default: ""
+    Default: "arn:aws:elasticloadbalancing:us-east-1:485015763915:targetgroup/abc123-aint/b8684ecd670f3d6b"
 
   InternalServiceTargetGroupArn:
     Description: ARN for internal service load balancer target group.
     Type: String
-    Default: ""
+    Default: "arn:aws:elasticloadbalancing:us-east-1:485015763915:targetgroup/abc123-sint/bc6e26819f263837"
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -82,7 +90,7 @@ Metadata:
         default: "Host Information"
       Parameters:
       - RhcosAmi
-      - BootstrapIgnitionLocation
+      - IgnitionLocation
       - MasterSecurityGroupId
     - Label:
         default: "Network Configuration"
@@ -109,7 +117,7 @@ Metadata:
         default: "Public Subnet"
       RhcosAmi:
         default: "Red Hat Enterprise Linux CoreOS AMI ID"
-      BootstrapIgnitionLocation:
+      IgnitionLocation:
         default: "Bootstrap Ignition Source"
       MasterSecurityGroupId:
         default: "Master Security Group ID"
@@ -185,8 +193,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: !Ref RhcosAmi
-      #IamInstanceProfile: !Ref BootstrapInstanceProfile
-      IamInstanceProfile: ''
+      IamInstanceProfile: 'Combine-Policy-TSInstanceProfileWLDEVELOPER-1BU3AI9ABLXLB'
       InstanceType: "i3.large"
       NetworkInterfaces:
       - AssociatePublicIpAddress: "false"
@@ -197,9 +204,10 @@ Resources:
         SubnetId: !Ref "PublicSubnet"
       UserData:
         Fn::Base64: !Sub [
-          '{"ignition":{"config":{"replace":{"source":"${S3Loc}"}},"version":"3.1.0"}}',
+          '{"ignition":{"config":{"merge":[{"source":"${SOURCE}"}]},"security":{"tls":{"certificateAuthorities":[{"source":"${CA_BUNDLE}"}]}},"version":"3.1.0"}}',
           {
-            S3Loc: !Ref BootstrapIgnitionLocation
+            SOURCE: !Ref IgnitionLocation,
+            CA_BUNDLE: !Ref CertificateAuthorities
           }
         ]
       Tags:
@@ -237,9 +245,9 @@ Outputs:
     Description: Bootstrap Instance ID.
     Value: !Ref BootstrapInstance
 
-  BootstrapPublicIp:
-    Description: The bootstrap node public IP address.
-    Value: !GetAtt BootstrapInstance.PublicIp
+#  BootstrapPublicIp:
+#    Description: The bootstrap node public IP address.
+#    Value: !GetAtt BootstrapInstance.PublicIp
 
   BootstrapPrivateIp:
     Description: The bootstrap node private IP address.
