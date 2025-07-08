@@ -1,0 +1,13 @@
+kind: ImageSetConfiguration
+apiVersion: mirror.openshift.io/v1alpha2
+#archiveSize: 2
+storageConfig:
+  local:
+    path: /opt/mirror
+mirror:
+  operators:
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.19
+    targetName: nmstate-catalog
+    targetTag: "4.19"
+    packages:
+    - name: kubernetes-nmstate-operator
