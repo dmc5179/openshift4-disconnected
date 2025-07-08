@@ -1,0 +1,20 @@
+---
+# Create a NAD for VLAN 1032 attached to the bridge-mapping named vlans-net
+# One-to-One mapping between bridge-mappings and NADs
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  annotations:
+    description: VLAN 1032 connection for VMs
+  name: vlan1032
+  namespace: default
+spec:
+  config: |-
+    {
+      "cniVersion": "0.3.1",
+      "name": "vlans-net",
+      "topology": "localnet",
+      "netAttachDefName": "default/vlan1032",
+      "type": "ovn-k8s-cni-overlay",
+      "vlanID": 1032
+    }

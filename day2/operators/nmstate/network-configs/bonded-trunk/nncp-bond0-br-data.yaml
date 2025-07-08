@@ -1,0 +1,19 @@
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: bond0-with-br-data
+spec:
+  desiredState:
+    interfaces:
+    - bridge:
+        allow-extra-patch-ports: true
+        options:
+          stp: false
+        port:
+        - name: bond0
+      description: A dedicated OVS bridge with bond0 as a port
+      name: br-data
+      state: up
+      type: ovs-bridge
+  nodeSelector:
+    node-role.kubernetes.io/worker: ""
