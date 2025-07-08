@@ -37,7 +37,7 @@ Parameters:
     Description: Name of RSA key for EC2 access for testing and troubleshooting.
 
   OpenShiftVersion:
-    Default: "4.12.27"
+    Default: "4.17.9"
     Description: OpenShift Version Number
     Type: String
 
@@ -104,7 +104,7 @@ Mappings:
     us-east-1:
       HVM64: ami-0b4466ff0aec45222
     us-east-2:
-      HVM64: ami-04496256d38fad452
+      HVM64: ami-002acc74c401fa86b
     us-west-1:
       HVM64: ami-02bfa5a117cd76b94
     eu-west-1:
@@ -589,7 +589,7 @@ Resources:
       BlockDeviceMappings: 
       - DeviceName: "/dev/sda1"
         Ebs: 
-          VolumeType: "gp2"
+          VolumeType: "gp3"
           DeleteOnTermination: "true"
           VolumeSize: "150"
       Tags:
@@ -607,6 +607,7 @@ Resources:
             #!/bin/bash -x
 
             yum update -y --security
+            dnf -y install wget vim podman unzip jq
 
             cd /tmp
 
@@ -615,28 +616,36 @@ Resources:
             echo '${pull_secret}' > /tmp/pull-secret.json
             echo '${pull_secret}' > /home/ec2-user/pull-secret.json
 
-            wget -q https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${ocp_ver}/openshift-client-linux-${ocp_ver}.tar.gz
-            wget -q https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${ocp_ver}/openshift-install-linux-${ocp_ver}.tar.gz
+            wget -q https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${ocp_ver}/openshift-client-linux-amd64-rhel9-${ocp_ver}.tar.gz
+            wget -q https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${ocp_ver}/openshift-install-rhel9-amd64.tar.gz
 
-            wget -q https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/latest-4.11/oc-mirror.tar.gz
+            wget -q https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${ocp_ver}/oc-mirror.rhel9.tar.gz
+            
+            wget -q https://developers.redhat.com/content-gateway/file/pub/openshift-v4/clients/mirror-registry/1.3.11/mirror-registry.tar.gz
 
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            ./aws/install
+            
             podman pull docker.io/library/registry:2
             podman save > docker_registry.tar docker.io/library/registry:2
 
-            aws s3 cp --quiet openshift-client-linux-${ocp_ver}.tar.gz "s3://${s3_bucket}/"
-            aws s3 cp --quiet openshift-install-linux-${ocp_ver}.tar.gz "s3://${s3_bucket}/"
-            aws s3 cp --quiet oc-mirror.tar.gz "s3://${s3_bucket}/"
-            aws s3 cp --quiet docker_registry.tar "s3://${s3_bucket}/"
+            /usr/local/bin/aws s3 cp --quiet openshift-client-linux-amd64-rhel9-${ocp_ver}.tar.gz "s3://${s3_bucket}/"
+            /usr/local/bin/aws s3 cp --quiet openshift-install-rhel9-amd64.tar.gz "s3://${s3_bucket}/"
+            /usr/local/bin/aws s3 cp --quiet oc-mirror.rhel9.tar.gz "s3://${s3_bucket}/"
+            /usr/local/bin/aws s3 cp --quiet docker_registry.tar "s3://${s3_bucket}/"
+            /usr/local/bin/aws s3 cp --quiet mirror-registry.tar.gz "s3://${s3_bucket}/"
 
-            tar -xzf openshift-client-linux-${ocp_ver}.tar.gz
-            tar -xzf openshift-install-linux-${ocp_ver}.tar.gz
-            tar -xzf oc-mirror.tar.gz
+            tar -xzf openshift-client-linux-amd64-rhel9-${ocp_ver}.tar.gz
+            tar -xzf openshift-install-rhel9-amd64.tar.gz
+            tar -xzf oc-mirror.rhel9.tar.gz
             rm -f README.md
 
-            mv oc openshift-install kubectl oc-mirror /usr/local/bin
-            chown root.root /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install /usr/local/bin/oc-mirror
-            chmod 0755 /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install /usr/local/bin/oc-mirror
-            restorecon -v /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install /usr/local/bin/oc-mirror
+            sudo mv oc openshift-install-fips kubectl oc-mirror /usr/local/bin
+            sudo chown root.root /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install-fips /usr/local/bin/oc-mirror
+            sudo chmod 0755 /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install-fips /usr/local/bin/oc-mirror
+            sudo restorecon -v /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install-fips /usr/local/bin/oc-mirror
+            sudo ln -sf /usr/local/bin/openshift-install-fips /usr/local/bin/openshift-install
 
             # Signal to the registry node that we're done mirroring to S3
             curl -X PUT -H 'Content-Type:' --data-binary \
@@ -700,8 +709,8 @@ Resources:
         ToPort: 22
         IpProtocol: tcp
       - CidrIp: 0.0.0.0/0  # TODO: VPC Cidr??
-        FromPort: 5000
-        ToPort: 5000
+        FromPort: 8443 
+        ToPort: 8443
         IpProtocol: tcp
       Tags:
       - Key: Name
@@ -719,9 +728,9 @@ Resources:
       BlockDeviceMappings:
       - DeviceName: "/dev/sda1"
         Ebs:
-          VolumeType: "gp2"
+          VolumeType: "gp3"
           DeleteOnTermination: "true"
-          VolumeSize: "150"
+          VolumeSize: "900"
       Tags:
       - Key: Name
         Value: !Sub 'Registry Node - ${AWS::StackName}'
@@ -737,72 +746,94 @@ Resources:
             #!/bin/bash -x
             cd /tmp
 
+            # Set the HOME env var missing in systemd
+            export HOME="/root"
+            export USER="root"
+
+            dnf -y install wget vim podman unzip jq
+            
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            ./aws/install
+
             region=${AWS::Region}
 
-            aws s3 cp --quiet "s3://${s3_bucket}/openshift-client-linux-${ocp_ver}.tar.gz" .
-            aws s3 cp --quiet "s3://${s3_bucket}/openshift-install-linux-${ocp_ver}.tar.gz" .
-            aws s3 cp --quiet "s3://${s3_bucket}/docker_registry.tar" .
+            /usr/local/bin/aws s3 cp --quiet "s3://${s3_bucket}/openshift-client-linux-amd64-rhel9-${ocp_ver}.tar.gz" .
+            /usr/local/bin/aws s3 cp --quiet "s3://${s3_bucket}/openshift-install-rhel9-amd64.tar.gz" .
+            /usr/local/bin/aws s3 cp --quiet "s3://${s3_bucket}/oc-mirror.rhel9.tar.gz" .
+            /usr/local/bin/aws s3 cp --quiet "s3://${s3_bucket}/docker_registry.tar" .
+            /usr/local/bin/aws s3 cp --quiet "s3://${s3_bucket}/mirror-registry.tar.gz" .
 
-            tar -xzf openshift-client-linux-${ocp_ver}.tar.gz
-            tar -xzf openshift-install-linux-${ocp_ver}.tar.gz
+            tar -xzf openshift-client-linux-amd64-rhel9-${ocp_ver}.tar.gz
+            tar -xzf openshift-install-rhel9-amd64.tar.gz
+            tar -xzf oc-mirror.rhel9.tar.gz
+            tar -xzf mirror-registry.tar.gz
             rm -f README.md
 
-            mv oc openshift-install kubectl /usr/local/bin
-            chown root.root /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install
-            chmod 0755 /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install
-            restorecon -v /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install
+            sudo mv oc openshift-install-fips kubectl oc-mirror /usr/local/bin
+            sudo chown root.root /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install-fips /usr/local/bin/oc-mirror
+            sudo chmod 0755 /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install-fips /usr/local/bin/oc-mirror
+            sudo restorecon -v /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install-fips /usr/local/bin/oc-mirror
+            sudo ln -sf /usr/local/bin/openshift-install-fips /usr/local/bin/openshift-install
 
-            podman load < docker_registry.tar
+            #Don't install mirror-registry until after FIPS is enabled
+            #./mirror-registry install 2>&1 | tee mirror-registry.log # probably should do this as the ec2-user
 
-            REGISTRY_DIR="/home/ec2-user/registry"
-            mkdir -p ${!REGISTRY_DIR}/{auth,certs,data}
-            export REGISTRY_IP=$(hostname -I | awk '{print $NF}')
-            openssl req -newkey rsa:4096 -nodes -keyout "${!REGISTRY_DIR}/certs/registry.key" \
-              -x509 -days 365 -out "${!REGISTRY_DIR}/certs/registry.crt" \
-              -addext "subjectAltName = IP:${!REGISTRY_IP},DNS:${!HOSTNAME}" \
-              -subj "/C=US/ST=VA/L=Chantilly/O=RedHat/OU=RedHat/CN=${!HOSTNAME}/"
+            cp /root/quay-install/quay-rootCA/rootCA.pem /etc/pki/ca-trust/source/anchors/quay.pem
+            update-ca-trust
+            update-ca-trust extract
+
+            #podman load < docker_registry.tar
+
+            #REGISTRY_DIR="/home/ec2-user/registry"
+            #mkdir -p ${!REGISTRY_DIR}/{auth,certs,data}
+            #export REGISTRY_IP=$(hostname -I | awk '{print $NF}')
+            #openssl req -newkey rsa:4096 -nodes -keyout "${!REGISTRY_DIR}/certs/registry.key" \
+            #  -x509 -days 365 -out "${!REGISTRY_DIR}/certs/registry.crt" \
+            #  -addext "subjectAltName = IP:${!REGISTRY_IP},DNS:${!HOSTNAME}" \
+            #  -subj "/C=US/ST=VA/L=Chantilly/O=RedHat/OU=RedHat/CN=${!HOSTNAME}/"
 
             # Generate the registry htpasswd file
-            htpasswd -bBc ${!REGISTRY_DIR}/auth/htpasswd "dummy" "dummy"
+            #htpasswd -bBc ${!REGISTRY_DIR}/auth/htpasswd "dummy" "dummy"
             #dummy:$2y$05$pUhcEFsOgS3iMO0hvkSFNeuFkzeXcTqVeO/QPNZEjn3FR1V2KeuG2
             
             #Make sure to trust the self signed cert we just made
-            sudo cp -f ${!REGISTRY_DIR}/certs/registry.crt /etc/pki/ca-trust/source/anchors/
-            sudo update-ca-trust
-            sudo update-ca-trust extract
+            #sudo cp -f ${!REGISTRY_DIR}/certs/registry.crt /etc/pki/ca-trust/source/anchors/
+            #sudo update-ca-trust
+            #sudo update-ca-trust extract
             
             # Configure the firewall
-            sudo systemctl enable --now firewalld
-            sudo firewall-cmd --add-port=5000/tcp --zone=internal --permanent
-            sudo firewall-cmd --add-port=5000/tcp --zone=public   --permanent
-            sudo firewall-cmd --add-service=http  --permanent
-            sudo firewall-cmd --reload
+            #sudo systemctl enable --now firewalld
+            #sudo firewall-cmd --add-port=8443/tcp --zone=internal --permanent
+            #sudo firewall-cmd --add-port=8443/tcp --zone=public   --permanent
+            #sudo firewall-cmd --add-service=http  --permanent
+            #sudo firewall-cmd --reload
 
             # Configure SELinux to allow containers in systemd services
-            setsebool -P container_manage_cgroup on
+            #setsebool -P container_manage_cgroup on
 
-            podman run --name registry_server -p 5000:5000 \
-            -v ${!REGISTRY_DIR}/data:/var/lib/registry:z \
-            -v ${!REGISTRY_DIR}/auth:/auth:z \
-            -e "REGISTRY_AUTH=htpasswd" \
-            -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry" \
-            -e "REGISTRY_HTTP_SECRET=ALongRandomSecretForRegistry" \
-            -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
-            -v ${!REGISTRY_DIR}/certs:/certs:z \
-            -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/registry.crt \
-            -e REGISTRY_HTTP_TLS_KEY=/certs/registry.key \
-            -e REGISTRY_STORAGE=s3 \
-            -e REGISTRY_STORAGE_S3_REGION=us-east-2 \
-            -e REGISTRY_STORAGE_S3_BUCKET=danregistry \
-            -e REGISTRY_STORAGE_S3_ENCRYPT=false \
-            -e REGISTRY_STORAGE_S3_SECURE=true \
-            -e REGISTRY_STORAGE_S3_V4AUTH=true \
-            -e REGISTRY_STORAGE_S3_CHUNKSIZE=5242880 \
-            -e REGISTRY_STORAGE_S3_ROOTDIRECTORY=/image-registry \
-            --hostname=${!HOSTNAME} \
-            --conmon-pidfile=/tmp/podman-registry-conman.pid \
-            --detach \
-            docker.io/library/registry:2
+            #podman run --name registry_server -p 8443:8443 \
+            #-v ${!REGISTRY_DIR}/data:/var/lib/registry:z \
+            #-v ${!REGISTRY_DIR}/auth:/auth:z \
+            #-e "REGISTRY_AUTH=htpasswd" \
+            #-e "REGISTRY_AUTH_HTPASSWD_REALM=Registry" \
+            #-e "REGISTRY_HTTP_SECRET=ALongRandomSecretForRegistry" \
+            #-e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
+            #-v ${!REGISTRY_DIR}/certs:/certs:z \
+            #-e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/registry.crt \
+            #-e REGISTRY_HTTP_TLS_KEY=/certs/registry.key \
+            #-e REGISTRY_STORAGE=s3 \
+            #-e REGISTRY_STORAGE_S3_REGION=us-east-2 \
+            #-e REGISTRY_STORAGE_S3_BUCKET=${s3_bucket} \
+            #-e REGISTRY_STORAGE_S3_ENCRYPT=false \
+            #-e REGISTRY_STORAGE_S3_SECURE=true \
+            #-e REGISTRY_STORAGE_S3_V4AUTH=true \
+            #-e REGISTRY_STORAGE_S3_CHUNKSIZE=5242880 \
+            #-e REGISTRY_STORAGE_S3_ROOTDIRECTORY=/image-registry \
+            #--hostname=${!HOSTNAME} \
+            #--conmon-pidfile=/tmp/podman-registry-conman.pid \
+            #--detach \
+            #docker.io/library/registry:2
 
           - ocp_ver: !Ref OpenShiftVersion
             s3_bucket: !Ref S3Bucket
