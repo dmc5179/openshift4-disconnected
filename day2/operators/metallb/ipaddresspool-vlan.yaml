@@ -4,7 +4,7 @@ metadata:
   namespace: metallb-system
   name: vlan1032
   labels:
-    zone: 1032
+    zone: "vlan1032"
 spec:
   addresses:
   - 10.150.49.220-10.150.49.254
