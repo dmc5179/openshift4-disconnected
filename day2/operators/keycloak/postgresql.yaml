@@ -1,3 +1,17 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: keycloak-postgresq
+  labels:
+    app: postgresql-db
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -29,8 +43,7 @@ spec:
             - name: POSTGRES_DB
               value: keycloak
       volumes:
-        - name: cache-volume
-          emptyDir: {}
+        - name: keycloak-postgresq
 ---
 apiVersion: v1
 kind: Service
