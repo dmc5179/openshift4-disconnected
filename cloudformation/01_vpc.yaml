@@ -359,7 +359,7 @@ Resources:
       - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
         Value: owned
 
-  Route3:
+  Route53:
     Type: "AWS::EC2::Route"
     Condition: DoAz3
     Properties:
