@@ -7,7 +7,7 @@ metadata:
     app: postgresql-db
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 20Gi
@@ -31,19 +31,27 @@ spec:
         - name: postgresql-db
           image: postgres:15
           volumeMounts:
-            - mountPath: /data
-              name: cache-volume
+            - name: postgresql-db
+              mountPath: "/var/lib/postgresql/data"
+              subPath: pgdata
+#          volumeMounts:
+#            - mountPath: /data
+#              name: postgresql-db
           env:
             - name: POSTGRES_USER
-              value: testuser
+              value: redhat
             - name: POSTGRES_PASSWORD
-              value: testpassword
+              value: "RedHat1234"
+#            - name: PGDATA
+#              value: /data/pgdata
             - name: PGDATA
-              value: /data/pgdata
+              value: /var/lib/postgresql/data/pgdata
             - name: POSTGRES_DB
               value: keycloak
       volumes:
-        - name: keycloak-postgresq
+      - name: postgresql-db
+        persistentVolumeClaim:
+          claimName: keycloak-postgresq
 ---
 apiVersion: v1
 kind: Service
