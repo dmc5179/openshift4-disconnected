@@ -1,11 +1,13 @@
 apiVersion: k8s.keycloak.org/v2alpha1
 kind: Keycloak
 metadata:
-  name: example-kc
+  name: keycloak
 spec:
   ingress:
     className: openshift-default
   instances: 1
+  http:
+    httpEnabled: true
   db:
     vendor: postgres
     host: postgres-db
@@ -20,4 +22,4 @@ spec:
 #  hostname:
 #    hostname: test.keycloak.org  # Leave blank to use default OpenShift Ingress
   proxy:
-    headers: xforwarded # double check your reverse proxy sets and overwrites the X-Forwarded-* headers
+    headers: xforwarded # xforwarded works for default OCP ingress. double check your reverse proxy sets and overwrites the X-Forwarded-* headers
