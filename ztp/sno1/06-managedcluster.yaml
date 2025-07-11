@@ -1,0 +1,19 @@
+---
+apiVersion: cluster.open-cluster-management.io/v1
+kind: ManagedCluster
+metadata:
+  annotations:
+    apps.open-cluster-management.io/do-not-delete: 'true'  
+    apps.open-cluster-management.io/reconcile-option: replace     
+  labels:
+    name: sno1
+    cluster-name: sno1
+    base-domain: ocp4.lab.example.com
+    environment-chain: prod
+    cluster-location: Rome
+    cluster.open-cluster-management.io/clusterset: lab
+  name: sno1
+spec:
+  hubAcceptsClient: true
+  leaseDurationSeconds: 120
+
