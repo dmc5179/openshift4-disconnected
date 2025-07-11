@@ -1,0 +1,26 @@
+---
+apiVersion: hive.openshift.io/v1
+kind: ClusterDeployment
+metadata:
+  name: sno1
+  namespace: sno1
+  annotations:
+    apps.open-cluster-management.io/do-not-delete: 'true'  
+spec:
+  baseDomain: ocp4.lab.example.com
+  clusterInstallRef:
+    group: extensions.hive.openshift.io
+    kind: AgentClusterInstall  
+    name: sno1
+    version: v1beta1    
+  clusterName: sno1
+  controlPlaneConfig:
+    servingCertificates: {}  
+  platform:
+    agentBareMetal:
+      agentSelector:
+        matchLabels:
+          cluster-name: sno1
+  pullSecretRef:
+    name: pull-secret
+

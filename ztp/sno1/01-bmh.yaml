@@ -1,0 +1,33 @@
+---
+apiVersion: v1
+data:
+  password: YWRtaW4=
+  username: YWRtaW4=
+kind: Secret
+metadata:
+  annotations:
+    apps.open-cluster-management.io/do-not-delete: 'true'
+  #name: sno1.ocp4.lab.example.com
+  name: ab05ru15.redhat.ten.vibrintlabs.net
+  namespace: sno1
+type: Opaque
+---
+apiVersion: metal3.io/v1alpha1
+kind: BareMetalHost
+metadata:
+  annotations:
+    bmac.agent-install.openshift.io/hostname: ab05ru15.redhat.ten.vibrintlabs.net
+    apps.open-cluster-management.io/do-not-delete: 'true'  
+  labels:
+    infraenvs.agent-install.openshift.io: sno1
+    cluster-name: sno1
+  name: ab05ru15.redhat.ten.vibrintlabs.net
+  namespace: sno1
+spec:
+  bmc:
+    address: redfish-virtualmedia+http://192.168.100.1:8000/redfish/v1/Systems/sno1 #
+    credentialsName: ab05ru15.redhat.ten.vibrintlabs.net
+  bootMACAddress: 18:66:da:ee:03:f4
+  online: true
+  rootDeviceHints:
+    deviceName: "/dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:3:0"
