@@ -1,0 +1,113 @@
+---
+apiVersion: siteconfig.open-cluster-management.io/v1alpha1
+kind: ClusterInstance
+metadata:
+  name: sno1
+spec:
+  additionalNTPSources:
+    - 10.100.128.53
+    - 10.100.144.53
+  apiVIPs:
+    - 10.150.50.201
+  baseDomain: "redhat.ten.vibrintlabs.net"
+  #caBundleRef:
+  clusterImageSetNameRef: img4.18.9-x86-64-appsub # From oc get -A ClusterImageSet
+  clusterName: "sno1"
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  clusterType: 'SNO'
+  cpuArchitecture: 'x86_64'
+  #cpuPartitioningMode:
+  #diskEncryption:
+  #extraAnnotations:
+  #extraLabels:
+  #extraManifestsRefs:
+  #holdInstallation:
+  #ignitionConfigOverride:
+  ingressVIPs:
+    - 10.150.50.202
+  #installConfigOverrides:
+  machineNetwork:
+    - cidr: 10.150.50.0/24
+  networkType: OVNKubernetes
+  nodes:
+    - hostName: ab05ru15
+      automatedCleaningMode: disabled
+      bmcAddress: redfish-virtualmedia+https://10.150.48.115/redfish/v1/Systems/System.Embedded.1
+      bmcCredentialsName:
+        name: ab05ru15
+      bootMACAddress: 18:66:da:ee:03:f4
+      bootMode: legacy
+      ironicInspect: ""
+      nodeNetwork:
+        interfaces:
+          - name: eno1
+            macAddress: "18:66:da:ee:03:f4"
+        config:
+          dns-resolver:
+            config:
+              server:
+              - 10.100.128.53
+              - 10.100.144.53
+          routes:
+            config:
+            - destination: 0.0.0.0/0
+              next-hop-address: 10.150.50.1
+              next-hop-interface: eno1.1033
+              table-id: 254
+          interfaces:
+            - name: eno1
+              type: ethernet
+              state: up
+              mtu: 9000
+              mac-address: 18:66:da:ee:03:f4
+              ipv4:
+                enabled: false
+              ipv6:
+                enabled: false
+            - name: eno1.1033
+              type: vlan
+              state: up
+              vlan:
+                base-iface: eno1
+                id: 1033
+              ipv4:
+                enabled: true
+                address:
+                  - ip: 10.150.50.115
+                    prefix-length: 24
+              ipv6:
+                enabled: false
+      role: master
+      rootDeviceHints:
+        deviceName: /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:3:0
+      templateRefs:
+        - name: ai-node-templates-v1
+          namespace: open-cluster-management
+#   - hostName:
+#     #extraAnnotations:
+#     #extraLabels:
+#     #ignitionConfigOverride:
+#     #installerArgs:
+#     #ironicInspect:
+#     nodeLabels:
+#     nodeNetwork:
+#     #pruneManifests:
+#     role:
+#     rootDeviceHints:
+#     #suppressedManifests:
+#     templateRefs:
+  platformType: None
+  #proxy:
+  #pruneManifests:
+  pullSecretRef:
+    name: pull-secret
+  #reinstall:
+  serviceNetwork:
+    - cidr: 172.30.0.0/16
+  sshPublicKey: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCa0T/UxQFppRf7IdNeRKPLGrIUMdpvAtXoPt/q8qULlGX8hG3/6u/rFUflA/BNojRIWaZiQ5VK7sXeSqMj70/wU7cA6uBgBEyfvrq509E8lH4/27GU6WuMWbOFo48E1SP2Wub6fDNEYeT4feEvNm0D0VwVx9VgDuAEyx3Q8GYFCUbHpWrPeHig3P2tA9zs5bhfjBGhAlVp+ZYwhoRuOiHNHuqzt0z8QfNyjheEF4WTkzSlN8lfvd1cREnX02edzkiIw8Jbj6Xk/vpLw+BkNNKcT7CMB0IJ6tbLlM5hGSq/xHuFf1mP/zfnnA7aKvIwBGZDYR6WHZcxAkXTxbiHylneG7aUwpqYXmQl/jUfleuwvKGIS6SoRNzotCiMoqZb6skvygR4ORhhdA1+G6PuWuD63nQJNbxo4CSq469lHt2jlmeCuSIpvfTnaUNVAjjVbmIFO2kVskExit+mzw/1uvyWwOHXGPGALGCl9v/op3y8BZaKZGhA9y1SWnYMK0KcNzn7iwQOibO9f/jHaLe86xR/xUNM71aTnx5bGbT5YZs7/Mj5fBoKEdebEluQ3uxkKscIt3q9Oed5AmLlgKCbaSoSSlrg4di5rH5dRwHxOrb2oC1npwYy5vphgC/jSTFXiA5R75AM5rTN1DjyV+A2oolEUiIANBfxf7rNCLYIv5a9bw=='
+  #suppressedManifests:
+  templateRefs:
+    - name: ai-cluster-templates-v1
+      namespace: open-cluster-management
