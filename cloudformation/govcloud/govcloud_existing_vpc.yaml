@@ -27,13 +27,13 @@ Parameters:
     Type: Number
   PublicSubnet:
     Description: "Public Subnet for Avalability Zone a"   
-    Type: String
+    Type: List<AWS::EC2::Subnet::Id>
   PublicSubnet2:
     Description: "Public Subnet for Availability Zone b"
-    Type: String
+    Type: List<AWS::EC2::Subnet::Id>
   PublicSubnet3:
     Description: "Public Subnet for Availability Zone c"
-    Type: String
+    Type: List<AWS::EC2::Subnet::Id>
   InfrastructureName:
     AllowedPattern: ^([a-zA-Z][a-zA-Z0-9\-]{0,26})$
     MaxLength: 27
@@ -75,7 +75,7 @@ Metadata:
       PublicSubnet:
         default: "Public Subnet for Avalability Zone a"
       PublicSubnet2:
-        default: "Public Subnet for Avalability Zone v"
+        default: "Public Subnet for Avalability Zone b"
       PublicSubnet3:
         default: "Public Subnet for Avalability Zone c"
 
@@ -117,7 +117,7 @@ Resources:
         "Fn::GetAtt":
         - EIP
         - AllocationId
-      SubnetId: !Ref PublicSubnet
+      SubnetId: PublicSubnet
 
   EIP:
     Type: "AWS::EC2::EIP"
@@ -169,7 +169,7 @@ Resources:
         "Fn::GetAtt":
         - EIP2
         - AllocationId
-      SubnetId: !Ref PublicSubnet2
+      SubnetId: PublicSubnet2
 
   EIP2:
     Type: "AWS::EC2::EIP"
@@ -223,7 +223,7 @@ Resources:
         "Fn::GetAtt":
         - EIP3
         - AllocationId
-      SubnetId: !Ref PublicSubnet3
+      SubnetId: PublicSubnet3
 
   EIP3:
     Type: "AWS::EC2::EIP"
