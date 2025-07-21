@@ -26,12 +26,6 @@ Parameters:
     Description: "Size of each subnet to create within the availability zones. (Min: 5 = /27, Max: 13 = /19)"
     Type: Number
 
-#  AmiId:
-#    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
-#    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
-#    Description: AMI ID pointer in AWS Systems Manager Parameter Store. Default value points to the
-#      latest Amazon Linux 2 AMI ID.
-
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: Name of RSA key for EC2 access for testing and troubleshooting.
