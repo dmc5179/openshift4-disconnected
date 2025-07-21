@@ -26,18 +26,18 @@ Parameters:
     Description: "Size of each subnet to create within the availability zones. (Min: 5 = /27, Max: 13 = /19)"
     Type: Number
 
-  AmiId:
-    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
-    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
-    Description: AMI ID pointer in AWS Systems Manager Parameter Store. Default value points to the
-      latest Amazon Linux 2 AMI ID.
+#  AmiId:
+#    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+#    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+#    Description: AMI ID pointer in AWS Systems Manager Parameter Store. Default value points to the
+#      latest Amazon Linux 2 AMI ID.
 
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: Name of RSA key for EC2 access for testing and troubleshooting.
 
   OpenShiftVersion:
-    Default: "4.17.9"
+    Default: "4.19.3"
     Description: OpenShift Version Number
     Type: String
 
@@ -104,7 +104,7 @@ Mappings:
     us-east-1:
       HVM64: ami-0b4466ff0aec45222
     us-east-2:
-      HVM64: ami-002acc74c401fa86b
+      HVM64: ami-002acc74c401fa86b # RHEL 9.5
     us-west-1:
       HVM64: ami-02bfa5a117cd76b94
     eu-west-1:
@@ -386,14 +386,6 @@ Resources:
         FromPort: 443
         ToPort: 443
         IpProtocol: TCP
-#      - CidrIp: '10.0.0.0/25'
-#        FromPort: 80
-#        ToPort: 80
-#        IpProtocol: TCP
-#      - CidrIp: '10.0.0.0/25'
-#        FromPort: 443
-#        ToPort: 443
-#        IpProtocol: TCP
       Tags:
       - Key: Name
         Value: !Sub 'NAT Instance SG - ${AWS::StackName}'
@@ -627,9 +619,6 @@ Resources:
             unzip awscliv2.zip
             ./aws/install
             
-            podman pull docker.io/library/registry:2
-            podman save > docker_registry.tar docker.io/library/registry:2
-
             /usr/local/bin/aws s3 cp --quiet openshift-client-linux-amd64-rhel9-${ocp_ver}.tar.gz "s3://${s3_bucket}/"
             /usr/local/bin/aws s3 cp --quiet openshift-install-rhel9-amd64.tar.gz "s3://${s3_bucket}/"
             /usr/local/bin/aws s3 cp --quiet oc-mirror.rhel9.tar.gz "s3://${s3_bucket}/"
@@ -704,11 +693,11 @@ Resources:
     Properties:
       GroupDescription: Allows SSH connections to the registry node
       SecurityGroupIngress:
-      - CidrIp: 0.0.0.0/0  # TODO: VPC Cidr??
+      - CidrIp: !Ref VpcCidr
         FromPort: 22
         ToPort: 22
         IpProtocol: tcp
-      - CidrIp: 0.0.0.0/0  # TODO: VPC Cidr??
+      - CidrIp: !Ref VpcCidr
         FromPort: 8443 
         ToPort: 8443
         IpProtocol: tcp
@@ -776,12 +765,13 @@ Resources:
             sudo restorecon -v /usr/local/bin/oc /usr/local/bin/kubectl /usr/local/bin/openshift-install-fips /usr/local/bin/oc-mirror
             sudo ln -sf /usr/local/bin/openshift-install-fips /usr/local/bin/openshift-install
 
+            #sudo fips-mode-setup --enable
             #Don't install mirror-registry until after FIPS is enabled
             #./mirror-registry install 2>&1 | tee mirror-registry.log # probably should do this as the ec2-user
 
-            cp /root/quay-install/quay-rootCA/rootCA.pem /etc/pki/ca-trust/source/anchors/quay.pem
-            update-ca-trust
-            update-ca-trust extract
+            #cp /root/quay-install/quay-rootCA/rootCA.pem /etc/pki/ca-trust/source/anchors/quay.pem
+            #update-ca-trust
+            #update-ca-trust extract
 
             #podman load < docker_registry.tar
 
@@ -811,29 +801,6 @@ Resources:
 
             # Configure SELinux to allow containers in systemd services
             #setsebool -P container_manage_cgroup on
-
-            #podman run --name registry_server -p 8443:8443 \
-            #-v ${!REGISTRY_DIR}/data:/var/lib/registry:z \
-            #-v ${!REGISTRY_DIR}/auth:/auth:z \
-            #-e "REGISTRY_AUTH=htpasswd" \
-            #-e "REGISTRY_AUTH_HTPASSWD_REALM=Registry" \
-            #-e "REGISTRY_HTTP_SECRET=ALongRandomSecretForRegistry" \
-            #-e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
-            #-v ${!REGISTRY_DIR}/certs:/certs:z \
-            #-e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/registry.crt \
-            #-e REGISTRY_HTTP_TLS_KEY=/certs/registry.key \
-            #-e REGISTRY_STORAGE=s3 \
-            #-e REGISTRY_STORAGE_S3_REGION=us-east-2 \
-            #-e REGISTRY_STORAGE_S3_BUCKET=${s3_bucket} \
-            #-e REGISTRY_STORAGE_S3_ENCRYPT=false \
-            #-e REGISTRY_STORAGE_S3_SECURE=true \
-            #-e REGISTRY_STORAGE_S3_V4AUTH=true \
-            #-e REGISTRY_STORAGE_S3_CHUNKSIZE=5242880 \
-            #-e REGISTRY_STORAGE_S3_ROOTDIRECTORY=/image-registry \
-            #--hostname=${!HOSTNAME} \
-            #--conmon-pidfile=/tmp/podman-registry-conman.pid \
-            #--detach \
-            #docker.io/library/registry:2
 
           - ocp_ver: !Ref OpenShiftVersion
             s3_bucket: !Ref S3Bucket
