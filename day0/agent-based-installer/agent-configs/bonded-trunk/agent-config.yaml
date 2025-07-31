@@ -1,0 +1,301 @@
+apiVersion: v1alpha1
+kind: AgentConfig
+metadata:
+  name: agent-config 
+rendezvousIP: 192.168.1.80  # For a SNO cluster this is the same IP as the server. For a non-SNO install, pick an IP of one of the control plane servers
+hosts:
+  - hostname: master-0
+    role: master
+    interfaces:
+      - name: eno1  # This doesn't need to be the actual interface name, it has to match the names below
+        macAddress: 00:ef:44:21:e6:a6
+      - name: eno2  # This doesn't need to be the actual interface name, it has to match the names below
+        macAddress: 00:ef:44:21:e6:a7
+    rootDeviceHints:
+      deviceName: /dev/sda # Change this to the drive that OCP should install the OS on
+    networkConfig:
+      interfaces:
+        - name: bond0.300 # standard name pattern is bond.VLAN_NUM
+          type: vlan
+          state: up
+          vlan:
+            base-iface: bond0
+            id: 300 # This is the VLAN Number
+          ipv4:
+            enabled: true
+            address:
+              - ip: 192.168.1.80
+                prefix-length: 24
+            dhcp: false
+          mtu: 9000
+        - name: bond0
+          type: bond
+          state: up
+          mac-address: 00:ef:44:21:e6:a6  # This should be one of the mac addresses from above
+          ipv4:
+            enabled: false
+          ipv6:
+            enabled: false
+          mtu: 9000
+          link-aggregation:
+            mode: 802.3ad
+            options:
+              miimon: "150"
+            port:
+             - eno1 # Must match one of the names in the "interfaces" section above
+             - eno2 # Must match one of the names in the "interfaces" section above
+      dns-resolver:
+        config:
+          server:
+            - 192.168.1.1
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 192.168.1.1
+            next-hop-interface: bond0.300 # Match the name of the bond vlan interface
+            table-id: 254
+#####
+  - hostname: master-1
+    role: master
+    interfaces:
+      - name: eno1  # This doesn't need to be the actual interface name, it has to match the names below
+        macAddress: 00:ef:44:21:e6:a8
+      - name: eno2  # This doesn't need to be the actual interface name, it has to match the names below
+        macAddress: 00:ef:44:21:e6:a9
+    rootDeviceHints: 
+      deviceName: /dev/sda # Change this to the drive that OCP should install the OS on
+    networkConfig:
+      interfaces:
+        - name: bond0.300 # standard name pattern is bond.VLAN_NUM
+          type: vlan
+          state: up
+          vlan:
+            base-iface: bond0
+            id: 300 # This is the VLAN Number
+          ipv4:
+            enabled: true
+            address:
+              - ip: 192.168.1.81
+                prefix-length: 24
+            dhcp: false
+        - name: bond0
+          type: bond
+          state: up
+          mac-address: 00:ef:44:21:e6:a8  # This should be one of the mac addresses from above
+          ipv4:
+            enabled: false
+          ipv6:
+            enabled: false
+          link-aggregation:
+            mode: active-backup
+            options:
+              miimon: "150" 
+            port:
+             - eno1 # Must match one of the names in the "interfaces" section above
+             - eno2 # Must match one of the names in the "interfaces" section above
+      dns-resolver:
+        config:
+          server:
+            - 192.168.1.1
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 192.168.1.1
+            next-hop-interface: bond0.300 # Match the name of the bond vlan interface
+            table-id: 254
+#####
+  - hostname: master-2
+    role: master
+    interfaces:
+      - name: eno1  # This doesn't need to be the actual interface name, it has to match the names below
+        macAddress: 00:ef:44:21:e6:b6
+      - name: eno2  # This doesn't need to be the actual interface name, it has to match the names below
+        macAddress: 00:ef:44:21:e6:b7
+    rootDeviceHints: 
+      deviceName: /dev/sda # Change this to the drive that OCP should install the OS on
+    networkConfig:
+      interfaces:
+        - name: bond0.300 # standard name pattern is bond.VLAN_NUM
+          type: vlan
+          state: up
+          vlan:
+            base-iface: bond0
+            id: 300 # This is the VLAN Number
+          ipv4:
+            enabled: true
+            address:
+              - ip: 192.168.1.82
+                prefix-length: 24
+            dhcp: false
+        - name: bond0
+          type: bond
+          state: up
+          mac-address: 00:ef:44:21:e6:b6  # This should be one of the mac addresses from above
+          ipv4:
+            enabled: false
+          ipv6:
+            enabled: false
+          link-aggregation:
+            mode: active-backup
+            options:
+              miimon: "150" 
+            port:
+             - eno1 # Must match one of the names in the "interfaces" section above
+             - eno2 # Must match one of the names in the "interfaces" section above
+      dns-resolver:
+        config:
+          server:
+            - 192.168.1.1
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 192.168.1.1
+            next-hop-interface: bond0.300 # Match the name of the bond vlan interface
+            table-id: 254
+#####
+  - hostname: worker-0
+    role: worker
+    interfaces:
+      - name: eno1  # This doesn't need to be the actual interface name, it has to match the names below
+        macAddress: 00:ef:44:21:e6:b8
+      - name: eno2  # This doesn't need to be the actual interface name, it has to match the names below
+        macAddress: 00:ef:44:21:e6:b9
+    rootDeviceHints: 
+      deviceName: /dev/sda # Change this to the drive that OCP should install the OS on
+    networkConfig:
+      interfaces:
+        - name: bond0.300 # standard name pattern is bond.VLAN_NUM
+          type: vlan
+          state: up
+          vlan:
+            base-iface: bond0
+            id: 300 # This is the VLAN Number
+          ipv4:
+            enabled: true
+            address:
+              - ip: 192.168.1.83
+                prefix-length: 24
+            dhcp: false
+        - name: bond0
+          type: bond
+          state: up
+          mac-address: 00:ef:44:21:e6:b8  # This should be one of the mac addresses from above
+          ipv4:
+            enabled: false
+          ipv6:
+            enabled: false
+          link-aggregation:
+            mode: active-backup
+            options:
+              miimon: "150" 
+            port:
+             - eno1 # Must match one of the names in the "interfaces" section above
+             - eno2 # Must match one of the names in the "interfaces" section above
+      dns-resolver:
+        config:
+          server:
+            - 192.168.1.1
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 192.168.1.1
+            next-hop-interface: bond0.300 # Match the name of the bond vlan interface
+            table-id: 254
+#####
+  - hostname: worker-1
+    role: worker
+    interfaces:
+      - name: eno1  # This doesn't need to be the actual interface name, it has to match the names below
+        macAddress: 00:ef:44:21:e6:c6
+      - name: eno2  # This doesn't need to be the actual interface name, it has to match the names below
+        macAddress: 00:ef:44:21:e6:c7
+    rootDeviceHints: 
+      deviceName: /dev/sda # Change this to the drive that OCP should install the OS on
+    networkConfig:
+      interfaces:
+        - name: bond0.300 # standard name pattern is bond.VLAN_NUM
+          type: vlan
+          state: up
+          vlan:
+            base-iface: bond0
+            id: 300 # This is the VLAN Number
+          ipv4:
+            enabled: true
+            address:
+              - ip: 192.168.1.84
+                prefix-length: 24
+            dhcp: false
+        - name: bond0
+          type: bond
+          state: up
+          mac-address: 00:ef:44:21:e6:c6  # This should be one of the mac addresses from above
+          ipv4:
+            enabled: false
+          ipv6:
+            enabled: false
+          link-aggregation:
+            mode: active-backup
+            options:
+              miimon: "150" 
+            port:
+             - eno1 # Must match one of the names in the "interfaces" section above
+             - eno2 # Must match one of the names in the "interfaces" section above
+      dns-resolver:
+        config:
+          server:
+            - 192.168.1.1
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 192.168.1.1
+            next-hop-interface: bond0.300 # Match the name of the bond vlan interface
+            table-id: 254
+#####
+  - hostname: worker-2
+    role: worker
+    interfaces:
+      - name: eno1  # This doesn't need to be the actual interface name, it has to match the names below
+        macAddress: 00:ef:44:21:e6:c8
+      - name: eno2  # This doesn't need to be the actual interface name, it has to match the names below
+        macAddress: 00:ef:44:21:e6:c9
+    rootDeviceHints: 
+      deviceName: /dev/sda # Change this to the drive that OCP should install the OS on
+    networkConfig:
+      interfaces:
+        - name: bond0.300 # standard name pattern is bond.VLAN_NUM
+          type: vlan
+          state: up
+          vlan:
+            base-iface: bond0
+            id: 300 # This is the VLAN Number
+          ipv4:
+            enabled: true
+            address:
+              - ip: 192.168.1.85
+                prefix-length: 24
+            dhcp: false
+        - name: bond0
+          type: bond
+          state: up
+          mac-address: 00:ef:44:21:e6:c8  # This should be one of the mac addresses from above
+          ipv4:
+            enabled: false
+          ipv6:
+            enabled: false
+          link-aggregation:
+            mode: active-backup
+            options:
+              miimon: "150" 
+            port:
+             - eno1 # Must match one of the names in the "interfaces" section above
+             - eno2 # Must match one of the names in the "interfaces" section above
+      dns-resolver:
+        config:
+          server:
+            - 192.168.1.1
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 192.168.1.1
+            next-hop-interface:  bond0.300 # Match the name of the bond vlan interface
+            table-id: 254
