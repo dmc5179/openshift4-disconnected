@@ -1,0 +1,77 @@
+apiVersion: v1
+additionalTrustBundlePolicy: Always
+baseDomain: danclark.io  # Change this to your base domain
+compute:
+- architecture: amd64
+  hyperthreading: Enabled
+  name: worker
+  replicas: 0 # Set to 0 for a 3 node cluster. Minimum 2 for a standard cluster
+controlPlane:
+  architecture: amd64
+  hyperthreading: Enabled
+  name: master
+  replicas: 3
+metadata:
+  creationTimestamp: null
+  name: ocp4  # cluster name is prepended to basedomain for DNS; i.e api-int.ocp4.danclark.io in this example file
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14  # Only change these if there are conflicts with the machineNetwork
+    hostPrefix: 23
+  networkType: OVNKubernetes
+  serviceNetwork:
+  - 172.30.0.0/16   # Only Change these if there are conflicts with the machineNetwork
+  machineNetwork:
+    - cidr: 192.168.1.0/24  # CIDR block of IPs for the physical servers
+platform:
+  none: {}
+#publish: External
+fips: true
+# Make sure the pull secret has creds for your private repo
+pullSecret: ''
+sshKey: 'ssh-rsa .....'
+# Make sure the additional trust bundle includes the CA of your private registry
+#additionalTrustBundle: |
+#  -----BEGIN CERTIFICATE-----
+#  -----END CERTIFICATE-----
+#  -----BEGIN CERTIFICATE-----
+#  -----END CERTIFICATE-----
+
+
+#Note: oc-mirror v1 creates imageContentSource  # deprecatewd
+#      oc-mirror v2 creates imageDigestSources  # GA in OCP 4.18
+#      Use only one. imageDigestSources can still be used with oc-mirror v1, just a manual change
+
+# Only choose one of imageContentSource or imageDigestSources below
+
+#
+# Note: oc mirror will create a file called imageContentSourcePolicy.yaml after pushing images to your private registry
+# The mappings below can be found in that file and will already have the right registry name and location
+# these are default examples for a command like
+# oc-mirror --from <archive_dir> bastion.localdomain:5000
+imageContentSources:
+- mirrors:
+  - bastion.localdomain:5000/openshift/release  # Change this line to point to your private registry
+  source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+- mirrors:
+  - bastion.localdomain:5000/openshift/release-images # Change this line to point to your private registry
+  source: quay.io/openshift-release-dev/ocp-release
+# Example of how to configure the install-config.yaml to use IDMS
+# instead of the old ICSP
+# Note that mirrorSourcePolicy is not respected by the openshift-installer
+# I have submitted a BZ/RFE for this that is currently being worked.
+# Adding that field now requires modifying the manifests that the openshift-installer
+# creates pre-install
+imageDigestSources:
+- mirrors:
+  - bastion.danclark.io:5000/openshift
+  source: quay.io/openshift-release-dev/ocp-release
+  mirrorSourcePolicy: NeverContactSource
+- mirrors:
+  - bastion.danclark.io:5000/openshift
+  source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+  mirrorSourcePolicy: NeverContactSource
+
+
+
+
