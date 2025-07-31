@@ -5,7 +5,7 @@ compute:
 - architecture: amd64
   hyperthreading: Enabled
   name: worker
-  replicas: 0 # Set to 0 for a 3 node cluster. Minimum 2 for a standard cluster
+  replicas: 3 # Set to 0 for a 3 node cluster. Minimum 2 for a standard cluster
 controlPlane:
   architecture: amd64
   hyperthreading: Enabled
