@@ -1,0 +1,41 @@
+apiVersion: v1
+additionalTrustBundlePolicy: Always
+baseDomain: danclark.io
+compute:
+- architecture: amd64
+  hyperthreading: Enabled
+  name: worker
+  replicas: 0
+controlPlane:
+  architecture: amd64
+  hyperthreading: Enabled
+  name: master
+  replicas: 1
+metadata:
+  creationTimestamp: null
+  name: ocp4
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  networkType: OVNKubernetes
+  serviceNetwork:
+  - 172.30.0.0/16
+platform:
+  none: {}
+BootstrapInPlace:
+  InstallationDisk: /dev/sda
+publish: External
+fips: false
+pullSecret: ''
+sshkey: ''
+#additionalTrustBundle: |
+#  -- BEGIN --
+#  -- END --
+#imageContentSources:
+#- mirrors:
+#  - {{ mirror_registry }}:{{ mirror_registry_port }}/ocp4/openshift4
+#  source: quay.io/openshift-release-dev/ocp-release
+#- mirrors:
+#  - {{ mirror_registry }}:{{ mirror_registry_port }}/ocp4/openshift4
+#  source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
