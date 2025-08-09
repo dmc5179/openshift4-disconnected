@@ -5,7 +5,7 @@ metadata:
   namespace: openshift-compliance
 profiles:
   - name: rhcos4-stig-v2r1-with-sshd-enabled
-    kind: Profile
+    kind: TailoredProfile
     apiGroup: compliance.openshift.io/v1alpha1
   - name: ocp4-stig-v2r1
     kind: Profile
