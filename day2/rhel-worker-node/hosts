@@ -1,9 +1,10 @@
 [all:vars]
+gather_facts=yes
 ansible_user=root 
-ansible_ssh_private_key_file="{{ ansible_env.HOME }}/.ssh/id_rsa"
+ansible_ssh_private_key_file="~/.ssh/id_rsa"
 #ansible_become=True
 
-openshift_kubeconfig_path="{{ ansible_env.HOME }}/.kube/config"
+openshift_kubeconfig_path="~/.kube/config"
 
 [new_workers] 
 # Add new worker node's hostname as it will appear in the cluster
