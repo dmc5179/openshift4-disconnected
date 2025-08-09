@@ -2,6 +2,7 @@ apiVersion: compliance.openshift.io/v1alpha1
 kind: TailoredProfile
 metadata:
   name: rhcos4-stig-v2r2-with-sshd-enabled
+  namespace: openshift-compliance
 spec:
   extends: rhcos4-stig-v2r2
   title: DISA STIG for Red Hat Enterprise Linux CoreOS with SSHD Enabled
