@@ -12,7 +12,7 @@ hosts:
       - name: eno2  # This doesn't need to be the actual interface name, it has to match the names below
         macAddress: 00:ef:44:21:e6:a7
     rootDeviceHints:
-      deviceName: /dev/sda # Change this to the drive that OCP should install the OS on
+      deviceName: /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:3:0 # RHCOS root device. This should be specified by-path
     networkConfig:
       interfaces:
         - name: bond0.300 # standard name pattern is bond.VLAN_NUM
@@ -63,7 +63,7 @@ hosts:
       - name: eno2  # This doesn't need to be the actual interface name, it has to match the names below
         macAddress: 00:ef:44:21:e6:a9
     rootDeviceHints: 
-      deviceName: /dev/sda # Change this to the drive that OCP should install the OS on
+      deviceName: /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:3:0 # RHCOS root device. This should be specified by-path
     networkConfig:
       interfaces:
         - name: bond0.300 # standard name pattern is bond.VLAN_NUM
@@ -112,7 +112,7 @@ hosts:
       - name: eno2  # This doesn't need to be the actual interface name, it has to match the names below
         macAddress: 00:ef:44:21:e6:b7
     rootDeviceHints: 
-      deviceName: /dev/sda # Change this to the drive that OCP should install the OS on
+      deviceName: /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:3:0 # RHCOS root device. This should be specified by-path
     networkConfig:
       interfaces:
         - name: bond0.300 # standard name pattern is bond.VLAN_NUM
@@ -161,7 +161,7 @@ hosts:
       - name: eno2  # This doesn't need to be the actual interface name, it has to match the names below
         macAddress: 00:ef:44:21:e6:b9
     rootDeviceHints: 
-      deviceName: /dev/sda # Change this to the drive that OCP should install the OS on
+      deviceName: /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:3:0 # RHCOS root device. This should be specified by-path
     networkConfig:
       interfaces:
         - name: bond0.300 # standard name pattern is bond.VLAN_NUM
@@ -210,7 +210,7 @@ hosts:
       - name: eno2  # This doesn't need to be the actual interface name, it has to match the names below
         macAddress: 00:ef:44:21:e6:c7
     rootDeviceHints: 
-      deviceName: /dev/sda # Change this to the drive that OCP should install the OS on
+      deviceName: /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:3:0 # RHCOS root device. This should be specified by-path
     networkConfig:
       interfaces:
         - name: bond0.300 # standard name pattern is bond.VLAN_NUM
@@ -259,7 +259,7 @@ hosts:
       - name: eno2  # This doesn't need to be the actual interface name, it has to match the names below
         macAddress: 00:ef:44:21:e6:c9
     rootDeviceHints: 
-      deviceName: /dev/sda # Change this to the drive that OCP should install the OS on
+      deviceName: /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:3:0 # RHCOS root device. This should be specified by-path
     networkConfig:
       interfaces:
         - name: bond0.300 # standard name pattern is bond.VLAN_NUM
