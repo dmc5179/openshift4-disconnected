@@ -1,0 +1,34 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: ldap-group-syncer
+  namespace: ldap-sync
+data:
+  sync.yaml: |                                 
+    kind: LDAPSyncConfig
+    apiVersion: v1
+    url: ldaps://10.0.0.0:389                  
+    insecure: false
+    bindDN: cn=admin,dc=example,dc=com         
+    bindPassword:
+      file: "/etc/secrets/bindPassword"
+    ca: /etc/ldap-ca/ca.crt
+    rfc2307:                                   
+      groupsQuery:
+        baseDN: "ou=groups,dc=example,dc=com"  
+        scope: sub
+        filter: "(objectClass=groupOfMembers)"
+        derefAliases: never
+        pageSize: 0
+      groupUIDAttribute: dn
+      groupNameAttributes: [ cn ]
+      groupMembershipAttributes: [ member ]
+      usersQuery:
+        baseDN: "ou=users,dc=example,dc=com"   
+        scope: sub
+        derefAliases: never
+        pageSize: 0
+      userUIDAttribute: dn
+      userNameAttributes: [ uid ]
+      tolerateMemberNotFoundErrors: false
+      tolerateMemberOutOfScopeErrors: false
