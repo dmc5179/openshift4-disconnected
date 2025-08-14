@@ -1,0 +1,111 @@
+apiVersion: v1
+baseDomain: basedomain.com
+compute:
+- architecture: amd64
+  hyperthreading: Enabled
+  name: worker
+  platform: {}
+  replicas: 3
+controlPlane:
+  architecture: amd64
+  hyperthreading: Enabled
+  name: master
+  platform: {}
+  replicas: 3
+metadata:
+  creationTimestamp: null
+  name: ocp4
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  machineNetwork:
+  - cidr: 10.0.0.0/16
+  networkType: OpenShiftSDN
+  serviceNetwork:
+  - 172.30.0.0/16
+platform:
+  vsphere:
+    apiVIP: 10.15.169.46  # Docs say this is deprecated and to use the blow
+    apiVIPs:
+      - 10.15.169.46
+    cluster: mycluster
+    datacenter: mydatacenter
+    defaultDatastore: mydatastore
+    ingressVIP: 10.15.169.48 # Docs say this is deprecated and to use the blow
+    ingressVIPs:
+      - 10.15.169.48
+    network: VM Network
+    password: ####
+    username: administrator@vsphere.mydomain
+    vCenter: center.subdomain.domain
+    clusterOSImage: http://mirror.example.com/images/rhcos-43.81.201912131630.0-vmware.x86_64.ova?sha256=ffebbd68e8a1f2a245ca19522c16c86f67f9ac8e4e0c1f0a812b068b16f7265d
+    # Below section is for setting the static IPs for each of the nodes in the cluster
+    # The bootstrap node will only exist during the cluster installation phase and is not the same as the bastion
+    # node which houses quay registry and container content.
+    hosts:
+    - role: bootstrap
+      networkDevice:
+        ipAddrs:
+        - 192.168.204.10/24
+        gateway: 192.168.204.1
+        nameservers:
+        - 192.168.204.1
+    - role: control-plane
+      networkDevice:
+        ipAddrs:
+        - 192.168.204.11/24
+        gateway: 192.168.204.1
+        nameservers:
+        - 192.168.204.1
+    - role: control-plane
+      networkDevice:
+        ipAddrs:
+        - 192.168.204.12/24
+        gateway: 192.168.204.1
+        nameservers:
+        - 192.168.204.1
+    - role: control-plane
+      networkDevice:
+        ipAddrs:
+        - 192.168.204.13/24
+        gateway: 192.168.204.1
+        nameservers:
+        - 192.168.204.1
+    - role: compute
+      networkDevice:
+        ipAddrs:
+        - 192.168.204.14/24
+        gateway: 192.168.204.1
+        nameservers:
+        - 192.168.204.1
+publish: External
+fips: false
+pullSecret: ''
+sshKey: |
+  ssh-rsa ''
+# The trust bundle below must include the CA that front the vCenter API or the cluster won't talk to it
+additionalTrustBundle: |
+  -----BEGIN CERTIFICATE -----
+  -----END CERTIFICATE -----
+
+# Only select imageContentSources or repositoryDigestMirros, not both
+# imageContentSources is deprecated.
+imageContentSources:
+- mirrors:
+  - myregistry.com:5000/ocp4/openshift4
+  source: quay.io/openshift-release-dev/ocp-release
+- mirrors:
+  - myregistry.com:5000/ocp4/openshift4
+  source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+
+repositoryDigestMirrors:
+- mirrors:
+  - bastion.localdomain:5000/openshift/release
+  source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+- mirrors:
+  - bastion.localdomain:5000/openshift/release-images
+  source: quay.io/openshift-release-dev/ocp-release
+
+
+
