@@ -1,0 +1,84 @@
+apiVersion: v1alpha1
+kind: AgentConfig
+metadata:
+  name: agent-config
+rendezvousIP: 10.15.168.75
+hosts:
+  - hostname: controlplane-0
+    interfaces:
+      - name: ens192
+        macAddress: 00:ef:44:21:e6:a5
+    networkConfig:
+      interfaces:
+        - name: ens192
+          type: ethernet
+          state: up
+          mac-address: 00:ef:44:21:e6:a5
+          ipv4:
+            enabled: true
+            address:
+              - ip: 10.15.168.75
+                prefix-length: 23
+            dhcp: false
+      dns-resolver:
+        config:
+          server:
+            - 10.15.168.20
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 10.15.168.1
+            next-hop-interface: ens192
+            table-id: 254
+  - hostname: controlplane-1
+    interfaces:
+      - name: ens192
+        macAddress: 00:ef:44:21:e6:a6
+    networkConfig:
+      interfaces:
+        - name: ens192
+          type: ethernet
+          state: up
+          mac-address: 00:ef:44:21:e6:a6
+          ipv4:
+            enabled: true
+            address:
+              - ip: 10.15.168.76
+                prefix-length: 23
+            dhcp: false
+      dns-resolver:
+        config:
+          server:
+            - 10.15.168.20
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 10.15.168.1
+            next-hop-interface: ens192
+            table-id: 254
+  - hostname: controlplane-2
+    interfaces:
+      - name: ens192
+        macAddress: 00:ef:44:21:e6:a7
+    networkConfig:
+      interfaces:
+        - name: ens192
+          type: ethernet
+          state: up
+          mac-address: 00:ef:44:21:e6:a7
+          ipv4:
+            enabled: true
+            address:
+              - ip: 10.15.168.77
+                prefix-length: 23
+            dhcp: false
+      dns-resolver:
+        config:
+          server:
+            - 10.15.168.20
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 10.15.168.1
+            next-hop-interface: ens192
+            table-id: 254

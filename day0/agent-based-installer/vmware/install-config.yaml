@@ -1,0 +1,72 @@
+additionalTrustBundlePolicy: Always
+apiVersion: v1
+baseDomain: dota-lab.iad.redhat.com
+compute:
+- architecture: amd64
+  hyperthreading: Enabled
+  name: worker
+  platform: {}
+  replicas: 0
+controlPlane:
+  architecture: amd64
+  hyperthreading: Enabled
+  name: master
+  platform: {}
+  replicas: 3
+metadata:
+  creationTimestamp: null
+  name: ocp-vmware
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  machineNetwork:
+  - cidr: 10.0.0.0/16
+  networkType: OVNKubernetes
+  serviceNetwork:
+  - 172.30.0.0/16
+platform:
+  vsphere:
+    apiVIPs:
+    - 10.15.168.162
+    failureDomains:
+    - name: generated-failure-domain
+      region: generated-region
+      server: vcenter.dota-lab.iad.redhat.com
+      topology:
+        computeCluster: /Datacenter/host/Cluster
+        datacenter: Datacenter
+        datastore: /Datacenter/datastore/rhsvc5-ssd
+        networks:
+        - labnet-10.15.168.x
+        resourcePool: /Datacenter/host/Cluster/Resources
+        folder: /Datacenter/datastore/rhsvc5-ssd/danclark # Field added for agent based installer
+      zone: generated-zone
+    ingressVIPs:
+    - 10.15.168.161
+    vcenters:
+    - datacenters:
+      - Datacenter
+      password: "removed"
+      port: 443
+      server: vcenter.dota-lab.iad.redhat.com
+      user: Administrator@vsphere.local
+    #clusterOSImage: http://lenovo-se350.dota-lab.iad.redhat.com/rhcos-4.18.1-x86_64-vmware.x86_64.ova # Field not used for agent based installer
+publish: External
+pullSecret: '{}'
+sshKey: |
+  ssh-rsa AAAA
+# The trust bundle below must include the CA that front the vCenter API or the cluster won't talk to it
+additionalTrustBundle: |
+  -----BEGIN CERTIFICATE -----
+  -----END CERTIFICATE -----
+# oc-mirror v1 create "ImageContentSourcePolicy mappings but we want to move to using repositoryDigestMirrors"
+# This means that after oc-mirror v1 pushes containers to your registry and you have the imageContentSourcePolicy.yaml file
+# Simply convert it into the format below to use "repositoryDigestMirrors"
+repositoryDigestMirrors: #oc-mirror v1 create "ImageContentSourcePolicy mappings but we want to move to using repositoryDigestMirrors"
+- mirrors:
+  - bastion.localdomain:5000/openshift/release
+  source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+- mirrors:
+  - bastion.localdomain:5000/openshift/release-images
+  source: quay.io/openshift-release-dev/ocp-release
