@@ -1,0 +1,34 @@
+apiVersion: ols.openshift.io/v1alpha1
+kind: OLSConfig
+metadata:
+  name: cluster
+spec:
+  llm:
+    providers:
+      - credentialsSecretRef:
+          name: credentials
+        models:
+          - name: "granite-code:8b"
+        name: OpenAI
+        type: rhelai_vllm
+        url: 'http://ollama.ollama.svc.cluster.local/v1'
+  ols:
+    conversationCache:
+      postgres:
+        credentialsSecret: lightspeed-redis-secret
+        dbName: postgres
+        maxConnections: 2000
+        sharedBuffers: 256MB
+        user: postgres
+        #maxMemory: 1024mb
+        #maxMemoryPolicy: allkeys-lru
+      type: postgres
+    defaultModel: "granite-code:8b"
+    defaultProvider: OpenAI
+    deployment:
+      console:
+        replicas: 1
+      replicas: 1
+    logLevel: INFO
+  olsDataCollector:
+    logLevel: INFO
