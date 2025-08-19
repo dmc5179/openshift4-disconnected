@@ -120,8 +120,8 @@ Resources:
             - "elasticloadbalancing:RegisterTargets"
             - "elasticloadbalancing:SetLoadBalancerPoliciesOfListener"
             - "elasticloadbalancing:SetSecurityGroups"
-            - "iam:AddRoleToInstanceProfile"  # Maybe not if we have existing IAM roles?
-            - "iam:CreateInstanceProfile"     # Maybe not if we have existing IAM roles?
+            - "iam:AddRoleToInstanceProfile"
+            - "iam:CreateInstanceProfile"
             #- "iam:CreateRole"
             #- "iam:DeleteInstanceProfile"
             #- "iam:DeleteRole"
