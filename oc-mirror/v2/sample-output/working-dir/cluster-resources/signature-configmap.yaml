@@ -1,0 +1,13 @@
+apiVersion: v1
+binaryData:
+  sha256-b6f3a6e7cab0bb6e2590f6e6612a3edec75e3b28d32a4e55325bdeeb7d836662-1: owGbwMvMwMEoOU9/4l9n2UDG0wd6kxgy5u3IqlZKLsosyUxOzFGyUqhWysxNTE8Fs1Lyk7NTi3RzE/My01KLS3RTMtOBFFBKqTgj0cjUzCrJLM040SzVPDkxySApySzVyNTSIM0s1czM0CjRODUlNdncNNU4ycgixdgo0STV1NTYyDQpJTU1yTzFwtjMzMxIqVZHQamksgBknVJiSX5uZrJCcn5eSWJmXmqRQnFmel5iSWlRqhJQVWZKal5JZkklssOKUtNSi1LzksHaC0sTK/Uy8/XzC1LzijMy00qA0jmpicWpuimpZfr5yQUwvpWJnqGlnqVuhYVZvJmJUi3IDfkFJZn5edAASC5KBbqlCGRoUGqKgkdiiYI/0NBgkKEKwUBHZealKziWlmTkA4OtUsFAz0DPEGhMJ5MMCwMjBwMbKxMoVBm4OAVgYV0sy//PvrwxTWBDvn21/K7GM/vF2WI36Cyx9P4oobO+1/vBDMHE8h/n12a981gbKV235mD7La8vHRNiXiR19P+sF5ETU+f6EF6y9u7DLwm+K+4ZpF2S2lRb/ZZptaJr268t4j83spceVL6czJ/8+Mq+DU7mhiEzWpb9XTSr+uvUns/1do5/Ze0ysyvCBPynxfAf7OsoinpRy7srQTdyU9XWhjNOybdn/Y/9N6Noa/rBkBV+rDvdVBYYVx39c6nsz6RN70zj8rd/bOLjmOPcHDeL992Hs5fFBYUnJbn1XFF7dP2u+1bH5Y8j1vw7fUtdX8b/68nFxRdYEjKmtwcdu/yS92x5qemLCUEzrslm/7fyK6ysE6t9uzqWK0T55hKzK4xBM4JkV+gb9+p4Pjxyxyvh+nbXqa8XvslalSIm2XDugvmmBb+b0gqtF0hIc5y+NNFkmhXLFvVwu+v2Pk6WYhozDJ+VM5owPsxoC7vqNdXWQExReF+PquWJ53dcW7PtVloVH2NW559n21Fw52NZ9vnY/TuVIiWSc79J31Z4rMvxi/twe/qdzMj3pU/7f1RM1Pp59sATxZv6GQwVXYtyP+06ljJzS/PhLaYbt/IcSucLvXDOjlWjMGHCuuuvN32065qWdE3lW5LFtInmVyMnrXZMC8kxcO5clnSS/73iarbtM/8Ei/No2vdp7IyYmqIob6T9LtJZmX3uxE1LJ1ec6gAA
+kind: ConfigMap
+metadata:
+  annotations:
+    createdAt: Sunday, 31-Aug-25 13:40:16 UTC
+    createdBy: oc-mirror v2
+    oc-mirror_version: 4.20.0-202508181603.p2.g830295b.assembly.stream.el9-830295b
+  labels:
+    release.openshift.io/verification-signatures: ""
+  name: mirrored-release-signatures
+  namespace: openshift-config-managed

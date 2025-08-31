@@ -1,0 +1,15 @@
+# Example of how to configure the install-config.yaml to use IDMS
+# instead of the old ICSP
+# Note that mirrorSourcePolicy is not respected by the openshift-installer
+# I have submitted a BZ/RFE for this that is currently being worked.
+# Adding that field now requires modifying the manifests that the openshift-installer
+# creates pre-install
+imageDigestSources:
+- mirrors:
+  - bastion.danclark.io:5000/openshift
+  source: quay.io/openshift-release-dev/ocp-release
+  mirrorSourcePolicy: NeverContactSource
+- mirrors:
+  - bastion.danclark.io:5000/openshift
+  source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+  mirrorSourcePolicy: NeverContactSource

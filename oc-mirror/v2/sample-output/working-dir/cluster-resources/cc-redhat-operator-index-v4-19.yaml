@@ -1,0 +1,15 @@
+apiVersion: olm.operatorframework.io/v1
+kind: ClusterCatalog
+metadata:
+  annotations:
+    createdAt: Sunday, 31-Aug-25 13:40:16 UTC
+    createdBy: oc-mirror v2
+    oc-mirror_version: 4.20.0-202508181603.p2.g830295b.assembly.stream.el9-830295b
+  name: cc-redhat-operator-index-v4-19
+spec:
+  priority: 0
+  source:
+    image:
+      ref: ip-10-0-35-196.us-east-2.compute.internal:8443/redhat/redhat-operator-index:v4.19
+    type: Image
+status: {}

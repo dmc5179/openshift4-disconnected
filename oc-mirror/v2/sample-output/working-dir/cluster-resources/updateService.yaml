@@ -1,0 +1,13 @@
+apiVersion: updateservice.operator.openshift.io/v1
+kind: UpdateService
+metadata:
+  annotations:
+    createdAt: Sunday, 31-Aug-25 13:40:16 UTC
+    createdBy: oc-mirror v2
+    oc-mirror_version: 4.20.0-202508181603.p2.g830295b.assembly.stream.el9-830295b
+  name: update-service-oc-mirror
+spec:
+  graphDataImage: ip-10-0-35-196.us-east-2.compute.internal:8443/openshift/graph-image:latest
+  releases: ip-10-0-35-196.us-east-2.compute.internal:8443/openshift/release-images
+  replicas: 2
+status: {}
