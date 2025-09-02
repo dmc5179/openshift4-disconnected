@@ -5,11 +5,18 @@
 # Adding that field now requires modifying the manifests that the openshift-installer
 # creates pre-install
 imageDigestSources:
+  # TODO: The openshift installer will fail if "allowMirrorByTags" is set. CRD shows it should be allowed. Need to look into why.
+  #allowMirrorByTags: false #Defaults to false according to CRD.
 - mirrors:
-  - bastion.danclark.io:5000/openshift
+  - bastion.io:8443/openshift
   source: quay.io/openshift-release-dev/ocp-release
-  mirrorSourcePolicy: NeverContactSource
+  mirrorSourcePolicy: NeverContactSource # OCP installer does not parse this field but does not fail if present. Bug already submitted
 - mirrors:
-  - bastion.danclark.io:5000/openshift
+  - bastion.io:8443/openshift
   source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
-  mirrorSourcePolicy: NeverContactSource
+  mirrorSourcePolicy: NeverContactSource # OCP installer does not parse this field but does not fail if present. Bug already submitted
+# additionalTrustBundle should have the CA for your private registry and any SSL endpoint
+# that the cluster needs to communicate with at least during initial OpenShift installation
+additionalTrustBundle: |
+  -----BEGIN CERTIFICATE -----
+  -----END CERTIFICATE -----
