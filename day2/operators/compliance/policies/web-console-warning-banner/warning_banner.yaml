@@ -6,7 +6,7 @@ metadata:
   namespace: openshift-config
 spec:
   scope: Cluster
-  backgroundColor: '#7FFF00'
+  backgroundColor: '#007A33'
   color: '#000000'
   location: BannerTop
   text: 'Highest Classification Level: Unclassified'
