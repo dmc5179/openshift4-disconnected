@@ -1,0 +1,54 @@
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  labels:
+    operators.openshift.org/catalog: "true"
+  name: operator-0
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/rhel9
+    source: registry.redhat.io/rhel9
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/ubi9
+    source: registry.redhat.io/ubi9
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/openshift4
+    source: registry.redhat.io/openshift4
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/openshift-service-mesh-dev-preview-beta
+    source: registry.redhat.io/openshift-service-mesh-dev-preview-beta
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/openshift-pipelines
+    source: registry.redhat.io/openshift-pipelines
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/openshift-builds
+    source: registry.redhat.io/openshift-builds
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/openshift-logging
+    source: registry.redhat.io/openshift-logging
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/source-to-image
+    source: registry.redhat.io/source-to-image
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/openshift-service-mesh
+    source: registry.redhat.io/openshift-service-mesh
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/openshift-service-mesh-tech-preview
+    source: registry.redhat.io/openshift-service-mesh-tech-preview
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/elastic
+    source: registry.connect.redhat.com/elastic
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/rhbk
+    source: registry.redhat.io/rhbk
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/rh-sso-7
+    source: registry.redhat.io/rh-sso-7
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/openshift-gitops-1
+    source: registry.redhat.io/openshift-gitops-1
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/openshift-serverless-1
+    source: registry.redhat.io/openshift-serverless-1

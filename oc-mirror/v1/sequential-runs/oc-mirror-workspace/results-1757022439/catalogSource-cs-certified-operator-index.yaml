@@ -1,0 +1,8 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: cs-certified-operator-index
+  namespace: openshift-marketplace
+spec:
+  image: ip-10-0-112-216.us-east-2.compute.internal:8443/redhat/certified-operator-index:v4.18
+  sourceType: grpc
