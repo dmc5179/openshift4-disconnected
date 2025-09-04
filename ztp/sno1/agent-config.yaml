@@ -1,0 +1,177 @@
+apiVersion: v1beta1
+kind: AgentConfig
+metadata:
+  name: ocp4-agent
+rendezvousIP: 10.150.50.115
+additionalNTPSources:
+  - 10.100.128.53
+  - 10.100.144.53
+hosts:
+  - hostname: ab05ru15
+    role: master
+    interfaces:
+      - name: eno1
+        macAddress: 18:66:da:ee:03:f4
+    rootDeviceHints: # Serial S75BNL0x328837B
+      deviceName: /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:3:0
+    networkConfig:
+      interfaces:
+        - name: eno1
+          type: ethernet
+          state: up
+          mtu: 9000
+          mac-address: 18:66:da:ee:03:f4
+          ipv4:
+            enabled: false
+          ipv6:
+            enabled: false
+        - name: eno1.1033
+          type: vlan
+          state: up
+          vlan:
+            base-iface: eno1
+            id: 1033
+          ipv4:
+            enabled: true
+            address:
+              - ip: 10.150.50.115
+                prefix-length: 24
+          ipv6:
+            enabled: false
+      dns-resolver:
+        config:
+          server:
+            - 10.100.128.53
+            - 10.100.144.53
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 10.150.50.1
+            next-hop-interface: eno1.1033
+            table-id: 254
+  - hostname: ab05ru16 # Done
+    role: master
+    interfaces:
+      - name: eno1
+        macAddress: 18:66:da:ed:f6:18
+    rootDeviceHints: #S75BNL0X329297R
+      deviceName: /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:3:0
+    networkConfig:
+      interfaces:
+        - name: eno1
+          type: ethernet
+          state: up
+          mtu: 9000
+          mac-address: 18:66:da:ed:f6:18
+          ipv4:
+            enabled: false
+          ipv6:
+            enabled: false
+        - name: eno1.1033
+          type: vlan
+          state: up
+          vlan:
+            base-iface: eno1
+            id: 1033
+          ipv4:
+            enabled: true
+            address:
+              - ip: 10.150.50.116
+                prefix-length: 24
+          ipv6:
+            enabled: false
+      dns-resolver:
+        config:
+          server:
+            - 10.100.128.53
+            - 10.100.144.53
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 10.150.50.1
+            next-hop-interface: eno1.1033
+            table-id: 254
+  - hostname: ab05ru17
+    role: master
+    interfaces:
+      - name: eno1
+        macAddress: 18:66:da:ed:fe:88
+    rootDeviceHints: # S75BNL0X327808Y
+      deviceName: /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:3:0
+    networkConfig:
+      interfaces:
+        - name: eno1
+          type: ethernet
+          state: up
+          mtu: 9000
+          mac-address: 18:66:da:ed:fe:88
+          ipv4:
+            enabled: false
+          ipv6:
+            enabled: false
+        - name: eno1.1033
+          type: vlan
+          state: up
+          vlan:
+            base-iface: eno1
+            id: 1033
+          ipv4:
+            enabled: true
+            address:
+              - ip: 10.150.50.117
+                prefix-length: 24
+          ipv6:
+            enabled: false
+      dns-resolver:
+        config:
+          server:
+            - 10.100.128.53
+            - 10.100.144.53
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 10.150.50.1
+            next-hop-interface: eno1.1033
+            table-id: 254
+  - hostname: ab05ru18
+    role: worker
+    interfaces:
+      - name: eno1
+        macAddress: 18:66:da:ed:f4:f8
+    rootDeviceHints: # S75BNL0X329299F
+      deviceName: /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:3:0
+    networkConfig:
+      interfaces:
+        - name: eno1
+          type: ethernet
+          state: up
+          mtu: 9000
+          mac-address: 18:66:da:ed:f4:f8
+          ipv4:
+            enabled: false
+          ipv6:
+            enabled: false
+        - name: eno1.1033
+          type: vlan
+          state: up
+          vlan:
+            base-iface: eno1
+            id: 1033
+          ipv4:
+            enabled: true
+            address:
+              - ip: 10.150.50.118
+                prefix-length: 24
+          ipv6:
+            enabled: false
+      dns-resolver:
+        config:
+          server:
+            - 10.100.128.53
+            - 10.100.144.53
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 10.150.50.1
+            next-hop-interface: eno1.1033
+            table-id: 254

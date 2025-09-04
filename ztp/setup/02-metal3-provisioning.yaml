@@ -1,0 +1,8 @@
+apiVersion: metal3.io/v1alpha1
+kind: Provisioning
+metadata:
+  name: metal3-provisioning
+spec:
+  provisioningNetwork: Disabled # [ Managed | Unmanaged | Disabled ]
+  virtualMediaViaExternalNetwork: true
+  watchAllNamespaces: true
