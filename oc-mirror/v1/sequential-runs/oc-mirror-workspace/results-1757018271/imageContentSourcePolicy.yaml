@@ -1,0 +1,50 @@
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  name: generic-0
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/ubi8
+    source: registry.access.redhat.com/ubi8
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  labels:
+    operators.openshift.org/catalog: "true"
+  name: operator-0
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/ubi9
+    source: registry.redhat.io/ubi9
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/devworkspace
+    source: registry.redhat.io/devworkspace
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/openshift4
+    source: registry.redhat.io/openshift4
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/web-terminal
+    source: registry.redhat.io/web-terminal
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/openshift-update-service
+    source: registry.redhat.io/openshift-update-service
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/compliance
+    source: registry.redhat.io/compliance
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  name: release-0
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/openshift/release
+    source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/openshift/release-images
+    source: quay.io/openshift-release-dev/ocp-release

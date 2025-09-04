@@ -1,0 +1,27 @@
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  labels:
+    operators.openshift.org/catalog: "true"
+  name: operator-0
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/openshift4
+    source: registry.redhat.io/openshift4
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/advanced-cluster-security
+    source: registry.redhat.io/advanced-cluster-security
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/devspaces-tech-preview
+    source: registry.redhat.io/devspaces-tech-preview
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/devspaces
+    source: registry.redhat.io/devspaces
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/rhel8
+    source: registry.redhat.io/rhel8
+  - mirrors:
+    - ip-10-0-112-216.us-east-2.compute.internal:8443/quay
+    source: registry.redhat.io/quay

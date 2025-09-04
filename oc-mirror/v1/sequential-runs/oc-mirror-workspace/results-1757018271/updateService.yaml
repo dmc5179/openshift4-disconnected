@@ -1,0 +1,8 @@
+apiVersion: updateservice.operator.openshift.io/v1
+kind: UpdateService
+metadata:
+  name: update-service-oc-mirror
+spec:
+  graphDataImage: ip-10-0-112-216.us-east-2.compute.internal:8443/openshift/graph-image@sha256:be2f3da93338121ae3a476ca3f2e1a0c4a3eab32e092d9e301dfa9f470c39c7e
+  releases: ip-10-0-112-216.us-east-2.compute.internal:8443/openshift/release-images
+  replicas: 2
