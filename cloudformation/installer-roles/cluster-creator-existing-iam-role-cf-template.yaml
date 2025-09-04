@@ -29,7 +29,7 @@ Resources:
   OpenShiftInstallerIamRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: "openshift-installer-role"
+      RoleName: "openshift-installer-existing-iam-role"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
