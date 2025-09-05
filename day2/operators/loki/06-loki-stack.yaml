@@ -1,0 +1,17 @@
+apiVersion: loki.grafana.com/v1
+kind: LokiStack
+metadata:
+  name: logging-loki 
+  namespace: openshift-logging 
+spec:
+  size: 1x.small 
+  storage:
+    schemas:
+    - version: v13
+      effectiveDate: "2025-09-04" #Set to yesterday's date to take effect
+    secret:
+      name: logging-loki-s3 
+      type: s3 
+  storageClassName: gp3-csi # block storage
+  tenants:
+    mode: openshift-logging
