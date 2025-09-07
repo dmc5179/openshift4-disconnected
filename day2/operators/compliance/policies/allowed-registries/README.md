@@ -4,6 +4,7 @@
 
 ```console
   oc patch image.config.openshift.io cluster --patch="$(cat ./default-allowed-registries.yaml)" --type=merge
+  oc patch configs.samples.operator.openshift.io cluster --type merge --patch '{"spec": {"samplesRegistry": "registry.redhat.io"}}'
 ```
 
 - id: xccdf_org.ssgproject.content_rule_ocp_allowed_registries
