@@ -1,0 +1,7 @@
+spec:
+  registrySources:
+    allowedRegistries:
+    - cloud.openshift.com
+    - quay.io
+    - registry.connect.redhat.com
+    - registry.redhat.io
