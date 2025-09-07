@@ -1,0 +1,11 @@
+spec:
+  allowedRegistriesForImport:
+  - domainName: cloud.openshift.com
+    insecure: false
+  - domainName: quay.io
+    insecure: false
+  - domainName: registry.connect.redhat.com
+    insecure: false
+  - domainName: registry.redhat.io
+    insecure: false
+
