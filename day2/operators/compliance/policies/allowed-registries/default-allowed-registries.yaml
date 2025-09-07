@@ -5,3 +5,4 @@ spec:
     - quay.io
     - registry.connect.redhat.com
     - registry.redhat.io
+    - image-registry.openshift-image-registry.svc:5000
