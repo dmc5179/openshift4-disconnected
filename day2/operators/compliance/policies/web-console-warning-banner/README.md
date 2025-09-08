@@ -1,6 +1,6 @@
 # Web console warning banner
 
-- Modifify the warning_banner.yaml file with the correct display text and color for your configuration
+- Modifify the classification-banner.yaml file with the correct display text and color for your configuration.  For the compliance operator to regonize compliance the ConsoleNotification must be named classification-banner
 
 These are the hexadecimal mappings for the banner background color based on classification level
 CONTROLLED UNCLASSIFIED INFORMATION (CUI, color code: #502B85)
@@ -16,5 +16,5 @@ Note: This console notification only appears after a user logs into the cluster.
 Customizing the web console splash screen is done in another config directory in this repository: custom-web-console-splash-screen
 
 ```console
-oc create -f warning_banner.yaml
+oc create -f classification_banner.yaml
 ```
