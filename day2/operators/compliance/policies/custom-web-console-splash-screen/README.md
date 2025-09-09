@@ -16,7 +16,7 @@ oc exec -n openshift-authentication "$POD" -- cat /var/config/system/secrets/v4-
 oc exec -n openshift-authentication "$POD" -- cat /var/config/system/secrets/v4-0-config-system-ocp-branding-template/providers.html > providers.html
 ```
 
-- Update each .html files above in the body section under <div class="pf-c-login__main-body"> or <div class="pf-c-login__main-body">.  Example below is an example config
+- Update each .html files above in the body section under \<div class="pf-c-login__main-body"> or \<div class="pf-c-login__main-body">.  Example below is an example config
 
 ```console
 <p>
