@@ -15,7 +15,10 @@ oc get  namespaces -o json | jq '[.items[] | select((.metadata.name | startswith
 oc get --all-namespaces resourcequota -o json | jq '[.items[] | select((.metadata.namespace | startswith("openshift") | not) and (.metadata.namespace | startswith("kube-") | not) and .metadata.namespace != "default" and .metadata.namespace != "rhacs-operator" and (true)) | .metadata.namespace] | unique'
 ```
 
-- For compliance ensure that all non-control plan namespaces have a resource quota and limit range applied.  ** NOTE: configure the namespace quota and limit ranges according to the neads of the applications, you can adjust these as needed **
+- For compliance ensure that all non-control plan namespaces have a resource quota and limit range applied.  
+
+- __NOTE: configure the namespace quota and limit ranges according to the neads of the applications, you can adjust these as needed__
+
 - In this repo there are example resource quota and limit range yamls, apply them to the needed namespace 
 
 ```console
