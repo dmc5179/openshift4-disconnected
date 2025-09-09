@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: cluster-quota
+spec:
+  hard:
+    pods: "10" 
+    requests.cpu: "1" 
+    requests.memory: 1Gi 
+    limits.cpu: "4" 
+    limits.memory: 8Gi
+    persistentvolumeclaims: "10"
+    requests.storage: "2000Gi"
