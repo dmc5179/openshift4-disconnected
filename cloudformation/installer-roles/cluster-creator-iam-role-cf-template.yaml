@@ -26,6 +26,14 @@ Metadata:
 
 Resources:
 
+  MyIAMUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: OpenShiftInstaller
+      # You can optionally attach managed policies directly to the user
+      ManagedPolicyArns:
+        - !Ref OpenShiftInstallerIamRole
+
   OpenShiftInstallerIamRole:
     Type: AWS::IAM::Role
     Properties:
