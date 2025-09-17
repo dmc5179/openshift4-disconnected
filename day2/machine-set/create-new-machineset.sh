@@ -1,16 +1,17 @@
 #!/bin/bash -ex
 
 EXISTING="ecs-2tzpd-worker-us-east-2a"
-NEW="${EXISTING}.json"
+#NEW="${EXISTING}.json"
 TMP="${EXISTING}-tmp.json"
 INITIAL_REPLICAS=0
 NEW_NAME="ecs-2tzpd-worker-gpu-us-east-2a"
-AWS_INSTANCE_TYPE=""
+NEW="${NEW_NAME}.json"
+AWS_INSTANCE_TYPE="g4dn.4xlarge"
 
 # Copy file
-cp "${EXISTING}" "${NEW}"
+#cp "${EXISTING}" "${NEW}"
 
-oc get -o json machineset "${NEW}" > "${TMP}" && mv "${TMP}" "${NEW}"
+oc get -o json machineset "${EXISTING}" > "${NEW}"
 
 jq 'del(.metadata.generation)' "${NEW}" > "${TMP}" && mv "${TMP}" "${NEW}"
 jq 'del(.metadata.creationTimestamp)' "${NEW}" > "${TMP}" && mv "${TMP}" "${NEW}"
