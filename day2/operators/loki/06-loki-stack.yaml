@@ -4,11 +4,31 @@ metadata:
   name: logging-loki 
   namespace: openshift-logging 
 spec:
-  size: 1x.small 
+# Commented out fields have not yet been tested. Need to understand how often it will write to S3
+#  limits:
+#    global:
+#      retention:
+#        days: 20
+#    tenants:  1 
+#      application:
+#        retention:
+#          days: 1
+#          streams:
+#            - days: 4
+#              selector: '{kubernetes_namespace_name=~"test.+"}'
+#      infrastructure:
+#        retention:
+#          days: 5
+#          streams:
+#            - days: 1
+#              selector: '{kubernetes_namespace_name=~"openshift.*"}'
+#  managementState: Managed
+#  replicationFactor: 1
+  size: 1x.small
   storage:
     schemas:
     - version: v13
-      effectiveDate: "2025-09-04" #Set to yesterday's date to take effect
+      effectiveDate: "2025-09-16" #Set to yesterday's date to take effect
     secret:
       name: logging-loki-s3 
       type: s3 
