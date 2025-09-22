@@ -5,7 +5,18 @@ metadata:
   namespace: openshift-logging 
 spec:
 # Commented out fields have not yet been tested. Need to understand how often it will write to S3
-#  limits:
+  limits:
+    ingestion:
+      ingestionBurstSize: 16
+      ingestionRate: 8
+#      maxGlobalStreamsPerTenant:
+#      maxLabelNameLength:
+#      maxLabelNamesPerSeries:
+#      maxLabelValueLength:
+#      maxLineSize:
+#      perStreamDesiredRate:
+      perStreamRateLimit: 5 # This number MUST be smaller than ingestionRate
+      perStreamRateLimitBurst: 15 # This number MUST be smaller than ingestionBurstSize
 #    global:
 #      retention:
 #        days: 20
@@ -23,7 +34,8 @@ spec:
 #            - days: 1
 #              selector: '{kubernetes_namespace_name=~"openshift.*"}'
 #  managementState: Managed
-#  replicationFactor: 1
+  replication:
+    factor: 1 # Default is 1
   size: 1x.small
   storage:
     schemas:
