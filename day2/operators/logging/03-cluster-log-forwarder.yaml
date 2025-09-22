@@ -7,6 +7,14 @@ spec:
   serviceAccount:
     name: logging-collector 
   outputs:
+#  - name: splunk-hec-output
+#    type: splunkHec
+#    url: https://your-splunk-hec-endpoint:8088/services/collector # Replace with your Splunk HEC URL and port
+#    secret:
+#      name: splunk-hec-secret # Name of the secret containing the HEC token
+#    # Optional: For insecure connections (not recommended for production)
+#    # tls:
+#    #   insecureSkipVerify: true
   - name: lokistack-out
     type: lokiStack 
     lokiStack:
@@ -22,8 +30,10 @@ spec:
         configMapName: openshift-service-ca.crt
   pipelines:
   - name: infra-app-logs
-    inputRefs: 
-    - application
-    - infrastructure
+    inputRefs:
+      - application
+      - infrastructure
+      - audit
     outputRefs:
-    - lokistack-out
+      - lokistack-out
+      #- splunk-hec-output
