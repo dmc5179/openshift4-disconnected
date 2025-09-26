@@ -17,23 +17,23 @@ spec:
 #      perStreamDesiredRate:
       perStreamRateLimit: 5 # This number MUST be smaller than ingestionRate
       perStreamRateLimitBurst: 15 # This number MUST be smaller than ingestionBurstSize
-#    global:
-#      retention:
-#        days: 20
-#    tenants:  1 
-#      application:
-#        retention:
-#          days: 1
-#          streams:
-#            - days: 4
-#              selector: '{kubernetes_namespace_name=~"test.+"}'
-#      infrastructure:
-#        retention:
-#          days: 5
-#          streams:
-#            - days: 1
-#              selector: '{kubernetes_namespace_name=~"openshift.*"}'
-#  managementState: Managed
+    global:
+      retention:
+        days: 20
+    tenants:  1 
+      application:
+        retention:
+          days: 5
+          streams:
+            - days: 1
+              selector: '{kubernetes_namespace_name=~"tenant.*"}'
+      infrastructure:
+        retention:
+          days: 5
+          streams:
+            - days: 1
+              selector: '{kubernetes_namespace_name=~"openshift.*"}'
+  managementState: Managed
   replication:
     factor: 1 # Default is 1
   size: 1x.small
