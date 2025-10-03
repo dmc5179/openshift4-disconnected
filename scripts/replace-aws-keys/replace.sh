@@ -14,7 +14,7 @@
 #  credentials: ZZZZZZZ==
 #kind: Secret
 
-# Should we base64 encode this first? probably not
+# Need to base64 encode what will be the .aws/credentials file that goes into the secret
 credentials=$(cat <<EOF | base64 -w0
 [default]
 aws_access_key_id = ${AWS_ACCESS_KEY_ID}
@@ -28,11 +28,17 @@ AWS_SECRET_ACCESS_KEY_ENCODED=$(echo ${AWS_SECRET_ACCESS_KEY} | base64 -w0)
 
 # patch the secrets....
 
-#cco-secret # oc get -o yaml -n openshift-cloud-credential-operator secret cloud-credential-operator-iam-ro-creds
+# cco-secret #
+# Backup the secret
+oc get -o yaml -n openshift-cloud-credential-operator secret cloud-credential-operator-iam-ro-creds > cloud-credential-operator-iam-ro-creds-orig.yaml
+# Apply the new config
 oc patch -n openshift-cloud-credential-operator secret cloud-credential-operator-iam-ro-creds --type='merge' \
   -p '{"data":{"aws_access_key_id":"'"$AWS_ACCESS_KEY_ID_ENCODED"'","aws_secret_access_key":"'"$AWS_SECRET_ACCESS_KEY_ENCODED"'","credentials":"'"$credentials"'"}}'
 
-#ebs-secret # oc get -o yaml -n openshift-cluster-csi-drivers secret ebs-cloud-credentials
+# ebs-secret #
+# Backup the secret
+oc get -o yaml -n openshift-cluster-csi-drivers secret ebs-cloud-credentials > ebs-cloud-credentials-orig.yaml
+# Apply the new config
 oc patch -n openshift-cluster-csi-drivers secret ebs-cloud-credentials --type='merge' \
   -p '{"data":{"aws_access_key_id":"'"$AWS_ACCESS_KEY_ID_ENCODED"'","aws_secret_access_key":"'"$AWS_SECRET_ACCESS_KEY_ENCODED"'","credentials":"'"$credentials"'"}}'
 
@@ -40,7 +46,10 @@ oc patch -n openshift-cluster-csi-drivers secret ebs-cloud-credentials --type='m
 #aws-ebs-csi-driver-controller-5d8cd59d8f-dlctj   11/11   Running   0          47s
 #aws-ebs-csi-driver-controller-5d8cd59d8f-nqrzd   11/11   Running   0          35s
 
-#image-registry-secret # oc get -o yaml -n openshift-image-registry secret installer-cloud-credentials
+# image-registry-secret #
+# Backup the secret
+oc get -o yaml -n openshift-image-registry secret installer-cloud-credentials > installer-cloud-credentials-orig.yaml
+# Apply the new config
 oc patch -n openshift-image-registry secret installer-cloud-credentials  --type='merge' \
   -p '{"data":{"aws_access_key_id":"'"$AWS_ACCESS_KEY_ID_ENCODED"'","aws_secret_access_key":"'"$AWS_SECRET_ACCESS_KEY_ENCODED"'","credentials":"'"$credentials"'"}}'
 
@@ -48,17 +57,24 @@ oc patch -n openshift-image-registry secret installer-cloud-credentials  --type=
 #image-registry-65f7cb59c-b47tc                     1/1     Running     0          5m49s
 #image-registry-65f7cb59c-gr7tg                     1/1     Running     0          5m49s
 
-#ingress-secret # oc get -o yaml -n openshift-ingress-operator secret cloud-credentials
+# ingress-secret #
+# Backup the secret
+oc get -o yaml -n openshift-ingress-operator secret cloud-credentials > cloud-credentials-orig.yaml
+# Apply the new config
 oc patch -n openshift-ingress-operator secret cloud-credentials --type='merge' \
   -p '{"data":{"aws_access_key_id":"'"$AWS_ACCESS_KEY_ID_ENCODED"'","aws_secret_access_key":"'"$AWS_SECRET_ACCESS_KEY_ENCODED"'","credentials":"'"$credentials"'"}}'
 
-#machine-api-secret # oc get -o yaml -n openshift-machine-api secret aws-cloud-credentials
+# machine-api-secret #
+# Backup the secret
+oc get -o yaml -n openshift-machine-api secret aws-cloud-credentials > aws-cloud-credentials-orig.yaml
+# Apply the new config
 oc patch -n openshift-machine-api secret aws-cloud-credentials --type='merge' \
   -p '{"data":{"aws_access_key_id":"'"$AWS_ACCESS_KEY_ID_ENCODED"'","aws_secret_access_key":"'"$AWS_SECRET_ACCESS_KEY_ENCODED"'","credentials":"'"$credentials"'"}}'
 
-#cloud-network-config-controller # oc get -o yaml -n openshift-cloud-network-config-controller secret cloud-credentials
+# cloud-network-config-controller #
+# Backup the secret
+oc get -o yaml -n openshift-cloud-network-config-controller secret cloud-credentials > cloud-credentials-orig.yaml
+# Apply the new config
 oc patch -n openshift-cloud-network-config-controller secret cloud-credentials --type='merge' \
   -p '{"data":{"aws_access_key_id":"'"$AWS_ACCESS_KEY_ID_ENCODED"'","aws_secret_access_key":"'"$AWS_SECRET_ACCESS_KEY_ENCODED"'","credentials":"'"$credentials"'"}}'
-
-
 
