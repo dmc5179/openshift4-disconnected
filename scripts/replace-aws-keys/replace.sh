@@ -1,18 +1,21 @@
-#!/bin/bash
+#!/bin/bash -xe
 
 # Easier if these are set in your shell to avoid checking them into github
 #AWS_ACCESS_KEY_ID="fakekey"
 #AWS_SECRET_ACCESS_KEY="fakesec"
 #AWS_DEFAULT_REGION="us-east-2"
 
-# Example of what the secrets look like
-#oc get -o yaml -n openshift-cloud-credential-operator Secret cloud-credential-operator-iam-ro-creds
-#apiVersion: v1
-#data:
-#  aws_access_key_id: XXXXXXX=
-#  aws_secret_access_key: YYYYY== 
-#  credentials: ZZZZZZZ==
-#kind: Secret
+# Need to base64 encode these values
+AWS_ACCESS_KEY_ID_ENCODED=$(echo ${AWS_ACCESS_KEY_ID} | base64 -w0)
+AWS_SECRET_ACCESS_KEY_ENCODED=$(echo ${AWS_SECRET_ACCESS_KEY} | base64 -w0)
+
+# Replace the top level aws creds secret for the Credentials Requests
+oc get -n kube-system -o yaml secret aws-creds
+
+oc patch -n kube-system secret aws-creds --type='merge' \
+  -p '{"data":{"aws_access_key_id":"'"$AWS_ACCESS_KEY_ID_ENCODED"'","aws_secret_access_key":"'"$AWS_SECRET_ACCESS_KEY_ENCODED"'"}}'
+
+# Below this might not be needed but makes the process go more quickly and smoothly
 
 # Need to base64 encode what will be the .aws/credentials file that goes into the secret
 credentials=$(cat <<EOF | base64 -w0
@@ -21,10 +24,6 @@ aws_access_key_id = ${AWS_ACCESS_KEY_ID}
 aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}
 EOF
 )
-
-# Need to base64 encode these values
-AWS_ACCESS_KEY_ID_ENCODED=$(echo ${AWS_ACCESS_KEY_ID} | base64 -w0)
-AWS_SECRET_ACCESS_KEY_ENCODED=$(echo ${AWS_SECRET_ACCESS_KEY} | base64 -w0)
 
 # patch the secrets....
 
@@ -41,6 +40,10 @@ oc get -o yaml -n openshift-cluster-csi-drivers secret ebs-cloud-credentials > e
 # Apply the new config
 oc patch -n openshift-cluster-csi-drivers secret ebs-cloud-credentials --type='merge' \
   -p '{"data":{"aws_access_key_id":"'"$AWS_ACCESS_KEY_ID_ENCODED"'","aws_secret_access_key":"'"$AWS_SECRET_ACCESS_KEY_ENCODED"'","credentials":"'"$credentials"'"}}'
+# wait for patch to apply
+sleep 4
+# delete the node csi driver pods to ensure credentials rotation after controller pods rotate
+oc delete pod -l app=aws-ebs-csi-driver-node
 
 # This should cause pods to rotate
 #aws-ebs-csi-driver-controller-5d8cd59d8f-dlctj   11/11   Running   0          47s
