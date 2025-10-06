@@ -1,0 +1,161 @@
+---
+apiVersion: apps.gitlab.com/v1beta1
+kind: GitLab
+metadata:
+  name: gitlab
+  namespace: gitlab-system
+spec:
+  chart:
+    values:
+      gitlab:
+        #toolbox:
+        #  backups:
+        #    objectStorage:
+        #      config:
+        #        secret: gitlab-object-storage
+        #        key: config
+        https: true
+        gitlab-shell:
+          maxReplicas: 2
+          minReplicas: 1
+        sidekiq:
+          maxReplicas: 2
+          minReplicas: 1
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1000M
+        webservice:
+          maxReplicas: 2
+          minReplicas: 1
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1500M
+      gitlab-runner:
+        image:
+          tag: ubi-fips-v18.4.0
+      global:
+        minio:
+          enabled: true
+        image:
+          tagSuffix: "-ubi"
+          #pullPolicy: Always
+        appConfig:
+          defaultProjectsFeatures:
+            issues: true
+            mergeRequests: true
+            wiki: true
+            snippets: true
+            builds: true
+            containerRegistry: true
+        #  artifacts:
+        #    bucket: gitlab-artifacts-storage
+        #    connection:
+        #      secret: gitlab-object-storage
+        #      key: "config"
+        #  backups:
+        #    bucket: gitlab-backup-storage
+        #    tmpBucket: gitlab-tmp-storage
+        #    connection:
+        #      secret: gitlab-object-storage
+        #      key: "config"
+        #  ciSecureFiles:
+        #    bucket: gitlab-ci-secure-files-storage
+        #    enabled: true
+        #    connection:
+        #      secret: gitlab-object-storage
+        #      key: "config"
+        #  dependencyProxy:
+        #    bucket: gitlab-dependency-proxy
+        #    enabled: true
+        #    connection:
+        #      secret: gitlab-object-storage
+        #      key: "config"
+        #  externalDiffs:
+        #    bucket: gitlab-external-diffs
+        #    enabled: true
+        #    connection:
+        #      secret: gitlab-object-storage
+        #      key: "config"
+        #  lfs:
+        #    bucket: gitlab-lfs-storage
+        #    connection:
+        #      secret: gitlab-object-storage
+        #      key: "config"
+        #  object_store:
+        #    connection:
+        #      secret: gitlab-object-storage
+        #      key: "config"
+        #    enabled: true
+        #    proxy_download: false
+        #  packages: 
+        #    accessControl: true
+        #    bucket: gitlab-packages-storage
+        #    connection:
+        #      secret: gitlab-object-storage
+        #      key: "config"
+        #  terraformState:
+        #    bucket: gitlab-terraform-state-storage
+        #    enabled: true
+        #    connection:
+        #      secret: gitlab-object-storage
+        #      key: "config"
+        #  uploads:
+        #    bucket: gitlab-uploads-storage
+        #    connection:
+        #      secret: gitlab-object-storage
+        #      key: "config"
+        #pages:
+        #  enabled: true
+        #  objectStore:
+        #    enabled: true
+        #    bucket: gitlab-pages-storage
+        #    connection:
+        #      secret: gitlab-object-storage
+        #      key: "config"
+        #registry: 
+        #  bucket: gitlab-registry-storage
+        #  connection:
+        #    secret: gitlab-object-storage
+        #    key: "config"
+        hosts:
+          domain: apps.clustername.basedomain # Part after console-openshift-console
+        ingress:
+          class: "none"
+          #class: "nginx" #set to 'none' to allow OpenShift to take over but then git over ssh is not supported
+          annotations:
+            route.openshift.io/termination: "edge" # For OpenShift Routes
+            route.openshift.io/insecure-edge-termination-policy: "Redirect" # For OpenShift Routes
+          configureCertmanager: false
+      installCertmanager: false
+      #registry:
+      #  storage:
+      #    secret: gitlab-object-storage
+      #    key: config
+      #smartcard:
+      #kas:
+      #pages:
+      #ssh:
+      minio:
+        #enabled: true # should be set in global.minio.enabled instead
+        resources:
+          requests:
+            cpu: 100m
+      nginx-ingress:
+        enabled: false
+        #controller:
+        #  electionID: ingress-controller-leader
+        #  replicaCount: 1
+      postgresql:
+        #install: false
+        primary:
+          extendedConfiguration: max_connections = 200
+      redis:
+        install: true
+        resources:
+          requests:
+            cpu: 100m
+      prometheus:
+        install: false
+    version: 9.4.1

@@ -1,0 +1,12 @@
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  annotations:
+    olm.providedAPIs: GitLab.v1beta1.apps.gitlab.com
+  generateName: gitlab-system-
+  name: gitlab-system-kgc7z
+  namespace: gitlab-system
+spec:
+  targetNamespaces:
+  - gitlab-system
+  upgradeStrategy: Default

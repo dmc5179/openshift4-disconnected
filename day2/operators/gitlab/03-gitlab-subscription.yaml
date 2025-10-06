@@ -1,0 +1,79 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  creationTimestamp: "2025-10-05T13:44:44Z"
+  generation: 1
+  labels:
+    operators.coreos.com/gitlab-operator-kubernetes.gitlab-system: ""
+  name: gitlab-operator-kubernetes
+  namespace: gitlab-system
+  resourceVersion: "1481821"
+  uid: 79d5c86e-07a3-4062-9410-6f31b7aa5a34
+spec:
+  channel: stable
+  installPlanApproval: Automatic
+  name: gitlab-operator-kubernetes
+  source: certified-operators
+  sourceNamespace: openshift-marketplace
+  startingCSV: gitlab-operator-kubernetes.v2.4.1
+status:
+  catalogHealth:
+  - catalogSourceRef:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      name: certified-operators
+      namespace: openshift-marketplace
+      resourceVersion: "983443"
+      uid: d520ee69-5cfe-483e-9d94-dc4ed0059d97
+    healthy: true
+    lastUpdated: "2025-10-05T13:44:49Z"
+  - catalogSourceRef:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      name: community-operators
+      namespace: openshift-marketplace
+      resourceVersion: "970160"
+      uid: 385e11cf-27c7-4127-b3eb-c72afa36291d
+    healthy: true
+    lastUpdated: "2025-10-05T13:44:49Z"
+  - catalogSourceRef:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      name: redhat-marketplace
+      namespace: openshift-marketplace
+      resourceVersion: "970246"
+      uid: 86eafd84-7b2b-422e-8509-e23e037c4c14
+    healthy: true
+    lastUpdated: "2025-10-05T13:44:49Z"
+  - catalogSourceRef:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: CatalogSource
+      name: redhat-operators
+      namespace: openshift-marketplace
+      resourceVersion: "970260"
+      uid: f473580b-9838-4f3e-8fad-591e1ff879a3
+    healthy: true
+    lastUpdated: "2025-10-05T13:44:49Z"
+  conditions:
+  - lastTransitionTime: "2025-10-05T13:44:52Z"
+    message: all available catalogsources are healthy
+    reason: AllCatalogSourcesHealthy
+    status: "False"
+    type: CatalogSourcesUnhealthy
+  currentCSV: gitlab-operator-kubernetes.v2.4.1
+  installPlanGeneration: 1
+  installPlanRef:
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: InstallPlan
+    name: install-4w6n5
+    namespace: gitlab-system
+    resourceVersion: "983607"
+    uid: 228dfb19-5dc3-4e8e-846e-ff14ec747a93
+  installedCSV: gitlab-operator-kubernetes.v2.4.1
+  installplan:
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: InstallPlan
+    name: install-4w6n5
+    uuid: 228dfb19-5dc3-4e8e-846e-ff14ec747a93
+  lastUpdated: "2025-10-05T23:34:11Z"
+  state: AtLatestKnown
