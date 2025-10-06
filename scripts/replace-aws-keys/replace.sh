@@ -1,5 +1,10 @@
 #!/bin/bash -xe
 
+# change this to "true" to replace the main secret and all sub secrets at the same time
+# instead of waiting for the secret rotation to flow down
+REPLACE_ALL="false"
+
+
 # Easier if these are set in your shell to avoid checking them into github
 #AWS_ACCESS_KEY_ID="fakekey"
 #AWS_SECRET_ACCESS_KEY="fakesec"
@@ -15,7 +20,15 @@ oc get -n kube-system -o yaml secret aws-creds
 oc patch -n kube-system secret aws-creds --type='merge' \
   -p '{"data":{"aws_access_key_id":"'"$AWS_ACCESS_KEY_ID_ENCODED"'","aws_secret_access_key":"'"$AWS_SECRET_ACCESS_KEY_ENCODED"'"}}'
 
-# Below this might not be needed but makes the process go more quickly and smoothly
+# Only the primary aws-creds secret in the kube-system namespace is required to be change.
+# The change will flow down to the other operator secrets but takes time
+# By default, we will wait for the flow down to happen.
+# Change this value at the top of the script to update all of the secrets at the same time.
+if [[ "${REPLACE_ALL}" == "false" ]]
+then
+  echo "Replacing only the kube-system aws-cred secret"
+  exit 0
+fi
 
 # Need to base64 encode what will be the .aws/credentials file that goes into the secret
 credentials=$(cat <<EOF | base64 -w0
