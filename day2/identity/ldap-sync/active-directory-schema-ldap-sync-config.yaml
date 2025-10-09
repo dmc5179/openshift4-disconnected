@@ -1,0 +1,19 @@
+---
+kind: LDAPSyncConfig
+apiVersion: v1
+url: ldap://LDAP_SERVICE_IP:389
+insecure: true # Set to false for ldaps
+bindDN: cn=admin,dc=example,dc=com
+bindPassword: "<password>"
+#ca: my-ldap-ca-bundle.crt # uncomment and set for ldaps
+activeDirectory:
+    usersQuery:
+        baseDN: "ou=users,dc=example,dc=com"
+        scope: sub
+        derefAliases: never
+        filter: (objectclass=person)
+        pageSize: 50 # 0 means no limit. Set to a number your AD allows.
+    userNameAttributes: [ mail ] 
+    groupMembershipAttributes: [ memberOf ] 
+groupUIDNameMapping:
+  "cn=admins,ou=groups,dc=example,dc=com": Administrators
