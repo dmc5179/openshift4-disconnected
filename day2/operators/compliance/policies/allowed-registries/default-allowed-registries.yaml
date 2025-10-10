@@ -6,3 +6,34 @@ spec:
     - registry.connect.redhat.com
     - registry.redhat.io
     - image-registry.openshift-image-registry.svc:5000
+# Below this are registries from the certified operator index
+    #- cgr.dev
+    ##- confluentinc # docker://confluentinc which doesn't make sense
+    #- container.repository.cloudera.com
+    #- docker.cloudsmith.io
+    #- docker.enterprisedb.com
+    #- docker.io
+    #- docker.lightbitslabs.com
+    #- docker.mariadb.com
+    #- drbd.io
+    ##- envoyproxy # docker://envoyproxy which doesn't make sense
+    #- gcr.io
+    #- ghcr.io
+    ##- harness # docker://harness which doesn't make sense
+    #- icr.io
+    ##- mariadb # docker://mariadb which doesn't make sense
+    #- mcr.microsoft.com
+    #- nvcr.io
+    #- prod.harbor.keysight.digital
+    #- public.ecr.aws
+    #- quay.io
+    #- registry.access.redhat.com
+    #- registry.connect.redhat.com
+    #- registry.crowdstrike.com
+    #- registry.gitlab.com
+    #- registry.hitachivantara.com
+    #- registry.redhat.io
+    #- registry.venafi.cloud
+    ##- splunk # docker://splunk which doesn't make sense
+    ##- tintri # docker://tintri which doesn't make sense
+    #- vault.habana.ai
