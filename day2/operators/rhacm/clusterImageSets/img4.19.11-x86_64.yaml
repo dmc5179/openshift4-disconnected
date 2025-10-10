@@ -1,0 +1,10 @@
+apiVersion: hive.openshift.io/v1
+kind: ClusterImageSet
+metadata:
+  labels:
+    channel: stable
+    visible: 'false'
+  name: img4.19.11-x86-64-appsub
+spec:
+  releaseImage: myregistry.com:8443/openshift/release-images:4.19.11-x86_64 # Change to point to your private registry
+  #releaseImage: quay.io/openshift-release-dev/ocp-release:4.19.11-x86_64
