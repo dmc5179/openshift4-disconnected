@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ocp-csr-approver-cronjob
+spec:
+  #schedule: "0 1 * * *"
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: csrapprover
+            securityContext:
+              allowPrivilegeEscalation: false
+              runAsNonRoot: true
+              seccompProfile:
+                type: "RuntimeDefault"
+              capabilities:
+                drop:
+                  - ALL
+            image: registry.redhat.io/openshift4/ose-cli-rhel9
+            #image: quay.io/openshift/origin-cli
+            commnad: ["/bin/sh"]
+            args:
+            - "-c"
+            - |
+              if [[ $(oc get csr -oname | grep -i pending | wc -l) > 0 ]]
+              then
+                echo "Approving CSRs..."
+                oc get csr -o name | grep -i pending | awk '{print $1}' | xargs -P 1 -n 20 oc adm certificate approve
+              else
+                echo "No pending CSRs..."
+              fi

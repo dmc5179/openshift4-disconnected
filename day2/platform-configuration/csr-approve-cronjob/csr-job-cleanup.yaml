@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: csr-auto-approval-cleaner
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: csr-auto-approval-cleaner
+            securityContext:
+              allowPrivilegeEscalation: false
+              runAsNonRoot: true
+              seccompProfile:
+                type: "RuntimeDefault"
+              capabilities:
+                drop:
+                  - ALL
+            #image: quay.io/openshift/origin-cli
+            image: registry.redhat.io/openshift4/ose-cli-rhel9
+            args:
+            - /bin/sh
+            - -c
+            - oc get pods -n openshift-cron-jobs -oname --field-selector=status.phase==Succeeded | xargs -P 1 -n 20 oc delete
+          restartPolicy: OnFailure
