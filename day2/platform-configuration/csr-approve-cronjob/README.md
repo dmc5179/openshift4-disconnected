@@ -10,15 +10,17 @@ oc adm policy add-cluster-role-to-user cluster-admin -z default -n openshift-cro
 ```
 
 ```console
-oc create -f csr-approve-job.yaml
+oc create -n openshift-cron-jobs -f csr-approve-job.yaml
 ```
 
 ```console
-oc create -f csr-job-cleanup.yaml
+oc create -n openshift-cron-jobs job --from=cronjob/ocp-csr-approver-cronjob csr-approve-12345
 ```
 
 ```console
-oc get cronjob
-oc get cronjob -A
-oc get pod openshift-cron-jobs
+oc create -n openshift-cron-jobs -f csr-job-cleanup.yaml
+```
+
+```console
+oc get -n openshift-cron-jobs cronjob
 ```
