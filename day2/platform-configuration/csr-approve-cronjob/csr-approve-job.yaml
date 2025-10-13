@@ -22,7 +22,7 @@ spec:
                   - ALL
             image: registry.redhat.io/openshift4/ose-cli-rhel9
             #image: quay.io/openshift/origin-cli
-            commnad: ["/bin/sh"]
+            command: ["/bin/sh"]
             args:
             - "-c"
             - |
