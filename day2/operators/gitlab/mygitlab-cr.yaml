@@ -8,12 +8,21 @@ spec:
   chart:
     values:
       gitlab:
-        #toolbox:
-        #  backups:
-        #    objectStorage:
-        #      config:
-        #        secret: gitlab-object-storage
-        #        key: config
+        gitaly:
+          persistence:
+            storageClass: gp3-csi-encrypted
+            size: 50Gi
+        toolbox:
+          backups:
+            objectStorage:
+              connection:
+                provider: AWS
+                secret: gitlab-object-storage
+                key: config
+              config:
+                provider: AWS
+                secret: gitlab-object-storage
+                key: config
         https: true
         gitlab-shell:
           maxReplicas: 2
@@ -37,7 +46,7 @@ spec:
           tag: ubi-fips-v18.4.0
       global:
         minio:
-          enabled: true
+          enabled: false # false when using AWS S3
         image:
           tagSuffix: "-ubi"
           #pullPolicy: Always
@@ -49,96 +58,120 @@ spec:
             snippets: true
             builds: true
             containerRegistry: true
-        #  artifacts:
-        #    bucket: gitlab-artifacts-storage
-        #    connection:
-        #      secret: gitlab-object-storage
-        #      key: "config"
-        #  backups:
-        #    bucket: gitlab-backup-storage
-        #    tmpBucket: gitlab-tmp-storage
-        #    connection:
-        #      secret: gitlab-object-storage
-        #      key: "config"
-        #  ciSecureFiles:
-        #    bucket: gitlab-ci-secure-files-storage
-        #    enabled: true
-        #    connection:
-        #      secret: gitlab-object-storage
-        #      key: "config"
-        #  dependencyProxy:
-        #    bucket: gitlab-dependency-proxy
-        #    enabled: true
-        #    connection:
-        #      secret: gitlab-object-storage
-        #      key: "config"
-        #  externalDiffs:
-        #    bucket: gitlab-external-diffs
-        #    enabled: true
-        #    connection:
-        #      secret: gitlab-object-storage
-        #      key: "config"
-        #  lfs:
-        #    bucket: gitlab-lfs-storage
-        #    connection:
-        #      secret: gitlab-object-storage
-        #      key: "config"
-        #  object_store:
-        #    connection:
-        #      secret: gitlab-object-storage
-        #      key: "config"
-        #    enabled: true
-        #    proxy_download: false
-        #  packages: 
-        #    accessControl: true
-        #    bucket: gitlab-packages-storage
-        #    connection:
-        #      secret: gitlab-object-storage
-        #      key: "config"
-        #  terraformState:
-        #    bucket: gitlab-terraform-state-storage
-        #    enabled: true
-        #    connection:
-        #      secret: gitlab-object-storage
-        #      key: "config"
-        #  uploads:
-        #    bucket: gitlab-uploads-storage
-        #    connection:
-        #      secret: gitlab-object-storage
-        #      key: "config"
-        #pages:
-        #  enabled: true
-        #  objectStore:
-        #    enabled: true
-        #    bucket: gitlab-pages-storage
-        #    connection:
-        #      secret: gitlab-object-storage
-        #      key: "config"
-        #registry: 
-        #  bucket: gitlab-registry-storage
-        #  connection:
-        #    secret: gitlab-object-storage
-        #    key: "config"
+          artifacts:
+            bucket: ocp-vn692-gitlab-artifacts-storage
+            #proxy_download: false # set to true when using encrypted buckets?
+            #connection:
+            #  secret: gitlab-object-storage
+            #  key: "config"
+          backups:
+            bucket: ocp-vn692-gitlab-backup-storage
+            tmpBucket: ocp-vn692-gitlab-tmp-storage
+            #proxy_download: false # set to true when using encrypted buckets?
+            #connection:
+            #  secret: gitlab-object-storage
+            #  key: "config"
+          ciSecureFiles:
+            bucket: ocp-vn692-gitlab-ci-secure-files-storage
+            enabled: true
+            #proxy_download: false # set to true when using encrypted buckets?
+            #connection:
+            #  secret: gitlab-object-storage
+            #  key: "config"
+          dependencyProxy:
+            bucket: ocp-vn692-gitlab-dependency-proxy
+            enabled: true
+            #proxy_download: false # set to true when using encrypted buckets?
+            #connection:
+            #  secret: gitlab-object-storage
+            #  key: "config"
+          externalDiffs:
+            bucket: ocp-vn692-gitlab-external-diffs
+            enabled: true
+            #proxy_download: false # set to true when using encrypted buckets?
+            #connection:
+            #  secret: gitlab-object-storage
+            #  key: "config"
+          lfs:
+            bucket: ocp-vn692-gitlab-lfs-storage
+            #proxy_download: false # set to true when using encrypted buckets?
+            #connection:
+            #  secret: gitlab-object-storage
+            #  key: "config"
+          packages:
+            accessControl: true
+            bucket: ocp-vn692-gitlab-packages-storage
+            #proxy_download: false # set to true when using encrypted buckets?
+            #connection:
+            #  secret: gitlab-object-storage
+            #  key: "config"
+          terraformState:
+            bucket: ocp-vn692-gitlab-terraform-state-storage
+            enabled: true
+            #proxy_download: false # set to true when using encrypted buckets?
+            #connection:
+            #  secret: gitlab-object-storage
+            #  key: "config"
+          uploads:
+            bucket: ocp-vn692-gitlab-uploads-storage
+            #proxy_download: false # set to true when using encrypted buckets?
+            #connection:
+            #  secret: gitlab-object-storage
+            #  key: "config"
+          object_store:
+            connection:
+              provider: AWS
+              #secret: gitlab-object-storage
+              #key: "config"
+              secret: gitlab-s3-secrets
+              key: "connection"
+            enabled: true
+            proxy_download: true # set to true when using encrypted buckets?
+            storage_options:
+              server_side_encryption: aws:kms
+              server_side_encryption_kms_key_id: "arn:aws:kms:us-east-2:731151848080:key/0a5910fd-8343-478e-8cbb-224ced2d7eb7"
+        pages:
+          enabled: true
+          objectStore:
+            enabled: true
+            bucket: ocp-vn692-gitlab-pages-storage
+            connection:
+              provider: AWS
+              secret: gitlab-object-storage
+              key: "config"
+        registry: 
+          bucket: ocp-vn692-gitlab-registry-storage
+          connection:
+            provider: AWS
+            secret: gitlab-object-storage
+            key: "config"
         hosts:
-          domain: apps.clustername.basedomain # Part after console-openshift-console
+          domain: apps.ecs.sandbox1248.opentlc.com # Part after console-openshift-console
+        edition: ce
         ingress:
+          #enabled: false
           class: "none"
           #class: "nginx" #set to 'none' to allow OpenShift to take over but then git over ssh is not supported
           annotations:
             route.openshift.io/termination: "edge" # For OpenShift Routes
             route.openshift.io/insecure-edge-termination-policy: "Redirect" # For OpenShift Routes
           configureCertmanager: false
+          tls:
+            secretName: gitlab-wildcard-tls-certs
       installCertmanager: false
-      #registry:
-      #  storage:
-      #    secret: gitlab-object-storage
-      #    key: config
+      registry:
+        storage:
+          secret: registry-storage
+          key: "config"
       #smartcard:
       #kas:
       #pages:
       #ssh:
       minio:
         #enabled: true # should be set in global.minio.enabled instead
+        persistence:
+          storageClass: gp3-csi-encrypted
+          size: 30Gi
         resources:
           requests:
             cpu: 100m
@@ -148,14 +181,21 @@ spec:
         #  electionID: ingress-controller-leader
         #  replicaCount: 1
       postgresql:
-        #install: false
+        install: true
         primary:
+          persistence:
+            storageClass: gp3-csi-encrypted
+            size: 30Gi
           extendedConfiguration: max_connections = 200
       redis:
         install: true
+        master:
+          persistence:
+            storageClass: gp3-csi-encrypted
+            size: 5Gi
         resources:
           requests:
             cpu: 100m
       prometheus:
         install: false
-    version: 9.4.1
+    version: 9.4.2
