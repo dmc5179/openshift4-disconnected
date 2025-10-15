@@ -1,0 +1,12 @@
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: gp3-csi-encrypted
+parameters:
+  fsType: ext4 
+  encrypted: "true"
+  kmsKeyId: # AWS ARN for KMS Key
+provisioner: ebs.csi.aws.com
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer

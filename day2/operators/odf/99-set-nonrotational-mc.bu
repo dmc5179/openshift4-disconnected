@@ -1,0 +1,42 @@
+variant: openshift
+version: 4.18.0
+metadata:
+  name: 99-set-nonrotational
+  labels:
+    machineconfiguration.openshift.io/role: master
+storage:
+  files:
+    - path: /etc/set-nonrotational.sh
+      mode: 0755
+      contents:
+        inline: |
+          #!/bin/bash
+
+          # Find disks with a size of 120G:
+          target_disks=$(lsblk -dn -o NAME,SIZE | awk '$2 == "2.2T" {print $1}')
+
+          # Mark these disks as NonRotational:
+          for disk in $target_disks; do
+              echo "Changing disk: /dev/$disk to non-rotational."
+              echo 0 > /sys/block/$disk/queue/rotational
+          done
+systemd:
+  units:
+    - name: set-nonrotational.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Force specific-size disks to be nonrotational
+        After=local-fs.target
+        Wants=local-fs.target
+
+        [Service]
+        Type=oneshot
+        ExecStart=/etc/set-nonrotational.sh
+        Restart=on-failure
+        RestartSec=5s
+        RemainAfterExit=true
+        User=root
+
+        [Install]
+        WantedBy=multi-user.target
