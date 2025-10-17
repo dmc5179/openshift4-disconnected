@@ -1,0 +1,21 @@
+- op: add
+  path: /spec/platformSpec/baremetal/machineNetworks/- 
+  value: 192.168.1.0/24 # Original CIDR block for machine network from install-config.yaml
+- op: add # Added cidr for clusterNetwork
+  path: /spec/clusterNetwork/-
+  value: 
+    cidr: fd01::/48
+    hostPrefix: 64
+- op: add  # Added CIDR for service Network
+  path: /spec/serviceNetwork/-
+  value: fd02::/112 
+- op: add # Added CIDR for machine network
+  path: /spec/platformSpec/baremetal/machineNetworks/- 
+  value: fd2e:6f44:5dd8::/64
+- op: add # Added CIDR for API ingress VIP
+  path: /spec/platformSpec/baremetal/apiServerInternalIPs/- 
+  value: fd2e:6f44:5dd8::4
+- op: add # Added CIDR for APPS VIP
+  path: /spec/platformSpec/baremetal/ingressIPs/-
+  value: fd2e:6f44:5dd8::5
+  
