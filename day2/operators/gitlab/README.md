@@ -1,5 +1,11 @@
 # Installing and Configuring the Gitlab Certified Operator on OpenShift
 
+## Create KMS backed encrypted EBS storage class if needed
+- Update the file encrypted-aws-sc.yaml with your AWS KMS ARN
+```console
+oc create -f encrypted-aws-sc.yaml
+```
+
 ## Deploy the Operator
 ```console
 oc create -f 01-gitlab-system-namespace.yaml
@@ -12,31 +18,91 @@ oc create -f 03-gitlab-subscription.yaml
 oc -n gitlab-system get deployment gitlab-controller-manager
 ```
 
-## Patch OCP ingress controller to ignore gitlab's nginx ingress controller if using nginx ingress
+## Create S3 buckets
 
-- I have not tested this yet. I use the OCP ingress router for right now. Skip this step unless you want to experiment
+- Precreating the S3 buckets allows for the setting of SSE-KMS
 
 ```console
-oc -n openshift-ingress-operator \
-  patch ingresscontroller default \
-  --type merge \
-  -p '{"spec":{"namespaceSelector":{"matchLabels":{"openshift.io/cluster-monitoring":"true"}}}}'
+PREFIX=ocp-abc123
+aws s3api create-bucket --region us-east-2 --bucket ${PREFIX}-gitlab-artifacts-storage --create-bucket-configuration LocationConstraint=us-east-2
+aws s3api create-bucket --region us-east-2 --bucket ${PREFIX}-gitlab-backup-storage --create-bucket-configuration LocationConstraint=us-east-2
+aws s3api create-bucket --region us-east-2 --bucket ${PREFIX}-gitlab-tmp-storage --create-bucket-configuration LocationConstraint=us-east-2
+aws s3api create-bucket --region us-east-2 --bucket ${PREFIX}-gitlab-ci-secure-files-storage  --create-bucket-configuration LocationConstraint=us-east-2
+aws s3api create-bucket --region us-east-2 --bucket ${PREFIX}-gitlab-dependency-proxy --create-bucket-configuration LocationConstraint=us-east-2
+aws s3api create-bucket --region us-east-2 --bucket ${PREFIX}-gitlab-external-diffs --create-bucket-configuration LocationConstraint=us-east-2
+aws s3api create-bucket --region us-east-2 --bucket ${PREFIX}-gitlab-lfs-storage --create-bucket-configuration LocationConstraint=us-east-2
+aws s3api create-bucket --region us-east-2 --bucket ${PREFIX}-gitlab-packages-storage --create-bucket-configuration LocationConstraint=us-east-2
+aws s3api create-bucket --region us-east-2 --bucket ${PREFIX}-gitlab-terraform-state-storage --create-bucket-configuration LocationConstraint=us-east-2
+aws s3api create-bucket --region us-east-2 --bucket ${PREFIX}-gitlab-uploads-storage --create-bucket-configuration LocationConstraint=us-east-2
+aws s3api create-bucket --region us-east-2 --bucket ${PREFIX}-gitlab-pages-storage --create-bucket-configuration LocationConstraint=us-east-2
+aws s3api create-bucket --region us-east-2 --bucket ${PREFIX}-gitlab-registry-storage --create-bucket-configuration LocationConstraint=us-east-2
 ```
+
+- Set SSE-KMS
+```console
+KMS_ARN="arn"
+PREFIX=ocp-abc123
+aws s3api put-bucket-encryption --bucket ${PREFIX}-gitlab-artifacts-storage \
+              --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"aws:kms","KMSMasterKeyID":"${KMS_ARN}"},"BucketKeyEnabled":true}]}'
+
+aws s3api put-bucket-encryption --bucket ${PREFIX}-gitlab-backup-storage \
+              --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"aws:kms","KMSMasterKeyID":"${KMS_ARN}"},"BucketKeyEnabled":true}]}'
+
+aws s3api put-bucket-encryption --bucket ${PREFIX}-gitlab-tmp-storage \
+              --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"aws:kms","KMSMasterKeyID":"${KMS_ARN}"},"BucketKeyEnabled":true}]}'
+
+aws s3api put-bucket-encryption --bucket ${PREFIX}-gitlab-ci-secure-files-storage\
+              --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"aws:kms","KMSMasterKeyID":"${KMS_ARN}"},"BucketKeyEnabled":true}]}'
+
+aws s3api put-bucket-encryption --bucket ${PREFIX}-gitlab-dependency-proxy\
+              --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"aws:kms","KMSMasterKeyID":"${KMS_ARN}"},"BucketKeyEnabled":true}]}'
+
+aws s3api put-bucket-encryption --bucket ${PREFIX}-gitlab-external-diffs\
+              --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"aws:kms","KMSMasterKeyID":"${KMS_ARN}"},"BucketKeyEnabled":true}]}'
+
+aws s3api put-bucket-encryption --bucket ${PREFIX}-gitlab-lfs-storage\
+              --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"aws:kms","KMSMasterKeyID":"${KMS_ARN}"},"BucketKeyEnabled":true}]}'
+
+aws s3api put-bucket-encryption --bucket ${PREFIX}-gitlab-packages-storage\
+              --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"aws:kms","KMSMasterKeyID":"${KMS_ARN}"},"BucketKeyEnabled":true}]}'
+
+aws s3api put-bucket-encryption --bucket ${PREFIX}-gitlab-terraform-state-storage\
+              --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"aws:kms","KMSMasterKeyID":"${KMS_ARN}"},"BucketKeyEnabled":true}]}'
+
+aws s3api put-bucket-encryption --bucket ${PREFIX}-gitlab-uploads-storage\
+              --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"aws:kms","KMSMasterKeyID":"${KMS_ARN}"},"BucketKeyEnabled":true}]}'
+
+aws s3api put-bucket-encryption --bucket ${PREFIX}-gitlab-pages-storage\
+              --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"aws:kms","KMSMasterKeyID":"${KMS_ARN}"},"BucketKeyEnabled":true}]}'
+
+aws s3api put-bucket-encryption --bucket ${PREFIX}-gitlab-registry-storage\
+              --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"aws:kms","KMSMasterKeyID":"${KMS_ARN}"},"BucketKeyEnabled":true}]}'
+```
+
+## Configure gitlab to use default OpenShift Router certificates
+
+- Export default router cert and key
+```console
+oc get -o yaml secrets router-certs-default | yq '.data."tls.crt"' | base64 -d > ocp-default-router-tls.crt
+oc get -o yaml secrets router-certs-default | yq '.data."tls.key"' | base64 -d > ocp-default-router-tls.key
+```
+
+- Create secret with default router cert and key
+```console
+oc create -n gitlab-system secret tls gitlab-wildcard-tls-certs --cert=ocp-default-router-tls.crt --key=ocp-default-router-tls.key
+```
+
 
 ## Create S3 credentials secret
 
-- Currently I'm just using the gitlab minio for object storage. I haven't fully tested using AWS S3 for storage. Skip for now
+- Update s3cmd-storage.config registry-storage.config gitlab-s3-secrets.yaml with your credentials
 
 ```console
-cat <<EOF >> storage.config
-[default]
-aws_access_key_id = ${AWS_ACCESS_KEY_ID}
-aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}
-bucket_location = ${AWS_DEFAULT_REGION}
-multipart_chunk_size_mb = 128 # default is 15 (MB)
-EOF
+oc create -n gitlab-system secret generic gitlab-object-storage --from-file=config=s3cmd-storage.config
 
-oc create -n gitlab-system secret generic gitlab-object-storage --from-file=config=storage.config
+oc create -n gitlab-system secret generic registry-storage --from-file=config=registry-storage.config
+
+oc create -n gitlab-system secret generic gitlab-s3-secrets --from-file=connection=gitlab-s3-secrets.yaml
 ```
 
 ## Get console route
@@ -81,3 +147,16 @@ s3:
   # regionendpoint: "https://minio.example.com:9000"
   v4auth: true
 
+
+
+## Patch OCP ingress controller to ignore gitlab's nginx ingress controller if using nginx ingress
+
+- Not required when using OpenShift Ingress Router
+- I have not tested this yet. I use the OCP ingress router for right now. Skip this step unless you want to experiment
+
+```console
+oc -n openshift-ingress-operator \
+  patch ingresscontroller default \
+  --type merge \
+  -p '{"spec":{"namespaceSelector":{"matchLabels":{"openshift.io/cluster-monitoring":"true"}}}}'
+```

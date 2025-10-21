@@ -51,6 +51,14 @@ spec:
           tagSuffix: "-ubi"
           #pullPolicy: Always
         appConfig:
+          omniauth:
+            allow_bypass_two_factor: true
+            allow_single_sign_on: true
+            allowSingleSignOn:
+            - oauth2_generic
+            enabled: true
+            providers:
+            - secret: gitlab-oauth2-generic
           defaultProjectsFeatures:
             issues: true
             mergeRequests: true
@@ -61,63 +69,36 @@ spec:
           artifacts:
             bucket: ocp-vn692-gitlab-artifacts-storage
             #proxy_download: false # set to true when using encrypted buckets?
-            #connection:
-            #  secret: gitlab-object-storage
-            #  key: "config"
           backups:
             bucket: ocp-vn692-gitlab-backup-storage
             tmpBucket: ocp-vn692-gitlab-tmp-storage
             #proxy_download: false # set to true when using encrypted buckets?
-            #connection:
-            #  secret: gitlab-object-storage
-            #  key: "config"
           ciSecureFiles:
             bucket: ocp-vn692-gitlab-ci-secure-files-storage
             enabled: true
             #proxy_download: false # set to true when using encrypted buckets?
-            #connection:
-            #  secret: gitlab-object-storage
-            #  key: "config"
           dependencyProxy:
             bucket: ocp-vn692-gitlab-dependency-proxy
             enabled: true
             #proxy_download: false # set to true when using encrypted buckets?
-            #connection:
-            #  secret: gitlab-object-storage
-            #  key: "config"
           externalDiffs:
             bucket: ocp-vn692-gitlab-external-diffs
             enabled: true
             #proxy_download: false # set to true when using encrypted buckets?
-            #connection:
-            #  secret: gitlab-object-storage
-            #  key: "config"
           lfs:
             bucket: ocp-vn692-gitlab-lfs-storage
             #proxy_download: false # set to true when using encrypted buckets?
-            #connection:
-            #  secret: gitlab-object-storage
-            #  key: "config"
           packages:
             accessControl: true
             bucket: ocp-vn692-gitlab-packages-storage
             #proxy_download: false # set to true when using encrypted buckets?
-            #connection:
-            #  secret: gitlab-object-storage
-            #  key: "config"
           terraformState:
             bucket: ocp-vn692-gitlab-terraform-state-storage
             enabled: true
             #proxy_download: false # set to true when using encrypted buckets?
-            #connection:
-            #  secret: gitlab-object-storage
-            #  key: "config"
           uploads:
             bucket: ocp-vn692-gitlab-uploads-storage
             #proxy_download: false # set to true when using encrypted buckets?
-            #connection:
-            #  secret: gitlab-object-storage
-            #  key: "config"
           object_store:
             connection:
               provider: AWS
@@ -127,18 +108,18 @@ spec:
               key: "connection"
             enabled: true
             proxy_download: true # set to true when using encrypted buckets?
-            storage_options:
-              server_side_encryption: aws:kms
-              server_side_encryption_kms_key_id: "arn:aws:kms:us-east-2:731151848080:key/0a5910fd-8343-478e-8cbb-224ced2d7eb7"
+            #storage_options:
+            #  server_side_encryption: aws:kms
+            #  server_side_encryption_kms_key_id: "arn:aws:kms"
         pages:
-          enabled: true
-          objectStore:
-            enabled: true
-            bucket: ocp-vn692-gitlab-pages-storage
-            connection:
-              provider: AWS
-              secret: gitlab-object-storage
-              key: "config"
+          enabled: false # pages doesn't work with OCP ingress due to its own wildcard. OCP Router denies it
+          #objectStore:
+          #  enabled: true
+          #  bucket: ocp-vn692-gitlab-pages-storage
+          #  connection:
+          #    provider: AWS
+          #    secret: gitlab-object-storage
+          #    key: "config"
         registry: 
           bucket: ocp-vn692-gitlab-registry-storage
           connection:

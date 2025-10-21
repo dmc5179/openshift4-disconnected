@@ -1,2 +1,4 @@
-storage.config
-gitlabs.apps.gitlab.com.yaml
+*.mine
+*.swp
+ocp-default-router-tls.crt
+ocp-default-router-tls.key
