@@ -1,19 +1,24 @@
 kind: LDAPSyncConfig
 apiVersion: v1
-url: ldap://LDAP_SERVICE_IP:389
+url: ldap://mydomaincontroller.openshift.example.com:389
+bindDN: ldap_svc@openshift.example.com
+bindPassword: '********'
+insecure: true
+groupUIDNameMapping:
+  "CN=OpenshiftAdmins,OU=Groups,DC=openshift,DC=example,DC=com": administrators
 augmentedActiveDirectory:
     groupsQuery:
         baseDN: "ou=groups,dc=example,dc=com"
         scope: sub
         derefAliases: never
         pageSize: 0
-    groupUIDAttribute: dn 
-    groupNameAttributes: [ cn ] 
+    groupUIDAttribute: dn
+    groupNameAttributes: [ cn ]
     usersQuery:
-        baseDN: "ou=users,dc=example,dc=com"
+        baseDN: "DC=openshift,DC=example,DC=com"
         scope: sub
         derefAliases: never
         filter: (objectclass=person)
         pageSize: 0
-    userNameAttributes: [ mail ] 
-    groupMembershipAttributes: [ memberOf ] 
+    userNameAttributes: [ sAMAccountName ]
+    groupMembershipAttributes: [ "memberOf:1.2.840.113556.1.4.1941:" ]
