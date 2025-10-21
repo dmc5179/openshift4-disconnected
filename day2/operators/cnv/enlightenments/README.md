@@ -1,5 +1,7 @@
 - Windows Hyper-V enlightenments causing issues
 
+- Perform these changes while the Virtual Machine is powered off
+
 https://access.redhat.com/solutions/7129100
 
 - Ensure all enlightenments are enabled in the VirtualMachine spec for the Windows VM. For example
@@ -20,6 +22,9 @@ tlbflush: {}
 vapic: {}
 vpindex: {}
 ```
+
+- If enlightenments above are not listed, edit the Virtual Machine spec to add them.
+
 
 - Add the evmcs field with oc edit
 ```console
