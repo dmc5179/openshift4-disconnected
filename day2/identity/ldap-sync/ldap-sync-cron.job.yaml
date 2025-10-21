@@ -29,7 +29,7 @@ spec:
           volumes:
             - name: "ldap-sync-volume"
               configMap:
-                name: "ldap-group-syncer"
+                name: "ldap-group-sync-cm"
             - name: "ldap-bind-password"
               secret:
                 secretName: "ldap-secret"                                            

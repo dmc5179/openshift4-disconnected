@@ -22,8 +22,24 @@ oc adm groups sync --sync-config=config.yaml
 oc adm groups sync --sync-config=config.yaml --confirm
 ```
 
-## Running ldap sync as a cron job
+## Creating ldap sync as a cron job
 
+- Create config map from your ldap sync file
+```console
+oc create configmap -n ldap-sync ldap-group-sync-cm --from-file=sync.yaml=config.yaml
+```
+
+- Create config map for LDAP Certificate Authority if needed
+```console
+oc create configmap -n ldap-sync ldap-ca --from-file=cert.pem=cert.pem
+```
+
+- Create secret for LDAP Bind Password
+```console
+oc create generic secret -n ldap-sync ldap-bind-password --from-file=pass=password.txt
+```
+
+- Deploy Cron job
 ```console
 oc new-project ldap-sync
 
@@ -32,8 +48,6 @@ oc create -f ldap-sync-service-account.yaml
 oc create -f ldap-sync-cluster-role.yaml
 
 oc create -f ldap-sync-cluster-role-binding.yaml
-
-oc create -f ldap-sync-config-map.yaml
 
 oc create -f ldap-sync-cron-job.yaml
 ```
