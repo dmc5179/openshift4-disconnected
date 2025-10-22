@@ -106,9 +106,12 @@ oc create -n gitlab-system secret generic gitlab-s3-secrets --from-file=connecti
 ```
 
 ## Get console route
-kubectl get route -n openshift-console console -ojsonpath='{.status.ingress[0].host}'
+```console
+oc get route -n openshift-console console -ojsonpath='{.status.ingress[0].host}'
+```
 
 - it goes into the CR here. If console is  console-openshift-console.apps.ecs.sandbox1248.opentlc.com
+```
 spec:
   chart:
     values:
@@ -116,6 +119,7 @@ spec:
         # Configure the domain from the previous step.
         hosts:
           domain: apps.ecs.sandbox1248.opentlc.com
+```
 
 
 ## Create the gitlab CR
@@ -130,26 +134,12 @@ oc create -f mygitlab-cr.yaml
 oc -n gitlab-system get secrets gitlab-gitlab-initial-root-password -o yaml | yq e '.data.password' - | base64 -d
 ```
 
+## Patch OCP ingress controller to ignore gitlab's nginx ingress controller if using nginx ingress
+
 - Get the Load Balancer IP
 ```console
 oc get svc -n gitlab-system gitlab-nginx-ingress-controller -ojsonpath='{.status.loadBalancer.ingress[].ip}'
-``` console
-
-- Below this is just notes for me
-
-# S3 Storage (Not sure whre this is used yet)
-Need to create a secret  registry-storage.yaml 
-s3:
-  bucket: gitlab-registry-storage
-  accesskey: AWS_ACCESS_KEY
-  secretkey: AWS_SECRET_KEY
-  region: us-east-1
-  # regionendpoint: "https://minio.example.com:9000"
-  v4auth: true
-
-
-
-## Patch OCP ingress controller to ignore gitlab's nginx ingress controller if using nginx ingress
+```
 
 - Not required when using OpenShift Ingress Router
 - I have not tested this yet. I use the OCP ingress router for right now. Skip this step unless you want to experiment
