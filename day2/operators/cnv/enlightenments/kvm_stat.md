@@ -1,37 +1,46 @@
 1. Start the VM on a physical node, let it boot and reach that state where the VM is apparently doing nothing yet the CPU usage is high.
 
-2. SSH to the node
-   # ssh core<node running the VM>
+2. Determine which OpenShift node the VM is running on
+```console
+oc get -o yaml VirtualMachine <VM name> | grep -i node
+```
 
-3. Find its kernel version
-   # uname -r
+3. SSH to the node
+```console
+ssh core@<node running the VM>
+```
 
-4. Enter a toolbox pod
-   # sudo su
-   # toolbox
+4. Find its kernel version
+```console
+uname -r
+```
 
-5. For that specific kernel version from step [3], get the corresponding kernel-tools-libs and kernel-tools rpm packages from our portal:
-   https://access.redhat.com/downloads/content/kernel-tools-libs/5.14.0-570.32.1.el9_6/x86_64/fd431d51/package
-   https://access.redhat.com/downloads/content/kernel-tools/5.14.0-570.32.1.el9_6/x86_64/fd431d51/package
-   NOTE: change the version at the top to match step 3.
+5. Enter a toolbox pod
+```console
+sudo -s
+toolbox
+```
 
-6. Also get this one:
-   https://access.redhat.com/downloads/content/pciutils-libs/3.7.0-7.el9/x86_64/fd431d51/package
+6. For that specific kernel version from step [4], install the RPMs into the toolbox container:
+- Note that this may require downloading the RPMs from RHN or a yum repo and copying them into the toolbox RPM
+- You can also rebuild the toolbox container image with these packages included and push it to your registry
+- The toolbox container image name can be found in the toolbox script "which toolbox"
+```console
+dnf install -y kernel-tools-$(uname -r) kernel-tools-libs-$(uname -r) pciutils-libs
+```
 
-7. Copy them to the toolbox pod (I like to just right click on the links above for download and then just curl from inside the pod to get them there)
+7. Find the qemu-kvm process PID of the VM started in step 1.
+```console
+ps -ef | grep qemu-kvm | grep <VM NAME>
+```
 
-8. Install the packages inside the toolbox 
-   # dnf install pciutils-libs-3.7.0-7.el9.x86_64.rpm kernel-tools-libs-5.14.0-570.32.1.el9_6.x86_64.rpm kernel-tools-5.14.0-570.32.1.el9_6.x86_64.rpm 
-   NOTE: change the versions to match yours
+8. Get kvm_stat for that qemu-kvm PID, for 1s a few times
+```console
+kvm_stat -p <PID from above> -1
+sleep 5
+kvm_stat -p <PID from above> -1
+sleep 5
+kvm_stat -p <PID from above> -1
+```
 
-9. Find the qemu-kvm process PID of the VM started in step 1.
-   # ps -ef | grep qemu-kvm | grep <VM NAME>
-
-10. Get kvm_stat for that qemu-kvm PID, for 1s a few times
-   # kvm_stat -p <PID from above> -1
-   # sleep 5
-   # kvm_stat -p <PID from above> -1
-   # sleep 5
-   # kvm_stat -p <PID from above> -1
-
-11. Please show us the outputs of the kvm_stats
+9. Note the outputs of the kvm_stats
