@@ -1,0 +1,39 @@
+apiVersion: v1alpha1
+kind: AgentConfig
+metadata:
+  name: kni-qe-31
+rendezvousIP: 10.1.101.10 # Rendezvous IP must be an IP assigned to a control plane host
+hosts:
+  - hostname: master-0
+    interfaces:
+    - name: eno3
+      macAddress: 10:70:fd:5d:d0:5c
+    networkConfig:
+      interfaces:
+      - name: eno3
+        state: up
+        ipv4:
+          address:
+          - ip: 10.1.101.0
+            prefix-length: 24
+          enabled: true
+          dhcp: false
+        ipv6:
+          address:
+          - ip: 2620:52:0:165::a
+            prefix-length: 124
+          enabled: true
+          dhcp: false
+      dns-resolver:
+        config:
+          server:
+          - 10.11.5.160
+          - 2620:52:0:aa0::big:bird
+      routes:
+        config:
+        - destination: 0.0.0.0/0 # IPv4 default route
+          next-hop-address: 10.1.101.14
+          next-hop-interface: eno3
+        - destination: ::/0       # IPv6 default route
+          next-hop-address: 2620:52:0:165::e
+          next-hop-interface: eno3
