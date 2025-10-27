@@ -6,18 +6,27 @@
 # Stick this in a for loop for each DEVICE to wipe
 DISK="/dev/sdX"
 
+if [ ! -e "${DISK}" ]; then
+  echo "Device: ${DISK} not found"
+  exit 1
+fi
+
 # Zap the disk to a fresh, usable state (zap-all is important, b/c MBR has to be clean)
-sgdisk --zap-all $DISK
+sgdisk --zap-all "${DISK}"
 
 # Wipe portions of the disk to remove more LVM metadata that may be present
-dd if=/dev/zero of="$DISK" bs=1K count=200 oflag=direct,dsync seek=0 # Clear at offset 0
-dd if=/dev/zero of="$DISK" bs=1K count=200 oflag=direct,dsync seek=$((1 * 1024**2)) # Clear at offset 1GB
-dd if=/dev/zero of="$DISK" bs=1K count=200 oflag=direct,dsync seek=$((10 * 1024**2)) # Clear at offset 10GB
-dd if=/dev/zero of="$DISK" bs=1K count=200 oflag=direct,dsync seek=$((100 * 1024**2)) # Clear at offset 100GB
-dd if=/dev/zero of="$DISK" bs=1K count=200 oflag=direct,dsync seek=$((1000 * 1024**2)) # Clear at offset 1000GB
+dd if=/dev/zero of="${DISK}" bs=1K count=200 oflag=direct,dsync seek=0 # Clear at offset 0
+dd if=/dev/zero of="${DISK}" bs=1K count=200 oflag=direct,dsync seek=$((1 * 1024**2)) # Clear at offset 1GB
+dd if=/dev/zero of="${DISK}" bs=1K count=200 oflag=direct,dsync seek=$((10 * 1024**2)) # Clear at offset 10GB
+dd if=/dev/zero of="${DISK}" bs=1K count=200 oflag=direct,dsync seek=$((100 * 1024**2)) # Clear at offset 100GB
+dd if=/dev/zero of="${DISK}" bs=1K count=200 oflag=direct,dsync seek=$((1000 * 1024**2)) # Clear at offset 1000GB
 
 # SSDs may be better cleaned with blkdiscard instead of dd
-blkdiscard $DISK
+if [[ $(cat /sys/block/$(echo ${DISK} | awk -F\/ '{print $NF}')/queue/rotational) -eq 0 ]]; then
+  blkdiscard "${DISK}"
+fi
 
-# Inform the OS of partition table changes
-partprobe $DISK
+# Inform the OS of partition table changes if partprobe exists
+if [ -e $(which partprobe) ]; then
+  partprobe "${DISK}"
+fi
