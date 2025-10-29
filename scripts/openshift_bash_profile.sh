@@ -56,4 +56,10 @@ function disable_telemetry {
 }
 export -f disable_telemetry
 
-
+# For those using the oc cli with multiple clusters and setting the oc context
+# The below function will add the name of the cluster to your bash terminal prompt
+function update_ps1() {
+  KUBE_CONTEXT=$(yq '.current-context' ~/.kube/config | awk -F\/ '{print $2}' | awk -F\- '{print $2}')
+  PS1="[${KUBE_CONTEXT}] \u@\h:\w \$ "
+}
+PROMPT_COMMAND=update_ps1
