@@ -1,0 +1,34 @@
+apiVersion: machineconfiguration.openshift.io/v1
+kind: KubeletConfig
+metadata:
+  # Use a distinct name for your configuration
+  name: increased-kubelet-resources
+spec:
+  # Apply this configuration to all worker nodes
+  machineConfigPoolSelector:
+    matchLabels:
+      pools.operator.machineconfiguration.openshift.io/worker: ""
+  # The actual Kubelet configuration section
+  kubeletConfig:
+    # --- Resource Reservation Settings ---
+    # Defines resources reserved for the OS/system services
+    systemReserved:
+      cpu: 1000m # 1 full CPU core
+      memory: 2Gi # 2 Gigabytes of memory
+    # Defines resources reserved for Kubelet and core Kubernetes components
+    kubeReserved:
+      cpu: 500m # 0.5 CPU core
+      memory: 1Gi # 1 Gigabyte of memory
+    
+    # Optional: Enforce the use of the reserved resources
+    enforceNodeAllocatable:
+      - "pods"
+      - "system-reserved"
+      - "kube-reserved"
+    
+    # Optional: Configure eviction thresholds to protect the node
+    # Example: begin eviction when only 100Mi of memory is left
+    evictionHard:
+      memory.available: "100Mi"
+      nodefs.available: "10%"
+      imagefs.available: "10%"
