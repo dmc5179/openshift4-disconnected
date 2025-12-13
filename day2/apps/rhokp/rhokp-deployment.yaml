@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: rhokp-server
+  namespace: rhokp-server
   labels:
     app: rhokp-app
 spec:
@@ -25,3 +26,42 @@ spec:
           containerPort: 8080
         - name: https
           containerPort: 8443
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: rhokp-app
+  name: rhokp-server
+  namespace: rhokp
+spec:
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 8443
+    protocol: TCP
+    targetPort: 8443
+  selector:
+    app: rhokp-app
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  annotations:
+    openshift.io/host.generated: "true"
+  labels:
+    app: rhokp-app
+  name: rhokp-server
+  namespace: rhokp
+spec:
+  port:
+    targetPort: 8443
+  to:
+    kind: Service
+    name: rhokp-server
+    weight: 100
+  wildcardPolicy: None
