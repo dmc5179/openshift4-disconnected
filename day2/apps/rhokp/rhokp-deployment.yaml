@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rhokp-server
+  labels:
+    app: rhokp-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: rhokp-app
+  template:
+    metadata:
+      labels:
+        app: rhokp-app
+    spec:
+      containers:
+      - name: rhokp
+        image: registry.redhat.io/offline-knowledge-portal/rhokp-rhel9:latest
+        env:
+        - name: ACCESS_KEY
+          value: 
+        ports:
+        - name: http
+          containerPort: 8080
+        - name: https
+          containerPort: 8443
