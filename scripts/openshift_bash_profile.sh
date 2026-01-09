@@ -13,7 +13,7 @@ function disable_operatorhub {
 export -f disable_operatorhub
 
 function getbadpods {
-  oc get -A pods | grep -v Completed | grep -v '1/1' | grep -v '2/2' | grep -v '3/3' | grep -v '4/4' | grep -v '5/5' | grep -v '6/6' | grep -v '7/7' | grep -v '8/8'
+  oc get pods --all-namespaces | awk '$4 != "Completed" && $3 !~ /^[0-9]+\/[0-9]+$/ {print $0}'
 }
 export -f getbadpods
 
