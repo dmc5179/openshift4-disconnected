@@ -1,0 +1,25 @@
+mirror:
+  platform:
+    channels:
+      shortestPath: true
+      # Keep existing version to ensure current cluster images remain available/valid
+      - name: stable-4.18
+        minVersion: 4.18.10
+        maxVersion: 4.18.10
+      # Add target version for the upgrade
+      - name: stable-4.19
+        minVersion: 4.19.0
+        maxVersion: 4.19.2
+  operators:
+    # Existing catalog for 4.18
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.18
+      packages:
+        - name: web-terminal
+          channels:
+            - name: fast
+    # New catalog for 4.19
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.19
+      packages:
+        - name: web-terminal
+          channels:
+            - name: fast
