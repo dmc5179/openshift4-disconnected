@@ -3,6 +3,9 @@ kind: AgentConfig
 metadata:
   name: agent-config 
 rendezvousIP: 192.168.1.80  # For a SNO cluster this is the same IP as the server. For a non-SNO install, pick an IP of one of the control plane servers
+additionalNtpSources: # Can use DNS or IP for NTP servers
+  - ntp.example.com
+  - 192.168.1.100
 hosts:
   - hostname: master-0
     role: master

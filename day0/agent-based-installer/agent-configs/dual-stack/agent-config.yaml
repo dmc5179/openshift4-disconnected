@@ -3,6 +3,9 @@ kind: AgentConfig
 metadata:
   name: kni-qe-31
 rendezvousIP: 10.1.101.10 # Rendezvous IP must be an IP assigned to a control plane host
+additionalNtpSources: # Can use DNS or IP for NTP servers
+  - ntp.example.com
+  - 192.168.1.100
 hosts:
   - hostname: master-0
     interfaces:
