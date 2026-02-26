@@ -607,7 +607,7 @@ Resources:
 
             wget -q https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${ocp_ver}/oc-mirror.rhel9.tar.gz
             
-            wget -q https://developers.redhat.com/content-gateway/file/pub/openshift-v4/clients/mirror-registry/1.3.11/mirror-registry.tar.gz
+            wget -q https://developers.redhat.com/content-gateway/file/pub/cgw/mirror-registry/2.0.9/mirror-registry-amd64.tar.gz
 
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
@@ -617,7 +617,7 @@ Resources:
             /usr/local/bin/aws s3 cp --quiet openshift-install-rhel9-amd64.tar.gz "s3://${s3_bucket}/"
             /usr/local/bin/aws s3 cp --quiet oc-mirror.rhel9.tar.gz "s3://${s3_bucket}/"
             /usr/local/bin/aws s3 cp --quiet docker_registry.tar "s3://${s3_bucket}/"
-            /usr/local/bin/aws s3 cp --quiet mirror-registry.tar.gz "s3://${s3_bucket}/"
+            /usr/local/bin/aws s3 cp --quiet mirror-registry-amd64.tar.gz "s3://${s3_bucket}/"
 
             tar -xzf openshift-client-linux-amd64-rhel9-${ocp_ver}.tar.gz
             tar -xzf openshift-install-rhel9-amd64.tar.gz
@@ -745,12 +745,12 @@ Resources:
             /usr/local/bin/aws s3 cp --quiet "s3://${s3_bucket}/openshift-install-rhel9-amd64.tar.gz" .
             /usr/local/bin/aws s3 cp --quiet "s3://${s3_bucket}/oc-mirror.rhel9.tar.gz" .
             /usr/local/bin/aws s3 cp --quiet "s3://${s3_bucket}/docker_registry.tar" .
-            /usr/local/bin/aws s3 cp --quiet "s3://${s3_bucket}/mirror-registry.tar.gz" .
+            /usr/local/bin/aws s3 cp --quiet "s3://${s3_bucket}/mirror-registry-amd64.tar.gz" .
 
             tar -xzf openshift-client-linux-amd64-rhel9-${ocp_ver}.tar.gz
             tar -xzf openshift-install-rhel9-amd64.tar.gz
             tar -xzf oc-mirror.rhel9.tar.gz
-            tar -xzf mirror-registry.tar.gz
+            tar -xzf mirror-registry-amd64.tar.gz
             rm -f README.md
 
             sudo mv oc openshift-install-fips kubectl oc-mirror /usr/local/bin
@@ -761,11 +761,13 @@ Resources:
 
             #sudo fips-mode-setup --enable
             #Don't install mirror-registry until after FIPS is enabled
+            mkdir -p /opt/quay-root /opt/quay-root/data /opt/quay-root/sqlite
+            ./mirror-registry install --quayRoot /opt/quay-root --quayStorage /opt/quay-root/data --sqliteStorage /opt/quay-root/sqlite 2>&1 | tee mirror-registry-install.log
             #./mirror-registry install 2>&1 | tee mirror-registry.log # probably should do this as the ec2-user
 
-            #cp /root/quay-install/quay-rootCA/rootCA.pem /etc/pki/ca-trust/source/anchors/quay.pem
-            #update-ca-trust
-            #update-ca-trust extract
+            cp /opt/quay-root/quay-rootCA/rootCA.pem /etc/pki/ca-trust/source/anchors/quay.pem
+            update-ca-trust
+            update-ca-trust extract
 
             #podman load < docker_registry.tar
 
