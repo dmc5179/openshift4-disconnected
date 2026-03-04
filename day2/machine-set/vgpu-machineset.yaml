@@ -1,0 +1,50 @@
+apiVersion: machine.openshift.io/v1beta1
+kind: MachineSet
+metadata:
+  labels:
+    machine.openshift.io/cluster-api-cluster: <infrastructure_id> 
+  name: <infrastructure_id>-gpu-worker 
+  namespace: openshift-machine-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      machine.openshift.io/cluster-api-cluster: <infrastructure_id>
+      machine.openshift.io/cluster-api-machineset: <infrastructure_id>-gpu-worker
+  template:
+    metadata:
+      labels:
+        machine.openshift.io/cluster-api-cluster: <infrastructure_id>
+        machine.openshift.io/cluster-api-machine-role: worker
+        machine.openshift.io/cluster-api-machine-type: worker
+        machine.openshift.io/cluster-api-machineset: <infrastructure_id>-gpu-worker
+    spec:
+      metadata:
+        labels:
+          node-role.kubernetes.io/worker: ""
+          cluster-api/accelerator: nvidia-t4 # 1. Specify the GPU accelerator label here
+      providerSpec:
+        value:
+          apiVersion: machine.openshift.io/v1beta1
+          credentialsSecret:
+            name: vsphere-cloud-credentials
+          diskGiB: 120
+          kind: VSphereMachineProviderSpec
+          memoryMiB: 16384 # Ensure this matches your vGPU workload requirements
+          metadata:
+            creationTimestamp: null
+          network:
+            devices:
+            - networkName: "<vm_network_name>" 
+          numCPUs: 4
+          numCoresPerSocket: 1
+          snapshot: ""
+          template: <vm_template_name> # 2. Specify the vCenter template configured with the vGPU profile
+          userDataSecret:
+            name: worker-user-data
+          workspace:
+            datacenter: <vcenter_data_center_name> 
+            datastore: <vcenter_datastore_name> 
+            folder: <vcenter_vm_folder_path> 
+            resourcepool: <vsphere_resource_pool> 
+            server: <vcenter_server_ip>
