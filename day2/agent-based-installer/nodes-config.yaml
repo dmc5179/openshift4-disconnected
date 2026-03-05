@@ -1,0 +1,38 @@
+hosts:
+    - hostname: extra-worker-0
+      interfaces:
+        - name: eth0
+          macAddress: 00:02:46:e3:9e:7c
+      networkConfig:
+        interfaces:
+          - name: eth0
+            type: ethernet
+            state: up
+            mac-address: 00:02:46:e3:9e:7c
+            ipv4:
+              enabled: true
+              address:
+                - ip: 192.168.111.90
+                  prefix-length: 24
+              dhcp: false
+        dns-resolver:
+          config:
+            server:
+              - 192.168.111.1
+        routes:
+          config:
+            - destination: 0.0.0.0/0 
+              next-hop-address: 192.168.111.1
+              next-hop-interface: eth0
+              table-id: 254
+################################################
+# Copy the "hostname" block above to add more than 1 node at a time
+# Ensure the node details like MAC and IP are correct for each new node
+#    - hostname: extra-worker-1
+#      interfaces:
+#        - name: eth0
+#          macAddress: 00:02:46:e3:9e:8c
+#    - hostname: extra-worker-2
+#      interfaces:
+#        - name: eth0
+#          macAddress: 00:02:46:e3:9e:9c
