@@ -19,4 +19,7 @@ oc adm node-image create --dir=/tmp/assets
 
 . Boot the nodes to be added to the new ISO that has been created under /tmp/assets in this example
 
-
+## Follow the installation of the node
+```console
+oc adm node-image monitor --ip-addresses 192.168.111.83,192.168.111.84  #Change to the IP or IPs of the node to be added to the cluster
+```
