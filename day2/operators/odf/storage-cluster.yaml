@@ -1,0 +1,71 @@
+---
+apiVersion: ocs.openshift.io/v1
+kind: StorageCluster
+metadata:
+  name: ocs-storagecluster
+  namespace: openshift-storage
+spec:
+#  encryption:
+#    clusterWide: true  ### this will use cryptsetup/LUKS for at-rest encryption
+  flexibleScaling: true ### allow scaling by node/host instead of by "rack" or by "zone"
+  monDataDirHostPath: /var/lib/rook
+  network:
+    provider: multus
+    selectors:
+      public: openshift-storage/ocs-public
+      cluster: openshift-storage/ocs-cluster
+  storageDeviceSets:
+  - name: nvme
+    config:
+      tuneFastDeviceClass: true  #This helps when rota=[0|1] can't be trusted
+    count: 6 
+    replica: 1 
+    deviceType: nvme   # <--- choices are: nvme, ssd, hdd
+    deviceClass: nvme  # <--- choices are: nvme, ssd, hdd
+    dataPVCTemplate:
+      spec:
+        storageClassName: local-nvme 
+        accessModes:
+        - ReadWriteOnce
+        volumeMode: Block
+        resources:
+          requests:
+            storage: 1
+    resources:
+      limits:
+        cpu: "2"     # <--- default is 2
+        memory: 8Gi  # <--- default is 8Gi
+      requests:
+        cpu: "2"     # <--- default is 2
+        memory: 8Gi  # <--- default is 8Gi
+  - name: hdd
+    config:
+      tuneSlowDeviceClass: true  #This helps when rota=[0|1] can't be trusted
+    count: 30
+    replica: 1
+    deviceType: hdd   # <--- choices are: nvme, ssd, hdd
+    deviceClass: hdd  # <--- choices are: nvme, ssd, hdd
+    dataPVCTemplate:
+      spec:
+        storageClassName: local-hdd
+        accessModes:
+        - ReadWriteOnce
+        volumeMode: Block
+        resources:
+          requests:
+            storage: 1
+    resources:
+      limits:
+        cpu: "2"     # <--- default is 2
+        memory: 8Gi  # <--- default is 8Gi
+      requests:
+        cpu: "2"     # <--- default is 2
+        memory: 8Gi  # <--- default is 8Gi
+  managedResources:
+    cephBlockPools:
+      reconcileStrategy: ignore  ###don't create the default CephBlockPool nor the RBD StorageClass
+#    cephFilesystems:
+#      reconcileStrategy: ignore  ###don't create the default CephFilesystem nor the CephFS StorageClass
+  multiCloudGateway:
+    dbStorageClassName: ocs-storagecluster-ceph-rbd-nvme
+
