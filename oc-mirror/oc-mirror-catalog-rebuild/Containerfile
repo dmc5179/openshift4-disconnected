@@ -1,0 +1,11 @@
+FROM
+USER root
+
+RUN rm -rf /configs
+COPY new_index /configs
+
+USER 1001
+RUN rm -fr /tmp/cache/*
+RUN /bin/opm serve /configs --cache-only --cache-dir=/tmp/cache
+
+CMD ["serve", "/configs", "--cache-dir=/tmp/cache"]
