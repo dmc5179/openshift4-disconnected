@@ -5,43 +5,8 @@ default menu.c32
 
  menu title ######## Default PXE Boot Menu ########
 
-{% if rhcos_ver[:3] | float < 4.6 %}
  label 1
  menu label ^1) Install Bootstrap Node
  menu default
- kernel rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer-kernel-{{ arch }}
- append initrd=rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer-initramfs.{{ arch }}.img nomodeset rd.neednet=1 coreos.inst=yes coreos.inst.install_dev={{ item.disk | default('sda') }} coreos.inst.image_url={{ openshift_bootstrap[0].ignserver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz coreos.inst.ignition_url={{ openshift_bootstrap[0].ignserver }}/{{ ocp_cluster_name }}/ignition/bootstrap.ign coreos.inst.platform_id=metal coreos.inst.insecure
-
- label 2
- menu label ^2) Install Master Node
- menu default
- kernel rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer-kernel-{{ arch }}
- append initrd=rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer-initramfs.{{ arch }}.img nomodeset rd.neednet=1 coreos.inst=yes coreos.inst.install_dev={{ item.disk | default('sda') }} coreos.inst.image_url={{ openshift_bootstrap[0].ignserver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz coreos.inst.ignition_url={{ openshift_bootstrap[0].ignserver }}/{{ ocp_cluster_name }}/ignition/master.ign coreos.inst.platform_id=metal coreos.inst.insecure
-
- label 3
- menu label ^3) Install Worker Node
- menu default
- kernel rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer-kernel-{{ arch }}
- append initrd=rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-installer-initramfs.{{ arch }}.img nomodeset rd.neednet=1 coreos.inst=yes coreos.inst.install_dev={{ item.disk | default('sda') }} coreos.inst.image_url={{ openshift_bootstrap[0].ignserver }}/rhcos-{{ rhcos_ver }}-{{ arch }}-metal.{{ arch }}.raw.gz coreos.inst.ignition_url={{ openshift_bootstrap[0].ignserver }}/{{ ocp_cluster_name }}/ignition/worker.ign coreos.inst.platform_id=metal coreos.inst.insecure
-{% else %}
-
- label 1
- menu label ^1) Install Bootstrap Node
- menu default
- kernel rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-kernel-{{ arch }}
- append initrd=rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-initramfs.{{ arch }}.img coreos.live.rootfs_url={{ openshift_bootstrap[0].ignserver }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-rootfs.{{ arch }}.img nomodeset rd.neednet=1 coreos.inst=yes coreos.inst.install_dev={{ item.disk | default('sda') }} coreos.inst.ignition_url={{ openshift_bootstrap[0].ignserver }}/{{ ocp_cluster_name }}/ignition/bootstrap.ign coreos.inst.platform_id=metal
-
- label 2
- menu label ^2) Install Master Node
- menu default
- kernel rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-kernel-{{ arch }}
- append initrd=rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-initramfs.{{ arch }}.img coreos.live.rootfs_url={{ openshift_bootstrap[0].ignserver }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-rootfs.{{ arch }}.img nomodeset rd.neednet=1 coreos.inst=yes coreos.inst.install_dev={{ item.disk | default('sda') }} coreos.inst.ignition_url={{ openshift_bootstrap[0].ignserver }}/{{ ocp_cluster_name }}/ignition/master.ign coreos.inst.platform_id=metal
-
- label 3
- menu label ^3) Install Worker Node
- menu default
- kernel rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-kernel-{{ arch }}
- append initrd=rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-initramfs.{{ arch }}.img coreos.live.rootfs_url={{ openshift_bootstrap[0].ignserver }}/rhcos/rhcos-{{ rhcos_ver }}-{{ arch }}-live-rootfs.{{ arch }}.img nomodeset rd.neednet=1 coreos.inst=yes coreos.inst.install_dev={{ item.disk | default('sda') }} coreos.inst.ignition_url={{ openshift_bootstrap[0].ignserver }}/{{ ocp_cluster_name }}/ignition/worker.ign coreos.inst.platform_id=metal
-
-
-{% endif %}
+ kernel rhcos/agent.x86_64-vmlinuz
+ append initrd=rhcos/agent.x86_64-initrd.img coreos.live.rootfs_url=http://192.168.1.65/agent.x86_64-rootfs.img rw  ignition.firstboot ignition.platform.id=metal nomodeset rd.neednet=1
