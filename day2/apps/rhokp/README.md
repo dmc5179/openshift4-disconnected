@@ -8,7 +8,11 @@ https://docs.redhat.com/en/documentation/red_hat_offline_knowledge_portal/1/html
 
 ## Deploy the RHOKP to OpenShift
 
-- Update the deployment yaml with your access key
+- Update the deployment yaml with your access key. The key will need to be base64 encoded like;
+
+```console
+echo 'key from RHN' | base64 -w 0
+```
 
 - Create a new namespace
 ```console

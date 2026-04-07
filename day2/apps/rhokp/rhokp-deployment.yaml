@@ -20,12 +20,24 @@ spec:
         image: registry.redhat.io/offline-knowledge-portal/rhokp-rhel9:latest
         env:
         - name: ACCESS_KEY
-          value: 
+          valueFrom:
+            secretKeyRef:
+              name: access-credentials
+              key: ACCESS_KEY
         ports:
         - name: http
           containerPort: 8080
         - name: https
           containerPort: 8443
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: access-credentials
+type: Opaque
+data:
+  # This is the key obtained from rhn.redhat.com, encoded in base64
+  ACCESS_KEY: "base64 encoded key from rhn.redhat.com"
 ---
 apiVersion: v1
 kind: Service
