@@ -1,0 +1,126 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: policy-latency-sensitive-operators
+  namespace: common-policies # The namespace on the Hub cluster
+  annotations:
+    policy.open-cluster-management.io/standards: NIST SP 800-53
+    policy.open-cluster-management.io/categories: CM Configuration Management
+    policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+spec:
+  remediationAction: inform # Set to 'enforce' to automatically install
+  disabled: false
+  policy-templates:
+    # --- 1. Topology Aware Lifecycle Manager (TALM) ---
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: install-talm
+        spec:
+          remediationAction: enforce
+          severity: high
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: operators.coreos.com/v1alpha1
+                kind: Subscription
+                metadata:
+                  name: topology-aware-lifecycle-manager
+                  namespace: openshift-operators
+                spec:
+                  channel: "stable"
+                  installPlanApproval: Automatic
+                  name: topology-aware-lifecycle-manager
+                  source: redhat-operators
+                  sourceNamespace: openshift-marketplace
+
+    # --- 2. NUMA Resources Operator ---
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: install-numa-operator
+        spec:
+          remediationAction: enforce
+          severity: high
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: v1
+                kind: Namespace
+                metadata:
+                  name: openshift-numaresources
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: operators.coreos.com/v1
+                kind: OperatorGroup
+                metadata:
+                  name: numaresources-operator
+                  namespace: openshift-numaresources
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: operators.coreos.com/v1alpha1
+                kind: Subscription
+                metadata:
+                  name: numaresources-operator
+                  namespace: openshift-numaresources
+                spec:
+                  channel: "4.18" # Match your OCP version
+                  installPlanApproval: Automatic
+                  name: numaresources-operator
+                  source: redhat-operators
+                  sourceNamespace: openshift-marketplace
+
+    # --- 3. CPU Manager (Via Node Tuning Operator / Performance Addon) ---
+    # Note: In modern OCP, CPU Manager is part of the Node Tuning Operator.
+    # We deploy the PerformanceProfile to activate it.
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: enable-cpu-manager
+        spec:
+          remediationAction: enforce
+          severity: medium
+          object-templates:
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: performance.openshift.io/v2
+                kind: PerformanceProfile
+                metadata:
+                  name: performance-cpu-manager
+                spec:
+                  cpu:
+                    isolated: "2-3" # Example: customize for your hardware
+                    reserved: "0-1"
+                  nodeSelector:
+                    node-role.kubernetes.io/worker-cnf: ""
+---
+# Placement Rule: Target clusters with specific labels
+apiVersion: cluster.open-cluster-management.io/v1beta1
+kind: Placement
+metadata:
+  name: placement-latency-sensitive
+  namespace: common-policies
+spec:
+  predicates:
+    - requiredClusterSelector:
+        labelSelector:
+          matchLabels:
+            performance: "high-throughput"
+---
+# Policy Binding: Connects Policy to Placement
+apiVersion: policy.open-cluster-management.io/v1
+kind: PolicyBinding
+metadata:
+  name: binding-latency-sensitive
+  namespace: common-policies
+policyRef:
+  name: policy-latency-sensitive-operators
+  kind: Policy
+  apiGroup: policy.open-cluster-management.io
+placementRef:
+  name: placement-latency-sensitive
+  kind: Placement
+  apiGroup: cluster.open-cluster-management.io
