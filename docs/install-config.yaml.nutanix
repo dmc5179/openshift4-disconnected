@@ -1,0 +1,60 @@
+apiVersion: v1
+baseDomain: mydomain.com
+compute: 
+- hyperthreading: Enabled 
+  name: worker
+  replicas: 3
+  platform:
+    nutanix: 
+      cpus: 2
+      coresPerSocket: 2
+      memoryMiB: 8196
+      osDisk:
+        diskSizeGiB: 120
+controlPlane: 
+  hyperthreading: Enabled 
+  name: master
+  replicas: 3
+  platform:
+    nutanix: 
+      cpus: 4
+      coresPerSocket: 2
+      memoryMiB: 16384
+      osDisk:
+        diskSizeGiB: 120
+metadata:
+  creationTimestamp: null
+  name: ocp4
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  machineNetwork:
+  - cidr: 10.0.0.0/16
+  networkType: OVNKubernetes
+  serviceNetwork:
+  - 172.30.0.0/16
+platform:
+  nutanix:
+    apiVIP: 10.40.142.7 
+    ingressVIP: 10.40.142.8 
+    prismCentral:
+      endpoint:
+        address: your.prismcentral.domainname 
+        port: 9440 
+    password: samplepassword 
+    username: sampleadmin 
+    prismElements:
+    - endpoint:
+        address: your.prismelement.domainname
+        port: 9440
+      uuid: 0005b0f1-8f43-a0f2-02b7-3cecef193712
+    subnetUUIDs:
+    - c7938dc6-7659-453e-a688-e26020c68e43
+    clusterOSImage: http://example.com/images/rhcos-47.83.202103221318-0-nutanix.x86_64.ova
+publish: External
+credentialsMode: Manual
+pullSecret: '{}'
+fips: false
+sshKey: |
+  ssh-rsa AAAA.....
