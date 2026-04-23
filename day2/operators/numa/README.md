@@ -1,0 +1,62 @@
+# Schedueling NUMA Aware Workloads
+
+To deploy high performance workloads with optimal efficiency, use NUMA-aware scheduling. This feature aligns pods with the underlying hardware topology in your OpenShift Container Platform cluster, minimizing latency and maximizing resource utilization.
+
+By using the NUMA Resources Operator, you can schedule high-performance workloads in the same NUMA zone. The Operator deploys a node resources exporting agent that reports on available cluster node NUMA resources, and a secondary scheduler that manages the workloads.
+
+https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/scalability_and_performance/cnf-numa-aware-scheduling#installing-the-numa-resources-operator_numa-aware
+
+## Deploy the NUMA resource Operator
+
+```console
+oc create -f nro-namespace.yaml
+
+sleep 1
+
+oc create -f nro-operatorgroup.yaml
+
+sleep 2
+
+oc create -f nro-sub.yamlp
+
+sleep 3
+
+oc create -f nro-nro.yaml
+
+sleep 15
+
+oc create -f nro-rs.yaml
+
+sleep 15
+```
+
+## Generate a must gather report
+```console
+mkdir must-gather | true
+oc adm must-gather --dest-dir=${PWD}/must-gather/
+```
+
+## Compress the must gather report
+```console
+tar caf must-gather.tar.gz ${PWD}/must-gather/
+```
+
+## Run the wrapper script help command
+```console
+./run-perf-profile-creator.sh -h
+```
+
+## Display information about the cluster
+```console
+./run-perf-profile-creator.sh -t ./must-gather.tar.gz info
+```
+
+## Create performance profile
+```console
+./run-perf-profile-creator.sh -t ./must-gather.tar.gz -- --mcp-name=worker --topology-manager-policy best-effort --reserved-cpu-count=2 --rt-kernel=true --split-reserved-cpus-across-numa=false --power-consumption-mode=ultra-low-latency --offlined-cpu-count=1 > my-performance-profile.yaml
+```
+
+## Apply Performance Profile
+```console
+oc apply -f my-performance-profile.yaml
+```

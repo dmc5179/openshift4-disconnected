@@ -1,0 +1,6 @@
+kind: NUMAResourcesScheduler
+apiVersion: nodetopology.openshift.io/v1
+metadata:
+  name: numaresourcesscheduler
+spec:
+  imageSpec: 'quay.io/openshift-kni/scheduler-plugins:4.20-snapshot'
