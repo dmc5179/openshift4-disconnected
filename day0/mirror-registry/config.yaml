@@ -1,0 +1,6 @@
+MAXIMUM_LAYER_SIZE: 100G  # Set this when deploying the RHOAI operator to quay
+#SECURITY_SCANNER_V4_INDEX_MAX_LAYER_SIZE: 100G  # Clair does not scan LLM model container images so this does nothing
+#
+
+# For s3 storage
+# - minimum_chunk_size_mb: 20   # Set this to 50 when deploying RHOAI operator to quay and quay is backed by S3 object storage
