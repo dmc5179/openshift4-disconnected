@@ -442,6 +442,7 @@ Resources:
             echo '.amazonaws.com' > /etc/squid/whitelist.txt
             echo '.cloudfront.net' >> /etc/squid/whitelist.txt
             echo '.ce.redhat.com' >> /etc/squid/whitelist.txt
+            echo '.opentlc.com' >> /etc/squid/whitelist.txt
 
             cat > /etc/squid/squid.conf << 'EOF'
 
