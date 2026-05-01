@@ -1,16 +1,16 @@
 #!/bin/bash
 
-EXISTING="ecs-2tzpd-worker-us-east-2a"
-#NEW="${EXISTING}.json"
-TMP="${EXISTING}-tmp.json"
-INITIAL_REPLICAS=1
-NEW_NAME="ecs-2tzpd-worker-spot-us-east-2a"
-NEW="${NEW_NAME}.json"
-AWS_INSTANCE_TYPE="m5.2xlarge"
-SPOT=1
+export EXISTING=""                     # Name of an existing machineset to clone
+export INITIAL_REPLICAS=1              # Initial number of replicas for the new machineset
+export NEW_NAME=""                     # Name of the new machineset, follow pattern of existing one
+export AWS_INSTANCE_TYPE="m5.2xlarge"  # AWS EC2 instance type for the new machineset
+export SPOT=1                          # If the machineset should use spot instances
 
-# Copy file
-#cp "${EXISTING}" "${NEW}"
+
+###############################
+TMP="${EXISTING}-tmp.json"
+NEW="${NEW_NAME}.json"
+##############################
 
 # Export an existing MachineSet
 oc get -o json machineset "${EXISTING}" > "${NEW}"
@@ -40,3 +40,7 @@ then
  echo "prepare spot instance"
  jq '.' "${NEW}" | jq '.spec.template.spec.providerSpec.value.spotMarketOptions = {}' > "${TMP}" && mv "${TMP}" "${NEW}"
 fi
+
+echo "New MachineSet yaml located here: ${NEW}"
+
+echo "To create the new machineset, run the following command: oc create -f ${NEW}"
