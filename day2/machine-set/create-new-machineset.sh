@@ -13,7 +13,7 @@ NEW="${NEW_NAME}.json"
 ##############################
 
 # Export an existing MachineSet
-oc get -o json machineset "${EXISTING}" > "${NEW}"
+oc get -o json -n openshift-machine-api machineset "${EXISTING}" > "${NEW}"
 
 # Remove generated data from existing MachineSet
 jq 'del(.metadata.generation)' "${NEW}" > "${TMP}" && mv "${TMP}" "${NEW}"
@@ -24,7 +24,7 @@ jq 'del(.metadata.annotations)' "${NEW}" > "${TMP}" && mv "${TMP}" "${NEW}"
 jq 'del(.status)' "${NEW}" > "${TMP}" && mv "${TMP}" "${NEW}"
 
 # Set replicas
-jq --arg replicas "${INITIAL_REPLICAS}" '.spec.replicas = \"$replicas\"' "${NEW}" > "${TMP}" && mv "${TMP}" "${NEW}"
+jq --argjson val $INITIAL_REPLICAS '.spec.replicas = $val' "${NEW}" > "${TMP}" && mv "${TMP}" "${NEW}"
 
 # Set instance Type
 jq --arg instance "${AWS_INSTANCE_TYPE}" '.spec.template.spec.providerSpec.value.instanceType = $instance' "${NEW}" > "${TMP}" && mv "${TMP}" "${NEW}"
