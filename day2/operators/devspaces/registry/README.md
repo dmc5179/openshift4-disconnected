@@ -1,13 +1,23 @@
 # Dev Spaces Plugin Registry for disconnected systems
 
-- Use this repo
+## Clone repo
 
-https://github.com/redhat-developer/che-plugin-registry.git
+```console
+git clone https://github.com/redhat-developer/che-plugin-registry.git
+```
 
-- modify openvsx-sync.json
+## modify openvsx-sync.json
 
-- Run build.sh
+## Build the plugin registry container image
+```console
+./build.sh --registry quay.io --organization danclark --tag latest
+```
 
-- Mirror container to disconnected side
+## Mirror container to disconnected side
 
-- Run the patch-cluster.sh script
+- bring the container and the "patch-cluster.sh" script or the entire git repo
+
+## Patch the che cluster
+```console
+./patch-cluster.sh
+```
