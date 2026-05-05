@@ -6,6 +6,10 @@ By using the NUMA Resources Operator, you can schedule high-performance workload
 
 https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/scalability_and_performance/cnf-numa-aware-scheduling#installing-the-numa-resources-operator_numa-aware
 
+https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/scalability_and_performance/cnf-tuning-low-latency-nodes-with-perf-profile#cnf-about-the-profile-creator-tool_cnf-tuning-low-latency-nodes-with-perf-profile
+
+https://access.redhat.com/articles/6994974
+
 ## Deploy the NUMA resource Operator
 
 ```console
@@ -59,4 +63,60 @@ tar caf must-gather.tar.gz ${PWD}/must-gather/
 ## Apply Performance Profile
 ```console
 oc apply -f my-performance-profile.yaml
+```
+
+
+## TODO: Check that the kublet is getting some of these configs from the performance profile process.
+
+- Need to check that the kubelet has some of these fields
+```
+apiVersion: machineconfiguration.openshift.io/v1
+kind: KubeletConfig
+metadata:
+  name: cpumanager-enabled
+spec:
+  machineConfigPoolSelector:
+    matchLabels:
+    custom-kubelet: cpumanager-enabled
+  kubeletConfig:
+    cpuManagerPolicy: static
+    cpuManagerReconcilePeriod: 5s
+    reservedSystemCPUs: "0,1"
+```
+
+## Example OCP VM config for single NUMA node
+
+```
+  cpu:
+    cores: 24
+    sockets: 4
+    threads: 1
+    dedicatedCpuPlacement: true
+    isolateEmulatorThread: true
+    numa:
+      guestMappingPassthrough : {}
+```
+
+## Do we need to use the topo aware scheduler in the virt deployment like this
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: numa-deployment-1
+  namespace: openshift-numaresources
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      schedulerName: topo-aware-scheduler
+      containers:
+      - name: ctnr
+        image: quay.io/openshifttest/hello-openshift:openshift
+        imagePullPolicy: IfNotPresent
 ```
