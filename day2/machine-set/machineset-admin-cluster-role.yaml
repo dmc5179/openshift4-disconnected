@@ -1,0 +1,26 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: machineset-admin
+rules:
+- apiGroups:
+  - machine.openshift.io
+  resources:
+  - machinesets
+  - machinesets/scale
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+  - patch
+  - update
+- apiGroups:
+  - machine.openshift.io
+  resources:
+  - machines
+  verbs:
+  - get
+  - list
+

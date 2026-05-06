@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: admin-machineset-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: machineset-admin
+subjects:
+#- kind: User
+#  name: name-of-user
+#  apiGroup: rbac.authorization.k8s.io
+#- kind: Group
+#  name: name-of-group
+#  apiGroup: rbac.authorization.k8s.io
