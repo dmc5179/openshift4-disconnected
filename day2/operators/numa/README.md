@@ -123,33 +123,75 @@ spec:
 
 ## Benchmarking
 
-### Viewing the numa config on the physical server
-- Install numactl package
+The numactl and numastat commands are the best tools to monitor process that should be configured to use single-numa-node or are known to span numa nodes.
 
+OpenShift RHCOS nodes do not have the numactl package installed on them. Below are steps to find what OCP node a virtual machine is running on and then leverage the numastat command to monitor the VM.
+
+### Set variables for the virtual machine
 ```console
-dnf install numactl
+export VM_NAME=test-syslog-server
+export NAMESPACE="cluster-vms"
 ```
 
-- View NUMA layout on the physical server
+### Determine the OCP node that the virtual machine is running on.
+
+- Note: The virtual machine must be running for these commands to work
+
 ```console
-numactl --hardware   # Node 0 == Disabled. If you see Node 0 and Node 1 that usually means enabled
+export POD=$(oc get pods -n ${NAMESPACE} -o custom-columns=":metadata.name" --no-headers | grep "${VM_NAME}")
+
+export HOST_IP=$(oc get -o jsonpath='{.status.hostIP}' pod ${POD})
+
+export NODE=$(oc get -o wide nodes | grep ${HOST_IP} | awk '{print $1}')
 ```
 
-- View CPU to NUMA Node mapping on the physical server
+### Find the qemu-kvm PID of the process running the VM on the OCP node
+
 ```console
-lscpu | grep -i numa
+export PID=$(oc debug node/${NODE} -q -- chroot /host ps -eaf | grep "guest=cluster-vms_test-syslog-server" | awk '{print $2}')
 ```
 
-- The most dramatic difference between a single-node schedule and a "split" schedule is memory access speed. Use Intel Memory Latency Checker (MLC) or PCM. If you want a native RHEL tool, use numademo
+### Deploy the toolbox container onto the Node where the virtual machine is running
 
-- Run a memory bandwidth test across nodes
+- This section deploys the openshift toolbox container onto the node where the virtual machine is running.
+- The toolbox container does not include the numa commands.
+- Subsequent commands will install the numactl package.
+- If dnf does not work inside the toolbox container, an alternate method to install numactl and numactl-libs will need to be used
+
+####  Deploy the toolbox container
 ```console
-numademo -e 128M
+yq --arg node "${NODE}" '.spec.nodeName = $node' toolbox-pod.yaml | oc create -f -
+
+oc wait --for=condition=ready pod/host-debug-pod --timeout=60s
 ```
 
-Look at the "Local" vs "Remote" memory throughput. If single NUMA scheduling is enabled, your throughput should be consistently high because "Remote" hits shouldn't happen.
+- If deploying the toolbox container using the method above cannot be done, a container can be run directly on the OCP node and the packages installed and used from there like this:
 
-### Inside the Virtual Machine testing
+```console
+oc debug node/${NODE}
+
+chroot /host
+
+sudo podman run -it --privileged --ipc=host --pid=host --net=host --cap-add=all -v /sys:/sys -v /proc:/proc -v /dev:/dev centos:stream9 bash
+
+ps -eaf | grep qemu-kvm   | grep 'guest=<namespace>_<vm name in ocp>
+
+watch -n 1 numastat -c <pid of qemu-kvm>
+```
+
+#### Install numactl package inside the toolbox container
+
+- Note: procps-ng is also installed because it contains the "watch" command
+
+```console
+oc exec -it host-debug-pod -- dnf install -y numactl procps-ng
+
+oc exec -it host-debug-pod -- watch -n 1 numastat -c ${PID}
+```
+
+### Benchmarks to run inside of the Virtual Machine
+
+- These are sample benchmarks that can be run inside the virtual machine while watching the qemu-kvm process with numastat using the previous section
 
 - CPU Execution time
 ```console
@@ -163,44 +205,27 @@ sysbench memory --memory-block-size=1M --memory-total-size=10G --threads=$(nproc
 
 Watch the Operations per second (ops/sec) and Average Latency. When the VM is stretched across NUMA nodes (scheduling disabled), latency spikes because memory requests have to cross the QPI/UPI link between sockets.
 
+### Additional numa commands that can be run on the physical server to gather information
 
-#####################################
+- Note: Since numactl does not exist on the OpenShift nodes, one of the methods describe above for deploying the toolbox container and installing the numactl/numactl-libs must be used. Then the commands below can be run on the nodes.
 
-oc project <namespace with the vm>
-oc get vm
+#### View NUMA layout on the physical server
+```console
+numactl --hardware   # Node 0 == Disabled. If you see Node 0 and Node 1 that usually means enabled
+```
 
+#### View CPU to NUMA Node mapping on the physical server
+```console
+lscpu | grep -i numa
+```
 
-oc debug node
-chroot /host
-crictl ps --namespace cluster-vms
-crictl inspect --output go-template --template '{{.info.pid}}' <container ID from the last command>
-nsenter -a -t <pid from the last command>
+#### numademo command
 
+- The most dramatic difference between a single-node schedule and a "split" schedule is memory access speed. Use Intel Memory Latency Checker (MLC) or PCM. If you want a native RHEL tool, use numademo
 
+- Run a memory bandwidth test across nodes
+```console
+numademo -e 128M
+```
 
-
-sudo podman run -it --privileged --ipc=host --pid=host --net=host --cap-add=all -v /sys:/sys -v /proc:/proc -v /dev:/dev centos:stream9 bash
-ps -eaf | grep qemu-kvm   | grep 'guest=<namespace>_<vm name in ocp>
-watch -n 1 numastat -c <pid of qemu-kvm>
-
-
-
-## Automation
-
-- get the node
-
-VM_NAME=test-syslog-server
-NAMESPACE="cluster-vms"
-POD=$(oc get pods -n ${NAMESPACE} -o custom-columns=":metadata.name" --no-headers | grep "${VM_NAME}")
-HOST_IP=$(oc get -o jsonpath='{.status.hostIP}' pod ${POD})
-NODE=$(oc get -o wide nodes | grep ${HOST_IP} | awk '{print $1}')
-
-PID=$(oc debug node/${NODE} -q -- chroot /host ps -eaf | grep "guest=cluster-vms_test-syslog-server" | awk '{print $2}')
-
-yq --arg node "${NODE}" '.spec.nodeName = $node' toolbox-pod.yaml | oc create -f -
-
-oc wait --for=condition=ready pod/host-debug-pod --timeout=60s
-
-oc exec -it host-debug-pod -- dnf install -y numactl procps-ng
-
-oc exec -it host-debug-pod -- watch -n 1 numastat -c ${PID}
+Look at the "Local" vs "Remote" memory throughput. If single NUMA scheduling is enabled, your throughput should be consistently high because "Remote" hits shouldn't happen.
