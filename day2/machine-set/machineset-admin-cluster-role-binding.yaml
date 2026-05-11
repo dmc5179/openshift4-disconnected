@@ -2,6 +2,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: admin-machineset-binding
+  namespace: openshift-machine-api
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -10,6 +11,23 @@ subjects:
 #- kind: User
 #  name: name-of-user
 #  apiGroup: rbac.authorization.k8s.io
-#- kind: Group
-#  name: name-of-group
+- kind: Group
+  name: name-of-group
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: node-viewer-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: node-viewer
+subjects:
+#- kind: User
+#  name: name-of-user
 #  apiGroup: rbac.authorization.k8s.io
+- kind: Group
+  name: name-of-group
+  apiGroup: rbac.authorization.k8s.io
