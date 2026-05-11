@@ -7,15 +7,23 @@ rules:
   - machine.openshift.io
   resources:
   - machinesets
-  - machinesets/scale
   verbs:
   - get
   - list
   - watch
-  #- create
-  #- delete
+- apiGroups:
+  - machine.openshift.io
+  resources:
+  - machinesets
+  - machinesets/scale
+  verbs:
   - patch
   - update
+  resourceNames: 
+  - <exact-name-of-machineset>
+  - <exact-name-of-machineset>
+  - <exact-name-of-machineset>
+  - <exact-name-of-machineset>
 - apiGroups:
   - machine.openshift.io
   resources:
