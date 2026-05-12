@@ -35,7 +35,6 @@ vim machineset-admin-cluster-role-binding.yaml
 - Apply the updated machineset-admin-cluster-role.yaml
 ```console
 oc create -f machineset-admin-cluster-role.yaml
-```
 
 subjects:
 #- kind: User
