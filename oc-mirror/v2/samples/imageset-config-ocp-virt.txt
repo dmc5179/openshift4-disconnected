@@ -1,0 +1,84 @@
+kind: ImageSetConfiguration
+apiVersion: mirror.openshift.io/v2alpha1
+#archiveSize: 8  ##### Uncomment this for oc-mirror to split the archive into 8GB chunks or use a different value
+mirror:
+  platform:
+    channels:
+    - name: stable-4.20
+      type: ocp
+      #minVersion: 4.20.xx
+      #maxVersion: 4.20.xx
+      shortestPath: true # Toggles shortest path mirroring
+    graph: true
+  operators:
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.20
+    packages:
+    - name: cincinnati-operator
+      channels:
+      - name: v1 
+    - name: rhacs-operator
+      channels:
+      - name: stable
+    - name: compliance-operator                                    
+      channels:
+      - name: stable 
+####### Operators for ODF Storage BEGIN #####
+    - name: ocs-client-operator
+      channels: 
+      - name: stable-4.20
+    - name: ocs-operator
+      channels:
+      - name: stable-4.20
+    - name: odf-operator 
+      channels:
+      - name: stable-4.20
+    - name: odf-csi-addons-operator 
+      channels:
+      - name: stable-4.20
+    - name: mcg-operator 
+      channels:
+      - name: stable-4.20
+    - name: odf-prometheus-operator
+      channels:
+      - name: stable-4.20
+    - name: recipe
+      channels:
+      - name: stable-4.20
+    - name: rook-ceph-operator
+      channels:
+      - name: stable-4.20
+    - name: cephcsi-operator
+      channels:
+      - name: stable-4.20
+    - name: odf-dependencies
+      channels:
+      - name: stable-4.20
+####### Operators for ODF Storage END #####
+    - name: local-storage-operator 
+      channels:
+      - name: stable
+    - name: web-terminal
+      channels:
+      - name: fast
+    - name: kubevirt-hyperconverged
+      channels:
+      - name: stable
+    - name: nfd
+      channels:
+      - name: stable
+    - name: metallb-operator
+      channels:
+      - name: stable
+    - name: mtv-operator
+      channels:
+      - name: release-v2.7
+  helm: {}
+  additionalImages:
+  # virt disk images
+  - name: quay.io/containerdisks/centos-stream:10
+  - name: quay.io/containerdisks/centos-stream:9
+  - name: quay.io/containerdisks/fedora:latest
+  - name: registry.redhat.io/rhel8/rhel-guest-image:latest
+  - name: registry.redhat.io/rhel9/rhel-guest-image:latest
+  - name: registry.redhat.io/rhel10/rhel-guest-image:latest
+
