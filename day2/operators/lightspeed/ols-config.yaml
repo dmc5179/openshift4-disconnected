@@ -3,6 +3,16 @@ kind: OLSConfig
 metadata:
   name: cluster
 spec:
+#  featureGates:
+#    - MCPServer
+#  mcpServers:
+#  - name: mcp-server-1
+#    url: https://mcp.example.com
+#    timeout: 30
+#    headers:
+#      - name: Authorization
+#        valueFrom:
+#         type: kubernetes
   llm:
     providers:
       - credentialsSecretRef:
@@ -13,6 +23,13 @@ spec:
         type: rhelai_vllm
         url: 'http://ollama.ollama.svc.cluster.local/v1'
   ols:
+    #rag:
+    #  - image: quay.io/<username>/my-byok-image:latest
+    #byokRAGOnly: true  # Set true to disable knowledge inside the operator and only use RHOKP
+    #storage:
+    #  size: 768Mi
+    #  class: gp2-csi
+    #introspectionEnabled: true  # give OpenShift Lightspeed cluster-specific context.
     conversationCache:
       postgres:
         credentialsSecret: lightspeed-redis-secret
@@ -30,5 +47,17 @@ spec:
         replicas: 1
       replicas: 1
     logLevel: INFO
+    #quotaHandlersConfig:
+    #  limitersConfig:
+    #  - name: user_limits
+    #    type: user_limiter
+    #    initialQuota: 100000
+    #    quotaIncrease: 1000
+    #    period: 30 days
+    #  - name: cluster_limits
+    #    type: cluster_limiter
+    #    initialQuota: 1000000
+    #    quotaIncrease: 100000
+    #    period: 30 days
   olsDataCollector:
     logLevel: INFO
