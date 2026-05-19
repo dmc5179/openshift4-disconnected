@@ -1,0 +1,16 @@
+apiVersion: compliance.openshift.io/v1alpha1
+kind: ScanSettingBinding
+metadata:
+  name: stig-compliance
+  namespace: openshift-compliance
+profiles:
+- apiGroup: compliance.openshift.io/v1alpha1
+  kind: Profile
+  name: rhcos4-stig-v2r1
+- apiGroup: compliance.openshift.io/v1alpha1
+  kind: Profile
+  name: ocp4-stig-v2r1
+settingsRef:
+  apiGroup: compliance.openshift.io/v1alpha1
+  kind: ScanSetting
+  name: default
