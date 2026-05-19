@@ -89,8 +89,8 @@ Resources:
       Tags:
       - Key: "Name"
         Value: !Join ["-", [!Ref InfrastructureName, "vpc"]]
-      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
-        Value: owned
+#      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
+#        Value: owned
 
   PublicSubnet1:
     Type: "AWS::EC2::Subnet"
@@ -101,8 +101,8 @@ Resources:
       Tags:
       - Key: "Name"
         Value: !Join ["-", [!Ref InfrastructureName, "public", !Select [0, Fn::GetAZs: !Ref "AWS::Region"]]]
-      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
-        Value: owned
+#      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
+#        Value: owned
 
   PublicSubnet2:
     Type: "AWS::EC2::Subnet"
@@ -114,8 +114,8 @@ Resources:
       Tags:
       - Key: "Name"
         Value: !Join ["-", [!Ref InfrastructureName, "public", !Select [1, Fn::GetAZs: !Ref "AWS::Region"]]]
-      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
-        Value: owned
+#      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
+#        Value: owned
 
   PublicSubnet3:
     Type: "AWS::EC2::Subnet"
@@ -127,8 +127,8 @@ Resources:
       Tags:
       - Key: "Name"
         Value: !Join ["-", [!Ref InfrastructureName, "public", !Select [2, Fn::GetAZs: !Ref "AWS::Region"]]]
-      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
-        Value: owned
+#      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
+#        Value: owned
 
   InternetGateway:
     Type: "AWS::EC2::InternetGateway"
@@ -136,8 +136,8 @@ Resources:
       Tags:
       - Key: "Name"
         Value: !Join ["-", [!Ref InfrastructureName, "igw"]]
-      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
-        Value: owned
+#      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
+#        Value: owned
 
   GatewayToInternet:
     Type: "AWS::EC2::VPCGatewayAttachment"
@@ -152,8 +152,8 @@ Resources:
       Tags:
       - Key: "Name"
         Value: !Join ["-", [!Ref InfrastructureName, "public"]]
-      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
-        Value: owned
+#      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
+#        Value: owned
 
   PublicRoute:
     Type: "AWS::EC2::Route"
@@ -192,10 +192,10 @@ Resources:
       Tags:
       - Key: "Name"
         Value: !Join ["-", [!Ref InfrastructureName, "private", !Select [0, Fn::GetAZs: !Ref "AWS::Region"]]]
-      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
-        Value: owned
-      - Key: kubernetes.io/role/internal-elb
-        Value: ""
+#      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
+#        Value: owned
+#      - Key: kubernetes.io/role/internal-elb
+#        Value: ""
 
   PrivateRouteTable1:
     Type: "AWS::EC2::RouteTable"
@@ -204,8 +204,8 @@ Resources:
       Tags:
       - Key: "Name"
         Value: !Join ["-", [!Ref InfrastructureName, "private", !GetAtt PublicSubnet1.AvailabilityZone]]
-      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
-        Value: owned
+#      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
+#        Value: owned
 
   PrivateSubnetRouteTableAssociation1:
     Type: "AWS::EC2::SubnetRouteTableAssociation"
@@ -223,8 +223,8 @@ Resources:
       Tags:
       - Key: "Name"
         Value: !Join ["-", [!Ref InfrastructureName, "nat", !GetAtt PublicSubnet1.AvailabilityZone]]
-      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
-        Value: owned
+#      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
+#        Value: owned
 
   EIP1:
     Type: "AWS::EC2::EIP"
@@ -233,8 +233,8 @@ Resources:
       Tags:
       - Key: "Name"
         Value: !Join ["-", [!Ref InfrastructureName, "eip", !GetAtt PublicSubnet1.AvailabilityZone]]
-      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
-        Value: owned
+#      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
+#        Value: owned
 
   Route1:
     Type: "AWS::EC2::Route"
@@ -255,10 +255,10 @@ Resources:
       Tags:
       - Key: "Name"
         Value: !Join ["-", [!Ref InfrastructureName, "private", !Select [1, Fn::GetAZs: !Ref "AWS::Region"]]]
-      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
-        Value: owned
-      - Key: kubernetes.io/role/internal-elb
-        Value: ""
+#      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
+#        Value: owned
+#      - Key: kubernetes.io/role/internal-elb
+#        Value: ""
 
   PrivateRouteTable2:
     Type: "AWS::EC2::RouteTable"
@@ -268,8 +268,8 @@ Resources:
       Tags:
       - Key: "Name"
         Value: !Join ["-", [!Ref InfrastructureName, "private", !GetAtt PublicSubnet2.AvailabilityZone]]
-      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
-        Value: owned
+#      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
+#        Value: owned
 
   PrivateSubnetRouteTableAssociation2:
     Type: "AWS::EC2::SubnetRouteTableAssociation"
@@ -289,8 +289,8 @@ Resources:
       Tags:
       - Key: "Name"
         Value: !Join ["-", [!Ref InfrastructureName, "nat", !GetAtt PublicSubnet2.AvailabilityZone]]
-      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
-        Value: owned
+#      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
+#        Value: owned
 
   EIP2:
     Type: "AWS::EC2::EIP"
@@ -300,8 +300,8 @@ Resources:
       Tags:
       - Key: "Name"
         Value: !Join ["-", [!Ref InfrastructureName, "eip", !GetAtt PublicSubnet2.AvailabilityZone]]
-      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
-        Value: owned
+#      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
+#        Value: owned
 
   Route2:
     Type: "AWS::EC2::Route"
@@ -323,10 +323,10 @@ Resources:
       Tags:
       - Key: "Name"
         Value: !Join ["-", [!Ref InfrastructureName, "private", !Select [2, Fn::GetAZs: !Ref "AWS::Region"]]]
-      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
-        Value: owned
-      - Key: kubernetes.io/role/internal-elb
-        Value: ""
+#      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
+#        Value: owned
+#      - Key: kubernetes.io/role/internal-elb
+#        Value: ""
 
   PrivateRouteTable3:
     Type: "AWS::EC2::RouteTable"
@@ -336,8 +336,8 @@ Resources:
       Tags:
       - Key: "Name"
         Value: !Join ["-", [!Ref InfrastructureName, "private", !GetAtt PublicSubnet3.AvailabilityZone]]
-      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
-        Value: owned
+#      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
+#        Value: owned
 
   PrivateSubnetRouteTableAssociation3:
     Type: "AWS::EC2::SubnetRouteTableAssociation"
@@ -357,8 +357,8 @@ Resources:
       Tags:
       - Key: "Name"
         Value: !Join ["-", [!Ref InfrastructureName, "nat", !GetAtt PublicSubnet3.AvailabilityZone]]
-      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
-        Value: owned
+#      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
+#        Value: owned
 
   EIP3:
     Type: "AWS::EC2::EIP"
@@ -368,8 +368,8 @@ Resources:
       Tags:
       - Key: "Name"
         Value: !Join ["-", [!Ref InfrastructureName, "eip", !GetAtt PublicSubnet3.AvailabilityZone]]
-      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
-        Value: owned
+#      - Key: !Join ["", [kubernetes.io/cluster/, !Ref InfrastructureName]]
+#        Value: owned
 
   Route3:
     Type: "AWS::EC2::Route"
