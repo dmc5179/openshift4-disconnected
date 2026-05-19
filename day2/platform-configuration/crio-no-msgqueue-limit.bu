@@ -1,0 +1,17 @@
+variant: openshift
+version: 4.18.0 # Adjust version to your OpenShift version
+metadata:
+  name: 99-worker-crio-msgqueue
+  labels:
+    #machineconfiguration.openshift.io/role: infra # Or master, or both
+    #machineconfiguration.openshift.io/role: master # Or master, or both
+    machineconfiguration.openshift.io/role: worker # Or master, or both
+storage:
+  files:
+  - path: /etc/crio/crio.conf.d/99-msgqueue-limit.conf
+    mode: 0644 # Permissions (rw-r--r--)
+    overwrite: true
+    contents:
+      inline: |
+        [crio.runtime]
+        no_msgqueue_limit = true
