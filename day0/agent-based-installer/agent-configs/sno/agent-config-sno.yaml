@@ -1,0 +1,41 @@
+apiVersion: v1alpha1
+kind: AgentConfig
+metadata:
+  name: agent-config 
+additionalNTPSources:
+  - 0.north-america.pool.ntp.org
+  - 1.north-america.pool.ntp.org
+rendezvousIP: 192.168.1.80  # For a SNO cluster this is the same IP as the server. 
+hosts:
+  - hostname: master-0
+    role: master
+    interfaces:
+      - name: eno1  # This doesn't need to be the actual interface name, it has to match the names below
+        macAddress: 00:ef:44:21:e6:a6
+    rootDeviceHints:
+      deviceName: /dev/sda # Change this to the drive that OCP should install the OS on
+    networkConfig:
+      interfaces:
+        - name: eno1  # This doesn't need to be the actual interface name, it has to match the name above
+          type: ethernet
+          state: up
+          mac-address: 00:ef:44:21:e6:a6  # This should match the mac addresse from above
+          mtu: 9000    # Only set this if Jumbo frames are requried otherwise delete entry
+          ipv4:
+            enabled: true
+            address:
+              - ip: 192.168.1.80
+                prefix-length: 24
+            dhcp: false
+          ipv6:
+            enabled: false
+      dns-resolver:
+        config:
+          server:
+            - 192.168.1.1
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 192.168.1.1   # Default route for node network
+            next-hop-interface: eno1  # This doesn't need to be the actual interface name, it has to match the name above
+            table-id: 254
