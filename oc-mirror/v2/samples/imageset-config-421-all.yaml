@@ -1,0 +1,176 @@
+apiVersion: mirror.openshift.io/v1alpha2
+kind: ImageSetConfiguration
+archiveSize: 400
+mirror:
+  platform:
+    channels:
+      - name: stable-4.21
+        minVersion: 4.21.11
+        maxVersion: 4.21.11
+        shortestPath: true
+    graph: true
+  operators:
+    # Red Hat Operator Index Catalog     
+    #- catalog: registry.redhat.io/redhat/redhat-operator-index:v4.21
+    - catalog: registry.redhat.io/redhat/redhat-operator-index@sha256:23b50d8ee99c65bc0d96106378cd8ff605d7b9998084c83ff6aa5ede8343e585
+      packages:
+        # RHOAI - You need to declare a min/max or you will pull multiple version
+        - name: rhods-operator
+          defaultChannel: stable-3.3
+          channels:
+            - name: stable-3.3
+              minVersion: 3.3.2
+              maxVersion: 3.3.2
+        - name: serverless-operator
+        - name: jobset-operator
+        - name: openshift-custom-metrics-autoscaler-operator
+        - name: lws-operator
+        - name: rhcl-operator
+        - name: kueue-operator
+        - name: sriov-network-operator
+        - name: authorino-operator
+        - name: openshift-cert-manager-operator
+
+        # Standard operators for Day-2
+        - name: compliance-operator
+        - name: web-terminal
+        - name: cincinnati-operator
+        - name: cluster-observability-operator
+        - name: netobserv-operator
+        - name: nfd
+
+        # Logging
+        - name: cluster-logging
+        - name: loki-operator
+
+        # ACM
+        - name: advanced-cluster-management
+        - name: multicluster-engine
+
+        # ACS
+        - name: rhacs-operator
+
+        # Quay
+        - name: quay-operator
+        - name: quay-bridge-operator
+        - name: container-security-operator
+
+        # ODF
+        - name: odf-operator
+        - name: odf-csi-addons-operator
+        - name: ocs-operator
+        - name: mcg-operator
+        - name: odf-dependencies
+        - name: rook-ceph-operator
+        - name: recipe
+        - name: cephcsi-operator
+        - name: ocs-client-operator
+        - name: odf-prometheus-operator
+        - name: odr-cluster-operator
+        - name: odr-hub-operator
+        - name: lvms-operator
+        - name: local-storage-operator
+
+        # Virtualization
+        - name: kubevirt-hyperconverged
+        - name: kubernetes-nmstate-operator
+        - name: mtv-operator
+
+        # Confidential Compute
+        - name: sandboxed-containers-operator
+        - name: trustee-operator
+
+        # Devspaces
+        - name: devspaces
+        - name: devworkspace-operator
+
+        # OpenShift Service Mesh
+        - name: servicemeshoperator3
+        - name: kiali-ossm
+        - name: jaeger-product
+
+        # MetalLB Operator
+        - name: metallb-operator
+
+        # Keycloak Operator
+        - name: rhbk-operator
+
+        # Openshift APOs for Data Protection
+        - name: redhat-oadp-operator
+
+        # Red Hat SSO
+        - name: rhsso-operator
+
+        # Ansible Automation Platform Operator
+        - name: ansible-automation-platform-operator
+
+        # Devops
+        - name: mta-operator
+        - name: openshift-gitops-operator 
+        - name: openshift-pipelines-operator-rh
+
+    # Red Hat Certified Operator Index Catalog     
+    #- catalog: registry.redhat.io/redhat/certified-operator-index:v4.21
+    - catalog: registry.redhat.io/redhat/certified-operator-index@sha256:7360415a8aa69923747d6ea0d436ca8d75cf5b991ae8a0358239459d21b21757
+      packages:
+        # NVIDIA GPU Operator
+        - name: gpu-operator-certified
+          channels:
+            - name: v26.3
+              minVersion: 26.3.1
+              maxVersion: 26.3.1
+        # Trident
+        - name: trident-operator
+          channels:
+            - name: stable
+
+    # Red Hat Community Operator Index Catalog
+    #- catalog: registry.redhat.io/redhat/community-operator-index:v4.21
+    - catalog: registry.redhat.io/redhat/community-operator-index@sha256:f54569b18124186173f2bfe08114422178bee218fb5729415f46bb66c64b6990
+      packages:
+        # Group Sync Operator
+        - name: group-sync-operator
+        - name: kubernetes-imagepuller-operator
+
+  additionalimages:
+    # Standard Day-2 images 
+    - name: registry.redhat.io/ubi8/ubi:latest
+    - name: registry.redhat.io/ubi8/ubi-init:latest
+    - name: registry.redhat.io/ubi8/podman:latest
+    - name: registry.redhat.io/rhel9/support-tools:latest
+    - name: registry.redhat.io/rhel9/rhel-guest-image:latest
+    - name: registry.redhat.io/openshift4/ose-must-gather:latest
+    - name: registry.redhat.io/ubi9/ubi:latest
+    - name: registry.redhat.io/odf4/odf-must-gather-rhel9:v4.20
+    - name: registry.redhat.io/container-native-virtualization/cnv-must-gather-rhel9:v4.20
+
+    # The following are for the Boot Images for various VM OS's (For OpenShift Virtualization). Feel free to remove/update as needed
+    - name: registry.redhat.io/rhel8/rhel-guest-image:8.4.0
+    - name: registry.redhat.io/rhel8/rhel-guest-image:8.6.0
+    - name: registry.redhat.io/rhel8/rhel-guest-image:8.8.0
+    - name: registry.redhat.io/rhel8/rhel-guest-image:8.10.0
+    - name: registry.redhat.io/rhel8/rhel-guest-image:latest
+    - name: registry.redhat.io/rhel9/rhel-guest-image:9.2
+    - name: registry.redhat.io/rhel9/rhel-guest-image:9.4
+    - name: registry.redhat.io/rhel9/rhel-guest-image:latest
+    - name: quay.io/containerdisks/centos:7-2009
+    - name: quay.io/containerdisks/centos-stream:8-latest
+    - name: quay.io/containerdisks/centos-stream:9-latest
+
+    # RHOAI 3.3.2 Images
+    - name: quay.io/modh/odh-anaconda-notebook@sha256:380c07bf79f5ec7d22441cde276c50b5eb2a459485cde05087837639a566ae3d
+    - name: quay.io/modh/fms-hf-tuning@sha256:83f70e981657728ef9929fa50d06fe5c72f364e5ed41a9fc1331e99751f610e8
+    - name: quay.io/modh/ray@sha256:595b3acd10244e33fca1ed5469dccb08df66f470df55ae196f80e56edf35ad5a
+    - name: quay.io/modh/ray@sha256:6b135421b6e756593a58b4df6664f82fc4b55237ca81475f2867518f15fe6d84
+    - name: quay.io/modh/ray@sha256:28a8745be454b0e881ce6c200599ddfcb3366b707a5b53cfa73087d599555158
+    - name: quay.io/modh/ray@sha256:900c35ec2fe4279b958e044c781a179c8cfe0c584e8af16e253814dba01816e6
+    - name: registry.redhat.io/rhoai/odh-workbench-jupyter-minimal-cpu-py311-rhel9@sha256:2b00a5b676b07d4fd6ab894d5dcaeb5bf88ef35bde76cbf3b4c0951987e5aad6
+    - name: registry.redhat.io/rhoai/odh-workbench-jupyter-minimal-cuda-py311-rhel9@sha256:481c5f3749efb85300ed6076a5b05ca5be1ceda17518791db3a67c7b1fa24941
+    - name: registry.redhat.io/rhoai/odh-workbench-jupyter-minimal-rocm-py311-rhel9@sha256:4cc172aab8be2ba278a9525ef0878c68d76963beb9506c8526c07d5b90b1eb58
+    - name: registry.redhat.io/rhoai/odh-workbench-jupyter-datascience-cpu-py311-rhel9@sha256:bd6528eddad7106704c9f78bd25d47bd5a556ecc0e35db317a0e95428be6d025
+    - name: registry.redhat.io/rhoai/odh-workbench-jupyter-pytorch-cuda-py311-rhel9@sha256:384f2ea2df8ccf1978ba633a0b32332e12a4c8d026967ff93e7b8fb0928c8265
+    - name: registry.redhat.io/rhoai/odh-workbench-jupyter-pytorch-rocm-py311-rhel9@sha256:8270d5c58389d0f7ed086336c730060c3792453a4ddc08f0bc622677edd3e0fd
+    - name: registry.redhat.io/rhoai/odh-workbench-jupyter-tensorflow-cuda-py311-rhel9@sha256:a2f863e8df080b683f52453b3a3b8c1f70a50c9bbe9480d7a55da8f0d54fbee2
+    - name: registry.redhat.io/rhoai/odh-workbench-jupyter-tensorflow-rocm-py311-rhel9@sha256:4d1b945221fe7f3e7a486277f27529b9ba2b73b03b9a7e2a3382c133671fcff3
+    - name: registry.redhat.io/rhoai/odh-workbench-jupyter-trustyai-cpu-py311-rhel9@sha256:4331bd07ffb9676a3d9f387b56148e679e0bc50a05dbcc5e693df5aafb097bc0
+    - name: registry.redhat.io/rhoai/odh-workbench-codeserver-datascience-cpu-py311-rhel9@sha256:755f8dacf495f6abb29233edb422ca473ba82cc23370d4fcbaa4f938e90a9c25
