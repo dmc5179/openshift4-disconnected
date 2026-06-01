@@ -614,6 +614,8 @@ Resources:
             echo '${pull_secret}' > /tmp/pull-secret.json
             echo '${pull_secret}' > /home/ec2-user/pull-secret.json
 
+            chown ec2-user:ec2-user /home/ec2-user/pull-secret.json
+
             wget -q https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${ocp_ver}/openshift-client-linux-amd64-rhel9-${ocp_ver}.tar.gz
             wget -q https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${ocp_ver}/openshift-install-rhel9-amd64.tar.gz
 
