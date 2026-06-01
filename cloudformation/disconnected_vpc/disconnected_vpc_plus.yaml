@@ -785,7 +785,8 @@ Resources:
             #sudo fips-mode-setup --enable
             #Don't install mirror-registry until after FIPS is enabled
             mkdir -p /opt/quay-root /opt/quay-root/data /opt/quay-root/sqlite
-            ./mirror-registry install --autoApprove --quayRoot /opt/quay-root --quayStorage /opt/quay-root/data --sqliteStorage /opt/quay-root/sqlite 2>&1 | tee mirror-registry-install.log
+            # --autoApprove should remove the need for a tty but is not yet supported in the released version
+            ./mirror-registry install --quayRoot /opt/quay-root --quayStorage /opt/quay-root/data --sqliteStorage /opt/quay-root/sqlite 2>&1 | tee mirror-registry-install.log
             #./mirror-registry install 2>&1 | tee mirror-registry.log # probably should do this as the ec2-user
 
             cp /opt/quay-root/quay-rootCA/rootCA.pem /etc/pki/ca-trust/source/anchors/quay.pem
