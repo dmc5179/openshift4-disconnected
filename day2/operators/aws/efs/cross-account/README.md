@@ -22,11 +22,13 @@ aws configure --profile "${AWS_ACCOUNT_B}"
 aws configure set aws_access_key_id <AWS Access Key ID> --profile "${AWS_ACCOUNT_A}"
 aws configure set aws_secret_access_key <AWS Sec Key> --profile "${AWS_ACCOUNT_A}"
 aws configure set region <AWS Region> --profile "${AWS_ACCOUNT_A}"
+aws configure set output json --profile "${AWS_ACCOUNT_A}"
 
 
 aws configure set aws_access_key_id <AWS Access Key ID> --profile "${AWS_ACCOUNT_B}"
 aws configure set aws_secret_access_key <AWS Sec Key> --profile "${AWS_ACCOUNT_B}"
 aws configure set region <AWS Region> --profile "${AWS_ACCOUNT_B}"
+aws configure set output json --profile "${AWS_ACCOUNT_B}"
 ```
 
 
