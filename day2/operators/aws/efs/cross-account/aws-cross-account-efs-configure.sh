@@ -127,6 +127,7 @@ cat << EOF > $SCRATCH_DIR/AssumeRoleInlinePolicyPolicyInAccountA.json
 }
 EOF
 
+# There is a typo 
 EFS_CLIENT_FULL_ACCESS_BUILTIN_POLICY_ARN=arn:aws:iam::aws:policy/AmazonElasticFileSystemClientFullAccess
 declare -A ROLE_SEEN
 for NODE in $(oc get nodes --selector="${NODE_SELECTOR}" -o jsonpath='{.items[*].metadata.name}'); do
@@ -146,7 +147,7 @@ for NODE in $(oc get nodes --selector="${NODE_SELECTOR}" -o jsonpath='{.items[*]
     fi
     ROLE_SEEN["$MASTER_ROLE_NAME"]=1
     echo "Assigning policy ${EFS_CLIENT_FULL_ACCESS_BUILTIN_POLICY_ARN} to role ${MASTER_ROLE_NAME}"
-    aws iam attach-role-policy --role-name "${MASTER_ROLE_NAME}" --policy-arn "${EEFS_CLIENT_FULL_ACCESS_BUILTIN_POLICY_ARN}"
+    aws iam attach-role-policy --role-name "${MASTER_ROLE_NAME}" --policy-arn "${EFS_CLIENT_FULL_ACCESS_BUILTIN_POLICY_ARN}"
 done
 
 # CHOICES! Unclear if we do both of these when non-sts mode. Docs update?
