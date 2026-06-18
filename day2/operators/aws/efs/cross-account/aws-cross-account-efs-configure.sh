@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 # AWS Account A: Contains a Red Hat OpenShift Container Platform cluster v4.16, or later, deployed within a VPC
 # AWS Account B: Contains a VPC (including subnets, route tables, and network connectivity). The EFS filesystem will be created in this VPC.
@@ -6,7 +6,8 @@
 # NOTE: Account A contains OpenShift. Account B contains the EFS storage we want to access from OCP in account A
 
 # Configure both account variables
-export CLUSTER_NAME="<CLUSTER_NAME>" 
+export CLUSTER_NAME="<CLUSTER_NAME>"          # This is just used to name the IAM policies and roles, does not have to match anything in OpenShift
+export AWS_ARN="aws-us-gov"                   # Change this if using commercial or something else
 export AWS_REGION="<AWS_REGION>" 
 export AWS_ACCOUNT_A_ID="<ACCOUNT_A_ID>" 
 export AWS_ACCOUNT_B_ID="<ACCOUNT_B_ID>" 
@@ -14,11 +15,12 @@ export AWS_ACCOUNT_A_VPC_CIDR="<VPC_A_CIDR>"
 export AWS_ACCOUNT_B_VPC_CIDR="<VPC_B_CIDR>" 
 export AWS_ACCOUNT_A_VPC_ID="<VPC_A_ID>" 
 export AWS_ACCOUNT_B_VPC_ID="<VPC_B_ID>" 
-export SCRATCH_DIR="<WORKING_DIRECTORY>" 
+export SCRATCH_DIR="scratch" 
 export CSI_DRIVER_NAMESPACE="openshift-cluster-csi-drivers" 
 export AWS_PAGER="" 
 
 # Uncomment and set this if there is already an EFS storage system in account B
+# If this is set, script will skip creating a new EFS storage system
 #export CROSS_ACCOUNT_FS_ID=""
 
 # Configure profiles
@@ -26,10 +28,10 @@ export AWS_ACCOUNT_A="<ACCOUNT_A_NAME>"
 export AWS_ACCOUNT_B="<ACCOUNT_B_NAME>"
 
 # Tests
-export AWS_DEFAULT_PROFILE=${AWS_ACCOUNT_A}
-aws configure get output
-export AWS_DEFAULT_PROFILE=${AWS_ACCOUNT_B}
-aws configure get output
+#export AWS_DEFAULT_PROFILE=${AWS_ACCOUNT_A}
+#aws configure get output
+#export AWS_DEFAULT_PROFILE=${AWS_ACCOUNT_B}
+#aws configure get output
 
 
 # Configure node selector
@@ -37,6 +39,16 @@ export NODE_SELECTOR=node-role.kubernetes.io/worker
 
 # Unset AWS profiles
 unset AWS_PROFILE
+
+##############################################################################################################
+#
+# Everything above this line is configuration in preparation for the commands below
+#
+##############################################################################################################
+
+# Cleanup a prior run
+rm -rf "${SCRATCH_DIR}"
+mkdir "${SCRATCH_DIR}" || true
 
 
 # AWS Account B (EFS Account) Configure
@@ -52,7 +64,7 @@ cat <<EOF > $SCRATCH_DIR/AssumeRolePolicyInAccountB.json
         {
             "Effect": "Allow",
             "Principal": {
-                "AWS": "arn:aws:iam::${AWS_ACCOUNT_A_ID}:root"
+                "AWS": "arn:${AWS_ARN}:iam::${AWS_ACCOUNT_A_ID}:root"
             },
             "Action": "sts:AssumeRole",
             "Condition": {}
@@ -61,11 +73,12 @@ cat <<EOF > $SCRATCH_DIR/AssumeRolePolicyInAccountB.json
 }
 EOF
 
-ACCOUNT_B_ROLE_ARN=$(aws iam create-role \
+ACCOUNT_B_ROLE_ARN=$(aws --profile "${AWS_ACCOUNT_A}" iam create-role \
   --role-name "${ACCOUNT_B_ROLE_NAME}" \
   --assume-role-policy-document file://$SCRATCH_DIR/AssumeRolePolicyInAccountB.json \
-  --query "Role.Arn" --output text) \
-&& echo $ACCOUNT_B_ROLE_ARN
+  --query "Role.Arn" --output text)
+
+echo $ACCOUNT_B_ROLE_ARN
 
 cat << EOF > $SCRATCH_DIR/EfsPolicyInAccountB.json
 {
@@ -128,7 +141,7 @@ cat << EOF > $SCRATCH_DIR/AssumeRoleInlinePolicyPolicyInAccountA.json
 EOF
 
 # There is a typo 
-EFS_CLIENT_FULL_ACCESS_BUILTIN_POLICY_ARN=arn:aws:iam::aws:policy/AmazonElasticFileSystemClientFullAccess
+EFS_CLIENT_FULL_ACCESS_BUILTIN_POLICY_ARN=arn:${AWS_ARN}:iam::aws:policy/AmazonElasticFileSystemClientFullAccess
 declare -A ROLE_SEEN
 for NODE in $(oc get nodes --selector="${NODE_SELECTOR}" -o jsonpath='{.items[*].metadata.name}'); do
     INSTANCE_PROFILE=$(aws ec2 describe-instances \
