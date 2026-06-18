@@ -18,6 +18,8 @@ export SCRATCH_DIR="<WORKING_DIRECTORY>"
 export CSI_DRIVER_NAMESPACE="openshift-cluster-csi-drivers" 
 export AWS_PAGER="" 
 
+# Uncomment and set this if there is already an EFS storage system in account B
+#export CROSS_ACCOUNT_FS_ID=""
 
 # Configure profiles
 export AWS_ACCOUNT_A="<ACCOUNT_A_NAME>"
@@ -207,10 +209,14 @@ aws ec2 authorize-security-group-ingress \
 
 export AWS_DEFAULT_PROFILE=${AWS_ACCOUNT_B}
 
-CROSS_ACCOUNT_FS_ID=$(aws efs create-file-system --creation-token efs-token-1 \
---region ${AWS_REGION} \
---encrypted | jq -r '.FileSystemId') \
-&& echo $CROSS_ACCOUNT_FS_ID
+# This creates a new EFS file system.....
+if [ -z ${CROSS_ACCOUNT_FS_ID} ]
+then 
+  CROSS_ACCOUNT_FS_ID=$(aws efs create-file-system --creation-token efs-token-1 \
+  --region ${AWS_REGION} \
+  --encrypted | jq -r '.FileSystemId')
+fi
+echo "Cross account FS ID: $CROSS_ACCOUNT_FS_ID"
 
 for SUBNET in $(aws ec2 describe-subnets \
   --filters "Name=vpc-id,Values=${AWS_ACCOUNT_B_VPC_ID}" \
