@@ -1,0 +1,51 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "EC2NodeAndRouteDiscovery",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeInstances",
+                "ec2:DescribeRouteTables"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "VPCPeeringAndRouting",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateVpcPeeringConnection",
+                "ec2:CreateRoute"
+            ],
+            "Resource": [
+                "arn:aws:ec2:*:*:vpc/*",
+                "arn:aws:ec2:*:*:route-table/*",
+                "arn:aws:ec2:*:*:vpc-peering-connection/*"
+            ]
+        },
+        {
+            "Sid": "IAMInstanceProfileModifications",
+            "Effect": "Allow",
+            "Action": [
+                "iam:GetInstanceProfile",
+                "iam:AttachRolePolicy"
+            ],
+            "Resource": [
+                "arn:aws:iam::*:instance-profile/*",
+                "arn:aws:iam::*:role/*"
+            ]
+        },
+        {
+            "Sid": "IAMOperatorPolicyModifications",
+            "Effect": "Allow",
+            "Action": [
+                "iam:PutUserPolicy",
+                "iam:PutRolePolicy"
+            ],
+            "Resource": [
+                "arn:aws:iam::*:user/*",
+                "arn:aws:iam::*:role/*"
+            ]
+        }
+    ]
+}

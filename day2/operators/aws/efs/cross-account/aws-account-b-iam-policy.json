@@ -1,0 +1,47 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "IAMCrossAccountRoleSetup",
+            "Effect": "Allow",
+            "Action": [
+                "iam:CreateRole",
+                "iam:CreatePolicy",
+                "iam:AttachRolePolicy"
+            ],
+            "Resource": [
+                "arn:aws:iam::*:role/*",
+                "arn:aws:iam::*:policy/*"
+            ]
+        },
+        {
+            "Sid": "VPCPeeringAcceptAndRoute",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:AcceptVpcPeeringConnection",
+                "ec2:DescribeRouteTables",
+                "ec2:CreateRoute"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "NetworkSecurityAndSubnetDiscovery",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeSecurityGroups",
+                "ec2:AuthorizeSecurityGroupIngress",
+                "ec2:DescribeSubnets"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "EFSProvisioning",
+            "Effect": "Allow",
+            "Action": [
+                "elasticfilesystem:CreateFileSystem",
+                "elasticfilesystem:CreateMountTarget"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
