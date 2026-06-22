@@ -1,0 +1,12 @@
+apiVersion: mirror.openshift.io/v2alpha1
+kind: ImageSetConfiguration
+mirror:
+  platform:
+    architectures:
+      - "amd64"
+    channels:
+      - name: stable-4.20
+        minVersion: 4.20.0
+        maxVersion: 4.20.0
+    graph: true
+    kubeVirtContainer: true
