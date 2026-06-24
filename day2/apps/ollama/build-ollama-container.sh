@@ -1,16 +1,27 @@
 #!/bin/bash -xe
 
+
+echo "Script is deprecated. See README.md"
+exit 1
+
+
+
 # This script will build an ollama image with models built into it
 # The image can be saved and moved to an offline container registry
 
 podman run -d -p 11434:11434 --name ollama docker.io/ollama/ollama:latest
 
+MODEL="gemma4:latest"
+
+
 # Import granite-code:8b model
-curl -X POST http://127.0.0.1:11434/api/pull -d '{"name": "granite-code:8b"}'
+#curl -X POST http://127.0.0.1:11434/api/pull -d '{"name": "granite-code:8b"}'
 # Import codellama:13b model
 #curl -X POST http://127.0.0.1:11434/api/pull -d '{"name": "codellama:13b"}'
 # Import llama3.2 model
 #curl -X POST http://127.0.0.1:11434/api/pull -d '{"name": "llama3.2"}'
+# Import gemma4
+curl -X POST 'http://127.0.0.1:11434/api/pull' -d  "{\"name\": \"gemma4:latest\"}"
 
 # Save the running container image as a new image
 podman commit ollama quay.io/danclark/ollama:granite-code-8b

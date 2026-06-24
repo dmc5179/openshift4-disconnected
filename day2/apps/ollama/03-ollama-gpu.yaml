@@ -17,7 +17,6 @@ spec:
     spec:
       containers:
       - name: ollama
-        #image: ollama/ollama:latest
         image: quay.io/danclark/ollama:granite-code-8b
         env:
         - name: PATH
