@@ -6,7 +6,7 @@ set -e
 # ==========================================
 # CONFIGURATION VARIABLES (Adjust as needed)
 # ==========================================
-NAMESPACE="monitoring-apps"
+NAMESPACE="openshift-operators"
 OPERATOR_CHANNEL="v5" # Adjust based on the latest Grafana Operator version available
 CLUSTER_DOMAIN=$(oc get ingresses.config.openshift.io cluster -o jsonpath='{.spec.domain}')
 API_URL=$(oc whoami --show-server)
@@ -28,22 +28,16 @@ oc create namespace "${NAMESPACE}" --dry-run=client -o yaml | oc apply -f -
 # --------------------------------------------------
 echo "📦 Installing Grafana Operator via OperatorHub..."
 cat <<EOF | oc apply -f -
-apiVersion: ://coreos.com
-kind: OperatorGroup
-metadata:
-  name: grafana-operator-group
-  namespace: ${NAMESPACE}
-spec:
-  targetNamespaces:
-  - ${NAMESPACE}
----
-apiVersion: ://coreos.comalpha1
+apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
+  labels:
+    operators.coreos.com/grafana-operator.openshift-operators: ""
   name: grafana-operator
-  namespace: ${NAMESPACE}
+  namespace: openshift-operators
 spec:
-  channel: ${OPERATOR_CHANNEL}
+  channel: v5
+  installPlanApproval: Automatic
   name: grafana-operator
   source: community-operators
   sourceNamespace: openshift-marketplace
@@ -58,7 +52,7 @@ oc wait --namespace="${NAMESPACE}" \
 sleep 15
 oc wait --namespace="${NAMESPACE}" \
   --for=condition=Available \
-  deployment/grafana-operator-controller-manager --timeout=120s
+  deployment/grafana-operator-controller-manager-v5 --timeout=120s
 
 # --------------------------------------------------
 # Step 3: Register Grafana as an OAuth Client
@@ -125,9 +119,19 @@ spec:
       auth_url: "https://oauth-openshift.apps.${CLUSTER_DOMAIN}/oauth/authorize"
       token_url: "https://oauth-openshift.apps.${CLUSTER_DOMAIN}/oauth/token"
       api_url: "${API_URL}/apis/user.openshift.io/v1/users/~"
-      role_attribute_path: "contains(groups, 'cluster-admins') && 'Admin' || contains(groups, 'dev-lead') && 'Editor' || 'Viewer'"
-      groups_attribute_path: "groups"
+      # 1. Map OpenShift Groups to Specific Grafana Organizations
+      org_attribute_path: "contains(groups, 'ocp-finance-group') && 'Finance Org' || contains(groups, 'ocp-engineering-group') && 'Engineering Org' || 'Main Org'"
+      # 2. Map OpenShift Roles/Groups inside those assigned Organizations
+      role_attribute_path: "contains(groups, 'cluster-admins') && 'Admin' || contains(groups, 'ocp-leads-group') && 'Editor' || 'Viewer'"
 EOF
+
+#       groups_attribute_path: "groups"
+#      role_attribute_path: "contains(groups, 'cluster-admins') && 'Admin' || contains(groups, 'dev-lead') && 'Editor' || 'Viewer'"
+
+echo "Waiting for grafana deployment to become ready"
+oc wait --namespace="${NAMESPACE}" \
+  --for=condition=Available \
+  deployment/grafana-oss-deployment --timeout=120s
 
 # --------------------------------------------------
 # Step 5: Expose the Grafana Route explicitly
@@ -135,11 +139,24 @@ EOF
 echo "🌐 Ensuring the Route matches the OAuth redirect reference name..."
 # The operator dynamically builds the route name based on ingress definitions, let's patch/verify its name
 # Force create/override the exact route name the OAuth client expects
-oc create route edge grafana-route \
-  --service=grafana-oss-service \
-  --port=grafana-http \
-  --hostname="grafana-route-${NAMESPACE}.apps.${CLUSTER_DOMAIN}" \
-  -n "${NAMESPACE}" --dry-run=client -o yaml | oc apply -f -
+cat <<EOF | oc apply -f -
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: grafana-route
+  namespace: openshift-operators
+spec:
+  to:
+    kind: Service
+    name: grafana-oss-service
+    weight: 100
+  port:
+    targetPort: grafana
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+EOF
 
 echo "===================================================="
 echo "✅ Deployment Successful!"
