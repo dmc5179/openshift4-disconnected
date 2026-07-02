@@ -1,0 +1,10 @@
+apiVersion: che.eclipse.org/v1alpha1
+kind: KubernetesImagePuller
+metadata:
+  name: image-puller
+  namespace: openshift-operators
+spec:
+  daemonsetName: k8s-image-puller
+  nodeSelector: '{"feature.node.kubernetes.io/pci-10de.present": "true"}' # This NFD label signifies a PCI device with Vendor ID 10de (NVIDIA) is present
+  images: |
+    modelcar-gemma-2=registry.redhat.io/rhelai1/modelcar-gemma-2-9b-it:1.5
