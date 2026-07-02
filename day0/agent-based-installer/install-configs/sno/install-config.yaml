@@ -1,6 +1,18 @@
 apiVersion: v1
 additionalTrustBundlePolicy: Always
 baseDomain: danclark.io
+proxy:
+  # Note: In some cases the same proxy endpoint like http(s)://theproxy, will be used for both http and https even though the protocols do not match.
+  httpProxy: http://<username>:<pswd>@<ip>:<port>
+  httpsProxy: https://<username>:<pswd>@<ip>:<port>
+  # noProxy below is example of what MUST be included. Some proxies will have more like api.<cluster-name>.<base-domain> or .apps.<cluster-name>.<base-domain>
+  #         may also need to include the external container registry so pull/push does not go through the proxy
+  noProxy: 127.0.0.1,localhost,.svc,.cluster.local,api-int.<cluster-name>.<base-domain>,172.30.0.0/16,10.128.0.0/14,<machine network CIDR>
+  #readinessEndpoints:          # Not all proxies will have readiness endpoints
+  #  - http://www.google.com
+  #  - https://www.google.com
+  #trustedCA:                   # This is used when editing the proxy/cluster object directly post installation
+  #  name: user-ca-bundle
 compute:
 - architecture: amd64
   hyperthreading: Enabled
@@ -23,8 +35,8 @@ networking:
   - 172.30.0.0/16
 platform:
   none: {}
-BootstrapInPlace:
-  InstallationDisk: /dev/sda
+#BootstrapInPlace:
+#  InstallationDisk: /dev/sda
 publish: External
 fips: false
 pullSecret: ''
