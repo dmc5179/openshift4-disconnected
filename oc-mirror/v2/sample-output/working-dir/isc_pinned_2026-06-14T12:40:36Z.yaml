@@ -1,0 +1,16 @@
+apiVersion: mirror.openshift.io/v2alpha1
+kind: ImageSetConfiguration
+mirror:
+  operators:
+  - catalog: quay.io/danclark/redhat-operator-index@sha256:a50a0f4fedc465647461f5d2ec9f2c4189b7b49372fbf8c012a434447cfd1c3c
+    packages:
+    - name: cincinnati-operator
+    - name: quay-operator
+    - name: quay-bridge-operator
+    - name: cluster-logging
+    - name: compliance-operator
+    - name: sandboxed-containers-operator
+    - name: trustee-operator
+    - name: local-storage-operator
+    - name: nfd
+    targetTag: v4.21
