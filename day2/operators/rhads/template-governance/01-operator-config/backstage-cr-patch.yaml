@@ -1,0 +1,31 @@
+# Backstage CR patch — mounts app-config and RBAC policy into the RHDH instance.
+# Apply with: oc apply -f backstage-cr-patch.yaml -n rhdh-operator
+#
+# If you already have a Backstage CR, merge these fields into it.
+# See: https://access.redhat.com/documentation/en-us/red_hat_developer_hub/
+apiVersion: rhdh.redhat.com/v1alpha3
+kind: Backstage
+metadata:
+  name: developer-hub
+  namespace: rhdh-operator  # Change to your RHDH namespace
+spec:
+  application:
+    appConfig:
+      configMaps:
+        - name: app-config-rhdh
+    extraFiles:
+      configMaps:
+        - name: rbac-policy
+    extraEnvs:
+      secrets:
+        - name: rhdh-secrets  # Must contain GITHUB_TOKEN (and/or GITLAB_TOKEN)
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rbac-policy
+  namespace: rhdh-operator
+data:
+  rbac-policy.csv: |
+    # This file is generated from 01-operator-config/rbac-policy.csv.
+    # Use the apply.sh script to create it from the source CSV.

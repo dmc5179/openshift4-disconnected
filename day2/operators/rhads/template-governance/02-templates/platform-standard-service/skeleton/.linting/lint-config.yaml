@@ -1,0 +1,20 @@
+# Platform-mandated linting rules.
+# This file is injected by the platform template and must not be removed.
+linting:
+  enabled: true
+  rules:
+    dockerfile:
+      tool: hadolint
+      severity: warning
+    yaml:
+      tool: yamllint
+      config:
+        extends: default
+        rules:
+          line-length:
+            max: 120
+          truthy:
+            allowed-values: ['true', 'false', 'yes', 'no']
+    shell:
+      tool: shellcheck
+      severity: warning

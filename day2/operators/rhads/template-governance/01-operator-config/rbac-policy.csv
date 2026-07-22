@@ -1,0 +1,72 @@
+# =====================================================================
+# RHDH RBAC Policy — Platform Template Governance
+# =====================================================================
+# Format: p, <role>, <permission>, <policy>, <effect>
+#          g, <user-or-group>, <role>
+#
+# This file is mounted into RHDH via the Backstage CR and referenced
+# by permission.rbac.policies-csv-file in app-config-rhdh.yaml.
+# =====================================================================
+
+# ---------------------------------------------------------------------
+# Role: platform-engineers — full template and catalog management
+# ---------------------------------------------------------------------
+# Catalog: full CRUD
+p, role:default/platform-engineers, catalog.entity.read, read, allow
+p, role:default/platform-engineers, catalog.entity.create, create, allow
+p, role:default/platform-engineers, catalog.entity.delete, delete, allow
+p, role:default/platform-engineers, catalog.entity.refresh, update, allow
+p, role:default/platform-engineers, catalog.location.read, read, allow
+p, role:default/platform-engineers, catalog.location.create, create, allow
+p, role:default/platform-engineers, catalog.location.delete, delete, allow
+
+# Scaffolder: full access (execute templates, read params and steps)
+p, role:default/platform-engineers, scaffolder.action.execute, use, allow
+p, role:default/platform-engineers, scaffolder.template.parameter.read, read, allow
+p, role:default/platform-engineers, scaffolder.template.step.read, read, allow
+
+# RBAC: manage roles and policies
+p, role:default/platform-engineers, policy-entity, read, allow
+p, role:default/platform-engineers, policy-entity, create, allow
+p, role:default/platform-engineers, policy-entity, update, allow
+p, role:default/platform-engineers, policy-entity, delete, allow
+
+# ---------------------------------------------------------------------
+# Role: developers — can USE templates, CANNOT register or modify them
+# ---------------------------------------------------------------------
+# Catalog: read + create entities (from template output), no location management
+p, role:default/developers, catalog.entity.read, read, allow
+p, role:default/developers, catalog.entity.create, create, allow
+p, role:default/developers, catalog.entity.refresh, update, allow
+
+# Scaffolder: execute templates and read their forms, but NOT register new templates
+p, role:default/developers, scaffolder.action.execute, use, allow
+p, role:default/developers, scaffolder.template.parameter.read, read, allow
+p, role:default/developers, scaffolder.template.step.read, read, allow
+
+# DENY: developers cannot register catalog locations (prevents adding rogue templates)
+# Omitting catalog.location.create is sufficient — RBAC defaults to deny.
+
+# ---------------------------------------------------------------------
+# Role: viewers — read-only access (optional, for stakeholders)
+# ---------------------------------------------------------------------
+p, role:default/viewers, catalog.entity.read, read, allow
+p, role:default/viewers, scaffolder.template.parameter.read, read, allow
+p, role:default/viewers, scaffolder.template.step.read, read, allow
+
+# =====================================================================
+# Group and user assignments
+# =====================================================================
+# Assign your IdP groups/users to roles.
+# Format: g, <user:default/NAME> or <group:default/NAME>, <role>
+
+# Platform engineering team — manages templates
+g, group:default/platform-engineering, role:default/platform-engineers
+
+# Developer teams — consume templates
+g, group:default/developers, role:default/developers
+# g, group:default/team-alpha, role:default/developers
+# g, group:default/team-beta, role:default/developers
+
+# Stakeholders — read-only
+# g, group:default/management, role:default/viewers
