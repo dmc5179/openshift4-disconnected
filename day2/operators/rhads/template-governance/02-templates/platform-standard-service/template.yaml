@@ -1,0 +1,283 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: platform-standard-service
+  title: Standard Service (Platform Approved)
+  description: |
+    Creates a new service with mandatory platform guardrails:
+    security scanning, CI/CD pipeline, code linting, namespace RBAC,
+    and catalog registration. Developers customize through parameters
+    only — all governance steps are enforced and cannot be bypassed.
+  tags:
+    - platform-managed
+    - recommended
+  annotations:
+    backstage.io/managed-by-location: platform-engineering
+spec:
+  owner: group:default/platform-engineering
+  type: service
+
+  # ================================================================
+  # PARAMETERS — what developers CAN customize
+  # ================================================================
+  parameters:
+    # ── Step 1: Service identity ──
+    - title: Service Configuration
+      description: Define your new service. All fields marked * are required.
+      required:
+        - serviceName
+        - description
+        - owner
+      properties:
+        serviceName:
+          title: Service Name
+          type: string
+          description: Unique name (lowercase, hyphens allowed, no spaces)
+          pattern: '^[a-z][a-z0-9-]{2,62}$'
+          ui:autofocus: true
+        description:
+          title: Description
+          type: string
+          description: Short description of the service
+        owner:
+          title: Owner
+          type: string
+          description: Team that owns this service
+          ui:field: OwnerPicker
+          ui:options:
+            catalogFilter:
+              kind: Group
+        lifecycle:
+          title: Lifecycle
+          type: string
+          description: Current lifecycle stage
+          default: experimental
+          enum:
+            - experimental
+            - development
+            - production
+
+    # ── Step 2: Repository location ──
+    - title: Repository Location
+      required:
+        - repoUrl
+      properties:
+        gitProvider:
+          title: Git Provider
+          type: string
+          description: Where to create the repository
+          default: github
+          enum:
+            - github
+            - gitlab
+          enumNames:
+            - GitHub
+            - GitLab
+        repoUrl:
+          title: Repository URL
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+              - gitlab.com
+              # Add your internal GitLab host here:
+              # - gitlab.<DOMAIN>
+
+    # ── Step 3: Optional features (developer choice) ──
+    - title: Optional Features
+      description: Select additional capabilities for your service.
+      properties:
+        enableDatabase:
+          title: Include database setup (PostgreSQL)
+          type: boolean
+          default: false
+        enableMonitoring:
+          title: Include Prometheus/Grafana monitoring
+          type: boolean
+          default: true
+        enableIngress:
+          title: Include OpenShift Route / Ingress
+          type: boolean
+          default: true
+        openshiftNamespace:
+          title: Target OpenShift Namespace
+          type: string
+          description: Namespace for deployment (leave blank for auto-generated)
+
+  # ================================================================
+  # STEPS — what developers CANNOT modify or bypass
+  # ================================================================
+  # Steps execute server-side in order. Developers never see or edit
+  # this section. Steps without an `if` condition are ALWAYS mandatory.
+  # ================================================================
+  steps:
+    # ──────────────────────────────────────────────
+    # MANDATORY: Fetch platform-approved skeleton
+    # ──────────────────────────────────────────────
+    - id: fetch-skeleton
+      name: Fetch Platform Skeleton
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          serviceName: ${{ parameters.serviceName }}
+          description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }}
+          lifecycle: ${{ parameters.lifecycle }}
+          enableDatabase: ${{ parameters.enableDatabase }}
+          enableMonitoring: ${{ parameters.enableMonitoring }}
+          enableIngress: ${{ parameters.enableIngress }}
+          namespace: ${{ parameters.openshiftNamespace }}
+
+    # ──────────────────────────────────────────────
+    # MANDATORY: Inject security scanning config
+    # ──────────────────────────────────────────────
+    - id: inject-security
+      name: Apply Security Scanning Configuration
+      action: fetch:plain
+      input:
+        targetPath: ./.security
+        url: ./skeleton/.security
+
+    # ──────────────────────────────────────────────
+    # MANDATORY: Inject code linting configuration
+    # ──────────────────────────────────────────────
+    - id: inject-linting
+      name: Apply Code Linting Standards
+      action: fetch:plain
+      input:
+        targetPath: ./.linting
+        url: ./skeleton/.linting
+
+    # ──────────────────────────────────────────────
+    # MANDATORY: Inject GitHub CI/CD pipeline
+    # ──────────────────────────────────────────────
+    - id: inject-github-ci
+      name: Apply GitHub Actions CI/CD Pipeline
+      if: ${{ parameters.gitProvider === "github" }}
+      action: fetch:template
+      input:
+        url: ./skeleton/.github
+        targetPath: ./.github
+        values:
+          serviceName: ${{ parameters.serviceName }}
+
+    # ──────────────────────────────────────────────
+    # MANDATORY: Inject GitLab CI/CD pipeline
+    # ──────────────────────────────────────────────
+    - id: inject-gitlab-ci
+      name: Apply GitLab CI Pipeline
+      if: ${{ parameters.gitProvider === "gitlab" }}
+      action: fetch:template
+      input:
+        url: ./skeleton/.gitlab
+        targetPath: ./
+        values:
+          serviceName: ${{ parameters.serviceName }}
+
+    # ──────────────────────────────────────────────
+    # MANDATORY: Inject namespace RBAC manifests
+    # ──────────────────────────────────────────────
+    - id: inject-namespace-rbac
+      name: Apply Namespace RBAC Manifests
+      action: fetch:template
+      input:
+        url: ./skeleton/deploy/rbac
+        targetPath: ./deploy/rbac
+        values:
+          serviceName: ${{ parameters.serviceName }}
+          owner: ${{ parameters.owner }}
+          namespace: ${{ parameters.openshiftNamespace }}
+
+    # ──────────────────────────────────────────────
+    # OPTIONAL: Database setup (developer toggle)
+    # ──────────────────────────────────────────────
+    - id: inject-database
+      name: Configure PostgreSQL Database
+      if: ${{ parameters.enableDatabase }}
+      action: fetch:template
+      input:
+        url: ./skeleton/deploy/database
+        targetPath: ./deploy/database
+        values:
+          serviceName: ${{ parameters.serviceName }}
+          namespace: ${{ parameters.openshiftNamespace }}
+
+    # ──────────────────────────────────────────────
+    # OPTIONAL: Monitoring setup (developer toggle)
+    # ──────────────────────────────────────────────
+    - id: inject-monitoring
+      name: Configure Prometheus Monitoring
+      if: ${{ parameters.enableMonitoring }}
+      action: fetch:template
+      input:
+        url: ./skeleton/deploy/monitoring
+        targetPath: ./deploy/monitoring
+        values:
+          serviceName: ${{ parameters.serviceName }}
+          namespace: ${{ parameters.openshiftNamespace }}
+
+    # ──────────────────────────────────────────────
+    # OPTIONAL: Ingress / Route (developer toggle)
+    # ──────────────────────────────────────────────
+    - id: inject-ingress
+      name: Configure OpenShift Route
+      if: ${{ parameters.enableIngress }}
+      action: fetch:template
+      input:
+        url: ./skeleton/deploy/ingress
+        targetPath: ./deploy/ingress
+        values:
+          serviceName: ${{ parameters.serviceName }}
+          namespace: ${{ parameters.openshiftNamespace }}
+
+    # ──────────────────────────────────────────────
+    # MANDATORY: Publish to GitHub
+    # ──────────────────────────────────────────────
+    - id: publish-github
+      name: Publish to GitHub
+      if: ${{ parameters.gitProvider === "github" }}
+      action: publish:github
+      input:
+        allowedHosts: ['github.com']
+        description: "${{ parameters.serviceName }} — ${{ parameters.description }}"
+        repoUrl: ${{ parameters.repoUrl }}
+        defaultBranch: main
+        protectDefaultBranch: true
+        repoVisibility: internal
+
+    # ──────────────────────────────────────────────
+    # MANDATORY: Publish to GitLab
+    # ──────────────────────────────────────────────
+    - id: publish-gitlab
+      name: Publish to GitLab
+      if: ${{ parameters.gitProvider === "gitlab" }}
+      action: publish:gitlab
+      input:
+        allowedHosts: ['gitlab.com']
+        description: "${{ parameters.serviceName }} — ${{ parameters.description }}"
+        repoUrl: ${{ parameters.repoUrl }}
+        defaultBranch: main
+        repoVisibility: internal
+
+    # ──────────────────────────────────────────────
+    # MANDATORY: Register in Software Catalog
+    # ──────────────────────────────────────────────
+    - id: register
+      name: Register in Software Catalog
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish-github'].output.repoContentsUrl or steps['publish-gitlab'].output.repoContentsUrl }}
+        catalogInfoPath: /catalog-info.yaml
+
+  # ================================================================
+  # OUTPUT — links shown to developer after completion
+  # ================================================================
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps['publish-github'].output.remoteUrl or steps['publish-gitlab'].output.remoteUrl }}
+      - title: Open in Catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}

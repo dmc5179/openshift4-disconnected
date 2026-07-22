@@ -1,0 +1,63 @@
+# Platform-mandated CI/CD pipeline — GitHub Actions.
+# Injected by the platform template. Do not remove required jobs.
+name: ${{ values.serviceName }} CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # MANDATORY: Lint check
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run YAML lint
+        run: yamllint .
+      - name: Run Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+
+  # MANDATORY: Security scan
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Gitleaks secret scan
+        uses: gitleaks/gitleaks-action@v2
+      - name: Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          severity: CRITICAL,HIGH
+          exit-code: 1
+
+  # MANDATORY: Build and push image
+  build:
+    name: Build
+    needs: [lint, security-scan]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build container image
+        run: make docker-build
+      # - name: Push container image
+      #   run: make docker-push
+
+  # MANDATORY: Deploy (on main branch only)
+  deploy:
+    name: Deploy
+    needs: [build]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to OpenShift
+        run: |
+          echo "Deploy step — configure with your cluster credentials"
+          # oc apply -k deploy/

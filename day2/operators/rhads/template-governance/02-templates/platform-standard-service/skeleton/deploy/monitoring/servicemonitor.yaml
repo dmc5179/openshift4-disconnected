@@ -1,0 +1,18 @@
+# Optional Prometheus ServiceMonitor.
+# Included when developer enables the monitoring toggle.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ${{ values.serviceName }}
+  namespace: {% if values.namespace %}${{ values.namespace }}{% else %}${{ values.serviceName }}{% endif %}
+  labels:
+    app.kubernetes.io/name: ${{ values.serviceName }}
+    app.kubernetes.io/part-of: ${{ values.serviceName }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ${{ values.serviceName }}
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s

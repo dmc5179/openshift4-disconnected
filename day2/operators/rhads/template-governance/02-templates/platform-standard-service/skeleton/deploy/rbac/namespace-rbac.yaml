@@ -1,0 +1,47 @@
+# Platform-mandated namespace RBAC.
+# Grants the owning team edit access and restricts privilege escalation.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {% if values.namespace %}${{ values.namespace }}{% else %}${{ values.serviceName }}{% endif %}
+  labels:
+    app.kubernetes.io/managed-by: platform-template
+    app.kubernetes.io/part-of: ${{ values.serviceName }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ${{ values.serviceName }}-edit
+  namespace: {% if values.namespace %}${{ values.namespace }}{% else %}${{ values.serviceName }}{% endif %}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: edit
+subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: Group
+    name: ${{ values.owner }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: {% if values.namespace %}${{ values.namespace }}{% else %}${{ values.serviceName }}{% endif %}
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-same-namespace
+  namespace: {% if values.namespace %}${{ values.namespace }}{% else %}${{ values.serviceName }}{% endif %}
+spec:
+  podSelector: {}
+  ingress:
+    - from:
+        - podSelector: {}
+  policyTypes:
+    - Ingress

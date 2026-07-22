@@ -1,0 +1,11 @@
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: platform-templates
+  description: Platform engineering managed software templates
+spec:
+  targets:
+    - ./platform-standard-service/template.yaml
+    # Add more templates here as needed:
+    # - ./platform-frontend-app/template.yaml
+    # - ./platform-data-pipeline/template.yaml

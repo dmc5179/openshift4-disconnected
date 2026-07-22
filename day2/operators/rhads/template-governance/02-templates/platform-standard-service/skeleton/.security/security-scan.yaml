@@ -1,0 +1,21 @@
+# Platform-mandated security scanning configuration.
+# This file is injected by the platform template and must not be removed.
+# Contact the platform engineering team for exceptions.
+security:
+  scanning:
+    enabled: true
+    tools:
+      - name: trivy
+        config:
+          severity: CRITICAL,HIGH
+          exit-code: 1
+          ignore-unfixed: false
+      - name: gitleaks
+        config:
+          enabled: true
+          report-format: json
+    policies:
+      block-on-critical: true
+      max-high-vulnerabilities: 0
+      require-sbom: true
+      sbom-format: cyclonedx

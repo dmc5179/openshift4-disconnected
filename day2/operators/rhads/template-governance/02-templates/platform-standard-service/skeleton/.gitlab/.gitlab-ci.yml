@@ -1,0 +1,56 @@
+# Platform-mandated CI/CD pipeline — GitLab CI.
+# Injected by the platform template. Do not remove required stages.
+
+stages:
+  - lint
+  - security
+  - build
+  - deploy
+
+variables:
+  SERVICE_NAME: ${{ values.serviceName }}
+
+# MANDATORY: Lint check
+lint:
+  stage: lint
+  image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+  script:
+    - echo "Running linters for ${SERVICE_NAME}"
+    # - yamllint .
+    # - hadolint Dockerfile
+
+# MANDATORY: Security scan
+gitleaks:
+  stage: security
+  image: zricethezav/gitleaks:latest
+  script:
+    - gitleaks detect --source . --report-format json
+
+trivy-scan:
+  stage: security
+  image: aquasec/trivy:latest
+  script:
+    - trivy fs --severity CRITICAL,HIGH --exit-code 1 .
+
+# MANDATORY: Build
+build-image:
+  stage: build
+  image: quay.io/buildah/stable:latest
+  script:
+    - buildah bud -t ${SERVICE_NAME}:${CI_COMMIT_SHORT_SHA} .
+  needs:
+    - lint
+    - gitleaks
+    - trivy-scan
+
+# MANDATORY: Deploy (main branch only)
+deploy:
+  stage: deploy
+  image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+  script:
+    - echo "Deploy step — configure with your cluster credentials"
+    # - oc apply -k deploy/
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  needs:
+    - build-image

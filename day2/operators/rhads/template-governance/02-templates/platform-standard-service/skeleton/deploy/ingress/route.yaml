@@ -1,0 +1,20 @@
+# Optional OpenShift Route.
+# Included when developer enables the ingress toggle.
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: ${{ values.serviceName }}
+  namespace: {% if values.namespace %}${{ values.namespace }}{% else %}${{ values.serviceName }}{% endif %}
+  labels:
+    app.kubernetes.io/name: ${{ values.serviceName }}
+    app.kubernetes.io/part-of: ${{ values.serviceName }}
+spec:
+  to:
+    kind: Service
+    name: ${{ values.serviceName }}
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

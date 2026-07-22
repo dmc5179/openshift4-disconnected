@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config-rhdh
+  namespace: rhdh-operator  # Change to your RHDH namespace
+data:
+  app-config-rhdh.yaml: |
+    app:
+      title: Red Hat Developer Hub
+      baseUrl: https://backstage-developer-hub-rhdh-operator.apps.<CLUSTER_DOMAIN>
+
+    backend:
+      baseUrl: https://backstage-developer-hub-rhdh-operator.apps.<CLUSTER_DOMAIN>
+      cors:
+        origin: https://backstage-developer-hub-rhdh-operator.apps.<CLUSTER_DOMAIN>
+
+    # ──────────────────────────────────────────────
+    # Authentication — adjust to your IdP
+    # ──────────────────────────────────────────────
+    # auth:
+    #   environment: production
+    #   providers:
+    #     oidc:
+    #       production:
+    #         metadataUrl: https://<KEYCLOAK_HOST>/realms/<REALM>/.well-known/openid-configuration
+    #         clientId: ${RHDH_OIDC_CLIENT_ID}
+    #         clientSecret: ${RHDH_OIDC_CLIENT_SECRET}
+    #         prompt: auto
+
+    # ──────────────────────────────────────────────
+    # Permission & RBAC — enforces template governance
+    # ──────────────────────────────────────────────
+    permission:
+      enabled: true
+      rbac:
+        admin:
+          users:
+            - name: user:default/platform-admin  # Change to your admin user
+        policies-csv-file: /opt/app-root/src/rbac-policy.csv
+        pluginsWithPermission:
+          - catalog
+          - scaffolder
+          - permission
+
+    # ──────────────────────────────────────────────
+    # Catalog — register platform-owned templates
+    # ──────────────────────────────────────────────
+    catalog:
+      rules:
+        - allow: [Component, System, API, Resource, Location, Template]
+      locations:
+        # GitHub template source
+        - type: url
+          target: https://github.com/<ORG>/platform-templates/blob/main/02-templates/catalog.yaml
+          rules:
+            - allow: [Template]
+
+        # -- OR -- GitLab template source (uncomment one)
+        # - type: url
+        #   target: https://gitlab.<DOMAIN>/<GROUP>/platform-templates/-/blob/main/02-templates/catalog.yaml
+        #   rules:
+        #     - allow: [Template]
+
+    # ──────────────────────────────────────────────
+    # Integrations — credentials for template actions
+    # ──────────────────────────────────────────────
+    integrations:
+      github:
+        - host: github.com
+          token: ${GITHUB_TOKEN}
+      # gitlab:
+      #   - host: gitlab.<DOMAIN>
+      #     token: ${GITLAB_TOKEN}
