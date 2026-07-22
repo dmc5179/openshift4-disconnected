@@ -4,6 +4,8 @@
 
 ## Mirroring images from Red Hat to disk
 
+IMPORTANT: Each oc-mirror mirror-to-disk MUST use its own cache dir. Use a separate port as well if intending to run multiple oc-mirror mirror-to-disk commands at the same time
+
 ### Example that separates into OCP release, redhat operators, and certified operator`
 ```console
 umask 0022
@@ -18,11 +20,13 @@ mkdir openshift/mirror || true
 mkdir redhat-operators/mirror || true
 mkdir certified-operators/mirror || true
 
-oc-mirror --v2 --authfile "${AUTH_FILE}" --cache-dir "${HOME}" --config "${TOP_DIR}/openshift/imageset-config-openshift-release.yaml" "file://${TOP_DIR}/openshift/mirror"
+mkdir ${HOME}/.oc-mirror/ocp-release ${HOME}/.oc-mirror/redhat-operators ${HOME}/.oc-mirror/certified-operators
 
-oc-mirror --v2 --authfile "${AUTH_FILE}" --cache-dir "${HOME}" --config "${TOP_DIR}/redhat-operators/imageset-config-redhat-operator-index.yaml" "file://${TOP_DIR}/redhat-operators/mirror"
+oc-mirror --v2 --authfile "${AUTH_FILE}" --cache-dir "${HOME}/.oc-mirror/ocp-release" --config "${TOP_DIR}/openshift/imageset-config-openshift-release.yaml" "file://${TOP_DIR}/openshift/mirror"
 
-oc-mirror --v2 --authfile "${AUTH_FILE}" --cache-dir "${HOME}" --config "${TOP_DIR}/certified-operators/imageset-config-certified-operator-index.yaml" "file://${TOP_DIR}/certified-operators/mirror"
+oc-mirror --v2 --authfile "${AUTH_FILE}" --cache-dir "${HOME}/.oc-mirror/redhat-operators" --config "${TOP_DIR}/redhat-operators/imageset-config-redhat-operator-index.yaml" "file://${TOP_DIR}/redhat-operators/mirror"
+
+oc-mirror --v2 --authfile "${AUTH_FILE}" --cache-dir "${HOME}/.oc-mirror/certified-operators" --config "${TOP_DIR}/certified-operators/imageset-config-certified-operator-index.yaml" "file://${TOP_DIR}/certified-operators/mirror"
 ```
 
 ### Example for a single operator
@@ -35,7 +39,7 @@ TOP_DIR=$(pwd)
 
 mkdir -p operators/rhacs/mirror || true
 
-oc-mirror --v2 --authfile "${AUTH_FILE}" --cache-dir "${HOME}" --config "${TOP_DIR}/operators/rhacs/imageset-config-rhacs.yaml" "file://${TOP_DIR}/operators/rhacs/mirror"
+oc-mirror --v2 --authfile "${AUTH_FILE}" --cache-dir "${HOME}/.oc-mirror/rhcas-operator" --config "${TOP_DIR}/operators/rhacs/imageset-config-rhacs.yaml" "file://${TOP_DIR}/operators/rhacs/mirror"
 ```
 
 ## Mirroring images from disk to private container registry
@@ -67,13 +71,14 @@ OC_MIRROR_CACHE_DIR="${HOME}"    # Location where oc-mirror will cache container
 
 REGISTRY_URI="myregistry.com:8443" # Include only the hostname and port number. Do not include the protocol like docker:// or https://
 
+mkdir ${HOME}/.oc-mirror/ocp-release ${HOME}/.oc-mirror/redhat-operators ${HOME}/.oc-mirror/certified-operators
 
-oc-mirror --v2 --authfile "${AUTH_FILE}" --cache-dir "${HOME}" --config "${TOP_DIR}/openshift/imageset-config-openshift-release.yaml" --from "file://${TOP_DIR}/openshift/mirror" "docker://${REGISTRY_URI}"
+oc-mirror --v2 --authfile "${AUTH_FILE}" --cache-dir "${HOME}/.oc-mirror/ocp-release" --config "${TOP_DIR}/openshift/imageset-config-openshift-release.yaml" --from "file://${TOP_DIR}/openshift/mirror" "docker://${REGISTRY_URI}"
 
-oc-mirror --v2 --authfile "${AUTH_FILE}" --cache-dir "${HOME}" --config "${TOP_DIR}/redhat-operators/imageset-config-redhat-operator-index.yaml" --from "file://${TOP_DIR}/redhat-operators/mirror" "docker://${REGISTRY_URI}"
+oc-mirror --v2 --authfile "${AUTH_FILE}" --cache-dir "${HOME}/.oc-mirror/redhat-operators" --config "${TOP_DIR}/redhat-operators/imageset-config-redhat-operator-index.yaml" --from "file://${TOP_DIR}/redhat-operators/mirror" "docker://${REGISTRY_URI}"
 
-oc-mirror --v2 --authfile "${AUTH_FILE}" --cache-dir "${HOME}" --config "${TOP_DIR}/certified-operators/imageset-config-certified-operator-index.yaml" --from "file://${TOP_DIR}/certified-operators/mirror" "docker://${REGISTRY_URI}"
+oc-mirror --v2 --authfile "${AUTH_FILE}" --cache-dir "${HOME}/.oc-mirror/certified-operators" --config "${TOP_DIR}/certified-operators/imageset-config-certified-operator-index.yaml" --from "file://${TOP_DIR}/certified-operators/mirror" "docker://${REGISTRY_URI}"
 
-oc-mirror --v2 --authfile "${AUTH_FILE}" --cache-dir "${HOME}" --config "${TOP_DIR}/operators/rhacs/imageset-config-rhacs.yaml" --from "file://${TOP_DIR}/operators/rhacs/mirror" "docker://${REGISTRY_URI}"
+oc-mirror --v2 --authfile "${AUTH_FILE}" --cache-dir "${HOME}/.oc-mirror/rhcas-operator" --config "${TOP_DIR}/operators/rhacs/imageset-config-rhacs.yaml" --from "file://${TOP_DIR}/operators/rhacs/mirror" "docker://${REGISTRY_URI}"
 
 ```
