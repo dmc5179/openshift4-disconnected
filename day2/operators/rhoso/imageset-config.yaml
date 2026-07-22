@@ -1,0 +1,40 @@
+kind: ImageSetConfiguration
+apiVersion: mirror.openshift.io/v2alpha1
+mirror:
+  platform:
+    channels:
+    - name: stable-4.18
+      type: ocp
+    graph: true
+  operators:
+    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.18
+      packages:
+       - name: openstack-operator
+         channels:
+         - name: stable-v1.0
+           minVersion: "1.0.19"
+           maxVersion: "1.18.0"
+       - name: kubernetes-nmstate-operator
+         #defaultChannel: stable
+       - name: openshift-cert-manager-operator
+         #defaultChannel: stable-v1
+       - name: metallb-operator
+         #defaultChannel: stable
+       - name: local-storage-operator
+       - name: lvms-operator
+         #defaultChannel: stable-4.18
+       - name: cluster-observability-operator
+         #defaultChannel: stable
+  additionalImages:
+   - name: registry.redhat.io/ubi8/ubi:latest
+   - name: registry.redhat.io/ubi9/ubi@sha256:20f695d2a91352d4eaa25107535126727b5945bff38ed36a3e59590f495046f0
+   - name: registry.redhat.io/rhceph/rhceph-7-rhel9:latest
+   - name: registry.redhat.io/rhceph/rhceph-haproxy-rhel9:latest
+   - name: registry.redhat.io/rhceph/keepalived-rhel9:latest
+   - name: registry.redhat.io/rhceph/grafana-rhel9:latest
+   - name: registry.redhat.io/openshift4/ose-prometheus-rhel9:latest
+   - name: registry.redhat.io/openshift4/ose-prometheus-node-exporter-rhel9:latest
+   - name: registry.redhat.io/openshift4/ose-prometheus-node-exporter-rhel9@sha256:0bfaebc5edc0b143685790dfdd6557c39469a7119d91cf57c6e1b1bf0782f484
+   - name: registry.redhat.io/openshift4/ose-prometheus-alertmanager-rhel9:latest
+   - name: registry.redhat.io/ubi9/httpd-24@sha256:8fa4069787d2e5cb7b7e8a30dd9cb688b8d66784943fea718c0d9778ad7a8897
+  helm: {}
