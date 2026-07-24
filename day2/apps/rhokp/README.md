@@ -20,19 +20,53 @@ podman run --rm -p 8080:8080 -p 8443:8443 \
 
 ## Deploy the RHOKP to OpenShift
 
-- Update the deployment yaml with your access key. The key will need to be base64 encoded like;
+### Security
+
+The deployment creates a dedicated `rhokp-server` ServiceAccount with:
+
+- **SCC v2 (restricted-v2):** `runAsNonRoot`, `allowPrivilegeEscalation: false`, drops all Linux capabilities, and sets a read-only root filesystem. These settings satisfy the OpenShift `restricted-v2` SCC which is the default for all authenticated service accounts — no custom SCC or RBAC role is required.
+- **Seccomp:** `RuntimeDefault` profile applied at the pod level.
+- **API token:** `automountServiceAccountToken: false` prevents the Kubernetes API token from being mounted into the pod since the application does not need cluster API access.
+
+### Deploy
+
+1. Create a new namespace
 
 ```console
-echo 'key from RHN' | base64 -w 0
+oc new-project rhokp-server
 ```
 
-- Create a new namespace
+2. Deploy RHOKP
+
 ```console
-oc new-project rhokp
+export RHOKP_KEY="RHOKP key from RHN"
+
+envsubst < rhokp-deployment.yaml | oc apply -f -
 ```
 
-- Deploy RHOKP
+3. Verify the deployment rolled out and pods are running under the service account
+
 ```console
-oc create -f rhokp-deployment.yaml
+oc rollout status deployment/rhokp-server -n rhokp-server
+oc get pods -n rhokp-server -o custom-columns='NAME:.metadata.name,SA:.spec.serviceAccountName,STATUS:.status.phase'
 ```
 
+4. Access the route
+
+```console
+oc get route rhokp-server -n rhokp-server -o jsonpath='{.spec.host}'
+```
+
+### Future: Update deployment to limit where the pod can write within its filesystem
+
+The pods will fail to start with a read-only filesystem error when read only FS is set, the application needs additional writable mount points. Determine and add more `emptyDir` volumes as needed:
+
+```yaml
+volumeMounts:
+- name: app-cache
+  mountPath: /path/to/writable/dir
+volumes:
+- name: app-cache
+  emptyDir:
+    sizeLimit: 128Mi
+```
