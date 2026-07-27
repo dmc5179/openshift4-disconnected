@@ -5,30 +5,33 @@ metadata:
 spec:
 #  featureGates:
 #    - MCPServer
-#  mcpServers:
-#  - name: mcp-server-1
-#    url: https://mcp.example.com
-#    timeout: 30
-#    headers:
-#      - name: Authorization
-#        valueFrom:
-#         type: kubernetes
+#  mcpServers:   # Old Format, 1.0.9
+#    - name: my-mcp-server
+#      streamableHTTP:
+#        url: 'http://my-mcp-server.example.svc.cluster.local:8085/mcp'
+#        timeout: 5
+#        enableSSE: false
+#        sseReadTimeout: 10
+#  mcpServers:   # New Format 1.0.10
+#    - name: rhokp-mcp
+#      url: 'http://rhokp-mcp.rhokp-server.svc.cluster.local:8000/mcp'
+#      timeout: 30
   llm:
     providers:
       - credentialsSecretRef:
           name: credentials
         models:
-          - name: "granite-code:8b"
-        name: OpenAI
-        type: rhelai_vllm
-        url: 'http://ollama.ollama.svc.cluster.local/v1'
+          - name: gpt-oss:120b
+        name: my-ollama
+        type: openai
+        url: 'http://ollama.ollama.svc.cluster.local:11434/v1'  # Not sure that this is correct
   ols:
     #rag:
     #  - image: quay.io/<username>/my-byok-image:latest
     #byokRAGOnly: true  # Set true to disable knowledge inside the operator and only use RHOKP
     #storage:
     #  size: 768Mi
-    #  class: gp2-csi
+    #  class: gp3-csi
     #introspectionEnabled: true  # give OpenShift Lightspeed cluster-specific context.
     conversationCache:
       postgres:
@@ -40,8 +43,8 @@ spec:
         #maxMemory: 1024mb
         #maxMemoryPolicy: allkeys-lru
       type: postgres
-    defaultModel: "granite-code:8b"
-    defaultProvider: OpenAI
+    defaultModel: gpt-oss:120b
+    defaultProvider: my-ollama
     deployment:
       console:
         replicas: 1
