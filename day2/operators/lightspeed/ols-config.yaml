@@ -3,8 +3,8 @@ kind: OLSConfig
 metadata:
   name: cluster
 spec:
-#  featureGates:
-#    - MCPServer
+  featureGates:
+    - MCPServer
 #  mcpServers:   # Old Format, 1.0.9
 #    - name: my-mcp-server
 #      streamableHTTP:
@@ -12,10 +12,10 @@ spec:
 #        timeout: 5
 #        enableSSE: false
 #        sseReadTimeout: 10
-#  mcpServers:   # New Format 1.0.10
-#    - name: rhokp-mcp
-#      url: 'http://rhokp-mcp.rhokp-server.svc.cluster.local:8000/mcp'
-#      timeout: 30
+  mcpServers:   # New Format 1.0.10
+    - name: rhokp-mcp
+      url: 'http://rhokp-mcp.rhokp-server.svc.cluster.local:8000/mcp'
+      timeout: 30
   llm:
     providers:
       - credentialsSecretRef:
