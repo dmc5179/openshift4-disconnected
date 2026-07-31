@@ -1,0 +1,99 @@
+# fips-ems-watcher: monitors openshift-ingress router pods and modifies
+# crypto policies to allow TLS 1.2 without EMS on FIPS-enabled clusters.
+#
+# Deploy:
+#   oc apply -f manifests.yaml
+#   oc create configmap fips-ems-watcher-script \
+#     --from-file=watcher.sh=watcher.sh \
+#     -n fips-ems-watcher
+#   oc apply -f deployment.yaml
+#
+# Or use the all-in-one deploy.sh script.
+
+# --- Namespace ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fips-ems-watcher
+  labels:
+    app.kubernetes.io/name: fips-ems-watcher
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
+---
+
+# --- ServiceAccount ---
+# Dedicated SA with no auto-created secrets beyond the projected token.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fips-ems-watcher
+  namespace: fips-ems-watcher
+  labels:
+    app.kubernetes.io/name: fips-ems-watcher
+---
+
+# --- Role (scoped to openshift-ingress only) ---
+# Minimum privileges: read pods + exec into them. Nothing else.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: fips-ems-watcher
+  namespace: openshift-ingress
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+---
+
+# --- RoleBinding (cross-namespace: SA in fips-ems-watcher -> Role in openshift-ingress) ---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: fips-ems-watcher
+  namespace: openshift-ingress
+subjects:
+  - kind: ServiceAccount
+    name: fips-ems-watcher
+    namespace: fips-ems-watcher
+roleRef:
+  kind: Role
+  name: fips-ems-watcher
+  apiGroup: rbac.authorization.k8s.io
+---
+
+# --- NetworkPolicy: allow egress to API server only ---
+# The watcher pod needs to reach the Kubernetes API server and nothing else.
+# Adjust the API server CIDR if yours differs from the default 172.30.0.1/32.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: fips-ems-watcher-egress
+  namespace: fips-ems-watcher
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: fips-ems-watcher
+  policyTypes:
+    - Egress
+    - Ingress
+  # No ingress rules = deny all inbound
+  ingress: []
+  egress:
+    # Allow DNS resolution
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Allow HTTPS to Kubernetes API server (default service CIDR)
+    - to:
+        - ipBlock:
+            cidr: 172.30.0.1/32
+      ports:
+        - protocol: TCP
+          port: 443
