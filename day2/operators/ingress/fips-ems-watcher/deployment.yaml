@@ -1,0 +1,101 @@
+# Deployment for the FIPS EMS watcher.
+# Apply AFTER creating the configmap:
+#   oc create configmap fips-ems-watcher-script \
+#     --from-file=watcher.sh=watcher.sh -n fips-ems-watcher
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fips-ems-watcher
+  namespace: fips-ems-watcher
+  labels:
+    app.kubernetes.io/name: fips-ems-watcher
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: fips-ems-watcher
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: fips-ems-watcher
+    spec:
+      serviceAccountName: fips-ems-watcher
+      automountServiceAccountToken: true
+      terminationGracePeriodSeconds: 10
+
+      containers:
+        - name: watcher
+          # ose-cli provides oc + kubectl + bash + coreutils.
+          # Pin to your cluster's minor version.
+          image: registry.redhat.io/openshift4/ose-cli:v4.22
+          command: ["/bin/bash", "/scripts/watcher.sh"]
+
+          env:
+            - name: WATCH_NAMESPACE
+              value: "openshift-ingress"
+
+            # Label that selects your ingress controller's router pods.
+            # For the default IngressController this is correct as-is.
+            # For a named controller "foo", change the value to "foo".
+            - name: LABEL_SELECTOR
+              value: "ingresscontroller.operator.openshift.io/deployment-ingresscontroller=default"
+
+            # Container name inside the router pod.
+            - name: CONTAINER_NAME
+              value: "router"
+
+            # How often (seconds) to check for unpatched pods.
+            - name: POLL_INTERVAL
+              value: "15"
+
+            # Seconds to wait after watcher startup before first poll.
+            - name: SETTLE_SECONDS
+              value: "5"
+
+            # HAProxy reload command executed inside the router pod.
+            # Replace with your specific nohup reload command.
+            # Default sends USR1 for a graceful re-exec.
+            - name: HAPROXY_RELOAD_CMD
+              value: "kill -USR1 $(cat /var/lib/haproxy/run/haproxy.pid)"
+
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+
+          # The watcher is a poll loop; if the process exits, restart.
+          livenessProbe:
+            exec:
+              command: ["pgrep", "-f", "watcher.sh"]
+            initialDelaySeconds: 10
+            periodSeconds: 30
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+              drop: ["ALL"]
+            seccompProfile:
+              type: RuntimeDefault
+
+      volumes:
+        - name: scripts
+          configMap:
+            name: fips-ems-watcher-script
+            defaultMode: 0555
+        - name: tmp
+          emptyDir:
+            sizeLimit: 10Mi
