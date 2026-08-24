@@ -66,15 +66,15 @@ echo "Step 4: Updating local install-config.yaml..."
 # 1. Update the baseDomain field
 # 2. Clear out the stub subnets array and inject our newly found subnet list
 yq -y -i --arg domain "${BASE_DOMAIN}" '.baseDomain = $domain' "$OUTPUT_FILE"
-yq -y -i '.platform.aws.vpc.subnets = []' "$OUTPUT_FILE"
+yq -y -i '.platform.aws.subnets = []' "$OUTPUT_FILE"
 
-# Append each subnet as a distinct item in the platform.aws.vpc.subnets array
+# Append each subnet as a distinct item in the platform.aws.subnets array
 #for subnet in $ALL_SUBNETS; do
-#    yq eval -i ".platform.aws.vpc.subnets += [\"$subnet\"]" "$OUTPUT_FILE"
+#    yq eval -i ".platform.aws.subnets += [\"$subnet\"]" "$OUTPUT_FILE"
 #done
 
 for subnet in $ALL_SUBNETS; do
-    yq -y -i --arg net "${subnet}" '.platform.aws.vpc.subnets += [$net]' "$OUTPUT_FILE"
+    yq -y -i --arg net "${subnet}" '.platform.aws.subnets += [$net]' "$OUTPUT_FILE"
 done
 
 echo "Success! Modified config saved to $OUTPUT_FILE"
