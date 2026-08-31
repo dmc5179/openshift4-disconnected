@@ -82,6 +82,19 @@ metadata:
 type: kubernetes.io/service-account-token
 EOF
 
+oc create -f <(echo '
+kind: OAuthClient
+apiVersion: oauth.openshift.io/v1
+metadata:
+ name: demo
+secret: "..."
+redirectURIs:
+ - "http://www.example.com/"
+grantMethod: prompt
+')
+
+
+
 # Give OpenShift a second to populate the secret token
 sleep 5
 CLIENT_SECRET=$(oc get secret grafana-oauth-token -n "${NAMESPACE}" -o jsonpath='{.data.token}' | base64 --decode)

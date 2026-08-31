@@ -1,0 +1,11 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: grafanafolder-sample
+  namespace: openshift-operators
+spec:
+  allowCrossNamespaceImport: false
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana-a
+  title: Example Folder
