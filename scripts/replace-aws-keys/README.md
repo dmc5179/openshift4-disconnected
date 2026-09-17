@@ -25,4 +25,5 @@ export AWS_SECRET_ACCESS_KEY=
 
 - Run the script
 ```console
-
+./replace-aws-keys.sh
+```

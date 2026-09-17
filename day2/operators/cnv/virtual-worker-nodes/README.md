@@ -9,6 +9,7 @@ for n in $(oc get nodes --no-headers=true -o custom-columns=NAME:.metadata.name 
 do
   oc label node "${n}" ingress-node=dedicated
 done
+```
 
 - Patch the OpenShift ingress operator to only run on nodes with the label ingress-node:dedicated
 ```console
