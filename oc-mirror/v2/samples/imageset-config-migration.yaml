@@ -1,0 +1,14 @@
+kind: ImageSetConfiguration
+apiVersion: mirror.openshift.io/v1alpha2
+mirror:
+  platform:
+    channels:
+    - name: stable-4.19
+      type: ocp
+    graph: true
+  operators:
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.19
+    packages:
+    - name: cincinnati-operator
+      channels:
+      - name: v1
