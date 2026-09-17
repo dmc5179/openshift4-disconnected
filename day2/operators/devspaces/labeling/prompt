@@ -1,0 +1,9 @@
+You are an OpenShift senior architect.
+
+Setup:
+- OpenShift 4.20
+- OpenShift is connected to Active Directory for Identity Management using the built in OAuth functionality of OpenShift
+
+ Create a mutating webhook that does the following
+- Detects when a new namespace is created by the dev workspaces operator for a user when they launch a dev workspace
+- 

@@ -1,0 +1,12 @@
+kind: Pattern
+apiVersion: gitops.hybrid-cloud-patterns.io/v1alpha1
+metadata:
+  name: pattern-sample
+  namespace: patterns-operator
+spec:
+  clusterGroupName: hub
+  gitSpec:
+    targetRepo: 'https://github.com/validatedpatterns/multicloud-gitops'
+    targetRevision: main
+  multiSourceConfig:
+    enabled: true
