@@ -37,7 +37,7 @@ oc create -f 01-bmh.yaml
 
 - Create a pull secret for the SNO cluster to pull containers
 ```console
-oc create secret generic -n sno1 sno1 --from-file=.dockerconfigjson=/home/danclark/pull-secret --type=kubernetes.io/dockerconfigjson
+oc create secret generic -n sno1 pull-secret --from-file=.dockerconfigjson=/home/danclark/pull-secret --type=kubernetes.io/dockerconfigjson
 ```
 
 - Deploy the new SNO cluster

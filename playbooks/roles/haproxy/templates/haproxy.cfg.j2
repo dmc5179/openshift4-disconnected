@@ -49,6 +49,8 @@ frontend openshift-api-server
 backend openshift-api-server
     balance source
     mode tcp
+    stick-table type ip  size 1m  expire 30m
+    stick on src
     server {{ openshift_bootstrap[0].name | lower }} {{ openshift_bootstrap[0].ip }}:6443 check
 {% for m in openshift_masters %}
     server {{ m.name | lower }} {{ m.ip }}:6443 check

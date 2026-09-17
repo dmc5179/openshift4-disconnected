@@ -10,3 +10,22 @@ skopeo list-tags $REPO | jq -r '.Tags[]' | xargs -I {} sh -c '
     echo "Match found: {}"
   fi
 '
+
+exit 0
+
+# Make it faster
+REPO="docker://docker.io/library/nginx"
+TARGET_DIGEST="sha256:b555f8c64cf4e221"
+
+skopeo list-tags $REPO | jq -r '.Tags[]' | \
+parallel -j 10 "echo -n '{}: ' && skopeo inspect --no-tags $REPO:{} --format '{{.Digest}}'" | \
+grep "$TARGET_DIGEST"
+
+# Use crane instead
+
+REPO="docker://docker.io/library/nginx"
+TARGET_DIGEST="sha256:b555f8c64cf4e221"
+
+crane list-tags $REPO | jq -r '.Tags[]' | \
+parallel -j 10 "echo -n '{}: ' && crane inspect --no-tags $REPO:{} --format '{{.Digest}}'" | \
+grep "$TARGET_DIGEST"

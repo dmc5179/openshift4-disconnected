@@ -47,4 +47,6 @@ days_diff=$((seconds_diff / 86400))
 
 echo "Closest date: $(date -d @${closest_date})"
 
+# Need to look at all the certs listed here to be included in this query to find the right shutdown max time.
+# https://access.redhat.com/solutions/5925951
 

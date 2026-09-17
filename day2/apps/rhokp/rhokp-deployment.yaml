@@ -15,7 +15,7 @@ metadata:
   labels:
     app: rhokp-app
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: rhokp-app

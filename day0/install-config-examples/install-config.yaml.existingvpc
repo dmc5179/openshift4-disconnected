@@ -34,13 +34,13 @@ platform:
   aws:
     region: us-east-2
     vpc:
-      subnets:
-      - subnet-id # private subnet 1
-      - subnet-id # private subnet 2
-      - subnet-id # private subnet 3
-      - subnet-id # public subnet 1
-      - subnet-id # public subnet 2
-      - subnet-id # public subnet 3
+    subnets:
+    - subnet-id # private subnet 1
+    - subnet-id # private subnet 2
+    - subnet-id # private subnet 3
+    - subnet-id # public subnet 1
+    - subnet-id # public subnet 2
+    - subnet-id # public subnet 3
 publish: Internal
 fips: false
 pullSecret: ''

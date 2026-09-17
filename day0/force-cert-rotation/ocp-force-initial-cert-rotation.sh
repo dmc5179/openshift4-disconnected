@@ -15,8 +15,8 @@
 
 NUM_NS=$(oc get namespaces --no-headers=true -o custom-columns=NAME:.metadata.name | wc -l)
 i=1
-for ns in $(oc get namespaces --no-headers=true -o custom-columns=NAME:.metadata.name)
-#for ns in openshift-kube-apiserver openshift-kube-apiserver-operator openshift-kube-controller-manager openshift-kube-controller-manager-operator
+#for ns in $(oc get namespaces --no-headers=true -o custom-columns=NAME:.metadata.name)
+for ns in openshift-kube-apiserver openshift-kube-apiserver-operator openshift-kube-controller-manager openshift-kube-controller-manager-operator
 do
   echo "Checking $ns ${i}/${NUM_NS}"
   for s in $(oc get --no-headers=true secrets -n $ns -o custom-columns=NAME:.metadata.name)
@@ -25,7 +25,7 @@ do
     if oc get -o json -n $ns secret $s | grep -q certificate-not-after
     then
       s_content=$(oc get -o json -n $ns secret $s | jq -c -r '.metadata.annotations."auth.openshift.io/certificate-not-after"')
-      if [[ "${s_content}" =~ "2025-11-05" ]]  # TODO, this date is currently hard coded
+      if [[ "${s_content}" =~ "2025-11-06" ]]  # TODO, this date is currently hard coded
       then
         echo "match: $ns    $s"
         #echo "Deleting: $ns $s"

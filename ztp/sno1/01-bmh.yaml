@@ -1,8 +1,8 @@
 ---
 apiVersion: v1
 data:
-  username: YWRtaW4K
-  password: YWRtaW4K
+  username: cm9vdAo=
+  password: Q0hBTkdFTUU=
 kind: Secret
 metadata:
   annotations:
