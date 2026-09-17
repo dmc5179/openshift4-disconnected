@@ -1,0 +1,3 @@
+
+
+oc create secret generic -n gitlab-system gitlab-oauth2-generic --from-file=provider=oauth2_generic.yaml

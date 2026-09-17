@@ -1,0 +1,9 @@
+kind: OAuthClient
+apiVersion: oauth.openshift.io/v1
+metadata:
+  name: gitlab-oauth-client # client_id when making requests to the namespace routes
+#secret: sha256~Adfler9dfgXDH_Fc7Adfler9dfgXDHFc7 # unique secret for the client used as client_secret, how do I generate this??
+secret: CHANGEME-OAUTH-CLIENT-SECRET
+redirectURIs: #redirect_uri parameter
+  - http://gitlab.apps.ecs.sandbox1248.opentlc.com/users/auth/oauth2_generic/callback
+grantMethod: auto

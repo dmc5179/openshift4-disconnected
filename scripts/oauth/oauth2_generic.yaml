@@ -1,0 +1,26 @@
+name: "oauth2_generic"
+label: "OpenShift" # optional label for login button defaults to "Oauth2 Generic"
+app_id: "gitlab-oauth-client"
+app_secret: "CHANGEME-OAUTH-CLIENT-SECRET"
+args:
+  client_options:
+    #site: "oauth-openshift.apps.ecs.sandbox1248.opentlc.com"
+    #user_info_url: "/oauth2/v1/userinfo"
+    #authorize_url: "/oauth2/v1/authorize"
+    #token_url: "/oauth2/v1/token"
+    site: "https://oauth-openshift.apps.ecs.sandbox1248.opentlc.com"
+    #user_info_url: "https://oauth-openshift.apps.ecs.sandbox1248.opentlc.com/oauth/userinfo"
+    user_info_url: "/oauth/userinfo"
+    #authorize_url: "https://oauth-openshift.apps.ecs.sandbox1248.opentlc.com/oauth/authorize"
+    authorize_url: "/oauth/authorize"
+    #token_url: "https://oauth-openshift.apps.ecs.sandbox1248.opentlc.com/oauth/token"
+    token_url: "/oauth/token"
+  user_response_structure:
+    root_path: []
+    id_path: ["sub"]
+    attributes:
+      email: "email"
+      name: "name"
+  authorize_params:
+    scope: "openid profile email"
+  strategy_class: "OmniAuth::Strategies::OAuth2Generic"
