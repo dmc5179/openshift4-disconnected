@@ -1,0 +1,3 @@
+metadata:
+  labels:
+    custom-kubelet: cpumanager-enabled
