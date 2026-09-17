@@ -1,0 +1,136 @@
+#
+# RHACM Policy to install the Compliance Operator and enforce DISA OpenShift 4 STIG.
+# This file contains the Policy, PlacementBinding, and Placement required
+# to deploy and enforce the compliance baseline across all managed clusters.
+#
+---
+# 1. Policy: Defines the desired state (Operator installation and STIG enforcement)
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+  name: policy-compliance-disa-stig-enforce
+  namespace: default
+  annotations:
+    # Standard annotations for policy visibility and filtering
+    policy.open-cluster-management.io/standards: STIG
+    policy.open-cluster-management.io/categories: System and Communications Protection
+    policy.open-cluster-management.io/controls: CM-6 Configuration Settings
+spec:
+  # Set global remediationAction to 'enforce' to ensure all sub-templates apply changes.
+  remediationAction: enforce
+  # Severity is for reporting purposes
+  severity: high
+  disabled: false
+  policy-templates:
+    
+    # -------------------------------------------------------------------------
+    # TEMPLATE 1: Install the Compliance Operator (Subscription & OperatorGroup)
+    # -------------------------------------------------------------------------
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: install-compliance-operator
+        spec:
+          # Ensure the compliance operator is installed
+          remediationAction: enforce 
+          # We need to ensure the following resources exist in the managed cluster.
+          object-templates:
+            
+            # 1a. Ensure the openshift-compliance namespace exists
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: v1
+                kind: Namespace
+                metadata:
+                  name: openshift-compliance
+
+            # 1b. Create the OperatorGroup in the dedicated namespace
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: operators.coreos.com/v1
+                kind: OperatorGroup
+                metadata:
+                  name: compliance-operator-group
+                  namespace: openshift-compliance
+                spec:
+                  targetNamespaces:
+                  - openshift-compliance
+            
+            # 1c. Create the Subscription for the Compliance Operator
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: operators.coreos.com/v1alpha1
+                kind: Subscription
+                metadata:
+                  name: compliance-operator
+                  namespace: openshift-compliance
+                spec:
+                  channel: release-0.1
+                  installPlanApproval: Automatic
+                  name: compliance-operator
+                  source: redhat-operators
+                  sourceNamespace: openshift-marketplace
+                  # Install the Operator in the 'openshift-compliance' namespace
+                  startingCSV: compliance-operator.0.1.660 # Use a stable starting CSV or omit for latest
+
+    # -------------------------------------------------------------------------
+    # TEMPLATE 2: Enforce the DISA STIG Profile (ScanSettingBinding)
+    # -------------------------------------------------------------------------
+    - objectDefinition:
+        apiVersion: policy.open-cluster-management.io/v1
+        kind: ConfigurationPolicy
+        metadata:
+          name: enforce-disa-stig-scan
+        spec:
+          remediationAction: enforce
+          object-templates:
+            # Ensure the ScanSettingBinding exists to trigger the scan and remediation
+            - complianceType: musthave
+              objectDefinition:
+                apiVersion: compliance.openshift.io/v1alpha1
+                kind: ScanSettingBinding
+                metadata:
+                  # This name is arbitrary but must be unique
+                  name: disa-stig-enforcement
+                  namespace: openshift-compliance
+                # The STIG profiles for OpenShift Platform and Node checks
+                profiles:
+                  - name: ocp4-stig
+                    apiGroup: compliance.openshift.io/v1alpha1
+                  - name: ocp4-stig-node
+                    apiGroup: compliance.openshift.io/v1alpha1
+                scanSettings:
+                  # Use the 'default' ScanSetting object provided by the Compliance Operator
+                  - name: default
+                    apiGroup: compliance.openshift.io/v1alpha1
+---
+# 2. PlacementBinding: Binds the Policy to the Placement
+apiVersion: policy.open-cluster-management.io/v1
+kind: PlacementBinding
+metadata:
+  name: binding-compliance-disa-stig
+  namespace: default
+placementRef:
+  name: placement-all-managed-clusters
+  kind: PlacementRule
+  apiGroup: apps.open-cluster-management.io
+subjects:
+- name: policy-compliance-disa-stig-enforce
+  kind: Policy
+  apiGroup: policy.open-cluster-management.io
+---
+# 3. Placement: Targets all managed clusters (you can adjust the selector if needed)
+# NOTE: Using the older PlacementRule API for wider compatibility
+apiVersion: apps.open-cluster-management.io/v1
+kind: PlacementRule
+metadata:
+  name: placement-all-managed-clusters
+  namespace: default
+spec:
+  clusterSelector:
+    matchLabels:
+      # This empty selector targets ALL clusters managed by the hub.
+      # To target specific clusters, replace this with your environment labels,
+      # e.g., environment: prod
+      '' : ''

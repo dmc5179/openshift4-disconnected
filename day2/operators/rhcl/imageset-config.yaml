@@ -1,0 +1,34 @@
+apiVersion: mirror.openshift.io/v1alpha2
+kind: ImageSetConfiguration
+mirror:
+#  platform:
+#    channels:
+#      - name: stable-4.21
+#        minVersion: 4.21.16
+#        maxVersion: 4.21.16
+#        shortestPath: true
+#    graph: true
+  operators:
+    # Red Hat Operator Index Catalog     
+    #- catalog: registry.redhat.io/redhat/redhat-operator-index:v4.21
+    - catalog: registry.redhat.io/redhat/redhat-operator-index@sha256:d87464a5536381e41a3cd0f0fc4913c4f05fa95ac385302f7cbf913d81876adc
+      packages:
+        # RHOAI - You need to declare a min/max or you will pull multiple version
+        - name: rhcl-operator
+          defaultChannel: stable
+          channels:
+            - name: stable
+              minVersion: 1.3.3
+              maxVersion: 1.3.3
+        - name: servicemeshoperator3
+          defaultChannel: stable
+          channels:
+            - name: stable
+              minVersion: 3.3.3
+              maxVersion: 3.3.3
+        - name: openshift-cert-manager-operator
+          defaultChannel: stable
+          channels:
+            - name: stable-v1
+              minVersion: 1.19.0
+              maxVersion: 1.19.0
