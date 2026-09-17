@@ -1,16 +1,16 @@
 kind: ImageSetConfiguration
 apiVersion: mirror.openshift.io/v2alpha1
-archiveSize: 25
+#archiveSize: 25
 mirror:
   platform:
     channels:
-    - name: stable-4.19
+    - name: stable-4.21
       type: ocp
-      minVersion: 4.19.11
-      maxVersion: 4.19.11
+      minVersion: 4.21.1
+      maxVersion: 4.21.1
     graph: true
   operators:
-  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.19
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.21
     packages:
     - name: cincinnati-operator
       channels:

@@ -3,6 +3,8 @@ kind: ImageSetConfiguration
 archiveSize: 400
 mirror:
   platform:
+    architectures:
+      - "amd64"
     channels:
       - name: stable-4.21
         minVersion: 4.21.11
