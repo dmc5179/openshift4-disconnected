@@ -1,0 +1,31 @@
+apiVersion: "logging.openshift.io/v1"
+kind: "ClusterLogForwarder"
+metadata:
+  name: instance # Or a custom name in multi-log forwarder scenarios
+  namespace: openshift-logging # Or a custom namespace
+spec:
+  outputs:
+    - name: splunk-hec-output
+      type: splunkHec
+      url: https://your-splunk-hec-endpoint:8088/services/collector # Replace with your Splunk HEC URL and port
+      secret:
+        name: splunk-hec-secret # Name of the secret containing the HEC token
+      # Optional: For insecure connections (not recommended for production)
+      # tls:
+      #   insecureSkipVerify: true
+  pipelines:
+    - name: application-logs-to-splunk
+      inputRefs:
+        - application
+      outputRefs:
+        - splunk-hec-output
+    - name: infrastructure-logs-to-splunk
+      inputRefs:
+        - infrastructure
+      outputRefs:
+        - splunk-hec-output
+    - name: audit-logs-to-splunk
+      inputRefs:
+        - audit
+      outputRefs:
+        - splunk-hec-output
