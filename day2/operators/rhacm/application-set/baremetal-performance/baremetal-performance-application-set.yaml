@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: latency-sensitive-operators
+  namespace: openshift-gitops
+spec:
+  generators:
+    # Uses RHACM Placement to find target clusters
+    - clusterDecisionResource:
+        configMapRef: acm-placement
+        labelSelector:
+          matchLabels:
+            cluster.open-cluster-management.io/placement: global-placement
+        requeueAfterSeconds: 180
+  template:
+    metadata:
+      name: 'latency-ops-{{name}}'
+    spec:
+      project: default
+      source:
+        repoURL: 'https://github.com/org/ocp-ops.git'
+        targetRevision: HEAD
+        path: clusters-config/latency-operators
+      destination:
+        server: '{{server}}'
+        # Operators are usually global, but the App record lives in this namespace
+        namespace: openshift-operators 
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

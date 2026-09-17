@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: rhokp-deployment
+  namespace: openshift-gitops
+spec:
+  generators:
+    # This generator targets clusters joined to RHACM
+    - clusterDecisionResource:
+        configMapRef: acm-placement
+        labelSelector:
+          matchLabels:
+            cluster.open-cluster-management.io/placement: global-placement
+        requeueAfterSeconds: 180
+  template:
+    metadata:
+      name: 'rhokp-{{name}}'
+    spec:
+      project: default
+      source:
+        repoURL: 'https://github.com/your-org/infra-apps.git' # Replace with your repo
+        targetRevision: HEAD
+        path: rhokp
+      destination:
+        server: '{{server}}'
+        namespace: rhokp-portal
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

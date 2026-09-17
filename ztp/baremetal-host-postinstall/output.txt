@@ -1,0 +1,409 @@
+ ./link-machine-and-node.sh ab05ru13 ab05ru13
+Waiting for oc_proxy to respond Success!
+Starting to serve on 127.0.0.1:8001
+PATCHING HOST
+{
+  "status": {
+    "hardware": {
+      "hostname": "ab05ru13",
+      "nics": [
+        {
+          "ip": "10.150.49.113",
+          "mac": "00:00:00:00:00:00",
+          "model": "unknown",
+          "speedGbps": 10,
+          "vlanId": 0,
+          "pxe": true,
+          "name": "eth1"
+        }
+      ],
+      "systemVendor": {
+        "manufacturer": "Red Hat",
+        "productName": "product name",
+        "serialNumber": ""
+      },
+      "firmware": {
+        "bios": {
+          "date": "04/01/2014",
+          "vendor": "SeaBIOS",
+          "version": "1.11.0-2.el7"
+        }
+      },
+      "ramMebibytes": 0,
+      "storage": [],
+      "cpu": {
+        "arch": "x86_64",
+        "model": "Intel(R) Xeon(R) CPU E5-2630 v4 @ 2.20GHz",
+        "clockMegahertz": 2199.998,
+        "count": 4,
+        "flags": []
+      }
+    }
+  }
+}
+{
+  "apiVersion": "metal3.io/v1alpha1",
+  "kind": "BareMetalHost",
+  "metadata": {
+    "creationTimestamp": "2026-04-29T21:26:56Z",
+    "finalizers": [
+      "baremetalhost.metal3.io"
+    ],
+    "generation": 5,
+    "managedFields": [
+      {
+        "apiVersion": "metal3.io/v1alpha1",
+        "fieldsType": "FieldsV1",
+        "fieldsV1": {
+          "f:metadata": {
+            "f:finalizers": {
+              ".": {},
+              "v:\"baremetalhost.metal3.io\"": {}
+            }
+          },
+          "f:spec": {
+            "f:bmc": {
+              ".": {},
+              "f:address": {},
+              "f:credentialsName": {}
+            }
+          }
+        },
+        "manager": "baremetal-operator",
+        "operation": "Update",
+        "time": "2026-04-29T21:26:56Z"
+      },
+      {
+        "apiVersion": "metal3.io/v1alpha1",
+        "fieldsType": "FieldsV1",
+        "fieldsV1": {
+          "f:spec": {
+            ".": {},
+            "f:automatedCleaningMode": {},
+            "f:bootMACAddress": {},
+            "f:bootMode": {},
+            "f:customDeploy": {
+              ".": {},
+              "f:method": {}
+            },
+            "f:externallyProvisioned": {},
+            "f:online": {}
+          }
+        },
+        "manager": "kubectl-create",
+        "operation": "Update",
+        "time": "2026-04-29T21:26:56Z"
+      },
+      {
+        "apiVersion": "metal3.io/v1alpha1",
+        "fieldsType": "FieldsV1",
+        "fieldsV1": {
+          "f:status": {
+            ".": {},
+            "f:errorCount": {},
+            "f:errorMessage": {},
+            "f:goodCredentials": {},
+            "f:lastUpdated": {},
+            "f:operationHistory": {
+              ".": {},
+              "f:deprovision": {
+                ".": {},
+                "f:end": {},
+                "f:start": {}
+              },
+              "f:inspect": {
+                ".": {},
+                "f:end": {},
+                "f:start": {}
+              },
+              "f:provision": {
+                ".": {},
+                "f:end": {},
+                "f:start": {}
+              },
+              "f:register": {
+                ".": {},
+                "f:end": {},
+                "f:start": {}
+              }
+            },
+            "f:operationalStatus": {},
+            "f:provisioning": {
+              ".": {},
+              "f:ID": {},
+              "f:image": {
+                ".": {},
+                "f:url": {}
+              },
+              "f:state": {}
+            },
+            "f:triedCredentials": {}
+          }
+        },
+        "manager": "baremetal-operator",
+        "operation": "Update",
+        "subresource": "status",
+        "time": "2026-04-29T21:26:57Z"
+      },
+      {
+        "apiVersion": "metal3.io/v1alpha1",
+        "fieldsType": "FieldsV1",
+        "fieldsV1": {
+          "f:spec": {
+            "f:userData": {}
+          }
+        },
+        "manager": "machine-controller-manager",
+        "operation": "Update",
+        "time": "2026-04-30T01:44:03Z"
+      },
+      {
+        "apiVersion": "metal3.io/v1alpha1",
+        "fieldsType": "FieldsV1",
+        "fieldsV1": {
+          "f:status": {
+            "f:poweredOn": {}
+          }
+        },
+        "manager": "kubectl-patch",
+        "operation": "Update",
+        "subresource": "status",
+        "time": "2026-04-30T01:45:42Z"
+      },
+      {
+        "apiVersion": "metal3.io/v1alpha1",
+        "fieldsType": "FieldsV1",
+        "fieldsV1": {
+          "f:spec": {
+            "f:consumerRef": {}
+          }
+        },
+        "manager": "kubectl-patch",
+        "operation": "Update",
+        "time": "2026-04-30T01:49:07Z"
+      },
+      {
+        "apiVersion": "metal3.io/v1alpha1",
+        "fieldsType": "FieldsV1",
+        "fieldsV1": {
+          "f:status": {
+            "f:hardware": {
+              ".": {},
+              "f:cpu": {
+                ".": {},
+                "f:arch": {},
+                "f:clockMegahertz": {},
+                "f:count": {},
+                "f:flags": {},
+                "f:model": {}
+              },
+              "f:firmware": {
+                ".": {},
+                "f:bios": {
+                  ".": {},
+                  "f:date": {},
+                  "f:vendor": {},
+                  "f:version": {}
+                }
+              },
+              "f:hostname": {},
+              "f:nics": {},
+              "f:ramMebibytes": {},
+              "f:storage": {},
+              "f:systemVendor": {
+                ".": {},
+                "f:manufacturer": {},
+                "f:productName": {},
+                "f:serialNumber": {}
+              }
+            }
+          }
+        },
+        "manager": "curl",
+        "operation": "Update",
+        "subresource": "status",
+        "time": "2026-05-10T22:38:03Z"
+      }
+    ],
+    "name": "ab05ru13",
+    "namespace": "openshift-machine-api",
+    "resourceVersion": "767494799",
+    "uid": "fdae3c5d-23bf-470e-825d-ef14f074f647"
+  },
+  "spec": {
+    "automatedCleaningMode": "metadata",
+    "bmc": {
+      "address": "",
+      "credentialsName": ""
+    },
+    "bootMACAddress": "18:66:da:ed:fb:bc",
+    "bootMode": "legacy",
+    "consumerRef": {
+      "apiVersion": "machine.openshift.io/v1beta1",
+      "kind": "Machine",
+      "name": "ab05ru13",
+      "namespace": "openshift-machine-api"
+    },
+    "customDeploy": {
+      "method": "install_coreos"
+    },
+    "externallyProvisioned": true,
+    "online": true,
+    "userData": {
+      "name": "worker-user-data-managed",
+      "namespace": "openshift-machine-api"
+    }
+  },
+  "status": {
+    "errorCount": 0,
+    "errorMessage": "",
+    "goodCredentials": {},
+    "hardware": {
+      "cpu": {
+        "arch": "x86_64",
+        "clockMegahertz": 2199.998,
+        "count": 4,
+        "flags": [],
+        "model": "Intel(R) Xeon(R) CPU E5-2630 v4 @ 2.20GHz"
+      },
+      "firmware": {
+        "bios": {
+          "date": "04/01/2014",
+          "vendor": "SeaBIOS",
+          "version": "1.11.0-2.el7"
+        }
+      },
+      "hostname": "ab05ru13",
+      "nics": [
+        {
+          "ip": "10.150.49.113",
+          "mac": "00:00:00:00:00:00",
+          "model": "unknown",
+          "name": "eth1",
+          "pxe": true,
+          "speedGbps": 10,
+          "vlanId": 0
+        }
+      ],
+      "ramMebibytes": 0,
+      "storage": [],
+      "systemVendor": {
+        "manufacturer": "Red Hat",
+        "productName": "product name",
+        "serialNumber": ""
+      }
+    },
+    "lastUpdated": "2026-04-29T21:26:57Z",
+    "operationHistory": {
+      "deprovision": {
+        "end": null,
+        "start": null
+      },
+      "inspect": {
+        "end": null,
+        "start": null
+      },
+      "provision": {
+        "end": null,
+        "start": null
+      },
+      "register": {
+        "end": null,
+        "start": null
+      }
+    },
+    "operationalStatus": "discovered",
+    "poweredOn": true,
+    "provisioning": {
+      "ID": "",
+      "image": {
+        "url": ""
+      },
+      "state": "unmanaged"
+    },
+    "triedCredentials": {}
+  }
+}apiVersion: metal3.io/v1alpha1
+kind: BareMetalHost
+metadata:
+  creationTimestamp: "2026-04-29T21:26:56Z"
+  finalizers:
+  - baremetalhost.metal3.io
+  generation: 5
+  name: ab05ru13
+  namespace: openshift-machine-api
+  resourceVersion: "767494799"
+  uid: fdae3c5d-23bf-470e-825d-ef14f074f647
+spec:
+  automatedCleaningMode: metadata
+  bmc:
+    address: ""
+    credentialsName: ""
+  bootMACAddress: 18:66:da:ed:fb:bc
+  bootMode: legacy
+  consumerRef:
+    apiVersion: machine.openshift.io/v1beta1
+    kind: Machine
+    name: ab05ru13
+    namespace: openshift-machine-api
+  customDeploy:
+    method: install_coreos
+  externallyProvisioned: true
+  online: true
+  userData:
+    name: worker-user-data-managed
+    namespace: openshift-machine-api
+status:
+  errorCount: 0
+  errorMessage: ""
+  goodCredentials: {}
+  hardware:
+    cpu:
+      arch: x86_64
+      clockMegahertz: 2199.998
+      count: 4
+      flags: []
+      model: Intel(R) Xeon(R) CPU E5-2630 v4 @ 2.20GHz
+    firmware:
+      bios:
+        date: 04/01/2014
+        vendor: SeaBIOS
+        version: 1.11.0-2.el7
+    hostname: ab05ru13
+    nics:
+    - ip: 10.150.49.113
+      mac: "00:00:00:00:00:00"
+      model: unknown
+      name: eth1
+      pxe: true
+      speedGbps: 10
+      vlanId: 0
+    ramMebibytes: 0
+    storage: []
+    systemVendor:
+      manufacturer: Red Hat
+      productName: product name
+      serialNumber: ""
+  lastUpdated: "2026-04-29T21:26:57Z"
+  operationHistory:
+    deprovision:
+      end: null
+      start: null
+    inspect:
+      end: null
+      start: null
+    provision:
+      end: null
+      start: null
+    register:
+      end: null
+      start: null
+  operationalStatus: discovered
+  poweredOn: true
+  provisioning:
+    ID: ""
+    image:
+      url: ""
+    state: unmanaged
+  triedCredentials: {}
+

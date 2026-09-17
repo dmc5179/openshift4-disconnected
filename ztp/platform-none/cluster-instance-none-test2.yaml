@@ -1,0 +1,38 @@
+apiVersion: extensions.hive.openshift.io/v1beta1
+kind: AgentClusterInstall
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    ran.openshift.io/ztp-gitops-generated: '{}'
+  name: three-nodes
+  namespace: three-nodes
+spec:
+#  loadBalancer:
+#    type: UserManaged
+  apiVIP: 10.6.56.7
+  apiVIPs:
+    - 10.6.56.7
+  ingressVIP: 10.6.56.8
+  ingressVIPs:
+    - 10.6.56.8 
+  clusterDeploymentRef:
+    name: three-nodes
+  imageSetRef:
+    name: openshift-4.18
+  manifestsConfigMapRef:
+    name: three-nodes
+  networking:
+    clusterNetwork:
+      - cidr: 10.128.0.0/14
+        hostPrefix: 23
+    machineNetwork:
+      - cidr: 10.6.56.0/24
+    serviceNetwork:
+      - 172.30.0.0/16
+#    userManagedNetworking: false
+    networkType: OVNKubernetes
+  provisionRequirements:
+    controlPlaneAgents: 3
+    workerAgents: 1
+  sshPublicKey: 
+

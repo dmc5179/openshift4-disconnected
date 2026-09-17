@@ -1,0 +1,27 @@
+apiVersion: ran.openshift.io/v1
+kind: SiteConfig
+metadata:
+  name: dc1-cs-ocp
+  namespace: dc1-cs-ocp
+spec:
+  baseDomain: "rtrpayments.internal"
+  pullSecretRef:
+    name: "dc1-cs-ocp-assisted-deployment-pull-secret"
+  clusterImageSetNameRef: "img4.17.16-x86-64-appsub"
+  sshPublicKey: "ssh-rsa AAB3NzaC1yc2EAAAADAQABAAACAQCwnu1"
+  clusters:
+    - clusterName: dc1-cs-ocp
+      networkType: "OVNKubernetes"
+      clusterLabels:
+        common: true
+        sites: dc1-cs-ocp
+        clustertype: standard
+      machineNetwork:
+        - cidr: 10.208.48.0/23
+      clusterNetwork:
+        - cidr: 172.22.0.0/16
+          hostPrefix: 23
+      serviceNetwork:
+        - 172.24.0.0/16
+      additionalNTPSources:
+        - 10.192.97.252

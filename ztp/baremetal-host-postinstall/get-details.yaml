@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: get-hardware-details
+  namespace: openshift-machine-api
+  labels:
+    app: get-hardware-details
+spec:
+  nodeName: "ab05ru12"
+  hostNetwork: true
+  #hostPID: true
+  #hostIPC: true
+  containers:
+  - name: baremetal-operator
+    image: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:0e72f286dc8d0721a472d7013364964737164d6281db7a739b22f04b5ba4e5b3
+    command: ["/bin/bash", "-c", "sleep infinity"]
+    #command: ["/get-hardware-details"]
+    #args:
+    #  - "http://localhost:5050/v1"
+    #  - "ab05ru12"
+    stdin: true
+    tty: true
+    securityContext:
+      privileged: true
+      runAsUser: 0
+#    volumeMounts:
+#    - name: host-sys
+#      mountPath: /sys
+#    - name: host-proc
+#      mountPath: /proc
+#    - name: host-dev
+#      mountPath: /dev
+#  volumes:
+#  - name: host-sys
+#    hostPath:
+#      path: /sys
+#  - name: host-proc
+#    hostPath:
+#      path: /proc
+#  - name: host-dev
+#    hostPath:
+#      path: /dev
+#  restartPolicy: Never

@@ -1,0 +1,38 @@
+ addresses=$(oc get node -n openshift-machine-api "${NODE_NAME}" -o json | jq -c '.status.addresses')
+ machine_data=$(oc get machines.machine.openshift.io -n openshift-machine-api -o json "${NEW_MACHINE_NAME}")
+ host=$(echo "$machine_data" | jq -c -r '.metadata.annotations["metal3.io/BareMetalHost"]' | cut -f2 -d/ )
+
+if [ -z "$host" ]; then
+    echo "Machine $machine is not linked to a host yet." 1>&2
+    exit 1
+fi
+
+
+hostname=$(echo "${addresses}" | jq -c -r '.[] | select(. | .type == "Hostname") | .address')
+nic=$(echo "${addresses}" | jq -c -r '.[] | select(. | .type == "InternalIP") | .address')
+
+read -r -d '' host_patch << EOF
+{
+  "status": {
+    "hardware": {
+      "hostname": "${hostname}",
+      "nics": [
+         {
+           "ip": "${nic}",
+           "mac": "00:00:00:00:00:00",
+           "model": "unknown",
+           "speedGbps": 10,
+           "vlanId": 0,
+           "pxe": true,
+           "name": "eth1"
+         }
+      ],
+    }
+  }
+}
+EOF
+
+oc patch baremetalhost ${NEW_MACHINE_NAME} --type='json' -p......=
+
+oc patch pod <pod-name> --type='json' -p='[{"op": "replace", "path": "/spec/containers/0/image", "value":"new-image-name"}]'
+
