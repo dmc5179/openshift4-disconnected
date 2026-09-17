@@ -1,6 +1,9 @@
 # Deploying OpenShift Lightspeed for offline environments
 
-- Note, a GPU resource is highly preferred. Without one OLS will take forever to respond or may never respond
+## Prereqs
+
+1. NFD Operator
+2. Nvidia GPU Operator - Note, a GPU resource is highly preferred. Without one OLS will take forever to respond or may never respond
 
 ## Install OpenShift lightspeed operator from the operator hub
 
