@@ -1,0 +1,15 @@
+---
+
+- name: Manage SSH Keys
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Invoke SSH Keys role
+      ansible.builtin.include_role:
+        name: infra.openshift_virtualization_migration.vm_ssh
+      vars:
+        openshift_host: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_HOST', default=Undefined) | default('', True) }}"
+        openshift_api_key: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_API_KEY', default=Undefined) | default('', True) }}" # noqa: yaml[line-length]
+        openshift_verify_ssl: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_VERIFY_SSL', default='') | default(false) | bool }}" # noqa: yaml[line-length]
+...

@@ -1,0 +1,18 @@
+---
+- name: create_nncp | DEBUG nncp Template
+  ansible.builtin.debug:
+    var: lookup('ansible.builtin.template', network_mgmt_openshift_network_bridge_mode + '/nncp.yaml.j2')
+  loop: "{{ network_mgmt_switches_to_migrate }}"
+  loop_control:
+    loop_var: vswitch
+  when: vswitch.name == network_mgmt_vcenter_dvswitch
+
+- name: create_nncp | Apply NodeNetworkConfigurationPolicy
+  redhat.openshift.k8s: # noqa: fqcn[canonical]
+    state: present
+    definition: "{{ (lookup('ansible.builtin.template', network_mgmt_openshift_network_bridge_mode + '/nncp.yaml.j2') | from_yaml) }}" # noqa: yaml[line-length]
+  loop: "{{ network_mgmt_switches_to_migrate }}"
+  loop_control:
+    loop_var: vswitch
+  when: vswitch.name == network_mgmt_vcenter_dvswitch
+...

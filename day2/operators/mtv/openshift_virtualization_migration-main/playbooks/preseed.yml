@@ -1,0 +1,26 @@
+---
+- name: Pre-seed AAP with initial content
+  hosts: localhost
+  gather_facts: false
+  vars:
+    controller_hostname: "{{ groups['bootstrap'][0] }}"
+    # All additional controller variables need to be loaded as extra vars to give them precedence
+  tasks:
+    - name: Wait for API to become available
+      retries: 300
+      delay: 5
+      register: api_status
+      until: api_status.status == 200
+      ansible.builtin.uri:
+        url: https://{{ controller_hostname }}/api/v2/config/
+        method: GET
+        user: "{{ controller_username }}"
+        password: "{{ controller_password }}"
+        body_format: json
+        validate_certs: false
+        force_basic_auth: true
+
+    - name: Call dispatch role
+      ansible.builtin.include_role:
+        name: infra.controller_configuration.dispatch
+...

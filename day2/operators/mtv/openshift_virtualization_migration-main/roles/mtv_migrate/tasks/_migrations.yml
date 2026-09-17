@@ -1,0 +1,63 @@
+---
+
+- name: _migrations | Template Migrations
+  ansible.builtin.set_fact:
+    _mtv_migrate_mtv_migrations: >-
+      "{{ _mtv_migrate_mtv_migrations | default([]) + [lookup('template', 'migration.yml.j2') | from_yaml] }}"
+  loop: "{{ _mtv_migrate_mtv_plans_to_migrate }}"
+  loop_control:
+    loop_var: _mtv_plan_to_migrate
+
+- name: _migrations | Create Migrations
+  redhat.openshift.k8s:
+    definition: "{{ _mtv_migrate_mtv_migrations }}"
+    state: present
+    apply: true
+  register: mtv_migrate_migrations_create_result
+
+- name: _migrations | Wait for Migrations
+  when: _mtv_verify_migrations_complete|bool
+  block:
+    - name: _migrations | Check on Migrations
+      kubernetes.core.k8s_info:
+        api_version: "{{ created_migration.result.apiVersion }}"
+        kind: "{{ created_migration.result.kind }}"
+        name: "{{ created_migration.result.metadata.name }}"
+        namespace: "{{ created_migration.result.metadata.namespace }}"
+      register: mtv_migrate_created_migration_status
+      loop_control:
+        loop_var: created_migration
+      loop: "{{ mtv_migrate_migrations_create_result.result.results if mtv_migrate_migrations_create_result.result is defined and 'results' in mtv_migrate_migrations_create_result.result else [mtv_migrate_migrations_create_result] }}" # noqa: yaml[line-length]
+      failed_when: >
+        (
+          mtv_migrate_created_migration_status.attempts | int > mtv_migrate_verify_migration_complete_retries | int
+        ) or
+        (
+          mtv_migrate_created_migration_status is defined and
+          'resources' in mtv_migrate_created_migration_status and
+          mtv_migrate_created_migration_status.resources | length == 1 and
+          'status' in mtv_migrate_created_migration_status.resources|first and
+          'completed' in (mtv_migrate_created_migration_status.resources|first).status and
+          (mtv_migrate_created_migration_status.resources|first).status.completed | trim | length > 0 and
+          'conditions' in (mtv_migrate_created_migration_status.resources|first).status and
+          (mtv_migrate_created_migration_status.resources|first).status.conditions |
+          selectattr('type', 'defined') | selectattr('status', 'defined') |
+          selectattr('type', 'equalto', 'Succeeded') | selectattr('status', 'equalto', 'True') |
+          list | length == 0
+        )
+      until: >
+        mtv_migrate_created_migration_status is defined and
+        'resources' in mtv_migrate_created_migration_status and
+        mtv_migrate_created_migration_status.resources | length == 1 and
+        'status' in mtv_migrate_created_migration_status.resources|first and
+        'completed' in (mtv_migrate_created_migration_status.resources|first).status and
+        (mtv_migrate_created_migration_status.resources|first).status.completed | trim | length > 0 and
+        'conditions' in (mtv_migrate_created_migration_status.resources|first).status and
+        (mtv_migrate_created_migration_status.resources|first).status.conditions |
+        selectattr('type', 'defined') | selectattr('status', 'defined') |
+        selectattr('type', 'equalto', 'Succeeded') |
+        selectattr('status', 'equalto', 'True') | list | length == 1
+      retries: "{{ mtv_migrate_verify_migration_complete_retries }}"
+      delay: "{{ mtv_migrate_verify_migration_complete_delay }}"
+
+...

@@ -1,0 +1,11 @@
+---
+- name: Install AAP
+  when: aap_deploy_aap_install | bool
+  ansible.builtin.include_tasks:
+    file: install.yml
+
+- name: Attach AAP Subscriptions
+  when: aap_deploy_aap_install | bool
+  ansible.builtin.include_tasks:
+    file: subscribe.yml
+...

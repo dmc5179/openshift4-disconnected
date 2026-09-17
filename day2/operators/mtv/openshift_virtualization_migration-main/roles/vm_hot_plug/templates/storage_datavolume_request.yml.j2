@@ -1,0 +1,12 @@
+{% if _vm_hot_plug_storage_operation == 'addvolume' %}
+disk:
+  disk:
+    bus: scsi
+  name: {{ vm_hot_plug_storage_instance.name }}
+name: {{ vm_hot_plug_storage_instance.name }}
+volumeSource:
+  dataVolume:
+    name: {{ vm_hot_plug_storage_instance.name }}
+{% else %}
+name: {{ vm_hot_plug_storage_instance.name }}
+{% endif %}

@@ -1,0 +1,46 @@
+---
+# This playbook points to a VM with a specific ansible_user to bootstrap AAP
+# (which must exist and have sudo access - see bootstrap_prep.yml if needed)
+- name: Bootstrap VM to use for infra.openshift_virtualization_migration
+  hosts: bootstrap
+  gather_facts: false
+  vars:
+    ansible_user: ansible
+
+  tasks:
+    - name: Read infra as code bootstrap vars
+      ansible.builtin.include_vars:
+        file: vars/infra_as_code-bootstrap_aap.yml
+
+    - name: Set inventory variable for AAP to include bootstrap inventory hostname
+      ansible.builtin.set_fact:
+        aap_setup_prep_inv_nodes: "{{ aap_setup_prep_inv_nodes | default({}) | combine((aap_component | from_yaml)) }}"
+      loop:
+        - "{{ aap_setup_prep_inv_nodes_automationcontroller }}"
+        - "{{ aap_setup_prep_inv_nodes_database }}"
+      loop_control:
+        loop_var: aap_component
+      vars:
+        controller_hostname: "{{ groups['bootstrap'][0] }}"
+        aap_setup_prep_inv_nodes_automationcontroller: |
+          { automationcontroller: { '{{ controller_hostname }}': }}
+        aap_setup_prep_inv_nodes_database: |
+          { database: { '{{ controller_hostname }}': }}
+
+    - name: Include aap_setup_download role
+      ansible.builtin.import_role:
+        name: infra.aap_utilities.aap_setup_download
+
+    - name: Include aap_setup_prepare role
+      ansible.builtin.import_role:
+        name: infra.aap_utilities.aap_setup_prepare
+
+    - name: Include aap_setup_install role
+      ansible.builtin.import_role:
+        name: infra.aap_utilities.aap_setup_install
+
+    - name: Call bootstrap role to subscribe AAP
+      ansible.builtin.import_role:
+        name: infra.openshift_virtualization_migration.bootstrap
+        tasks_from: aap_subscription.yml
+...

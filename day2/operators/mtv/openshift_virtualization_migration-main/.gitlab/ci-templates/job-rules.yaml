@@ -1,0 +1,25 @@
+---
+# yaml-language-server: $schema=https://gitlab.com/gitlab-org/gitlab/-/raw/master/app/assets/javascripts/editor/schema/ci.json
+
+# Anchors don't get included, leaving here for reference only
+# Needs to be cop
+
+.rules_run_on_merge_requests_and_main:
+  rules:
+    # Allow pipelines on merge requests
+    - if: "$CI_PIPELINE_SOURCE == 'merge_request_event'"
+    # If branch and merge request pipelines are enabled this prevents duplicates
+    - if: "$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS"
+      when: never
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+.rules_run_on_main_and_web:
+  rules:
+    # Allow runs from the web interface
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH != "main"'
+    # Do not run this job when a tag is created manually
+    - if: $CI_COMMIT_TAG
+      when: never
+    # Run this job when commits are pushed or merged to the default branch
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+...

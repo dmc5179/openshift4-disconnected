@@ -1,0 +1,11 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: {{ _operator_name | infra.openshift_virtualization_migration.rfc1123 }}
+  namespace: {{ _operator.namespace.metadata.name | d('openshift-operators', true) }}
+spec:
+  channel: {{ _operator.subscription.spec.channel | default(omit) }}
+  installPlanApproval: {{ _operator.subscription.spec.installPlanApproval | d('Automatic', true) }}
+  name: {{ _operator.subscription.spec.name | d( _operator.subscription.metadata.name | d(_operator_name, true), true) | infra.openshift_virtualization_migration.rfc1123 }}
+  source: {{ _operator.subscription.spec.source | d('redhat-operators', true) }}
+  sourceNamespace: {{ _operator.subscription.spec.sourceNamespace | d('openshift-marketplace', true) }}

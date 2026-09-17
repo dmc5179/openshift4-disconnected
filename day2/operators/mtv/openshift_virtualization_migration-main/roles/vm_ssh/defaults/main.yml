@@ -1,0 +1,48 @@
+---
+# defaults file for vm_ssh
+
+# title: SSH Requests
+# required: True
+# description: SSH Requests
+vm_ssh_request: {}
+#  secrets:
+#    name: # Name of Secret to Create
+#    namespace:# Namespace of Secret to Create
+#    ssh_keys:
+#      - path: # Path to the public key on the Control Node
+#        content: # Public key provided in line
+#  targets:
+#    - namespace: <namespace> # Namespace containing VMs to perform operations against.
+#      names: # List of VM's within a namespace
+#      label_selectors: # Label Selectors to apply. Cannot be used with list of VM names
+#        - <key>=<value>
+#      secret: # Name of the secret containing the SSH keys to add to the VM(s)
+#      users:
+#        - user1
+
+# title: OpenShift host
+# required: True
+# description: OpenShift host
+vm_ssh_openshift_host: "{{ openshift_host }}"
+
+# title: OpenShift API Key
+# required: True
+# description: OpenShift API Key
+vm_ssh_openshift_api_key: "{{ openshift_api_key }}"
+
+# title: Verify SSL Certificate
+# required: True
+# description: Variable to enable SSL verification
+vm_ssh_openshift_verify_ssl: "{{ openshift_verify_ssl }}"
+
+# title: List of default SSH users
+# required: True
+# description: List of default SSH users (default user: root)
+vm_ssh_default_users:
+  - root
+
+# title: KubeVirt API Version
+# required: True
+# description: KubeVirt API Version
+vm_ssh_kubevirt_api_version: kubevirt.io/v1
+...

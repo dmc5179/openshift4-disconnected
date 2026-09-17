@@ -1,0 +1,34 @@
+---
+# tasks file for vm_ssh
+
+- name: Verify OpenShift Connectivity Details Provided
+  ansible.builtin.assert:
+    that:
+      - vm_ssh_openshift_host | default("", true) | length > 0
+      - vm_ssh_openshift_api_key | default("", true) | length > 0
+    quiet: true
+    fail_msg: OpenShift Connectivity Details Not Provided
+
+- name: Manage Secrets
+  when: "'secrets' in vm_ssh_request | default({})"
+  block:
+    - name: Process Secrets
+      ansible.builtin.include_tasks:
+        file: _manage_secrets.yml
+      loop: "{{ vm_ssh_request['secrets'] }}"
+      loop_control:
+        loop_var: ssh_secret
+        label: "Namespace: {{ ssh_secret['namespace'] | default('<Undefined>') }} - Name: {{ ssh_secret['name'] | default('<Undefined>') }}" # noqa: yaml[line-length]
+
+- name: Manage Targets
+  when: "'targets' in vm_ssh_request | default({})"
+  block:
+    - name: Process Targets
+      ansible.builtin.include_tasks:
+        file: _manage_targets.yml
+      loop: "{{ vm_ssh_request['targets'] }}"
+      loop_control:
+        loop_var: ssh_target
+        label: "Namespace: {{ ssh_secret['namespace'] | default('<Undefined>') }} - Name: {{ ssh_secret['name'] | default('<Undefined>') }}" # noqa: yaml[line-length]
+
+...

@@ -1,0 +1,68 @@
+---
+
+- name: _mtv_storage_map_process_datastore | Set VMware StorageMap Variables
+  ansible.builtin.set_fact:
+    mtv_management_storage_map_name: "{{ (mtv_management_source_target + '-' + mtv_vmware_datastore.id) | infra.openshift_virtualization_migration.rfc1123 }}" # noqa: yaml[line-length]
+    _mtv_management_storage_map_storage_class: "{{ mtv_management_default_storage_class }}"
+    mtv_management_mtv_vmware_datastore_overrides: "{{ mtv_management_storage_map_overrides | default([]) | selectattr('id', 'equalto', mtv_vmware_datastore.id) | list | first if mtv_management_storage_map_overrides | default([]) | selectattr('id', 'equalto', mtv_vmware_datastore.id) | list | length > 0 else {} }}" # noqa: yaml[line-length]
+  when: mtv_vmware_datastore is defined
+
+- name: _mtv_storage_map_process_datastore | Set Ovirt StorageMap Variables
+  ansible.builtin.set_fact:
+    mtv_management_storage_map_name: "{{ (mtv_management_source_target + '-' + mtv_ovirt_datastore.id) | infra.openshift_virtualization_migration.rfc1123 }}" # noqa: yaml[line-length]
+    _mtv_management_storage_map_storage_class: "{{ mtv_management_default_storage_class }}"
+    mtv_management_mtv_ovirt_datastore_overrides: "{{ mtv_management_storage_map_overrides | default([]) | selectattr('id', 'equalto', mtv_ovirt_datastore.id) | list | first if mtv_management_storage_map_overrides | default([]) | selectattr('id', 'equalto', mtv_ovirt_datastore.id) | list | length > 0 else {} }}" # noqa: yaml[line-length]
+  when: mtv_ovirt_datastore is defined
+
+- name: _mtv_storage_map_process_datastore | Set VMware StorageMap StorageClass from Overrides
+  ansible.builtin.set_fact:
+    _mtv_management_storage_map_storage_class: "{{ mtv_management_mtv_vmware_datastore_overrides.storageClass }}"
+  when:
+    - mtv_vmware_datastore is defined
+    - "'storageClass' in mtv_management_mtv_vmware_datastore_overrides"
+    - mtv_management_mtv_vmware_datastore_overrides.storageClass | default('', true) | trim | length > 0
+
+- name: _mtv_storage_map_process_datastore | Set Ovirt StorageMap StorageClass from Overrides
+  ansible.builtin.set_fact:
+    _mtv_management_storage_map_storage_class: "{{ mtv_management_mtv_ovirt_datastore_overrides.storageClass }}"
+  when:
+    - mtv_ovirt_datastore is defined
+    - "'storageClass' in mtv_management_mtv_ovirt_datastore_overrides"
+    - mtv_management_mtv_ovirt_datastore_overrides.storageClass | default('', true) | trim | length > 0
+
+- name: _mtv_storage_map_process_datastore | Verify VMWare Destination Storage Class
+  ansible.builtin.assert:
+    that:
+      - _mtv_management_storage_map_storage_class is defined
+      - _mtv_management_storage_map_storage_class | default('', true) | trim | length > 0
+    quiet: true
+    fail_msg: "Unable to determine destination Storage Class for '{{ mtv_vmware_datastore.id }}'"
+  when: mtv_vmware_datastore is defined
+
+- name: _mtv_storage_map_process_datastore | Verify Ovirt Destination Storage Class
+  ansible.builtin.assert:
+    that:
+      - _mtv_management_storage_map_storage_class is defined
+      - _mtv_management_storage_map_storage_class | default('', true) | trim | length > 0
+    quiet: true
+    fail_msg: "Unable to determine destination Storage Class for '{{ mtv_ovirt_datastore.id }}'"
+  when: mtv_ovirt_datastore is defined
+
+- name: _mtv_storage_map_process_datastore | Template StorageMap Map
+  ansible.builtin.set_fact:
+    mtv_management_storage_map_map: "{{ (lookup('ansible.builtin.template', 'storagemap_map.yml.j2') | from_yaml) }}"
+
+- name: _mtv_storage_map_process_datastore | Add VMware StorageMap Map to Dict
+  ansible.builtin.set_fact:
+    mtv_management_mtv_storagemap_maps: "{{ mtv_management_mtv_storagemap_maps | default({}) | ansible.builtin.combine({mtv_vmware_datastore.selfLink: mtv_management_storage_map_map}, recursive=true) }}" # noqa: yaml[line-length]
+  when:
+    - mtv_vmware_datastore is defined
+    - "(('include' in mtv_management_mtv_vmware_datastore_overrides and mtv_management_storage_map_overrides | selectattr('include', 'defined') | list | length > 0) or (mtv_management_storage_map_overrides | selectattr('include', 'defined') | list | length == 0 and mtv_management_storage_map_overrides | selectattr('exclude', 'defined') | list | length == 0)) or ('exclude' not in mtv_management_mtv_vmware_datastore_overrides and mtv_management_storage_map_overrides | selectattr('exclude', 'defined') | list | length > 0)" # noqa: yaml[line-length]
+
+- name: _mtv_storage_map_process_datastore | Add Ovirt StorageMap Map to Dict
+  ansible.builtin.set_fact:
+    mtv_management_mtv_storagemap_maps: "{{ mtv_management_mtv_storagemap_maps | default({}) | ansible.builtin.combine({mtv_ovirt_datastore.selfLink: mtv_management_storage_map_map}, recursive=true) }}" # noqa: yaml[line-length]
+  when:
+    - mtv_ovirt_datastore is defined
+    - "(('include' in mtv_management_mtv_ovirt_datastore_overrides and mtv_management_storage_map_overrides | selectattr('include', 'defined') | list | length > 0) or (mtv_management_storage_map_overrides | selectattr('include', 'defined') | list | length == 0 and mtv_management_storage_map_overrides | selectattr('exclude', 'defined') | list | length == 0)) or ('exclude' not in mtv_management_mtv_ovirt_datastore_overrides and mtv_management_storage_map_overrides | selectattr('exclude', 'defined') | list | length > 0)" # noqa: yaml[line-length]
+...

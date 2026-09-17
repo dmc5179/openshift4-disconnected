@@ -1,0 +1,11 @@
+---
+
+- name: _perform_operation | Perform VM Operation
+  ansible.builtin.uri:
+    url: "{{ vm_lifecycle_openshift_host }}/apis/subresources.{{ vm_lifecycle_kubevirt_api_version }}/namespaces/{{ vm_operations_vm.vm.metadata.namespace }}/virtualmachines/{{ vm_operations_vm.vm.metadata.name }}/{{ vm_lifecycle_valid_vm_operations[vm_operations_vm['operation']].endpoint }}" # noqa: yaml[line-length]
+    validate_certs: "{{ vm_lifecycle_openshift_verify_ssl }}"
+    method: PUT
+    headers:
+      Authorization: Bearer {{ vm_lifecycle_openshift_api_key }}
+    status_code: 202
+...

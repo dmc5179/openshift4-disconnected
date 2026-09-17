@@ -1,0 +1,16 @@
+---
+# This playbook runs as root to setup a new non-root user for use with the bootstrap
+# if a user is already created for use with become, this playbook is not needed
+- name: Bootstrap prep for use with infra.openshift_virtualization_migration.bootstrap
+  hosts: bootstrap
+  gather_facts: false
+  vars:
+    ansible_user: root # Root is needed to setup initial non-root user with sudo
+  tasks:
+    - name: Call bootstrap role
+      ansible.builtin.import_role:
+        name: infra.openshift_virtualization_migration.bootstrap
+        tasks_from: prep.yml
+      vars:
+        bootstrap_user: ansible
+...

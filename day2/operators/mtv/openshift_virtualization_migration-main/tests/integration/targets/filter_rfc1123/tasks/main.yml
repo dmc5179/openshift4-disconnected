@@ -1,0 +1,55 @@
+---
+
+- name: Main | Basic test that values that are already correct are not modified
+  ansible.builtin.include_tasks:
+    file: basic_no_change.yml
+  loop: "{{ filter_rfc1123_no_modify }}"
+  loop_control:
+    loop_var: __filter_rfc1123_loop_var
+
+- name: Main | Basic test that values are modified
+  vars:
+    __filter_rfc1123_input: "{{ __filter_rfc1123_loop_var['input'] }}"
+    __filter_rfc1123_output: "{{ __filter_rfc1123_loop_var['output'] }}"
+  ansible.builtin.include_tasks:
+    file: basic_changed.yml
+  loop: "{{ filter_rfc1123_modified }}"
+  loop_control:
+    loop_var: __filter_rfc1123_loop_var
+
+- name: Main | Prefix testing
+  vars:
+    __filter_rfc1123_input: "{{ __filter_rfc1123_loop_var['input'] }}"
+    __filter_rfc1123_prefix: "{{ __filter_rfc1123_loop_var['prefix'] }}"
+    __filter_rfc1123_output: "{{ __filter_rfc1123_loop_var['output'] }}"
+  ansible.builtin.include_tasks:
+    file: prefix_changed.yml
+  loop: "{{ filter_rfc1123_prefix }}"
+  loop_control:
+    loop_var: __filter_rfc1123_loop_var
+
+- name: Main | Prefix testing with condition
+  vars:
+    __filter_rfc1123_input: "{{ __filter_rfc1123_loop_var['input'] }}"
+    __filter_rfc1123_prefix: "{{ __filter_rfc1123_loop_var['prefix'] }}"
+    __filter_rfc1123_condition: "{{ __filter_rfc1123_loop_var['condition'] }}"
+    __filter_rfc1123_output: "{{ __filter_rfc1123_loop_var['output'] }}"
+  ansible.builtin.include_tasks:
+    file: prefix_changed_condition.yml
+  loop: "{{ filter_rfc1123_prefix_condition }}"
+  loop_control:
+    loop_var: __filter_rfc1123_loop_var
+
+- name: Main | Basic test that plugin fails
+  when:
+    - filter_rfc1123_fail is defined
+    - filter_rfc1123_fail | length > 0
+  vars:
+    __filter_rfc1123_input: "{{ __filter_rfc1123_loop_var['input'] }}"
+    __filter_rfc1123_fail_msg: "{{ __filter_rfc1123_loop_var['fail_msg'] }}"
+  ansible.builtin.include_tasks:
+    file: basic_fail.yml
+  loop: "{{ filter_rfc1123_fail }}"
+  loop_control:
+    loop_var: __filter_rfc1123_loop_var
+...

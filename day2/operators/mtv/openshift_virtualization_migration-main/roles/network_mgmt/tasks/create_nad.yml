@@ -1,0 +1,26 @@
+---
+- name: create_nad | "DEBUG nad Template"
+  ansible.builtin.debug:
+    msg: "{{  lookup('ansible.builtin.template', network_mgmt_openshift_network_bridge_mode + '/nad.yaml.j2') }}"
+  loop: "{{ network_mgmt_portgrous_to_migrate }}"
+  loop_control:
+    loop_var: portgroup
+  when:
+    - portgroup.uplinks > 0
+    - not (portgroup.vlan.trunk and (network_mgmt_openshift_network_bridge_mode == 'ovs-bridge'))
+      # for OVS a port only supports being an access port
+    - portgroup.switch == network_mgmt_vcenter_dvswitch
+
+- name: create_nad | Apply NetworkAttachmentDefinitions
+  redhat.openshift.k8s: # noqa: fqcn[canonical]
+    state: present
+    definition: "{{ (lookup('ansible.builtin.template', network_mgmt_openshift_network_bridge_mode + '/nad.yaml.j2') | from_yaml) }}" # noqa: yaml[line-length]
+  loop: "{{ network_mgmt_portgrous_to_migrate }}"
+  loop_control:
+    loop_var: portgroup
+  when:
+    - portgroup.uplinks > 0
+    - not (portgroup.vlan.trunk and (network_mgmt_openshift_network_bridge_mode == 'ovs-bridge'))
+      # for OVS a port only supports being an access port
+    - portgroup.switch == network_mgmt_vcenter_dvswitch
+...

@@ -1,0 +1,31 @@
+---
+# defaults file for vm_mac_address
+
+# title: MAC Address Request
+# required: True
+# description: List of MAC Address Requests
+vm_mac_address_request: []
+# -  namespace: <namespace> # Namespace of the VM. \
+#    name: # Name of the VM. \
+#    interfaces: # List of interfaces to request MAC addresses for. \
+#      - name: <interface_name> # Name of the interface. \
+#        macAddress: <mac_address> # Value of the MAC address to be updated. \
+
+# title: OpenShift Host
+# required: True
+# description: OpenShift Host
+vm_mac_address_openshift_host: "{{ openshift_host }}"
+# title: OpenShift API Key
+# required: True
+# description: OpenShift API Key
+vm_mac_address_api_key: "{{ openshift_api_key }}"
+# title: Verify SSL Certificate
+# required: True
+# description: Verify SSL Certificate
+vm_mac_address_openshift_verify_ssl: "{{ openshift_verify_ssl }}"
+# title: KubeVirt API Version
+# required: True
+# description: KubeVirt API Version
+vm_mac_address_kubevirt_api_version: kubevirt.io/v1
+
+...

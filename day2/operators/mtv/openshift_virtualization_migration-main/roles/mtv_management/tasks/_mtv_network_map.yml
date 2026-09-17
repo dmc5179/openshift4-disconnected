@@ -1,0 +1,64 @@
+---
+
+- name: _mtv_network_map | Initialize data structures
+  ansible.builtin.set_fact:
+    mtv_management_mtv_networkmap_maps: {}
+
+- name: _mtv_network_map | Verify Network Map Overrides do not contain both includes and excludes
+  ansible.builtin.fail:
+    msg: "Network Map Overrides cannot contain both includes and excludes directives"
+  when:
+    - mtv_management_network_map_overrides is defined
+    - mtv_management_network_map_overrides | selectattr('include', 'defined') | list | length > 0
+    - mtv_management_network_map_overrides | selectattr('exclude', 'defined') | list | length > 0
+
+- name: _mtv_network_map | Query for VMWare Networks from Source Provider
+  ansible.builtin.include_tasks: mtv_query_inventory.yml
+  vars:
+    mtv_management_inventory_query_endpoint: /providers/vsphere/{{ (mtv_providers.vsphere | selectattr('name', 'equalto', mtv_management_source_target) | first).uid }}/networks?detail=4 # noqa: yaml[line-length]
+    mtv_management_inventory_query_result_var: mtv_networks
+  when: "'vsphere' in provider"
+
+- name: _mtv_network_map | Query for Ovirt Networks from Source Provider
+  ansible.builtin.include_tasks: mtv_query_inventory.yml
+  vars:
+    mtv_management_inventory_query_endpoint: /providers/ovirt/{{ (mtv_providers.ovirt | selectattr('name', 'equalto', mtv_management_source_target) | first).uid }}/networks?detail=4 # noqa: yaml[line-length]
+    mtv_management_inventory_query_result_var: mtv_networks
+  when: "'ovirt' in provider"
+
+- name: _mtv_network_map | Query for NetworkAttachmentDefinitions from Destination Provider
+  ansible.builtin.include_tasks: mtv_query_inventory.yml
+  vars:
+    mtv_management_inventory_query_endpoint: /providers/openshift/{{ (mtv_providers.openshift | selectattr('name', 'equalto', mtv_management_destination_target) | first).uid }}/networkattachmentdefinitions?detail=4 # noqa: yaml[line-length]
+    mtv_management_inventory_query_result_var: mtv_networkattachmentdefinitions
+
+- name: _mtv_network_map | Process VMware Networks
+  ansible.builtin.include_tasks: _mtv_network_map_process_network.yml
+  loop: "{{ mtv_networks }}"
+  loop_control:
+    loop_var: mtv_vmware_network
+  when:
+    - "'vsphere' in provider"
+    - mtv_networks is defined
+    - mtv_networks | length > 0
+
+- name: _mtv_network_map | Process Ovirt Networks
+  ansible.builtin.include_tasks: _mtv_network_map_process_network.yml
+  loop: "{{ mtv_networks }}"
+  loop_control:
+    loop_var: mtv_ovirt_network
+  when:
+    - "'ovirt' in provider"
+    - mtv_networks is defined
+    - mtv_networks | length > 0
+
+- name: _mtv_network_map | Template NetworkMap Map
+  ansible.builtin.set_fact:
+    mtv_management_network_map: "{{ (lookup('ansible.builtin.template', 'networkmap.yml.j2') | from_yaml) | ansible.builtin.combine({'spec': {'map': (mtv_management_mtv_networkmap_maps | dict2items | map(attribute='value') | list)}}, recursive=true) }}" # noqa: yaml[line-length]
+
+- name: _mtv_network_map | Create Network Map
+  redhat.openshift.k8s:
+    state: present
+    definition: "{{ mtv_management_network_map }}"
+    apply: true
+...

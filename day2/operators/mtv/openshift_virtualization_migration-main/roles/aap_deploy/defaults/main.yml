@@ -1,0 +1,61 @@
+---
+# defaults file for aap_deploy
+
+# title: Boolean to allow AAP instalation and subscription attachment
+# required: True
+# description: Setting this variable to true will install AAP and attach a valid subscription based on your account.
+aap_deploy_aap_install: true
+
+# aap_namespace: "{{ aap_namespace }}"
+# aap_channel: "{{ aap_channel }}"
+# aap_instance_name: "{{ aap_instance_name }}"
+# aap_org_name: "{{ aap_org_name }}"
+# bootstrap_aap: "{{ true if 'bootstrap' groups and groups['bootstrap'] | length > 0 else false }}"
+
+# title: Username for AAP Controller authentication
+# required: True
+# description: Username used to authenticate against the AAP Controller.
+aap_deploy_controller_username: "{{ controller_username | default('admin', true) }}"
+
+# title: OpenShift cluster hostname
+# required: True
+# description: The hostname or API endpoint of the OpenShift cluster to validate bearer token.
+aap_deploy_openshift_host: "{{ openshift_host }}"
+
+# title: OpenShift API authentication key
+# required: False
+# description: API key used to authenticate against the OpenShift cluster.
+aap_deploy_openshift_api_key: "{{ openshift_api_key }}"
+
+# title: Verify SSL certificates for OpenShift connection
+# required: False
+# description: Whether to verify SSL certificates when connecting to OpenShift.
+aap_deploy_openshift_verify_ssl: "{{ openshift_verify_ssl }}"
+
+# title: Ansible Automation Platform component validation
+# required: True
+# description: The names of the components to verify is running after installation.
+aap_deploy_validate_components:
+  - "{{ aap_instance_name + '-controller-task' if aap_version is
+    not defined or aap_version is version('2.5', '>=') else aap_instance_name + '-web' }}"
+  - "{{ aap_instance_name + '-controller-task' if aap_version is
+    not defined or aap_version is version('2.5', '>=') else aap_instance_name + '-task' }}"
+  - "{{ aap_instance_name + '-gateway' if aap_version is
+    not defined or aap_version is version('2.5', '>=') else '' }}"
+
+# title: Ansible Automation Platform configuration collection
+# required: True
+# description: Determines which collection to use for configuring AAP based on the version.
+aap_deploy_cac_collection: >-
+  {{ 'infra.controller_configuration' if aap_version is defined and aap_version is version('2.5', '<')
+  else 'infra.aap_configuration' }}
+
+aap_deploy_aap_channel: "{{ aap_channel | default('stable-2.5') }}"
+
+# controller_hostname: "{{ controller_hostname }}"
+# controller_password: "{{ controller_password }}"
+# controller_validate_certs: "{{ controller_validate_certs }}"
+# vmware_host: "{{ vmware_host }}"
+# vmware_user: "{{ vmware_user }}"
+# vmware_password: "{{ vmware_password }}"
+...

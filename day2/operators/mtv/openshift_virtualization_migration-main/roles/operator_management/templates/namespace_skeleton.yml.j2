@@ -1,0 +1,4 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ _operator_name | infra.openshift_virtualization_migration.rfc1123 }}

@@ -1,0 +1,71 @@
+---
+- name: Verify Request Variable Provided
+  ansible.builtin.assert:
+    that:
+      - vm_collect_request_instance | default("", true) | length > 0
+    quiet: true
+    fail_msg: "Variable Holding {{ vm_collect_obj | default(vm_collect_obj_default_kind) }} Input Variable Not Provided"
+
+- name: Verify Valid Result Variable Provided
+  ansible.builtin.assert:
+    that:
+      - vm_collect_vms_var | default("", true) | length > 0
+    quiet: true
+    fail_msg: "Variable Holding {{ vm_collect_obj | default(vm_collect_obj_default_kind) }} Output Variable Not Provided" # noqa: yaml[line-length]
+
+- name: Verify Namespace Provided When Name Specified
+  ansible.builtin.assert:
+    that:
+      - "'namespace' in vm_collect_request_instance"
+    quiet: true
+    fail_msg: "Must Provide a Namespace for {{ vm_collect_obj | default(vm_collect_obj_default_kind) }}"
+  when: "'name' in vm_collect_request_instance"
+
+- name: "Query Without Label Selector - {{ vm_collect_obj | default(vm_collect_obj_default_kind) }}"
+  when: "'label_selectors' not in vm_collect_request_instance"
+  block:
+    - name: "Query Without Label Selector {{ vm_collect_obj | default(vm_collect_obj_default_kind) }}"
+      kubernetes.core.k8s_info:
+        api_key: "{{ vm_collect_openshift_api_key }}"
+        host: "{{ vm_collect_openshift_host }}"
+        api_version: "{{ vm_collect_api_version | default(vm_collect_obj_default_api_version) }}"
+        kind: "{{ vm_collect_obj | default(vm_collect_obj_default_kind) }}"
+        namespace: "{{ vm_collect_request_instance['namespace'] if 'namespace' in vm_collect_request_instance else omit }}" # noqa: yaml[line-length]
+        validate_certs: "{{ vm_collect_verify_ssl }}"
+      register: vm_collect_no_label_selectors_responses
+
+    - name: "Add (Without Label Selector) {{ vm_collect_obj | default(vm_collect_obj_default_kind) }}"
+      ansible.builtin.set_fact:
+        "{{ vm_collect_vms_var }}": "{{ lookup('ansible.builtin.vars', vm_collect_vms_var, default=[]) + [{'response_obj': vm_collect_no_label_selectors_response} | ansible.builtin.combine(vm_collect_request_instance, recursive=True)] }}" # noqa: var-naming[no-jinja] # noqa: yaml[line-length]
+      loop: "{{ vm_collect_no_label_selectors_responses['resources'] if 'resources' in vm_collect_no_label_selectors_responses else [] }}" # noqa: yaml[line-length]
+      loop_control:
+        loop_var: vm_collect_no_label_selectors_response
+        label: "Namespace: {{ vm_collect_no_label_selectors_response.metadata.namespace }} - Name: {{ vm_collect_no_label_selectors_response.metadata.name }}" # noqa: yaml[line-length]
+      when:
+        - "(lookup('ansible.builtin.vars', vm_collect_vms_var, default=[]) | map(attribute='response_obj') | list) | selectattr('metadata.namespace', 'equalto', vm_collect_no_label_selectors_response.metadata.namespace) | list | selectattr('metadata.name', 'equalto', vm_collect_no_label_selectors_response.metadata.name) | list | length == 0" # noqa: yaml[line-length]
+        - "('namespace' in vm_collect_request_instance and 'names' in vm_collect_request_instance and vm_collect_no_label_selectors_response.metadata.name in vm_collect_request_instance['names']) or ('namespace' in vm_collect_request_instance and 'names' not in vm_collect_request_instance) or ('namespace' not in vm_collect_request_instance)" # noqa: yaml[line-length]
+
+- name: "Query Using Label Selector - {{ vm_backup_restore_collect_obj | default(collect_obj_default_kind) }}"
+  when: "'label_selectors' in vm_collect_request_instance"
+  block:
+    - name: "Query (With Label Selector) - {{ vm_collect_obj | default(vm_collect_obj_default_kind) }}"
+      kubernetes.core.k8s_info:
+        api_key: "{{ vm_collect_openshift_api_key }}"
+        host: "{{ vm_collect_openshift_host }}"
+        api_version: "{{ vm_collect_api_version | default(vm_collect_obj_default_api_version) }}"
+        kind: "{{ vm_collect_obj | default(vm_collect_obj_default_kind) }}"
+        namespace: "{{ vm_collect_request_instance['namespace'] if 'namespace' in vm_collect_request_instance else omit }}" # noqa: yaml[line-length]
+        validate_certs: "{{ vm_collect_verify_ssl }}"
+        label_selectors: "{{ vm_collect_request_instance['label_selectors'] | default([]) }}"
+      register: vm_collect_label_selectors_responses
+
+    - name: "Add (With Label Selector) - {{ vm_collect_obj | default(vm_collect_obj_default_kind) }}"
+      ansible.builtin.set_fact:
+        "{{ vm_collect_vms_var }}": "{{ lookup('ansible.builtin.vars', vm_collect_vms_var, default=[]) + [{'response_obj': vm_collect_no_label_selectors_response} | ansible.builtin.combine(vm_collect_request_instance, recursive=True)] }}" # noqa: var-naming[no-jinja] # noqa: yaml[line-length]
+      loop: "{{ vm_collect_label_selectors_responses['resources'] if 'resources' in vm_collect_label_selectors_responses else [] }}" # noqa: yaml[line-length]
+      loop_control:
+        loop_var: vm_collect_label_selectors_response
+        label: "Namespace: {{ vm_collect_label_selectors_response.metadata.namespace }} - Name: {{ vm_collect_label_selectors_response.metadata.name }}" # noqa: yaml[line-length]
+      when:
+        - "(lookup('ansible.builtin.vars', vm_collect_vms_var, default=[]) | map(attribute='response_obj') | list) | selectattr('metadata.namespace', 'equalto', vm_collect_label_selectors_response.metadata.namespace) | list | selectattr('metadata.name', 'equalto', vm_collect_label_selectors_response.metadata.name) | list | length == 0" # noqa: yaml[line-length]
+...

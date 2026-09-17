@@ -1,0 +1,12 @@
+---
+- name: Configure Network
+  hosts: localhost
+  tasks:
+    - name: Include infra.openshift_virtualization_migration.network_mgmt role
+      ansible.builtin.include_role:
+        name: infra.openshift_virtualization_migration.network_mgmt
+      vars:
+        network_mgmt_vcenter_hostname: "{{ lookup('ansible.builtin.env', 'VMWARE_HOST') }}"
+        network_mgmt_vcenter_username: "{{ lookup('ansible.builtin.env', 'VMWARE_USER') }}"
+        network_mgmt_vcenter_password: "{{ lookup('ansible.builtin.env', 'VMWARE_PASSWORD') }}"
+...

@@ -1,0 +1,23 @@
+---
+- name: _operator_config_item | Retrieve Operator name
+  ansible.builtin.set_fact:
+    _operator_management_operator: "{{ vars['operator_management_' + _operator_name] | default(vars['operator_management_default_' + _operator_name]) }}" # noqa: yaml[line-length]
+
+- name: _operator_config_item | Configure Resources
+  ansible.builtin.include_tasks: _operator_resource_item.yml
+  loop_control:
+    loop_var: _operator_resource_name
+  when: _operator_management_operator[_operator_resource_name] is defined
+  loop:
+    - namespace
+    - operatorgroup
+    - subscription
+
+- name: _operator_config_item | Apply Extra Resources
+  redhat.openshift.k8s: # noqa: fqcn[canonical]
+    state: present
+    definition: "{{ item.value }}"
+    apply: true
+  when: _operator_management_operator['extra_resources'] is defined
+  loop: "{{ _operator_management_operator['extra_resources'] | dict2items }}"
+...

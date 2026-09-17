@@ -1,0 +1,31 @@
+---
+- name: Obtain List of PackageManifests
+  kubernetes.core.k8s_info:
+    api_version: packages.operators.coreos.com/v1
+    kind: PackageManifest
+  register: operator_management_packagemanifests_results
+  when: operator_management_operators | default(operator_management_default_operators) | length > 0
+
+- name: Disable default CatalogSources # noqa: fqcn[canonical]
+  redhat.openshift.k8s:
+    state: patched
+    api_version: config.openshift.io/v1
+    kind: OperatorHub
+    name: cluster
+    definition:
+      spec:
+        disableAllDefaultSources: "{{ disableDefaultOperatorSources }}"
+  when: disableDefaultOperatorSources is defined
+
+- name: Configure CatalogSources
+  ansible.builtin.include_tasks: _operator_catalog_source_item.yml
+  loop: "{{ operator_management_catalogsources | dict2items }}"
+  loop_control:
+    loop_var: _catalogsource_item
+
+- name: Configure Operators
+  ansible.builtin.include_tasks: _operator_config_item.yml
+  loop: "{{ operator_management_operators | default(operator_management_default_operators) }}"
+  loop_control:
+    loop_var: _operator_name
+...

@@ -1,0 +1,11 @@
+name: OpenShift Virtualization Migration - Configure Operators - {{ _mf_host }}
+organization: "{{ aap_seed_aap_org_name }}"
+project: "{{ aap_seed_aap_project }}"
+job_type: run
+extra_vars: 
+  {{ (aap_seed_aap_job_template_extra_vars |  ansible.builtin.combine({'operator_management_operators': operator_management_operators})) | to_yaml | indent(2) }}
+playbook: playbooks/operator_management.yml
+inventory: "{{ aap_seed_aap_inventory }}"
+execution_environment: "{{ aap_seed_aap_execution_environment }}"
+credentials:
+    - Kubeconfig - {{ _mf_host }}

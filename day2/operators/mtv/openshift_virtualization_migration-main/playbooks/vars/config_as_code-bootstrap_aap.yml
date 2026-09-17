@@ -1,0 +1,461 @@
+---
+################################################################################
+# This file is used to preseed an AAP instance with objects used to kickoff the
+# remaining automation from there. Typically this will be the bootstrap VM
+# but might be an existing AAP instance. Provide the following secrets in a more
+# secure way than just adding them here.
+#
+# The vars below use the following collection to configure AAP:
+# https://console.redhat.com/ansible/automation-hub/repo/validated/infra/controller_configuration/
+################################################################################
+
+# General controller vars
+controller_configuration_async_retries: 60
+controller_dependency_check: false
+
+# Bootstrap vars typically set in a separate secrets file
+bootstrap_aap_inventory: bootstrap
+bootstrap_aap_version: "{{ aap_version }}"
+bootstrap_aap_namespace: "{{ aap_namespace }}"
+bootstrap_aap_channel: "{{ aap_channel }}"
+bootstrap_aap_instance_name: "{{ aap_instance_name }}"
+bootstrap_aap_execution_environment: "{{ aap_execution_environment }}"
+bootstrap_aap_execution_environment_image: "{{ aap_execution_environment_image }}"
+bootstrap_aap_project: "{{ aap_project }}"
+bootstrap_aap_org_name: "{{ aap_org_name }}"
+bootstrap_aap_project_branch: "{{ aap_project_branch }}"
+bootstrap_aap_project_repo: "{{ aap_project_repo }}"
+bootstrap_automation_hub_certified_url: "{{ automation_hub_certified_url }}"
+bootstrap_automation_hub_certified_auth_url: "{{ automation_hub_certified_auth_url }}"
+bootstrap_automation_hub_certified_token: "{{ automation_hub_certified_token }}"
+bootstrap_automation_hub_validated_url: "{{ automation_hub_validated_url }}"
+bootstrap_automation_hub_validated_auth_url: "{{ automation_hub_validated_auth_url }}"
+bootstrap_automation_hub_validated_token: "{{ automation_hub_validated_token }}"
+bootstrap_openshift_host: "{{ openshift_host }}"
+bootstrap_openshift_api_key: "{{ openshift_api_key }}"
+bootstrap_openshift_verify_ssl: "{{ openshift_verify_ssl | default(false) }}"
+bootstrap_controller_hostname: "{{ controller_hostname }}"
+bootstrap_controller_username: "{{ controller_username }}"
+bootstrap_controller_password: "{{ controller_password }}"
+bootstrap_controller_validate_certs: "{{ controller_validate_certs | default(false) }}"
+bootstrap_git_username: "{{ git_username }}"
+bootstrap_git_password: "{{ git_password }}"
+bootstrap_git_ssh_private_key: "{{ git_ssh_private_key }}"
+bootstrap_git_ssh_key_passphrase: "{{ git_ssh_key_passphrase }}"
+bootstrap_container_host: "{{ container_host }}"
+bootstrap_container_password: "{{ container_password }}"
+bootstrap_container_username: "{{ container_username }}"
+bootstrap_container_verify_ssl: "{{ container_verify_ssl | default(false) }}"
+bootstrap_idrac_username: "{{ idrac_username }}"
+bootstrap_idrac_password: "{{ idrac_password }}"
+bootstrap_idrac_validate_certs: "{{ idrac_validate_certs | default(false) }}"
+bootstrap_vmware_host: "{{ vmware_host }}"
+bootstrap_vmware_user: "{{ vmware_user }}"
+bootstrap_vmware_password: "{{ vmware_password }}"
+bootstrap_vmware_validate_certs: "{{ vmware_validate_certs | default(false) }}"
+bootstrap_vmware_cacert: "{{ vmware_cacert }}"
+bootstrap_vmware_context_path: "{{ vmware_context_path }}"
+bootstrap_aap_job_template_extra_vars: "{{ aap_job_template_extra_vars | default({}) }}"
+
+# Controller bootstrap vars. Don't worry about order, when the dispatch role is called it \
+# will create in the proper order
+controller_organizations:
+  - name: "{{ bootstrap_aap_org_name }}"
+    galaxy_credentials:
+      - Red Hat Automation Hub Certified
+      - Red Hat Automation Hub Validated
+      - Ansible Galaxy
+controller_credentials:
+  - name: Quay
+    description: Quay credential
+    organization: "{{ bootstrap_aap_org_name }}"
+    credential_type: Container Registry
+    inputs:
+      host: "{{ bootstrap_container_host }}"
+      password: "{{ bootstrap_container_password }}"
+      username: "{{ bootstrap_container_username }}"
+      verify_ssl: "{{ bootstrap_container_verify_ssl }}"
+  - name: Red Hat Automation Hub Certified
+    description: Red Hat Automation Hub Certified Credential
+    organization: "{{ bootstrap_aap_org_name }}"
+    credential_type: Ansible Galaxy/Automation Hub API Token
+    inputs:
+      url: "{{ bootstrap_automation_hub_certified_url }}"
+      auth_url: "{{ bootstrap_automation_hub_certified_auth_url }}"
+      token: "{{ bootstrap_automation_hub_certified_token }}"
+  - name: Red Hat Automation Hub Validated
+    description: Red Hat Automation Hub Validated Credential
+    organization: "{{ bootstrap_aap_org_name }}"
+    credential_type: Ansible Galaxy/Automation Hub API Token
+    inputs:
+      url: "{{ bootstrap_automation_hub_validated_url }}"
+      auth_url: "{{ bootstrap_automation_hub_validated_auth_url }}"
+      token: "{{ bootstrap_automation_hub_validated_token }}"
+  - name: GitLab
+    description: GitLab access to clone repositories
+    organization: "{{ bootstrap_aap_org_name }}"
+    credential_type: Source Control
+    inputs:
+      username: "{{ bootstrap_git_username }}"
+      password: "{{ bootstrap_git_password }}"
+      ssh_key_data: "{{ bootstrap_git_ssh_private_key }}"
+      ssh_key_unlock: "{{ bootstrap_git_ssh_key_passphrase }}"
+  - name: VMware
+    description: VMware credential
+    organization: "{{ bootstrap_aap_org_name }}"
+    credential_type: VMware vCenter
+    inputs:
+      host: "{{ bootstrap_vmware_host }}"
+      password: "{{ bootstrap_vmware_password }}"
+      username: "{{ bootstrap_vmware_user }}"
+  - name: bootstrap_cac
+    description: Bootstrap Config as Code Data structure
+    organization: "{{ bootstrap_aap_org_name }}"
+    credential_type: bootstrap_cac
+    inputs:
+      git_username: "{{ bootstrap_git_username }}"
+      git_password: "{{ bootstrap_git_password }}"
+      git_ssh_private_key: "{{ bootstrap_git_ssh_private_key }}"
+      git_ssh_key_passphrase: "{{ bootstrap_git_ssh_key_passphrase }}"
+      automation_hub_certified_url: "{{ bootstrap_automation_hub_certified_url }}"
+      automation_hub_certified_auth_url: "{{ bootstrap_automation_hub_certified_auth_url }}"
+      automation_hub_certified_token: "{{ bootstrap_automation_hub_certified_token }}"
+      automation_hub_validated_url: "{{ bootstrap_automation_hub_validated_url }}"
+      automation_hub_validated_auth_url: "{{ bootstrap_automation_hub_validated_auth_url }}"
+      automation_hub_validated_token: "{{ bootstrap_automation_hub_validated_token }}"
+      aap_version: "{{ bootstrap_aap_version }}"
+      aap_namespace: "{{ bootstrap_aap_namespace }}"
+      aap_channel: "{{ bootstrap_aap_channel }}"
+      aap_instance_name: "{{ bootstrap_aap_instance_name }}"
+      aap_project: "{{ bootstrap_aap_project }}"
+      aap_org_name: "{{ bootstrap_aap_org_name }}"
+      aap_project_repo: "{{ bootstrap_aap_project_repo }}"
+      aap_project_branch: "{{ bootstrap_aap_project_branch }}"
+      aap_execution_environment: "{{ bootstrap_aap_execution_environment }}"
+      aap_execution_environment_image: "{{ bootstrap_aap_execution_environment_image }}"
+      rh_username: "{{ rh_username }}"
+      rh_password: "{{ rh_password }}"
+      vmware_validate_certs: "{{ bootstrap_vmware_validate_certs }}"
+      vmware_cacert: "{{ bootstrap_vmware_cacert }}"
+      vmware_context_path: "{{ bootstrap_vmware_context_path }}"
+      container_host: "{{ bootstrap_container_host }}"
+      container_password: "{{ bootstrap_container_password }}"
+      container_username: "{{ bootstrap_container_username }}"
+      container_verify_ssl: "{{ bootstrap_container_verify_ssl }}"
+      aap_job_template_extra_vars: "{{ bootstrap_aap_job_template_extra_vars | to_json }}"
+  - name: iDRAC
+    description: iDRAC credentials
+    organization: "{{ bootstrap_aap_org_name }}"
+    credential_type: iDRAC
+    inputs:
+      idrac_username: "{{ bootstrap_idrac_username }}"
+      idrac_password: "{{ bootstrap_idrac_password }}"
+      idrac_validate_certs: "{{ bootstrap_idrac_validate_certs }}"
+  - name: Kubeconfig
+    description: Cluster Kubeconfig
+    organization: "{{ bootstrap_aap_org_name }}"
+    credential_type: OpenShift or Kubernetes API Bearer Token
+    inputs:
+      host: "{{ bootstrap_openshift_host }}"
+      verify_ssl: "{{ bootstrap_openshift_verify_ssl }}"
+      bearer_token: "{{ bootstrap_openshift_api_key }}"
+  - name: Bootstrap AAP
+    description: Bootstrap Credential
+    organization: "{{ bootstrap_aap_org_name }}"
+    credential_type: Red Hat Ansible Automation Platform
+    inputs:
+      host: "{{ bootstrap_controller_hostname }}"
+      username: "{{ bootstrap_controller_username }}"
+      password: "{{ bootstrap_controller_password }}"
+      verify_ssl: "{{ bootstrap_controller_validate_certs }}"
+  - name: Migration Factory AAP
+    description: Migration Factory AAP Credential
+    organization: "{{ bootstrap_aap_org_name }}"
+    credential_type: Red Hat Ansible Automation Platform
+controller_credential_types:
+  - name: bootstrap_cac
+    description: Bootstrap Config-as-Code Data structure
+    organization: "{{ bootstrap_aap_org_name }}"
+    kind: cloud
+    inputs:
+      fields:
+        - id: aap_version
+          type: string
+          label: AAP Version
+        - id: aap_namespace
+          type: string
+          label: AAP Namespace
+        - id: aap_channel
+          type: string
+          label: AAP Channel
+        - id: aap_instance_name
+          type: string
+          label: AAP Instance Name
+        - id: automation_hub_certified_url
+          type: string
+          label: Automation Hub Certified URL
+        - id: automation_hub_certified_auth_url
+          type: string
+          label: Automation Hub Certified auth URL
+        - id: automation_hub_certified_token
+          type: string
+          label: Automation Hub Certified token
+          secret: true
+        - id: automation_hub_validated_url
+          type: string
+          label: Automation Hub Validated URL
+        - id: automation_hub_validated_auth_url
+          type: string
+          label: Automation Hub Validated auth URL
+        - id: automation_hub_validated_token
+          type: string
+          label: Automation Hub Validated token
+          secret: true
+        - id: git_username
+          type: string
+          label: Git username
+        - id: git_password
+          type: string
+          label: Git password
+          secret: true
+        - id: git_ssh_private_key
+          type: string
+          label: Git SSH private key
+          secret: true
+        - id: git_ssh_key_passphrase
+          type: string
+          label: Git SSH key passphrase
+          secret: true
+        - id: aap_project
+          type: string
+          label: AAP Project
+        - id: aap_org_name
+          type: string
+          label: AAP Organization
+        - id: aap_project_repo
+          type: string
+          label: AAP Repository
+        - id: aap_project_branch
+          type: string
+          label: AAP Branch
+        - id: aap_execution_environment
+          type: string
+          label: AAP Execution Environment
+        - id: aap_execution_environment_image
+          type: string
+          label: AAP Execution Environment Image
+        - id: rh_username
+          type: string
+          label: Red Hat Username
+        - id: rh_password
+          type: string
+          label: Red Hat Password
+          secret: true
+        - id: vmware_validate_certs
+          type: boolean
+          label: Validate VMware Certificate
+        - id: vmware_cacert
+          type: string
+          label: VMware CA Certificate
+        - id: vmware_context_path
+          type: string
+          label: VMware Context Path
+        - id: container_host
+          type: string
+          label: Container Host
+        - id: container_username
+          type: string
+          label: Container Username
+        - id: container_password
+          type: string
+          label: Container Password
+          secret: true
+        - id: container_verify_ssl
+          type: boolean
+          label: Container Verify SSL
+        - id: aap_job_template_extra_vars
+          type: string
+          label: Job Template Extra Variables
+          secret: true
+      required:
+        - aap_namespace
+        - aap_channel
+        - aap_version
+        - aap_instance_name
+        - aap_project
+        - aap_org_name
+        - aap_project_repo
+        - aap_project_branch
+        - aap_execution_environment
+        - aap_execution_environment_image
+        - automation_hub_certified_url
+        - automation_hub_certified_auth_url
+        - automation_hub_certified_token
+        - automation_hub_validated_url
+        - automation_hub_validated_auth_url
+        - automation_hub_validated_token
+        - git_username
+        - rh_username
+        - rh_password
+        - vmware_validate_certs
+        - vmware_context_path
+        - container_host
+        - container_username
+        - container_password
+        - aap_job_template_extra_vars
+    injectors:
+      extra_vars:
+        aap_namespace: "{% raw %}{  { aap_namespace }}{% endraw %}"
+        aap_version: "{% raw %}{  { aap_version }}{% endraw %}"
+        aap_channel: "{% raw %}{  { aap_channel }}{% endraw %}"
+        aap_instance_name: "{% raw %}{  { aap_instance_name }}{% endraw %}"
+        aap_project: "{% raw %}{  { aap_project }}{% endraw %}"
+        aap_org_name: "{% raw %}{  { aap_org_name }}{% endraw %}"
+        aap_project_repo: "{% raw %}{  { aap_project_repo }}{% endraw %}"
+        aap_project_branch: "{% raw %}{  { aap_project_branch }}{% endraw %}"
+        aap_execution_environment: "{% raw %}{  { aap_execution_environment }}{% endraw %}"
+        aap_execution_environment_image: "{% raw %}{  { aap_execution_environment_image }}{% endraw %}"
+        automation_hub_url: "{% raw %}{  { automation_hub_url }}{% endraw %}"
+        automation_hub_auth_url: "{% raw %}{  { automation_hub_auth_url }}{% endraw %}"
+        automation_hub_token: "{% raw %}{  { automation_hub_token }}{% endraw %}"
+        git_username: "{% raw %}{  { git_username }}{% endraw %}"
+        git_password: "{% raw %}{  { git_password }}{% endraw %}"
+        git_ssh_private_key: "{% raw %}{  { git_ssh_private_key }}{% endraw %}"
+        git_ssh_key_passphrase: "{% raw %}{  { git_ssh_key_passphrase }}{% endraw %}"
+        rh_username: "{% raw %}{  { rh_username }}{% endraw %}"
+        rh_password: "{% raw %}{  { rh_password }}{% endraw %}"
+        vmware_validate_certs: "{% raw %}{  { vmware_validate_certs }}{% endraw %}"
+        vmware_cacert: "{% raw %}{  { vmware_cacert }}{% endraw %}"
+        vmware_context_path: "{% raw %}{  { vmware_context_path }}{% endraw %}"
+        container_host: "{% raw %}{  { container_host }}{% endraw %}"
+        container_username: "{% raw %}{  { container_username }}{% endraw %}"
+        container_password: "{% raw %}{  { container_password }}{% endraw %}"
+        container_verify_ssl: "{% raw %}{  { container_verify_ssl }}{% endraw %}"
+        aap_job_template_extra_vars: "{% raw %}{  { aap_job_template_extra_vars }}{% endraw %}"
+  - name: iDRAC
+    description: iDRAC credentials
+    kind: cloud
+    inputs:
+      fields:
+        - id: idrac_username
+          type: string
+          label: idrac username
+        - id: idrac_password
+          type: string
+          label: idrac_password
+          secret: true
+        - id: idrac_validate_certs
+          type: boolean
+          label: idrac validate certs
+          default: false
+      required:
+        - idrac_username
+        - idrac_password
+        - idrac_validate_certs
+    injectors:
+      extra_vars:
+        idrac_username: "{% raw %}{  { idrac_username }}{% endraw %}"
+        idrac_password: "{% raw %}{  { idrac_password }}{% endraw %}"
+        idrac_validate_certs: "{% raw %}{  { idrac_validate_certs }}{% endraw %}"
+controller_execution_environments:
+  - name: "{{ bootstrap_aap_execution_environment }}"
+    image: "{{ bootstrap_aap_execution_environment_image }}"
+    pull: always
+    credential: Quay
+controller_projects:
+  - name: "{{ bootstrap_aap_project }}"
+    scm_type: git
+    scm_url: "{{ bootstrap_aap_project_repo }}"
+    scm_branch: "{{ bootstrap_aap_project_branch }}"
+    scm_clean: true
+    description: Bootstrap project
+    organization: "{{ bootstrap_aap_org_name }}"
+    credential: GitLab
+    update_project: true
+    execution_environment: "{{ bootstrap_aap_execution_environment }}"
+controller_inventories:
+  - name: source_hosts
+    organization: "{{ bootstrap_aap_org_name }}"
+  - name: "{{ bootstrap_aap_inventory }}"
+    organization: "{{ bootstrap_aap_org_name }}"
+controller_hosts:
+  - name: localhost
+    inventory: "{{ bootstrap_aap_inventory }}"
+    variables:
+      ansible_connection: local
+      ansible_python_interpreter: "{  { ansible_playbook_python }}"
+controller_templates:
+  - name: Bootstrap Step 0 - Pre-config
+    organization: "{{ bootstrap_aap_org_name }}"
+    project: "{{ bootstrap_aap_project }}"
+    inventory: source_hosts
+    job_type: run
+    extra_vars: "{{ bootstrap_aap_job_template_extra_vars }}"
+    playbook: playbooks/pre_config.yml
+    credentials:
+      - iDRAC
+  - name: Bootstrap Step 1 - Install Migration Factory AAP on OpenShift
+    organization: "{{ bootstrap_aap_org_name }}"
+    project: "{{ bootstrap_aap_project }}"
+    job_type: run
+    extra_vars: "{{ bootstrap_aap_job_template_extra_vars | combine({'controller_dependency_check': controller_dependency_check}) }}" # noqa: yaml[line-length]
+    inventory: "{{ bootstrap_aap_inventory }}"
+    playbook: playbooks/migration_factory_aap_install.yml
+    execution_environment: "{{ bootstrap_aap_execution_environment }}"
+    credentials:
+      - bootstrap_cac
+      - Kubeconfig
+      - Bootstrap AAP
+  - name: Bootstrap Step 2 - Subscribe Migration Factory AAP On OpenShift
+    organization: "{{ bootstrap_aap_org_name }}"
+    project: "{{ bootstrap_aap_project }}"
+    job_type: run
+    extra_vars: "{{ bootstrap_aap_job_template_extra_vars | combine({'controller_dependency_check': controller_dependency_check}) }}" # noqa: yaml[line-length]
+    inventory: "{{ bootstrap_aap_inventory }}"
+    ask_variables_on_launch: false
+    playbook: playbooks/migration_factory_aap_subscribe.yml
+    execution_environment: "{{ bootstrap_aap_execution_environment }}"
+    credentials:
+      - bootstrap_cac
+      - Migration Factory AAP
+  - name: Bootstrap Step 3 - Preseed Migration AAP Factory On OpenShift
+    organization: "{{ bootstrap_aap_org_name }}"
+    project: "{{ bootstrap_aap_project }}"
+    job_type: run
+    extra_vars: "{{ bootstrap_aap_job_template_extra_vars | combine({'controller_dependency_check': controller_dependency_check}) }}" # noqa: yaml[line-length]
+    inventory: "{{ bootstrap_aap_inventory }}"
+    ask_variables_on_launch: false
+    playbook: playbooks/migration_factory_aap_preseed.yml
+    execution_environment: "{{ bootstrap_aap_execution_environment }}"
+    credentials:
+      - bootstrap_cac
+      - Kubeconfig
+      - Migration Factory AAP
+      - VMware
+controller_workflows:
+  - name: Bootstrap All Steps - Install, Subscribe and Preseed Migration Factory AAP On OpenShift
+    description: Bootstrap overall workflow
+    organization: "{{ bootstrap_aap_org_name }}"
+    survey_enabled: false
+    allow_simultaneous: false
+    ask_variables_on_launch: false
+    inventory: "{{ bootstrap_aap_inventory }}"
+    state: present
+    simplified_workflow_nodes:
+      - all_parents_must_converge: false
+        identifier: Step 1 Install Migration Factory AAP
+        unified_job_template: Bootstrap Step 1 - Install Migration Factory AAP on OpenShift
+        success_nodes:
+          - Step 2 Subscribe Migration Factory AAP
+      - all_parents_must_converge: false
+        identifier: Step 2 Subscribe Migration Factory AAP
+        unified_job_template: Bootstrap Step 2 - Subscribe Migration Factory AAP On OpenShift
+        success_nodes:
+          - Step 3 Preseed Migration Factory AAP
+      - all_parents_must_converge: false
+        identifier: Step 3 Preseed Migration Factory AAP
+        unified_job_template: Bootstrap Step 3 - Preseed Migration AAP Factory On OpenShift
+controller_workflow_launch_jobs:
+  - name: Bootstrap All Steps - Install, Subscribe and Preseed Migration Factory AAP On OpenShift
+    wait: true
+...

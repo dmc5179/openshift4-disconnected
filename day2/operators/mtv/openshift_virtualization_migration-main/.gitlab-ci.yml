@@ -1,0 +1,104 @@
+---
+# yamllint disable-line rule:line-length
+# yaml-language-server: $schema=https://gitlab.com/gitlab-org/gitlab/-/raw/master/app/assets/javascripts/editor/schema/ci.json
+
+default:
+  interruptible: true
+  retry:
+    when: runner_system_failure
+    max: 2
+  tags:
+    - ansible
+
+# The default image used if not overridden at the job level
+image: >-
+  ghcr.io/ansible/community-ansible-dev-tools:latest
+
+# Every job should include a stage with a goal of failing fast
+# List of stages for jobs, and their order of execution
+stages:
+  - secrets
+  - prepare
+  - test
+  - report
+  - release
+  - publish
+
+################################################################################
+##########################            NOTE            ##########################
+################################################################################
+# Gitlab requires this file be named with the '.yml' suffix to be recognized
+# however to reduce the linting issues in IDE and CLI tools, all other gitlab
+# files in this collection will use the '.yaml' extension.
+
+# The include parameter allows for the reuse of gitlab ci code
+# It merges all the sources prior to execution
+include:
+
+  # Workflow and job rules
+  - local: '.gitlab/ci-templates/workflow-rules.yaml'
+  - local: '.gitlab/ci-templates/job-rules.yaml'
+
+  # Secret detection
+  - template: Security/Secret-Detection.gitlab-ci.yml
+  - local: '.gitlab/ci-templates/default-variables.yaml'
+  - local: '.gitlab/ci-templates/secret-detection.yaml'
+
+  # Semantic Versioning - Next Version
+  - component: >-
+      $CI_SERVER_FQDN/redhat-cop/openshift-virtualization-migration/openshift_migration_ci_components/semver-next@~latest
+
+  # Ansible Validate Tokens
+  - component: >-
+      $CI_SERVER_FQDN/redhat-cop/openshift-virtualization-migration/openshift_migration_ci_components/ansible-validate-tokens@~latest
+
+  # Collection install
+  - component: >-
+      $CI_SERVER_FQDN/redhat-cop/openshift-virtualization-migration/openshift_migration_ci_components/ansible-collection-install@~latest
+    inputs:
+      needs-collection-requirements: requirements-dev.yml
+      needs-collections-path: .ansible/collections
+
+  # Ansible Lint
+  # production strict
+  # generate sarif report
+  # install test-requirements.txt
+  - component: >-
+      $CI_SERVER_FQDN/redhat-cop/openshift-virtualization-migration/openshift_migration_ci_components/ansible-lint@~latest
+    inputs:
+      opt-profile: production
+      opt-job-prefix: automation-hub-verify
+      opt-strict: true
+      opt-pip-requirements: test-requirements.txt
+      opt-sarif-file: true
+
+  # Tox
+  - component: >-
+      $CI_SERVER_FQDN/redhat-cop/openshift-virtualization-migration/openshift_migration_ci_components/tox@~latest
+    inputs:
+      opt-stage: test
+
+  # Code quality report sarif lint
+  - component: >-
+      $CI_SERVER_FQDN/redhat-cop/openshift-virtualization-migration/openshift_migration_ci_components/ansible-code-quality@~latest
+
+  # Semantic Versioning - Release
+  - component: >-
+      $CI_SERVER_FQDN/redhat-cop/openshift-virtualization-migration/openshift_migration_ci_components/semver-release@~latest
+    inputs:
+      needs-artifacts:
+        - collection-build.log
+        - infra-openshift_virtualization_migration-${NEXT_VERSION}.tar.gz
+
+  # Publish collection to GitLab Package registry
+  # depends on semver-next and semver-release
+  - component: >-
+      $CI_SERVER_FQDN/redhat-cop/openshift-virtualization-migration/openshift_migration_ci_components/gitlab-package-publisher@~latest
+    inputs:
+      needs-file-path-name: infra-openshift_virtualization_migration-${NEXT_VERSION}.tar.gz
+      needs-package-version: ${NEXT_VERSION}
+      needs-build-previous-job:
+        - job-semantic_release
+        - job-semver-next
+
+...

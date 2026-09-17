@@ -1,0 +1,45 @@
+---
+
+- name: vm_operations | Verify OpenShift Connectivity Details Provided
+  ansible.builtin.assert:
+    that:
+      - vm_lifecycle_openshift_host | default("", true) | length > 0
+      - vm_lifecycle_openshift_api_key | default("", true) | length > 0
+    quiet: true
+    fail_msg: OpenShift Connectivity Details Not Provided
+
+- name: vm_operations | Initialize Variables
+  ansible.builtin.set_fact:
+    vm_lifecycle_vm_operations_vms: []
+
+- name: vm_operations | Collect VM's
+  ansible.builtin.include_tasks:
+    file: _collect_vms.yml
+  loop: "{{ vm_lifecycle_vm_operations_request }}"
+  loop_control:
+    loop_var: "vm_operations_request_instance"
+
+- name: vm_operations | Print VM's
+  ansible.builtin.debug:
+    msg: "Namespace: {{ vm_operations_vm.vm.metadata.namespace }} - Name: {{ vm_operations_vm.vm.metadata.name }} - Operation: {{ vm_operations_vm.operation }}" # noqa: yaml[line-length]
+  loop: "{{ vm_lifecycle_vm_operations_vms }}"
+  loop_control:
+    loop_var: vm_operations_vm
+    label: "Namespace: {{ vm_operations_vm.vm.metadata.namespace }} - Name: {{ vm_operations_vm.vm.metadata.name }}"
+
+- name: vm_operations | Perform VM Operations
+  ansible.builtin.include_tasks:
+    file: _perform_operation.yml
+  loop: "{{ vm_lifecycle_vm_operations_vms }}"
+  loop_control:
+    loop_var: vm_operations_vm
+    label: "Namespace: {{ vm_operations_vm.vm.metadata.namespace }} - Name: {{ vm_operations_vm.vm.metadata.name }} - Operation: {{ vm_operations_vm.operation }}" # noqa: yaml[line-length]
+
+- name: vm_operations | Verify VMs
+  ansible.builtin.include_tasks:
+    file: _verify_operation.yml
+  loop: "{{ vm_lifecycle_vm_operations_vms }}"
+  loop_control:
+    loop_var: vm_operations_vm
+    label: "Namespace: {{ vm_operations_vm.vm.metadata.namespace }} - Name: {{ vm_operations_vm.vm.metadata.name }} - Operation: {{ vm_operations_vm.operation }}" # noqa: yaml[line-length]
+...

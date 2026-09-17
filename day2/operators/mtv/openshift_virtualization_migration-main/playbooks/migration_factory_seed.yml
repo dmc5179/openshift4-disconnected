@@ -1,0 +1,8 @@
+---
+- name: Seed AAP with Migration Factory Content
+  hosts: migration_aap
+  connection: local
+  gather_facts: false
+  roles:
+    - role: infra.openshift_virtualization_migration.aap_seed
+...

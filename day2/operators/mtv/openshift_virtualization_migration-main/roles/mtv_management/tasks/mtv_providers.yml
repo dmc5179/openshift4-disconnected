@@ -1,0 +1,43 @@
+---
+
+- name: mtv_providers | Verify ForkliftController status
+  kubernetes.core.k8s_info:
+    api_version: forklift.konveyor.io/v1beta1
+    kind: ForkliftController
+    namespace: "{{ mtv_management_namespace }}"
+  register: mtv_management_r_forkliftcontrollers
+  retries: 100
+  delay: 10
+  until:
+    - "'resources' in mtv_management_r_forkliftcontrollers"
+    - mtv_management_r_forkliftcontrollers.resources | length == 1
+    - mtv_management_r_forkliftcontrollers.resources[0].status is defined
+    - mtv_management_r_forkliftcontrollers.resources[0].status.conditions | selectattr('type', 'equalto', 'Successful') | list | length == 1 # noqa: yaml[line-length]
+  when: mtv_management_migration_targets | default([]) | length > 0
+
+- name: mtv_providers | Debug
+  ansible.builtin.debug:
+    msg: "{{ mtv_management_migration_targets }}"
+
+- name: mtv_providers | Configure vmware providers
+  ansible.builtin.include_tasks: _mtv_provider_vmware.yml
+  loop: "{{ mtv_management_migration_targets | selectattr('type', 'equalto', 'vmware') | list }}"
+  loop_control:
+    loop_var: vmware_target
+  vars:
+    single_vmware_target: "{{ mtv_management_migration_targets | selectattr('type', 'equalto', 'vmware') | list | length == 1 }}" # noqa: yaml[line-length]
+  when:
+    - mtv_management_migration_targets is defined
+    - mtv_management_migration_targets | selectattr('type', 'equalto', 'vmware') | list | length > 0
+
+- name: mtv_providers | Configure ovirt providers
+  ansible.builtin.include_tasks: _mtv_provider_ovirt.yml
+  loop: "{{ mtv_management_migration_targets | selectattr('type', 'equalto', 'ovirt') | list }}"
+  loop_control:
+    loop_var: ovirt_target
+  vars:
+    single_ovirt_target: "{{ mtv_management_migration_targets | selectattr('type', 'equalto', 'ovirt') | list | length == 1 }}" # noqa: yaml[line-length]
+  when:
+    - mtv_management_migration_targets is defined
+    - mtv_management_migration_targets | selectattr('type', 'equalto', 'ovirt') | list | length > 0
+...

@@ -1,0 +1,72 @@
+---
+
+- name: _process_folder | Initialize Folder Variables
+  ansible.builtin.set_fact:
+    _mtv_migrate_folder_to_process: {}
+    _mtv_migrate_folder_candidates: []
+
+- name: _process_folder | Verify Name or ID or Path specified for Folder
+  ansible.builtin.assert:
+    that:
+      - "'name' in folder_to_process or 'id' in folder_to_process or 'path' in folder_to_process"
+    quiet: true
+    fail_msg: "'name' or 'id' or 'path' not specified for Folder"
+
+- name: _process_folder | Locate Folder by name
+  ansible.builtin.set_fact:
+    _mtv_migrate_folder_candidates: >-
+      "{{ _mtv_inventory_folders | selectattr('name', 'equalto', folder_to_process['name']) | list }}"
+  when: "'name' in folder_to_process and 'id' not in folder_to_process and 'path' not in folder_to_process"
+
+- name: _process_folder | Locate Folder by id
+  ansible.builtin.set_fact:
+    _mtv_migrate_folder_candidates: >-
+      "{{ _mtv_inventory_folders | selectattr('id', 'equalto', folder_to_process['id']) | list }}"
+  when: "'id' in folder_to_process and 'name' not in folder_to_process and 'path' not in folder_to_process"
+
+- name: _process_folder | Locate VM by path
+  ansible.builtin.set_fact:
+    _mtv_migrate_folder_candidates: >-
+      "{{ _mtv_inventory_folders | selectattr('path', 'equalto', folder_to_process['path']) | list }}"
+  when: "'path' in folder_to_process and 'id' not in folder_to_process and 'name' not in folder_to_process"
+
+- name: _process_folder | Verify single Folder found
+  ansible.builtin.assert:
+    that:
+      - _mtv_migrate_folder_candidates is defined and _mtv_migrate_folder_candidates | length == 1
+    quiet: true
+    fail_msg: "Failed to locate Folder with {{ 'id of ' + folder_to_process['id'] if 'id' in folder_to_process else 'path of ' + folder_to_process['path'] if 'path' in folder_to_process else folder_to_process['name'] }}" # noqa: yaml[line-length]
+
+- name: _process_folder | Set Folder to Process
+  ansible.builtin.set_fact:
+    _mtv_migrate_folder_to_process: "{{ _mtv_migrate_folder_candidates | first }}"
+
+- name: _process_folder | Check Excludes
+  when:
+    - mtv_migrate_migration_request['folders'] | default([]) | selectattr('exclude', 'defined') | selectattr('exclude', 'equalto', true) | selectattr('name', 'defined') | selectattr('name', 'equalto', _mtv_migrate_folder_to_process['name']) | list | length == 0 # noqa: yaml[line-length]
+    - mtv_migrate_migration_request['folders'] | default([]) | selectattr('exclude', 'defined') | selectattr('exclude', 'equalto', true) | selectattr('id', 'defined') | selectattr('id', 'equalto', _mtv_migrate_folder_to_process['id']) | list | length == 0 # noqa: yaml[line-length]
+    - mtv_migrate_migration_request['folders'] | default([]) | selectattr('exclude', 'defined') | selectattr('exclude', 'equalto', true) | selectattr('path', 'defined') | selectattr('path', 'equalto', _mtv_migrate_folder_to_process['path']) | list | length == 0 # noqa: yaml[line-length]
+  block:
+    - name: _process_folder | Process Folder VM's
+      ansible.builtin.include_tasks: _process_vm.yml
+      loop: "{{ _mtv_migrate_folder_to_process['children'] | selectattr('kind', 'equalto', 'VM') | list }}"
+      loop_control:
+        loop_var: subvm_to_process
+      when:
+        - "'children' in _mtv_migrate_folder_to_process"
+      vars:
+        vm_to_process:
+          id: "{{ subvm_to_process.id }}"
+        folder_overrides: "{{ folder_to_process['overrides'] | default({}) }}"
+
+    - name: _process_folder | Process Subfolders
+      ansible.builtin.include_tasks: _process_folder.yml
+      loop: "{{ _mtv_migrate_folder_to_process['children'] | selectattr('kind', 'equalto', 'Folder') | list }}"
+      loop_control:
+        loop_var: subfolder_to_process
+      when: "'children' in _mtv_migrate_folder_to_process"
+      vars:
+        folder_to_process:
+          id: "{{ subfolder_to_process.id }}"
+        folder_overrides: "{{ folder_to_process['overrides'] | default({}) }}"
+...

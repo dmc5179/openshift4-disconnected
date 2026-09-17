@@ -1,0 +1,14 @@
+ name: "openshift_virtualization_migration_cac - {{ _mf_host }}"
+ description: OpenShift Virtualization Migration Config as Code Data structure
+ organization: "{{ aap_seed_aap_org_name }}"
+ credential_type: openshift_virtualization_migration_cac
+ inputs:
+   aap_instance_name: "{{ aap_seed_aap_instance_name }}"
+   aap_execution_environment: "{{ aap_seed_aap_execution_environment }}"
+   aap_org_name: "{{ aap_seed_aap_org_name }}"
+   aap_namespace: "{{ aap_seed_aap_namespace }}"
+   aap_project: "{{ aap_seed_aap_project }}"
+   aap_inventory: "{{ aap_seed_aap_inventory }}"
+   aap_job_template_extra_vars: "{{ aap_seed_aap_job_template_extra_vars | to_yaml }}"
+   aap_version: "{{ aap_seed_aap_version }}"
+   migration_targets: '{{ _aap_seed_cluster_migration_targets | to_json }}'

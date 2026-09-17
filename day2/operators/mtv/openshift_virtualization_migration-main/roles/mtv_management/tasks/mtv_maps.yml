@@ -1,0 +1,45 @@
+---
+
+- name: mtv_maps | Retrieve Configured providers
+  ansible.builtin.include_tasks: mtv_query_inventory.yml
+  vars:
+    mtv_management_inventory_query_endpoint: /providers
+    mtv_management_inventory_query_result_var: mtv_providers
+
+- name: mtv_maps | Verify VMWare Source Provider Exists
+  ansible.builtin.assert:
+    that:
+      - mtv_providers is defined
+      - mtv_providers.vsphere is defined
+      - mtv_providers.vsphere | selectattr('name', 'equalto', mtv_management_source_target) | selectattr('namespace', 'equalto', mtv_management_provider_namespace) | list | length == 1 # noqa: yaml[line-length]
+    quiet: true
+    fail_msg: "Source Provider with name '{{ mtv_management_source_target }}' not found in namespace '{{ mtv_management_provider_namespace }}'" # noqa: yaml[line-length]
+  when: "'vsphere' in provider"
+
+- name: mtv_maps | Verify Ovirt Source Provider Exists
+  ansible.builtin.assert:
+    that:
+      - mtv_providers is defined
+      - mtv_providers.ovirt is defined
+      - mtv_providers.ovirt | selectattr('name', 'equalto', mtv_management_source_target) | selectattr('namespace', 'equalto', mtv_management_provider_namespace) | list | length == 1 # noqa: yaml[line-length]
+    quiet: true
+    fail_msg: "Source Provider with name '{{ mtv_management_source_target }}' not found in namespace '{{ mtv_management_provider_namespace }}'" # noqa: yaml[line-length]
+  when: "'ovirt' in provider"
+
+- name: mtv_maps | Destination OpenShift Destination Provider Exists
+  ansible.builtin.assert:
+    that:
+      - mtv_providers is defined
+      - mtv_providers.openshift is defined
+      - mtv_providers.openshift | selectattr('name', 'equalto', mtv_management_destination_target) | selectattr('namespace', 'equalto', mtv_management_provider_namespace) | list | length == 1 # noqa: yaml[line-length]
+    quiet: true
+    fail_msg: "Destination Provider with name '{{ mtv_management_destination_target }}' not found in namespace '{{ mtv_management_provider_namespace }}'" # noqa: yaml[line-length]
+
+- name: mtv_maps | Configure MTV Storage Maps
+  ansible.builtin.include_tasks: _mtv_storage_map.yml
+  when: mtv_management_map_storage is defined and mtv_management_map_storage | bool
+
+- name: mtv_maps | Configure MTV Network Map
+  ansible.builtin.include_tasks: _mtv_network_map.yml
+  when: mtv_management_map_networks is defined and mtv_management_map_networks | bool
+...

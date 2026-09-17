@@ -1,0 +1,5 @@
+---
+- name: automatic_nad | Include tasks from create_nad.yml
+  ansible.builtin.include_tasks:
+    file: create_nad.yml
+...

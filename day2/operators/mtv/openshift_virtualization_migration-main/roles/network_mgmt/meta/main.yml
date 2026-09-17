@@ -1,0 +1,10 @@
+---
+galaxy_info:
+  author: Kyle Button
+  description: Management of network related components.
+  company: Red Hat
+  license: GPL-3.0-only
+  min_ansible_version: 2.15.0
+  galaxy_tags: []
+dependencies: []
+...

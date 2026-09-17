@@ -1,0 +1,27 @@
+objects:
+  role:
+    mtv_migrate:
+      description: MTV Migrate - Migrate VMs at scale
+      name: mtv_migrate
+      version_added: null
+plugins:
+  become: {}
+  cache: {}
+  callback: {}
+  cliconf: {}
+  connection: {}
+  filter:
+    rfc1123:
+      description: Converts an input string to an RFC1123 compatible value
+      name: rfc1123
+      version_added: 1.0.0
+  httpapi: {}
+  inventory: {}
+  lookup: {}
+  module: {}
+  netconf: {}
+  shell: {}
+  strategy: {}
+  test: {}
+  vars: {}
+version: 1.21.2

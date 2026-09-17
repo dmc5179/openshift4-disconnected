@@ -1,0 +1,75 @@
+---
+- name: aap_subscription | Get subscriptions with a filter
+  when:
+    - bootstrap_rh_pool_id | default('', true) | trim | length == 0
+    - bootstrap_aap_license_manifest | default('', true) | trim | length == 0
+  block:
+    - name: aap_subscription | Query Subscription
+      ansible.controller.subscriptions:
+        username: "{{ bootstrap_rh_username }}"
+        password: "{{ bootstrap_rh_password }}"
+        filters:
+          product_name: "{{ bootstrap_rh_filter_product_name }}"
+          support_level: "{{ bootstrap_rh_filter_support_level }}"
+        controller_host: "{{ bootstrap_controller_hostname }}"
+        controller_username: "{{ bootstrap_controller_username }}"
+        controller_password: "{{ bootstrap_controller_password }}"
+        validate_certs: "{{ bootstrap_controller_validate_certs }}"
+      register: bootstrap_subscription
+      retries: 10
+      delay: 5
+      until: bootstrap_subscription is not failed
+
+    - name: aap_subscription | Set pool based on bootstrap_subscription
+      ansible.builtin.set_fact:
+        bootstrap_rh_pool_id: "{{ bootstrap_subscription.subscriptions[0].pool_id }}"
+
+    - name: aap_subscription | Attach to a pool
+      ansible.controller.license:
+        pool_id: "{{ bootstrap_rh_pool_id | default(omit, true) }}"
+        manifest: "{{ bootstrap_aap_license_manifest | default(omit, true) }}"
+        controller_host: "{{ bootstrap_controller_hostname }}"
+        controller_username: "{{ bootstrap_controller_username }}"
+        controller_password: "{{ bootstrap_controller_password }}"
+        validate_certs: "{{ bootstrap_controller_validate_certs }}"
+
+- name: aap_subscription | Verify License Manifest Exists
+  when:
+    - bootstrap_aap_license_manifest | default('', true) | trim | length > 0
+  block:
+    - name: aap_subscription | Check if license file exists
+      ansible.builtin.stat:
+        path: "{{ bootstrap_aap_license_manifest }}"
+      register: __bootstrap_aap_license_manifest_stat
+
+    - name: aap_subscription | Verify license file exists
+      ansible.builtin.assert:
+        that:
+          - __bootstrap_aap_license_manifest_stat.stat.exists
+        quiet: true
+        fail_msg: "AAP Manifest File at '{{ bootstrap_aap_license_manifest }}' Does Not Exist"
+
+    - name: aap_subscription | Read the License file
+      ansible.builtin.slurp:
+        src: "{{ bootstrap_aap_license_manifest }}"
+      register: __bootstrap_aap_license_manifest_content
+
+    - name: aap_subscription | Apply license to AAP
+      ansible.builtin.uri:
+        method: POST
+        status_code: 200
+        url: "https://{{ bootstrap_controller_hostname }}/api{{ '/controller' if bootstrap_aap_version is not defined or bootstrap_aap_version is defined and bootstrap_aap_version is version('2.5', '>=') }}/v2/config/" # noqa: yaml[line-length]
+        user: "{{ bootstrap_controller_username }}"
+        password: "{{ bootstrap_controller_password }}"
+        force_basic_auth: true
+        validate_certs: "{{ bootstrap_controller_validate_certs }}"
+        body_format: json
+        headers:
+          Content-Type: application/json
+        body:
+          manifest: "{{ __bootstrap_aap_license_manifest_content.content }}"
+      register: __bootstrap_aap_license_submission_response
+      retries: "{{ bootstrap_license_file_submission_retries }}"
+      until: __bootstrap_aap_license_submission_response.status == 200
+      delay: "{{ bootstrap_license_file_submission_delay }}"
+...

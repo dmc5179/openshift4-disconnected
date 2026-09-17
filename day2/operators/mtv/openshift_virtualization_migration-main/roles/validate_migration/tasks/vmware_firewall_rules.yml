@@ -1,0 +1,14 @@
+---
+- name: vmware_firewall_rules | Build a list of all the clusters
+  vmware.vmware_rest.vcenter_cluster_info:
+  register: validate_migration_all_vmware_clusters
+
+- name: vmware_firewall_rules | Gather firewall info about all ESXi Host in given Cluster
+  community.vmware.vmware_host_firewall_info:
+    cluster_name: "{{ validate_migration_all_vmware_clusters.value[0].name }}"
+
+- name: vmware_firewall_rules | Debug firewall details
+  ansible.builtin.debug:
+    var: hosts_firewall_info
+  when: validate_migration_debug is defined and validate_migration_debug
+...

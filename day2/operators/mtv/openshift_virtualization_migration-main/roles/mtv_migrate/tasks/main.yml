@@ -1,0 +1,83 @@
+---
+# tasks file for mtv_migrate
+
+- name: Verify Request Provided
+  ansible.builtin.assert:
+    that:
+      - mtv_migrate_migration_request is defined
+      - mtv_migrate_migration_request | ansible.builtin.type_debug == 'dict'
+      - mtv_migrate_migration_request | dict2items | length > 0
+    quiet: true
+    fail_msg: "mtv_migrate_migration_request variable is required and was not provided"
+
+- name: Initialize Data Structures
+  ansible.builtin.set_fact:
+    _mtv_migrate_mtv_vms_to_migrate: {}
+    _mtv_migrate_mtv_plans: []
+    _mtv_migrate_mtv_plans_to_migrate: []
+    _mtv_migrate_mtv_migrations: []
+
+- name: Process Request (MTV Namespace)
+  ansible.builtin.set_fact:
+    _mtv_migrate_mtv_namespace: >-
+      "{{ mtv_migrate_migration_request['mtv_namespace'] | default(mtv_migrate_default_namespace) }}"
+
+- name: Process Request (Baseline)
+  ansible.builtin.set_fact:
+    _mtv_migrate_mtv_source_type: >-
+      "{{ mtv_migrate_migration_request['source_type'] | default(mtv_migrate_default_source_type) }}"
+    _mtv_migrate_mtv_source_target: >-
+      "{{ mtv_migrate_migration_request['source'] | default(mtv_migrate_default_source_target) }}"
+    _mtv_migrate_mtv_source_target_namespace: >-
+      "{{ mtv_migrate_migration_request['source_namespace'] | default(mtv_migrate_default_source_target_namespace) }}"
+    _mtv_migrate_mtv_destination_type: >-
+      "{{ mtv_migrate_migration_request['destination_type'] | default(mtv_migrate_default_destination_type) }}"
+    _mtv_migrate_mtv_destination_target: >-
+      "{{ mtv_migrate_migration_request['destination'] | default(mtv_migrate_default_destination_target) }}"
+    _mtv_migrate_mtv_destination_target_namespace: >-
+      "{{ mtv_migrate_migration_request['destination_namespace'] |
+      default(mtv_migrate_default_destination_target_namespace) }}" # noqa: yaml[line-length]
+    _mtv_migrate_mtv_split_plans: >-
+       "{{ mtv_migrate_migration_request['split_plans'] | default(mtv_migrate_default_split_plans) }}"
+    _mtv_migrate_mtv_vms_per_plan: >-
+       "{{ mtv_migrate_migration_request['vms_per_plan'] | default(mtv_migrate_default_vms_per_plan) }}"
+    _mtv_migrate_mtv_dry_run: >-
+      "{{ mtv_migrate_migration_request['dry_run'] | default(mtv_migrate_default_migrate_dry_run) }}"
+    _mtv_migrate_mtv_target_namespace: >-
+      "{{ mtv_migrate_migration_request['target_namespace'] | default(mtv_migrate_default_target_namespace) }}"
+    _mtv_migrate_mtv_verify_plans_ready: >-
+      "{{ mtv_migrate_migration_request['verify_plans_ready'] | default(mtv_migrate_default_verify_plans_ready) }}"
+    _mtv_migrate_mtv_verify_migrations_complete: >-
+      "{{ mtv_migrate_migration_request['verify_migrations_complete'] |
+      default(mtv_migrate_default_verify_migrations_complete) }}"
+    _mtv_migrate_mtv_start_migration: >-
+      "{{ mtv_migrate_migration_request['start_migration'] | default(mtv_migrate_default_start_migration) }}"
+
+- name: Process Request (Maps)
+  ansible.builtin.set_fact:
+    _mtv_migrate_mtv_network_map_name: "{{ mtv_migrate_migration_request['network_map'] | default(mtv_migrate_default_network_map_name) }}" # noqa: yaml[line-length]
+    _mtv_migrate_mtv_network_map_namespace: "{{ mtv_migrate_migration_request['network_map_namespace'] | default(mtv_migrate_default_network_map_namespace) }}" # noqa: yaml[line-length]
+    _mtv_migrate_mtv_storage_map_name: "{{ mtv_migrate_migration_request['storage_map'] | default(mtv_migrate_default_storage_map_name) }}" # noqa: yaml[line-length]
+    _mtv_migrate_mtv_storage_map_namespace: "{{ mtv_migrate_migration_request['storage_map_namespace'] | default(mtv_migrate_default_storage_map_namespace) }}" # noqa: yaml[line-length]
+
+- name: Verify Split Plan Value is Positive
+  when: _mtv_split_plans | bool
+  ansible.builtin.assert:
+    that:
+      - _mtv_vms_per_plan | int > 0
+    fail_msg: "Split plans are enabled but vms_per_plan is not set to a positive integer"
+    quiet: true
+
+- name: Generate Plans
+  ansible.builtin.include_tasks: _plans.yml
+  when: >-
+    (mtv_migrate_migration_request['vms'] |
+    default([]) + mtv_migrate_migration_request['folders'] |
+    default([])) | length > 0
+
+- name: Manage Migrations
+  ansible.builtin.include_tasks: _migrations.yml
+  when: >-
+    mtv_start_migration|bool and not _mtv_dry_run|bool and _mtv_migrate_mtv_plans_to_migrate |
+    default([]) | length > 0
+...

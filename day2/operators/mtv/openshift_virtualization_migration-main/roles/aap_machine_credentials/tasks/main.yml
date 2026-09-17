@@ -1,0 +1,45 @@
+---
+# tasks file for aap_machine_credentials
+
+- name: Initialize Variables
+  ansible.builtin.set_fact:
+    _aap_machine_credentials_controller_credentials: []
+
+- name: Process Machine Credentials
+  ansible.builtin.include_tasks:
+    file: _process_machine_credential.yml
+  loop: "{{ aap_machine_credentials_request }}"
+  loop_control:
+    loop_var: aap_machine_credential
+    label: >
+      "Machine Credential: {{ aap_machine_credential['name'] if 'name' in aap_machine_credential else '<undefined>' }}"
+
+- name: Manage Credentials
+  block:
+    - name: Verify Config as Code parameters required (for AAP 2.5 and below)
+      ansible.builtin.assert:
+        that:
+          - controller_hostname | default('', true) | trim | length > 0
+          - controller_username | default('', true) | trim | length > 0
+          - controller_password | default('', true) | trim | length > 0
+        quiet: true
+        fail_msg: "Required AAP Config as Code Parameters Not Provided"
+      when: aap_version is defined and aap_version is version('2.5', '<')
+
+    - name: Verify Config as Code parameters required (for AAP 2.4 and below)
+      ansible.builtin.assert:
+        that:
+          - aap_hostname | default('', true) | trim | length > 0
+          - aap_username | default('', true) | trim | length > 0
+          - aap_password | default('', true) | trim | length > 0
+        quiet: true
+        fail_msg: "Required AAP Config as Code Parameters Not Provided"
+      when: aap_version is not defined or aap_version is version('2.5', '>=')
+
+- name: Call credential config as code role
+  when: _aap_machine_credentials_controller_credentials | length > 0
+  ansible.builtin.include_role:
+    name: "{{ aap_machine_credentials_cac_credentials_role }}"
+  vars:
+    controller_credentials: "{{ _aap_machine_credentials_controller_credentials }}"
+...

@@ -1,0 +1,160 @@
+---
+# defaults file for mtv_management
+
+# title: Default MTV Namespace
+# required: True
+# description: The default namespace to use if not specified
+mtv_management_namespace: openshift-mtv
+# title: MTV Provider Namespace
+# required: True
+# description: The provider namespace to use
+mtv_management_provider_namespace: "{{ mtv_management_namespace }}"
+# title: MTV Migration Namespace
+# required: True
+# description: The migration namespace to use
+mtv_management_migration_namespace: "{{ mtv_management_namespace }}"
+
+# Toggle functionality of each type
+# title: Map Providers Boolean
+# required: False
+# description: Determines whether to include the mtv_providers task file
+mtv_management_map_providers: true
+# title: Map Storage Boolean
+# required: False
+# description: Determines whether to include the mtv_maps task file
+mtv_management_map_storage: true
+# title: Map Networks Boolean
+# required: False
+# description: Determines whether to include the mtv_maps task file
+mtv_management_map_networks: true
+
+# MTV inventory
+# title: Inventory URL
+# required: False
+# description: Inventory URL
+mtv_management_inventory_url: ""
+# title: Inventory Route Name
+# required: True
+# description: Inventory Route Name
+mtv_management_inventory_route_name: forklift-inventory
+
+# MTV Inventory Retrieval Method
+# required: True
+# description_lines:
+# Options include rest or exec (Currently only supports exec)
+mtv_management_inventory_retrieval_method: "exec"
+
+# title: MTV Migration Targets
+# required: False
+# description_lines:
+# Target Configurations
+mtv_management_migration_targets: []
+# - name: vmware # (Required if more than 1 credential provided. Otherwise, default to 'vmware')
+#   type: vmware
+#   host: vcenter.example.com
+#   sdkEndpoint: /sdk # SDK endpoint (defaults to '/sdk' if not provided)
+#   username: <username>
+#   password: <password>
+#   vddk:
+#     image: <image>
+#     username: <username>
+#     password: <password>
+#     credentialsSecret: <secret> # Name of the Secret in the <mtv_migration_namespace> containing MTV VDDK credentials
+#   certificate: |
+#     <certificate>
+#   insecureSkipTlsVerify: true
+#   credentialsSecretRef: <reference> # Namespaced name (<namespace>/<name>) or just <name> \
+#   if in <mtv_management_provider_namespace> containing MTV provider details
+
+# title: MTV VMware Provider Name
+# required: True
+# description: Default name for VMware provider
+mtv_management_vmware_provider_default_name: vmware
+# title: MTV SDK Endpoint
+# required: True
+# description: VMware provider endpoint
+mtv_management_vmware_provider_default_sdk_endpoint: /sdk
+# title: MTV Ovirt Provider Name
+# required: True
+# description: Default name for Ovirt provider
+mtv_management_ovirt_provider_default_name: ovirt
+# title: MTV SDK Endpoint
+# required: True
+# description: Ovirt provider endpoint
+mtv_management_ovirt_provider_default_sdk_endpoint: /ovirt-engine/api
+# title: MTV Skip TLS
+# required: False
+# description: Whether to skip TLS verify
+mtv_management_vmware_provider_insecure_skip_tls_verify: true
+# title: MTV Default StorageClass
+# required: False
+# description: The StorageClass to use by default
+mtv_management_default_storage_class: ""
+
+# Default targets
+# title: MTV Source Target
+# required: True
+# description: Source target
+mtv_management_source_target: "vmware"
+# title: MTV Destination Target
+# required: True
+# description: Destination target
+mtv_management_destination_target: "host"
+
+# title: MTV NAD Source Portgroup Annotation
+# required: True
+# description: The annotation to use for the Network Attachment Definition
+mtv_management_nad_source_portgroup_annotation: "infra.openshift-virtualization-migration/source-portgroup"
+
+# title: VDDK Secret Name
+# required: True
+# description: Name of the Created Secret for VDDK Credentials
+mtv_management_vmware_vddk_secret_name: "{{ mtv_management_source_target }}-vddk"
+
+# title: MTV VDDK Image
+# required: False
+# description: The image to use for VDDK
+mtv_management_vmware_vddk_init_image: ""
+
+# title: VDDK Image Username
+# required: False
+# description: Username for the VDDK Image
+mtv_management_vmware_vddk_init_image_username: ""
+
+# title: VDDK Image Password
+# required: False
+# description: Password for the VDDK Image
+mtv_management_vmware_vddk_init_image_password: ""
+
+# title: VDDK Credentials Secret
+# required: False
+# description: Secret Containing Credentials for the VDDK Image
+mtv_management_vmware_vddk_init_image_credentials_secret: ""
+
+# title: VDDK Service Account
+# required: False
+# description: Service Account to Associate the VDDK Init Image Pull Secret
+mtv_management_vmware_vddk_init_image_service_account: default
+
+# Overrides
+# title: MTV Storage Map Override
+# required: False
+# description: Overrides for the storage map
+mtv_management_storage_map_overrides: [
+# - id: <datastore_id>
+#   storageClass: <name of the storage class>
+#   exclude: true
+#   include: true
+]
+
+# title: MTV Network Map Overrides
+# required: False
+# description: Overrides for the network map
+mtv_management_network_map_overrides: [
+# - id: <network_id>
+#   network_destination_type: pod # Explicitly specify destination type
+#   network_attachment_definition: nad # Namespaced name (<namespace>/<name>) or just <name> if in default namespace
+#   exclude: true
+#   include: true
+]
+...

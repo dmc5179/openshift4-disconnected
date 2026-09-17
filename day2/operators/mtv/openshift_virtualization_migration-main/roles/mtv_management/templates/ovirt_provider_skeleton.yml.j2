@@ -1,0 +1,11 @@
+apiVersion: forklift.konveyor.io/v1beta1
+kind: Provider
+metadata:
+  name: "{{ mtv_management_populated_ovirt_target['name'] }}"
+  namespace: "{{ mtv_management_provider_namespace }}"
+spec:
+  secret:
+    name: "{{ mtv_management_ovirt_provider_secret_name }}"
+    namespace: "{{ mtv_management_ovirt_provider_secret_namespace }}"
+  type: ovirt
+  url: "{{ mtv_management_mtv_ovirt_url }}"

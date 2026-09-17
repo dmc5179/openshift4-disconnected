@@ -1,0 +1,88 @@
+---
+
+- name: mtv_query_inventory | Verify valid inventory query retrieval method
+  ansible.builtin.assert:
+    that:
+      - mtv_management_inventory_retrieval_method == 'exec' or mtv_management_inventory_retrieval_method == 'rest'
+    quiet: true
+    fail_msg: "`mtv_management_inventory_retrieval_method` must be specified as `exec` or `rest"
+
+- name: mtv_query_inventory | Verify valid query parameters
+  ansible.builtin.assert:
+    that:
+      - mtv_management_inventory_query_endpoint | default("", true) | length > 0
+      - openshift_api_key | default("", true) | length > 0
+    quiet: true
+    fail_msg: "Missing required MTV Inventory Query parameters"
+
+- name: mtv_query_inventory | Exec inventory retrieval method
+  when: mtv_management_inventory_retrieval_method == 'exec'
+  block:
+    - name: mtv_query_inventory | Obtain the name of a Running Forklift Inventory Pod
+      kubernetes.core.k8s_info:
+        kind: Endpoints
+        name: "forklift-inventory"
+        namespace: "{{ mtv_management_namespace }}"
+      register: _mtv_management_mtv_inventory_endpoints
+      until:
+        - "'resources' in _mtv_management_mtv_inventory_endpoints"
+        - _mtv_management_mtv_inventory_endpoints.resources | length > 0
+        - (_mtv_management_mtv_inventory_endpoints.resources | first).subsets is defined
+        - (_mtv_management_mtv_inventory_endpoints.resources | first).subsets | length > 0
+      retries: 180
+      delay: 20
+
+    - name: mtv_query_inventory | Set name of the MTV Inventory Pod
+      ansible.builtin.set_fact:
+        mtv_management_mtv_inventory_pod_name: "{{ (((_mtv_management_mtv_inventory_endpoints.resources | first).subsets | first).addresses | first).targetRef.name }}" # noqa: yaml[line-length]
+
+    - name: mtv_query_inventory | Execute Query (exec)
+      kubernetes.core.k8s_exec:
+        namespace: "{{ mtv_management_namespace }}"
+        pod: "{{ mtv_management_mtv_inventory_pod_name }}"
+        command: 'curl -k -H "Authorization: Bearer {{ openshift_api_key }}" https://localhost:8443{{ mtv_management_inventory_query_endpoint }}' # noqa: yaml[line-length]
+      register: _mtv_management_mtv_inventory_query_result
+      changed_when: false
+
+    - name: mtv_query_inventory | Set Result Fact
+      ansible.builtin.set_fact:
+        "{{ mtv_management_inventory_query_result_var | default('mtv_management_inventory_query_result') }}": "{{ _mtv_management_mtv_inventory_query_result.stdout | from_json }}" # noqa var-naming[no-jinja] # noqa: yaml[line-length]
+
+- name: mtv_query_inventory | Rest inventory retrieval method
+  when: mtv_management_inventory_retrieval_method == 'rest'
+  block:
+    - name: mtv_query_inventory | Locate MTV Route
+      when: forklift_inventory_url | default("", True) | length == 0
+      kubernetes.core.k8s_info:
+        api_key: "{{ openshift_api_key }}"
+        host: "{{ openshift_host | default(omit) }}"
+        validate_certs: "{{ openshift_verify_ssl | default(false) }}"
+        api_version: route.openshift.io/v1
+        kind: Route
+        name: "{{ mtv_management_inventory_route_name }}"
+        namespace: "{{ mtv_management_namespace }}"
+      register: _mtv_management_mtv_inventory_route_result
+
+    - name: mtv_query_inventory | Verify route found
+      ansible.builtin.assert:
+        that:
+          - _mtv_management_mtv_inventory_route_result is defined
+          - _mtv_management_mtv_inventory_route_result.resources is defined
+          - _mtv_management_mtv_inventory_route_result.resources | length > 0
+        quiet: true
+        fail_msg: "Unable to locate MTV Inventory Route"
+
+    - name: mtv_query_inventory | Execute Query (rest)
+      ansible.builtin.uri:
+        url: "https://{{ _mtv_management_mtv_inventory_route_result.resources[0].spec.host }}{{ mtv_management_inventory_query_endpoint }}" # noqa: yaml[line-length]
+        method: GET
+        body_format: json
+        validate_certs: false
+        headers:
+          Authorization: Bearer {{ openshift_api_key }}
+      register: _mtv_management_mtv_inventory_query_result
+
+    - name: mtv_query_inventory | Set Result Fact
+      ansible.builtin.set_fact:
+        "{{ mtv_management_inventory_query_result_var | default('mtv_management_inventory_query_result') }}": "{{ _mtv_management_mtv_inventory_query_result.json }}" # noqa var-naming[no-jinja] # noqa: yaml[line-length]
+...

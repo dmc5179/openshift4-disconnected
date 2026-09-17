@@ -1,0 +1,14 @@
+---
+- name: Use automatic mode
+  ansible.builtin.include_tasks:
+    file: automatic.yml
+  when:
+    (network_mgmt_manual_nad_list | default([]) | length) == 0
+
+- name: Use manual mode
+  ansible.builtin.include_tasks:
+    file: manual.yml
+  when:
+    - (network_mgmt_manual_nad_list | default([])) is iterable
+    - (network_mgmt_manual_nad_list | length) > 0
+...

@@ -1,0 +1,76 @@
+---
+
+- name: _mtv_network_map_process_network | Set VMware NetworkMap Variables
+  ansible.builtin.set_fact:
+    mtv_management_mtv_vmware_network_overrides: >-
+      {{ mtv_management_network_map_overrides |
+      default([]) | selectattr('id', 'equalto', mtv_vmware_network.id) |
+      list | first if mtv_management_network_map_overrides | default([]) |
+      selectattr('id', 'equalto', mtv_vmware_network.id) | list | length > 0 else {} }}
+  when: mtv_vmware_network is defined
+
+- name: _mtv_network_map_process_network | Set Ovirt NetworkMap Variables
+  ansible.builtin.set_fact:
+    mtv_management_mtv_ovirt_network_overrides: >-
+      {{ mtv_management_network_map_overrides |
+      default([]) | selectattr('id', 'equalto', mtv_ovirt_network.id) |
+      list | first if mtv_management_network_map_overrides | default([]) |
+      selectattr('id', 'equalto', mtv_ovirt_network.id) | list | length > 0 else {} }}
+  when: mtv_ovirt_network is defined
+
+- name: _mtv_network_map_process_network | Locate VMware NetworkAttachmentDefinition
+  ansible.builtin.set_fact:
+    mtv_management_mtv_network_networkattachmentdefinition: >-
+      {{ mtv_networkattachmentdefinitions | json_query(__mtv_management_query) }}
+  vars:
+    __mtv_management_query: "{{ '[?object.metadata.annotations.\"' + mtv_management_nad_source_portgroup_annotation + '\"==`' + mtv_vmware_network.name + '`]' }}" # noqa: yaml[line-length]
+  when: mtv_vmware_network is defined
+
+- name: _mtv_network_map_process_network | Locate Ovirt NetworkAttachmentDefinition
+  ansible.builtin.set_fact:
+    mtv_management_mtv_network_networkattachmentdefinition: >-
+      {{ mtv_networkattachmentdefinitions | json_query(__mtv_management_query) }}
+  vars:
+    __mtv_management_query: "{{ '[?object.metadata.annotations.\"' + mtv_management_nad_source_portgroup_annotation + '\"==`' + mtv_ovirt_network.name + '`]' }}" # noqa: yaml[line-length]
+  when: mtv_ovirt_network is defined
+
+- name: _mtv_network_map_process_network | Validate Found VMware NetworkAttachmentDefinitions
+  ansible.builtin.assert:
+    that:
+      - mtv_management_mtv_network_networkattachmentdefinition | length <= 1
+    fail_msg: >-
+      Could not locate a single NetworkAttachmentDefinition for network portgroup '{{ mtv_vmware_network.name }}'
+  when: mtv_vmware_network is defined
+
+- name: _mtv_network_map_process_network | Validate Found Ovirt NetworkAttachmentDefinitions
+  ansible.builtin.assert:
+    that:
+      - mtv_management_mtv_network_networkattachmentdefinition | length <= 1
+    fail_msg: >-
+      Could not locate a single NetworkAttachmentDefinition for network portgroup '{{ mtv_ovirt_network.name }}'
+  when: mtv_ovirt_network is defined
+
+- name: _mtv_network_map_process_network | Template NetworkMap Map
+  ansible.builtin.set_fact:
+    mtv_management_network_map_map: "{{ (lookup('ansible.builtin.template', 'networkmap_map.yml.j2') | from_yaml) }}"
+
+- name: _mtv_network_map_process_network | Add VMWare NetworkMaps Map to Dict
+  ansible.builtin.set_fact:
+    mtv_management_mtv_management_mtv_networkmap_maps: >-
+      {{ mtv_management_mtv_networkmap_maps | default({}) |
+      ansible.builtin.combine({mtv_vmware_network.selfLink: mtv_management_network_map_map},
+      recursive=true) }}
+  when:
+    - mtv_vmware_network is defined
+    - (('include' in mtv_management_mtv_vmware_network_overrides and mtv_management_network_map_overrides | selectattr('include', 'defined') | list | length > 0) or (mtv_management_network_map_overrides | selectattr('include', 'defined') | list | length == 0 and mtv_management_network_map_overrides | selectattr('exclude', 'defined') | list | length == 0)) or ('exclude' not in mtv_management_mtv_vmware_network_overrides and mtv_management_network_map_overrides | selectattr('exclude', 'defined') | list | length > 0) # noqa: yaml[line-length]
+
+- name: _mtv_network_map_process_network | Add Ovirt NetworkMaps Map to Dict
+  ansible.builtin.set_fact:
+    mtv_management_mtv_networkmap_maps: >-
+      {{ mtv_management_mtv_networkmap_maps | default({}) |
+      ansible.builtin.combine({mtv_ovirt_network.selfLink: mtv_management_network_map_map},
+      recursive=true) }}
+  when:
+    - mtv_ovirt_network is defined
+    - (('include' in mtv_management_mtv_ovirt_network_overrides and mtv_management_network_map_overrides | selectattr('include', 'defined') | list | length > 0) or (mtv_management_network_map_overrides | selectattr('include', 'defined') | list | length == 0 and mtv_management_network_map_overrides | selectattr('exclude', 'defined') | list | length == 0)) or ('exclude' not in mtv_management_mtv_ovirt_network_overrides and mtv_management_network_map_overrides | selectattr('exclude', 'defined') | list | length > 0) # noqa: yaml[line-length]
+...

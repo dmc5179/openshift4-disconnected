@@ -1,0 +1,37 @@
+---
+# tasks file for vm_backup_restore
+
+- name: vm_restore | Verify OpenShift Connectivity Details Provided
+  ansible.builtin.assert:
+    that:
+      - vm_backup_restore_openshift_host | default("", true) | length > 0
+      - vm_backup_restore_openshift_api_key | default("", true) | length > 0
+    quiet: true
+    fail_msg: OpenShift Connectivity Details Not Provided
+
+- name: vm_restore | Initialize Variables
+  ansible.builtin.set_fact:
+    vm_backup_restore_vm_restore_snapshots: []
+
+- name: vm_restore | Invoke Collect VM Role
+  ansible.builtin.include_role:
+    name: infra.openshift_virtualization_migration.vm_collect
+  vars:
+    vm_collect_openshift_api_key: "{{ vm_backup_restore_openshift_api_key }}"
+    vm_collect_openshift_host: "{{ vm_backup_restore_openshift_host }}"
+    vm_collect_verify_ssl: "{{ vm_backup_restore_openshift_verify_ssl }}"
+    vm_collect_vms_var: vm_backup_restore_vm_restore_snapshots
+    vm_collect_obj: "VirtualMachineSnapshot"
+    vm_collect_api_version: "{{ vm_backup_restore_snapshot_kubevirt_api_version }}"
+  loop: "{{ vm_backup_restore_request | selectattr('operation', 'equalto', 'snapshot_restore') | list }}"
+  loop_control:
+    loop_var: "vm_collect_request_instance"
+
+- name: vm_restore | Restore VM Snapshots
+  ansible.builtin.include_tasks:
+    file: _restore_vm.yml
+  loop: "{{ vm_backup_restore_vm_restore_snapshots }}"
+  loop_control:
+    loop_var: vm_restore_snapshot
+    label: "Namespace: {{ vm_restore_snapshot.response_obj.metadata.namespace }} - Name: {{ vm_restore_snapshot.response_obj.metadata.name }}" # noqa: yaml[line-length]
+...

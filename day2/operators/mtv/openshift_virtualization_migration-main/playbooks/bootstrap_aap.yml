@@ -1,0 +1,18 @@
+---
+# This playbook runs as root to setup a new non-root user for use with the bootstrap
+# if a user is already created for use with become, this playbook is not needed
+- name: Prepare VM for Bootstrap AAP
+  ansible.builtin.import_playbook: bootstrap_aap_prep.yml
+  vars:
+    bootstrap_aap: true
+
+- name: Install and subscribe AAP on Bootstrap VM
+  ansible.builtin.import_playbook: bootstrap_aap_install.yml
+  vars:
+    bootstrap_aap: true
+
+- name: Preseed Bootstrap AAP with Config as Code
+  ansible.builtin.import_playbook: bootstrap_aap_preseed.yml
+  vars:
+    bootstrap_aap: true
+...

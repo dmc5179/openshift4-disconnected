@@ -1,0 +1,15 @@
+---
+#
+# ** DEPRECATED: ** This role is deprecated here because it was moved to the
+# `openshift_virtualization_ops` collection.
+#
+
+# patching for vm's on openshift
+- name: Patching vm's
+  hosts: "{{ infra_openshift_virtualization_migration_vm_name | default('all') }}"
+  become: true
+  tasks:
+    - name: Calling patching role
+      ansible.builtin.include_role:
+        name: infra.openshift_virtualization_migration.vm_patching
+...

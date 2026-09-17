@@ -1,0 +1,32 @@
+---
+
+- name: _compute | Verify Instance Type exists on VM
+  when: "'instanceType' in vm_hot_plug_vm.compute"
+  ansible.builtin.assert:
+    that:
+      - "'instancetype' in vm_hot_plug_vm.response_obj.spec"
+    fail_msg: >-
+      Instance Type not defined for VM '{{ vm_hot_plug_vm.response_obj.metadata.name }}'
+      in namespace '{{  vm_hot_plug_vm.response_obj.metadata.namespace }}'
+    quiet: true
+
+- name: _compute | Verify Instance Type does not exist on VM
+  when: "'cpu' in vm_hot_plug_vm.compute or 'memory' in vm_hot_plug_vm.compute"
+  ansible.builtin.assert:
+    that: "'instancetype' not in vm_hot_plug_vm.response_obj.spec"
+    fail_msg: >-
+      Instance Type not defined for VM '{{ vm_hot_plug_vm.response_obj.metadata.name }}'
+      in namespace '{{  vm_hot_plug_vm.response_obj.metadata.namespace }}'
+    quiet: true
+
+- name: _compute | Patch VM with Compute Modifications
+  kubernetes.core.k8s_json_patch:
+    api_key: "{{ vm_hot_plug_api_key }}"
+    host: "{{ vm_hot_plug_openshift_host }}"
+    api_version: "{{ vm_hot_plug_kubevirt_api_version }}"
+    validate_certs: "{{ vm_hot_plug_openshift_verify_ssl }}"
+    kind: VirtualMachine
+    namespace: "{{ vm_hot_plug_vm.response_obj.metadata.namespace }}"
+    name: "{{ vm_hot_plug_vm.response_obj.metadata.name }}"
+    patch: "{{ lookup('ansible.builtin.template', 'compute_patch.yml.j2', template_vars=dict(vm_hot_plug_compute=vm_hot_plug_vm['compute'])) | from_yaml }}" # noqa: yaml[line-length]
+...

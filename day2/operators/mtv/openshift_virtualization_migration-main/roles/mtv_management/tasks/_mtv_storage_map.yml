@@ -1,0 +1,73 @@
+---
+
+- name: _mtv_storage_map | Initialize data structures
+  ansible.builtin.set_fact:
+    mtv_management_mtv_storagemaps: {}
+
+- name: _mtv_storage_map | Verify Storage Map Overrides do not contain both includes and excludes
+  ansible.builtin.fail:
+    msg: "Storage Map Overrides cannot contain both includes and excludes directives"
+  when:
+    - mtv_management_storage_map_overrides is defined
+    - mtv_management_storage_map_overrides | selectattr('include', 'defined') | list | length > 0
+    - mtv_management_storage_map_overrides | selectattr('exclude', 'defined') | list | length > 0
+
+- name: _mtv_storage_map | Query for Storage Classes from Destination Provider
+  ansible.builtin.include_tasks: mtv_query_inventory.yml
+  vars:
+    mtv_management_inventory_query_endpoint: /providers/openshift/{{ (mtv_providers.openshift | selectattr('name', 'equalto', mtv_management_destination_target) | first).uid }}/storageclasses?detail=4 # noqa: yaml[line-length]
+    mtv_management_inventory_query_result_var: mtv_destination_storageclasses
+
+- name: _mtv_storage_map | Determine Destination Storage Class
+  ansible.builtin.set_fact:
+    mtv_management_default_storage_class: "{{ item.name }}"
+  loop: "{{ mtv_destination_storageclasses }}"
+  when:
+    - mtv_management_default_storage_class is not defined or mtv_management_default_storage_class | default('', true) | trim | length == 0 # noqa: yaml[line-length]
+    - item.object.metadata.annotations is defined
+    - ((item.object.metadata.annotations['storageclass.kubernetes.io/is-default-class'] | default('false') | string | lower) == 'true') # noqa: yaml[line-length]
+
+- name: _mtv_storage_map | Query for Datastores from Destination Provider
+  ansible.builtin.include_tasks: mtv_query_inventory.yml
+  vars:
+    mtv_management_inventory_query_endpoint: /providers/ovirt/{{ (mtv_providers.ovirt | selectattr('name', 'equalto', mtv_management_source_target) | first).uid }}/storagedomains?detail=4 # noqa: yaml[line-length]
+    mtv_management_inventory_query_result_var: mtv_destination_datastores
+  when: "'ovirt' in provider"
+
+- name: _mtv_storage_map | Query for Datastores from Destination Provider
+  ansible.builtin.include_tasks: mtv_query_inventory.yml
+  vars:
+    mtv_management_inventory_query_endpoint: /providers/vsphere/{{ (mtv_providers.vsphere | selectattr('name', 'equalto', mtv_management_source_target) | first).uid }}/datastores?detail=4 # noqa: yaml[line-length]
+    mtv_management_inventory_query_result_var: mtv_destination_datastores
+  when: "'vsphere' in provider"
+
+- name: _mtv_storage_map | Process VMware Datastores
+  ansible.builtin.include_tasks: _mtv_storage_map_process_datastore.yml
+  loop: "{{ mtv_destination_datastores }}"
+  loop_control:
+    loop_var: mtv_vmware_datastore
+  when:
+    - "'vsphere' in provider"
+    - mtv_destination_datastores is defined
+    - mtv_destination_datastores | length > 0
+
+- name: _mtv_storage_map | Process Ovirt Datastores
+  ansible.builtin.include_tasks: _mtv_storage_map_process_datastore.yml
+  loop: "{{ mtv_destination_datastores }}"
+  loop_control:
+    loop_var: mtv_ovirt_datastore
+  when:
+    - "'ovirt' in provider"
+    - mtv_destination_datastores is defined
+    - mtv_destination_datastores | length > 0
+
+- name: _mtv_storage_map | Template StorageMap Map
+  ansible.builtin.set_fact:
+    mtv_management_storage_map: "{{ (lookup('ansible.builtin.template', 'storagemap.yml.j2') | from_yaml) | ansible.builtin.combine({'spec': {'map': (mtv_management_mtv_storagemap_maps | dict2items | map(attribute='value') | list)}}, recursive=true) }}" # noqa: yaml[line-length]
+
+- name: _mtv_storage_map | Create Storage Map
+  redhat.openshift.k8s:
+    state: present
+    definition: "{{ mtv_management_storage_map }}"
+    apply: true
+...

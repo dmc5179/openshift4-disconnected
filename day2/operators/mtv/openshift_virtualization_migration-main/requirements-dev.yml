@@ -1,0 +1,31 @@
+---
+collections:
+  # Red Hat Certified Content
+  - name: redhat.openshift_virtualization
+    version: ">=2.1.0"
+  - name: redhat.openshift
+    version: ">=4.0.0"
+  - name: vmware.vmware_rest
+    version: ">=4.6.0"
+  - name: ansible.controller
+    version: ">=4.5.12"
+  - name: ansible.posix
+    version: ">=1.6.2"
+  # Red Hat Validated
+    # Dependency of playbooks/bootstrap_aap_install.yml: uses 'infra.aap_utilities.aap_setup_download
+  - name: "infra.aap_utilities"
+    version: ">=2.6.0"
+    # Dependency of playbooks/preseed.yml
+  - name: "infra.controller_configuration"
+    version: ">=3.0.2"
+  # Community
+  - name: kubernetes.core
+    version: ">=5.2.0"
+  - name: community.crypto
+    version: ">=2.26.0"
+  - name: community.general
+    version: ">=10.5.0"
+  - name: community.vmware
+    version: ">=5.5.0"
+
+...

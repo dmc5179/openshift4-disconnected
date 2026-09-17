@@ -1,0 +1,6 @@
+---
+# tasks file for bootstrap
+- name: Subscribe AAP
+  ansible.builtin.include_tasks:
+    file: aap_subscription.yml
+...

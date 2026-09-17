@@ -1,0 +1,50 @@
+---
+# .ansible-lint
+
+profile: production
+
+exclude_paths:
+  - .cache/ # implicit unless exclude_paths is defined in config
+  - collections # location that pytest installs required collections
+  - changelogs/ # checked by antsibull-changelog lint
+  - .gitlab-ci.yml # Not ansible
+  - .gitlab/ # Not ansible
+  - devfile.yaml # Not ansible
+  - docs/ # Not ansible
+  - .pre-commit-config.yaml # Not ansible
+  - .markdownlint-cli2.yaml # Not ansible
+  - .ansible # Avoid linting other collections
+  - changelogs/.plugin-cache.yaml # Not ansible
+  - plugins/ # Not yaml
+
+parseable: true
+
+loop_var_prefix: ^(__|{role}_)
+
+var_naming_pattern: ^[a-z_][a-z0-9_]*$
+
+use_default_rules: true
+
+skip_list:
+  - fqcn[canonical] # Needed for redhat.openshift.k8s / kubernetes.core.k8s_info
+
+enable_list:
+  - args
+  - empty-string-compare # opt-in
+  - no-log-password # opt-in
+  - no-same-owner # opt-in
+  - name[prefix] # opt-in
+  - yaml
+
+# Ansible-lint does not fail on warnings from the rules or tags listed below
+warn_list:
+  - yaml[line-length]
+
+offline: false
+
+kinds:
+  - yaml: "**/*.yaml-too"
+
+task_name_prefix: "{stem} | "
+
+...

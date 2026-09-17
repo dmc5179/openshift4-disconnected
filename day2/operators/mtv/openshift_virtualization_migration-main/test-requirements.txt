@@ -1,0 +1,15 @@
+# TO-DO: add python packages that are required for testing this collection
+pytest-ansible
+pytest-xdist
+pytest-cov
+coverage
+molecule
+tox
+tox-ansible
+black
+jmespath
+ansible-core
+ansible-lint
+antsibull-changelog
+distlib
+pyyaml

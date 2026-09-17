@@ -1,0 +1,125 @@
+---
+- name: "_operator_resource_item | Set Fact: {{ _operator_resource_name | capitalize }}"
+  ansible.builtin.set_fact:
+    _operator_management_resource: >-
+      {{
+        lookup('ansible.builtin.template', _operator_resource_name + '_skeleton.yml.j2')
+        | from_yaml
+        | ansible.builtin.combine(_operator[_operator_resource_name], recursive=true)
+      }}
+
+- name: _operator_resource_item | Configure Operator Subscription
+  when: _operator_resource_name == 'subscription'
+  block:
+    - name: _operator_resource_item | Verify Operator Exists
+      ansible.builtin.assert:
+        that:
+          - >-
+            operator_management_resource.spec is defined
+            and _operator_management_resource.spec.name is defined
+            and _operator_management_resource.spec.source is defined
+          - >-
+            operator_management_packagemanifests_results.resources
+            | selectattr('status.packageName', 'equalto', _operator_management_resource.spec.name)
+            | selectattr('status.catalogSource', 'equalto', _operator_management_resource.spec.source)
+            | list
+            | length == 1
+        quiet: true
+        fail_msg: |
+          "Unable to locate Operator '{{ _operator_management_resource.spec.name }}'
+          in catalog '{{ _operator_management_resource.spec.source }}'"
+
+    - name: _operator_resource_item | Verify Operator Channel Exists
+      when: _operator_management_resource.spec is defined and _operator_management_resource.spec.channel is defined
+      ansible.builtin.assert:
+        that:
+          - >-
+            (
+              operator_management_packagemanifests_results.resources
+              | selectattr('status.packageName', 'equalto', _operator_management_resource.spec.name)
+              | selectattr('status.catalogSource', 'equalto', _operator_management_resource.spec.source)
+              | first
+            ).status.channels
+            | selectattr('name', 'equalto', _operator_management_resource.spec.channel)
+            | list
+            | length == 1
+        quiet: true
+        fail_msg: >-
+          "Unable to locate Operator Channel '{{ _operator_management_resource.spec.channel }}' in operator
+          '{{ _operator_management_resource.spec.name }}' in catalog '{{ _operator_management_resource.spec.source }}'"
+
+    - name: _operator_resource_item | Set Operator channel when not defined
+      ansible.builtin.set_fact:
+        _operator_management_resource: >-
+          {{
+            _operator_management_resource
+            | ansible.builtin.combine({'spec':{ 'channel': (operator_management_packagemanifests_results.resources
+            | selectattr('status.packageName', 'equalto', _operator_management_resource.spec.name)
+            | selectattr('status.catalogSource', 'equalto', _operator_management_resource.spec.source)
+            | first).status.defaultChannel }}, recursive=true)
+          }}
+
+- name: _operator_resource_item | Apply Resource {{ _operator_resource_name | capitalize }}
+  redhat.openshift.k8s: # noqa: fqcn[canonical]
+    state: present
+    definition: "{{ _operator_management_resource }}"
+    apply: true
+
+- name: _operator_resource_item | Operator Installation Management
+  when: _operator_resource_name == 'subscription'
+  block:
+    - name: _operator_resource_item | Obtain Related CSV Name
+      ansible.builtin.set_fact:
+        operator_management_operator_csv: >-
+          {{
+            ((operator_management_packagemanifests_results.resources
+            | selectattr('status.packageName', 'equalto', _operator_management_resource.spec.name)
+            | selectattr('status.catalogSource', 'equalto', _operator_management_resource.spec.source)
+            | first).status.channels
+            | selectattr('name', 'equalto', _operator_management_resource.spec.channel)
+            | first).currentCSV
+          }}
+
+    - name: "_operator_resource_item | Wait until InstallPlan created: ({{ _operator_management_resource.spec.name }})"
+      kubernetes.core.k8s_info:
+        api_version: operators.coreos.com/v1alpha1
+        kind: InstallPlan
+        namespace: "{{ _operator_management_resource.metadata.namespace }}"
+      register: operator_management_r_install_plans
+      vars:
+        _query: >-
+          [?contains(spec.clusterServiceVersionNames[] |
+          join(',', @), '{{ operator_management_operator_csv }}') && status.phase ]
+      retries: 100
+      delay: 15
+      until:
+        - operator_management_r_install_plans.resources | default([]) | length > 0
+        - operator_management_r_install_plans.resources | to_json | from_json | json_query(_query)
+
+    - name: "_operator_resource_item | Get Installed CSV: ({{ _operator_management_resource.spec.name }})"
+      kubernetes.core.k8s_info:
+        api_version: operators.coreos.com/v1alpha1
+        kind: Subscription
+        name: "{{ _operator_management_resource.metadata.name }}"
+        namespace: "{{ _operator_management_resource.metadata.namespace }}"
+      register: operator_management_r_subscription
+      retries: 30
+      delay: 5
+      until:
+        - operator_management_r_subscription.resources[0].status.currentCSV is defined
+        - operator_management_r_subscription.resources[0].status.currentCSV | length > 0
+
+    - name: "_operator_resource_item | Wait until CSV is installed: ({{ _operator_management_resource.spec.name }})"
+      kubernetes.core.k8s_info:
+        api_version: operators.coreos.com/v1alpha1
+        kind: ClusterServiceVersion
+        name: "{{ operator_management_r_subscription.resources[0].status.currentCSV }}"
+        namespace: "{{ _operator_management_resource.metadata.namespace }}"
+      register: operator_management_r_csv
+      retries: 100
+      delay: 15
+      until:
+        - operator_management_r_csv.resources[0].status.phase is defined
+        - operator_management_r_csv.resources[0].status.phase | length > 0
+        - operator_management_r_csv.resources[0].status.phase == "Succeeded"
+...

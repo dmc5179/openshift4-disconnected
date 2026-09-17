@@ -1,0 +1,15 @@
+---
+vm_lifecycle_valid_vm_operations:
+  start:
+    endpoint: start
+    status: Running
+    ready: true
+  stop:
+    endpoint: stop
+    status: Stopped
+  restart:
+    endpoint: restart
+    status: Running
+    ready: true
+    idempotent: true
+...

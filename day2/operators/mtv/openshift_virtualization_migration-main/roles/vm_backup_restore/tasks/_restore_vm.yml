@@ -1,0 +1,54 @@
+---
+
+- name: _restore_vm | Stop Virtual Machine
+  redhat.openshift_virtualization.kubevirt_vm:
+    api_key: "{{ vm_backup_restore_openshift_api_key }}"
+    host: "{{ vm_backup_restore_openshift_host }}"
+    validate_certs: "{{ vm_backup_restore_openshift_verify_ssl }}"
+    name: "{{ vm_restore_snapshot.response_obj.spec.source.name }}"
+    namespace: "{{ vm_restore_snapshot.response_obj.metadata.namespace }}"
+    running: false
+    wait: true
+    wait_timeout: "{{ vm_backup_restore_vm_wait_timeout }}"
+
+- name: _restore_vm | Create Restore
+  redhat.openshift.k8s:
+    state: present
+    api_key: "{{ vm_backup_restore_openshift_api_key }}"
+    host: "{{ vm_backup_restore_openshift_host }}"
+    validate_certs: "{{ vm_backup_restore_openshift_verify_ssl }}"
+    definition:
+      apiVersion: "{{ snapshot_kubevirt_api_version }}"
+      kind: VirtualMachineRestore
+      metadata:
+        generateName: "{{ vm_restore_snapshot.response_obj.metadata.ownerReferences[0].name }}-"
+        namespace: "{{ vm_restore_snapshot.response_obj.metadata.namespace }}"
+        ownerReferences:
+          - apiVersion: "{{ kubevirt_api_version }}"
+            blockOwnerDeletion: false
+            kind: VirtualMachine
+            name: "{{ vm_restore_snapshot.response_obj.metadata.ownerReferences[0].name }}"
+            uid: "{{ vm_restore_snapshot.response_obj.metadata.ownerReferences[0].uid }}"
+      spec:
+        target:
+          apiGroup: "{{ kubevirt_api_version.split('/')[0] }}"
+          kind: VirtualMachine
+          name: "{{ vm_restore_snapshot.response_obj.metadata.ownerReferences[0].name }}"
+        virtualMachineSnapshotName: "{{ vm_restore_snapshot.response_obj.metadata.name }}"
+    wait: true
+    wait_timeout: "{{ vm_backup_restore_vm_restore_wait_timeout }}"
+    wait_condition:
+      type: Ready
+
+- name: _restore_vm | Start Virtual Machine
+  redhat.openshift_virtualization.kubevirt_vm:
+    api_key: "{{ vm_backup_restore_openshift_api_key }}"
+    host: "{{ vm_backup_restore_openshift_host }}"
+    validate_certs: "{{ vm_backup_restore_openshift_verify_ssl }}"
+    name: "{{ vm_restore_snapshot.response_obj.metadata.ownerReferences[0].name }}"
+    namespace: "{{ vm_restore_snapshot.response_obj.metadata.namespace }}"
+    running: true
+    wait: true
+    wait_timeout: "{{ vm_backup_restore_vm_wait_timeout }}"
+  when: vm_restore_snapshot['start_vm'] | default(true) | bool
+...

@@ -1,0 +1,38 @@
+destination:
+{% if 'vsphere' == provider %}
+{% if ('network_destination_type' in mtv_management_mtv_vmware_network_overrides and mtv_management_mtv_vmware_network_overrides['network_destination_type'] == "pod") or mtv_management_mtv_network_networkattachmentdefinition | length == 0 %}
+  type: pod
+{% else %}
+{% if 'network_attachment_definition' in mtv_management_mtv_vmware_network_overrides and mtv_management_mtv_vmware_network_overrides['network_attachment_definition'] | default('', true) | trim | length > 0 %}
+{%  set multus_nad_name = (mtv_management_mtv_vmware_network_overrides['network_attachment_definition'] | ansible.builtin.split('/'))[1] if mtv_management_mtv_vmware_network_overrides['network_attachment_definition'] | ansible.builtin.split('/') | length == 2 else mtv_management_mtv_vmware_network_overrides['network_attachment_definition'] %}
+{%  set multus_nad_namespace = (mtv_management_mtv_vmware_network_overrides['network_attachment_definition'] | ansible.builtin.split('/'))[0] if mtv_management_mtv_vmware_network_overrides['network_attachment_definition'] | ansible.builtin.split('/') | length == 2 else "default" %}
+{% else %}
+{%  set multus_nad_name = (mtv_management_mtv_network_networkattachmentdefinition | first).object.metadata.name %}
+{%  set multus_nad_namespace = (mtv_management_mtv_network_networkattachmentdefinition | first).object.metadata.namespace %}
+{% endif %}
+  type: multus
+  name: {{ multus_nad_name }}
+  namespace: {{ multus_nad_namespace }}
+{% endif %}
+source:
+  id: "{{ mtv_vmware_network.id }}"
+  name: "{{ mtv_vmware_network.name }}"
+{% elif 'ovirt' == provider %}
+{% if ('network_destination_type' in mtv_management_mtv_ovirt_network_overrides and mtv_management_mtv_ovirt_network_overrides['network_destination_type'] == "pod") or mtv_management_mtv_network_networkattachmentdefinition | length == 0 %}
+  type: pod
+{% else %}
+{% if 'network_attachment_definition' in mtv_management_mtv_ovirt_network_overrides and mtv_management_mtv_ovirt_network_overrides['network_attachment_definition'] | default('', true) | trim | length > 0 %}
+{%  set multus_nad_name = (mtv_management_mtv_ovirt_network_overrides['network_attachment_definition'] | ansible.builtin.split('/'))[1] if mtv_management_mtv_ovirt_network_overrides['network_attachment_definition'] | ansible.builtin.split('/') | length == 2 else mtv_management_mtv_ovirt_network_overrides['network_attachment_definition'] %}
+{%  set multus_nad_namespace = (mtv_management_mtv_ovirt_network_overrides['network_attachment_definition'] | ansible.builtin.split('/'))[0] if mtv_management_mtv_ovirt_network_overrides['network_attachment_definition'] | ansible.builtin.split('/') | length == 2 else "default" %}
+{% else %}
+{%  set multus_nad_name = (mtv_management_mtv_network_networkattachmentdefinition | first).object.metadata.name %}
+{%  set multus_nad_namespace = (mtv_management_mtv_network_networkattachmentdefinition | first).object.metadata.namespace %}
+{% endif %}
+  type: multus
+  name: {{ multus_nad_name }}
+  namespace: {{ multus_nad_namespace }}
+{% endif %}
+source:
+  id: "{{ mtv_ovirt_network.id }}"
+  name: "{{ mtv_ovirt_network.name }}"
+{% endif %}

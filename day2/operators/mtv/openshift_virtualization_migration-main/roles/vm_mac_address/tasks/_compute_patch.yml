@@ -1,0 +1,41 @@
+---
+
+- name: _compute_patch | Verify Valid MAC Address Provided
+  ansible.builtin.assert:
+    that:
+      - _vm_mac_address_interface.macAddress | default("", true) | string | length > 0
+      - _vm_mac_address_interface.macAddress is ansible.utils.mac
+    fail_msg: >-
+      MAC Address for Virtual Machine '{{ _vm_mac_address.namespace }}/{{ _vm_mac_address.name }}'
+      is not valid
+    quiet: true
+
+- name: _compute_patch | Locate Interface Index
+  ansible.builtin.set_fact:
+    _vm_mac_address_interface_idx: >-
+      {{
+        lookup('ansible.utils.index_of',
+        _vm_mac_address_vm_interfaces,
+        'eq', _vm_mac_address_interface.name, 'name', wantlist=true)
+      }}
+
+- name: _compute_patch | Create Patch Item
+  when:
+    - _vm_mac_address_interface_idx | length > 0
+    - >-
+      'macAddress' not in _vm_mac_address_vm_interfaces[_vm_mac_address_interface_idx[0]] or
+      (
+        'macAddress' in _vm_mac_address_vm_interfaces[_vm_mac_address_interface_idx[0]] and
+        _vm_mac_address_vm_interfaces[_vm_mac_address_interface_idx[0]].macAddress
+        != _vm_mac_address_interface.macAddress
+      )
+  ansible.builtin.set_fact:
+    vm_mac_address_interfaces_patch: "{{ vm_mac_address_interfaces_patch + [_vm_mac_address_patch_data] }}"
+  vars:
+    _vm_mac_address_patch_data:
+      op: >-
+        {{ 'add' if 'macAddress' not in _vm_mac_address_vm_interfaces[_vm_mac_address_interface_idx[0]]
+        else 'replace' }}
+      path: "/spec/template/spec/domain/devices/interfaces/{{ _vm_mac_address_interface_idx[0] }}/macAddress"
+      value: "{{ _vm_mac_address_interface.macAddress }}"
+...

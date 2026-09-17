@@ -1,0 +1,27 @@
+---
+# vars file for aap_machine_credentials
+aap_machine_credentials_input_keys:
+  - username
+  - password
+  - ssh_key_data
+  - ssh_public_key_data
+  - ssh_key_unlock
+  - become_method
+  - become_username
+  - become_password
+  - state
+
+aap_machine_credentials_base_keys:
+  - name: "name"
+  - name: "description"
+  - name: "organization"
+    default: "{{ aap_machine_credentials_organization }}"
+  - name: "credential_type"
+    default: "Machine"
+
+aap_machine_credentials_input_maps:
+  - src: ssh_key_data_path
+    dest: ssh_key_data
+  - src: ssh_public_key_data_path
+    dest: ssh_public_key_data
+...

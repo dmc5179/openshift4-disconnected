@@ -1,0 +1,20 @@
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: {{ portgroup.name | infra.openshift_virtualization_migration.rfc1123(network_mgmt_nad_name_prefix, "^[\d]+") }}
+  namespace: {{ network_mgmt_nad_namespace }} 
+  annotations: 
+    infra.openshift-virtualization-migration/source-portgroup: {{ portgroup.name }}
+    infra.openshift-virtualization-migration/source-switch: {{ portgroup.switch }}
+    infra.openshift-virtualization-migration/provider-hostname: {{ network_mgmt_vcenter_hostname }}
+    infra.openshift-virtualization-migration/provider-type: vmware 
+spec:
+  config: | 
+    {"name": "localnet-vlan-{{ portgroup.vlan.vlan_id }}",
+     "type": "ovn-k8s-cni-overlay",
+     "cniVersion": "0.3.1",
+     "topology": "localnet",
+     "netAttachDefName": "{{ network_mgmt_nad_namespace }}/{{ portgroup.name | infra.openshift_virtualization_migration.rfc1123(network_mgmt_nad_name_prefix, "^[\d]+") }}",
+     "mtu": {{ (network_mgmt_switches_to_migrate | selectattr('name','equalto', portgroup.switch) | first).mtu }}, 
+     "vlanID": {{ portgroup.vlan.vlan_id | int }}
+     }

@@ -1,0 +1,3 @@
+---
+create_mf_aap_token_secure_logging: "{{ secure_logging | default(true) }}"
+...

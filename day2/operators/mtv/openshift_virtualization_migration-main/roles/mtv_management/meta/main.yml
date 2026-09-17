@@ -1,0 +1,28 @@
+---
+galaxy_info:
+  author: Andrew Block
+  description: Management of the Migration Toolkit for Virtualization (MTV).
+  company: Red Hat
+
+  license: GPL-3.0-only
+
+  min_ansible_version: 2.15.0
+
+  platforms:
+    - name: EL
+      versions:
+        - all
+
+  galaxy_tags:
+    - openshift
+    - virt
+    - vmware
+    - migrate
+    - mtv
+
+collections:
+  - redhat.openshift
+  - kubernetes.core
+
+dependencies: []
+...

@@ -1,0 +1,82 @@
+---
+
+- name: manual | Validate network_mgmt_manual_nad_list
+  ansible.builtin.assert:
+    that:
+      - network_mgmt_manual_nad_list is iterable
+      - network_mgmt_manual_nad_list is not string
+      - network_mgmt_manual_nad_list | default([]) | length > 0
+
+- name: manual | Validate supported bonding mode if also creating bond
+  ansible.builtin.assert:
+    fail_msg: >-
+      "{{ network_mgmt_openshift_network_bond_mode }} is not a supported bond mode.
+      Supported bond modes: {{  network_mgmt_openshift_network_supported_bond_modes | join(',') }}"
+    that:
+      - network_mgmt_openshift_network_bond_mode in network_mgmt_openshift_network_supported_bond_modes
+  when:
+    - not (network_mgmt_override_openshift_supported_bond_mode | default(false))
+    - (network_mgmt_openshift_node_network_ports | default([]) | length) != 0
+
+- name: manual | Validate ovs-bridge mode
+  ansible.builtin.assert:
+    that:
+      - network_mgmt_manual_localnet_name is string
+      - (network_mgmt_manual_localnet_name | default('') | length) > 0
+  when:
+    - "network_mgmt_openshift_network_bridge_mode == 'ovs-bridge'"
+
+- name: manual | Validate linux-bridge
+  ansible.builtin.assert:
+    that:
+      - network_mgmt_manual_bridge_name is string
+      - (network_mgmt_manual_bridge_name | default('') | length) > 0
+
+## Only create the NNCP if the bridge and the bond is defined, the template looks for the ports to put in the bond.
+- name: manual | Apply NodeNetworkConfigurationPolicy
+  redhat.openshift.k8s:
+    state: present
+    definition: "{{ (lookup('ansible.builtin.template', 'manual-lb/nncp.yaml.j2') | from_yaml) }}"
+  when:
+    - network_mgmt_manual_bridge_name | default('') | length > 0
+    - network_mgmt_manual_bond_name | default('') | length > 0
+    - "network_mgmt_openshift_network_bridge_mode == 'linux-bridge'"  ## TODO manually setup the OSV-bridge NNCP
+
+- name: manual | Validate access port
+  ansible.builtin.assert:
+    that:
+      - "'name' in nad"
+      - "'vlan' in nad"
+      - "'vlan_id' in nad.vlan"
+      - nad.vlan.vlan_id is string or nad.vlan.vlan_id is integer
+  loop: "{{ network_mgmt_manual_nad_list }}"
+  when:
+    - ('trunk' not in nad) or (not nad.trunk)
+  loop_control:
+    loop_var: nad
+
+- name: manual | Validate trunk ports
+  ansible.builtin.assert:
+    that:
+      - "'name' in nad"
+      - "'vlan' in nad"
+      - "'vlan_id' in nad.vlan"
+      - nad.vlan.vlan_id is iterable
+      - nad.vlan.vlan_id is not string
+      - "network_mgmt_openshift_network_bridge_mode == 'linux-bridge'"
+      ## Only allow trunks with linux-bridge not supported with ovs-bridge
+  loop: "{{ network_mgmt_manual_nad_list }}"
+  when:
+    - "'trunk' in nad"
+    - nad.trunk
+  loop_control:
+    loop_var: nad
+
+- name: manual | Apply NetworkAttachmentDefinitions
+  redhat.openshift.k8s:
+    state: present
+    definition: "{{ (lookup('ansible.builtin.template', 'manual-lb/nad.yaml.j2') | from_yaml) }}"
+  loop: "{{ network_mgmt_manual_nad_list }}"
+  loop_control:
+    loop_var: nad
+...

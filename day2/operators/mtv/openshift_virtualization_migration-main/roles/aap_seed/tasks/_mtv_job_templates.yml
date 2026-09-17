@@ -1,0 +1,40 @@
+---
+- name: _mtv_job_templates | Configure VMWare MTV Job Template
+  when:
+    - _target_type == 'vmware'
+    - (_mtv_job_template | trim | length) > 0
+  ansible.builtin.set_fact:
+    aap_seed_controller_templates: "{{ aap_seed_controller_templates + [_mtv_job_template | from_yaml] }}"
+  loop:
+    - "mtv_provider_job_template.yaml.j2"
+    - "configure_network_job_template.yaml.j2"
+    - "mtv_mapping_job_template.yaml.j2"
+    - "mtv_vddk_job_template.yaml.j2"
+    - "migrate_job_template.j2"
+  loop_control:
+    loop_var: _job_template
+  vars:
+    _kubeconfig_credential: "Kubeconfig - {{ _mf_host }}"
+    _target_credential: "{{ _target_name }}"
+    _mf_cac_credential: "openshift_virtualization_migration_cac - {{ _mf_host }}"
+    _mtv_job_template: "{{ (lookup('ansible.builtin.template', _target_type ~ '/' ~ _job_template)) }}"
+
+- name: _mtv_job_templates | Configure Ovirt MTV Job Template
+  when:
+    - _target_type == 'ovirt'
+    - (_mtv_job_template | trim | length) > 0
+  ansible.builtin.set_fact:
+    aap_seed_controller_templates: "{{ aap_seed_controller_templates + [_mtv_job_template | from_yaml] }}"
+  loop:
+    - "mtv_provider_job_template.yaml.j2"
+    - "configure_network_job_template.yaml.j2"
+    - "mtv_mapping_job_template.yaml.j2"
+    - "migrate_job_template.j2"
+  loop_control:
+    loop_var: _job_template
+  vars:
+    _kubeconfig_credential: "Kubeconfig - {{ _mf_host }}"
+    _target_credential: "{{ _target_name }}"
+    _mf_cac_credential: "openshift_virtualization_migration_cac - {{ _mf_host }}"
+    _mtv_job_template: "{{ (lookup('ansible.builtin.template', _target_type ~ '/' ~ _job_template)) }}"
+...

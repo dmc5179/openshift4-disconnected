@@ -1,0 +1,11 @@
+---
+# tasks file for mtv_management
+
+- name: Configure MTV Providers
+  ansible.builtin.include_tasks: mtv_providers.yml
+  when: mtv_management_map_providers is defined and mtv_management_map_providers | bool
+
+- name: Configure MTV Maps
+  ansible.builtin.include_tasks: mtv_maps.yml
+  when: (mtv_management_map_storage is defined and mtv_management_map_storage | bool) or (mtv_management_map_networks is defined and mtv_management_map_networks | bool) # noqa: yaml[line-length]
+...

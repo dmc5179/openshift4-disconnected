@@ -1,0 +1,30 @@
+---
+
+- name: Verify vm_mac_address_request Variable Provided
+  ansible.builtin.assert:
+    that:
+      - vm_mac_address_request | default("", true) | length > 0
+    fail_msg: "'vm_mac_address_request' Variable Not Provided"
+    quiet: true
+
+- name: Verify Required Properties Provided
+  ansible.builtin.assert:
+    that:
+      - vm_mac_address_request | selectattr('name', 'undefined') | list | length == 0
+      - vm_mac_address_request | selectattr('namespace', 'undefined') | list | length == 0
+      - vm_mac_address_request | selectattr('interfaces', 'undefined') | list | length == 0
+    fail_msg: "Required properties in 'vm_mac_address_request' Variable Not Provided"
+    quiet: true
+
+- name: Process MAC Address VM
+  ansible.builtin.include_tasks:
+    file: _process_vm.yml
+  loop: "{{ vm_mac_address_request }}"
+  loop_control:
+    loop_var: _vm_mac_address
+    label: >-
+      "Namespace: {{ _vm_mac_address['namespace']
+      if 'namespace' in _vm_mac_address else '<undefined>' }}
+      - Name: {{ _vm_mac_address['name']
+      if 'name' in _vm_mac_address else '<undefined>' }}"
+...

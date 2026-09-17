@@ -1,0 +1,11 @@
+---
+
+- name: basic_no_change | Basic execution of the plugin that returns the same value
+  ansible.builtin.assert:
+    that: "__filter_rfc1123_loop_var | infra.openshift_virtualization_migration.rfc1123 ==
+      __filter_rfc1123_loop_var"
+    success_msg: "{{ __filter_rfc1123_loop_var }} not modified"
+    fail_msg: "Input = '{{ __filter_rfc1123_loop_var }}''
+      unexpected output =
+      '{{ __filter_rfc1123_loop_var | infra.openshift_virtualization_migration.rfc1123 }}'"
+...

@@ -1,0 +1,14 @@
+name: Configure OpenShift Virtualization Migration - Configure Migration Targets
+description: Configuration of Migration Targets
+organization: "{{ aap_seed_aap_org_name }}"
+survey_enabled: false
+allow_simultaneous: false
+ask_variables_on_launch: false
+inventory: "{{ aap_seed_aap_inventory }}"
+state: present
+simplified_workflow_nodes:
+{% for workflow in  _aap_seed_mtv_workflow_names %}
+  - all_parents_must_converge: false
+    identifier: {{ workflow }}
+    unified_job_template: {{ workflow }}
+{% endfor %}

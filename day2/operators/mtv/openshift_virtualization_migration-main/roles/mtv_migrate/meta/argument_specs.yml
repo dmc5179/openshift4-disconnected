@@ -1,0 +1,169 @@
+---
+argument_specs:
+  main:
+    short_description: MTV Migrate - Migrate VMs at scale
+    options:
+      mtv_migrate_default_namespace:
+        description: The default namespace to use if not specified
+        type: str
+        default: openshift-mtv
+      mtv_migrate_migration_request:
+        description: This is a dictionary with details of a migration plan to create and / or run
+        type: dict
+        required: true
+        options:
+          mtv_namespace:
+            description: The namespace MTV is deployed in
+            type: str
+            default: openshift-mtv
+          source_type:
+            description: Source MTV Provider
+            type: str
+            default: vsphere
+          source:
+            description: Source containing VMs
+            type: str
+            default: vmware
+          source_namespace:
+            description: Namespace the source provider is located
+            type: str
+            default: openshift-mtv
+          destination:
+            description: Name of target to migrate VMs to
+            type: str
+            default: host
+          destination_namespace:
+            description: Namespace the MTV destination provider is located
+            type: str
+            default: openshift-mtv
+          destination_type:
+            description: Destination provider type
+            type: str
+            default: openshift
+          vms_per_plan:
+            description: Number of VMs to split into multiple plans
+            type: int
+            default: 10
+          split_plans:
+            description: Determines whether to split into multiple plans
+            type: bool
+            default: false
+          plan_overrides:
+            description: Config to apply at the plan level
+            type: dict
+          vm_overrides:
+            description: Config to apply at to each VM
+            type: dict
+          target_namespace:
+            description: Namespace to create VMs in
+            type: str
+            default: openshift-mtv
+          dry_run:
+            description: Build the plans without applying them
+            type: bool
+            default: false
+          network_map:
+            description: Name of the network map to use
+            type: str
+            default: vmware-host
+          network_map_namespace:
+            description: Namespace containing the network map
+            type: str
+            default: openshift-mtv
+          storage_map:
+            description: Name of the storage map
+            type: str
+            default: vmware-host
+          storage_map_namespace:
+            description: Namespace containing the storage map
+            type: str
+            default: openshift-mtv
+          start_migration:
+            description: Create migration resources for the created plan
+            type: bool
+            default: false
+          verify_plans_ready:
+            description: Verify the plan is in a ready state
+            type: bool
+            default: false
+          verify_migrations_complete:
+            description: Waits for migrations to complete
+            type: bool
+            default: false
+          plan_name:
+            description: Name of the migration plan
+            type: str
+            default: source_name-target_name-yyyyMMdd-HHmm
+          vms:
+            description: Explicit list of VMs to migrate
+            type: list
+          folders:
+            description: Explicit list of folders to migrate
+            type: list
+      mtv_migrate_plan_base_name_annotation:
+        description: Label assigned to the MTV plan name
+        type: str
+        default: infra.openshift-virtualization-migration/plan-name
+      mtv_migrate_default_source_type:
+        description: Default source type for migrations
+        type: str
+        default: vsphere
+      mtv_migrate_default_source_target:
+        description: Default source target for migration
+        type: str
+        default: vmware
+      mtv_migrate_default_destination_type:
+        description: Default destination type for migrations
+        type: str
+        default: openshift
+      mtv_migrate_default_destination_target:
+        description: Default destination for migrations
+        type: str
+        default: host
+      mtv_migrate_default_split_plans:
+        description: Whether to split the plans into chunks of VMs
+        type: bool
+        default: false
+      mtv_migrate_default_vms_per_plan:
+        description: The size for each chunk of VMs split out
+        type: int
+        default: 10
+      mtv_migrate_default_start_migration:
+        description: Whether to start the migration after plan is created
+        type: bool
+        default: false
+      mtv_migrate_default_migrate_dry_run:
+        description: Whether to perform a dry_run of plan creation
+        type: bool
+        default: false
+      mtv_migrate_default_verify_plans_ready:
+        description: Whether to verify the plans are ready
+        type: bool
+        default: false
+      mtv_migrate_default_verify_migrations_complete:
+        description: Whether to wait for migrations to finish
+        type: bool
+        default: false
+      # Commented out due to arg_spec errors with internal variables
+      # mtv_migrate_default_plan_base_name:
+      #  description: The default base name for migration plans
+      #  type: str
+      # mtv_migrate_default_network_map_name:
+      #  description: The default name of the network map
+      #  type: str
+      # mtv_migrate_default_storage_map_name:
+      #  description: The default name of the storage map
+      #  type: str
+      # mtv_migrate_default_target_namespace:
+      #  description: The default target namespace
+      #  type: raw
+      # mtv_migrate_default_storage_map_namespace:
+      #  description: The default namespace of the storage map
+      #  type: str
+      # mtv_migrate_default_source_target_namespace:
+      #  description: Default source target namespace
+      #  type: str
+      # mtv_migrate_default_destination_target_namespace:
+      #  description: Default namespace for migration targets
+      #  type: raw
+...

@@ -1,0 +1,24 @@
+---
+# defaults file for aap_machine_credentials
+
+# title: List of AAP Credentials
+# required: True
+# description: List of credentials to access AAP provided by _process_machine_credential.yml
+aap_machine_credentials_request: []
+# - name: "my-ssh-key"
+#   username: user
+#   ssh_key_data: "<ssh_key_content>"
+
+# title: Organization name in AAP host
+# required: True
+# description: Name of the organization in AAP
+aap_machine_credentials_organization: "{{ aap_project | default('OpenShift Virtualization Migration', true) }}"
+
+# title: Ansible Automation Platform configuration collection credentials role
+# required: True
+# description: Determines which collection to use for configuring AAP based on the version.
+aap_machine_credentials_cac_credentials_role: >-
+  {{ 'infra.controller_configuration.credentials' if aap_version is defined and aap_version is version('2.5', '<')
+  else 'infra.aap_configuration.controller_credentials' }}
+
+...

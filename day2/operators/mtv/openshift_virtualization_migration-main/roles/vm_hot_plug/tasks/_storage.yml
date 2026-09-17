@@ -1,0 +1,43 @@
+---
+
+- name: _storage | Perform VM Storage Operation
+  when: >
+    (
+      'state' in vm_hot_plug_storage_instance and
+      vm_hot_plug_storage_instance.state == 'absent' and
+      vm_hot_plug_vm.response_obj.spec.template.spec.domain.devices.disks |
+      default([]) |
+      selectattr('name', 'equalto', vm_hot_plug_storage_instance.name) | list | length > 0
+    ) or
+    (
+      (
+        'state' not in vm_hot_plug_storage_instance or
+        'state' in vm_hot_plug_storage_instance and
+        vm_hot_plug_storage_instance.state != 'absent'
+      ) and
+      vm_hot_plug_vm.response_obj.spec.template.spec.domain.devices.disks |
+      default([]) |
+      selectattr('name', 'equalto', vm_hot_plug_storage_instance.name) | list | length == 0
+    )
+  ansible.builtin.uri:
+    url:
+      "{{ vm_hot_plug_openshift_host }}/apis/subresources.{{ vm_hot_plug_kubevirt_api_version }}\
+      /namespaces/{{ vm_hot_plug_vm.response_obj.metadata.namespace }}/virtualmachines\
+      /{{ vm_hot_plug_vm.response_obj.metadata.name }}\
+      /{{ _vm_hot_plug_storage_operation }}"
+    validate_certs: "{{ vm_hot_plug_openshift_verify_ssl }}"
+    method: PUT
+    body: "{{ lookup('ansible.builtin.template', 'storage_datavolume_request.yml.j2') | from_yaml }}"
+    body_format: json
+    headers:
+      Authorization: Bearer {{ vm_hot_plug_api_key }}
+    status_code: 202
+  loop: "{{ vm_hot_plug_vm.storage.volumes | default([]) }}"
+  loop_control:
+    label: "{{ vm_hot_plug_storage_instance.name }}"
+    loop_var: vm_hot_plug_storage_instance
+  vars:
+    _vm_hot_plug_storage_operation: >-
+      {{ 'removevolume' if 'state' in vm_hot_plug_storage_instance and
+      vm_hot_plug_storage_instance.state == 'absent' else 'addvolume' }}
+...

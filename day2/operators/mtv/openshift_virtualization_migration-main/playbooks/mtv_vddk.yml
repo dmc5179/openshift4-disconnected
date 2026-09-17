@@ -1,0 +1,18 @@
+---
+- name: Configure MTV VDDK
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: MTV VDDK
+      ansible.builtin.include_role:
+        name: infra.openshift_virtualization_migration.mtv_management
+        tasks_from: mtv_vddk.yml
+      vars:
+        openshift_api_key: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_API_KEY') }}"
+        mtv_management_vmware_vddk_init_image: "{{ vmware_vddk_init_image | default('', true) }}"
+        mtv_management_vmware_vddk_init_image_username: "{{ vmware_vddk_init_image_username | default('', true) }}"
+        mtv_management_vmware_vddk_init_image_password: "{{ vmware_vddk_init_image_password | default('', true) }}"
+        mtv_management_vmware_vddk_init_image_credentials_secret: "{{ vmware_vddk_init_image_credentials_secret | default('', true) }}" # noqa: yaml[line-length]
+
+...

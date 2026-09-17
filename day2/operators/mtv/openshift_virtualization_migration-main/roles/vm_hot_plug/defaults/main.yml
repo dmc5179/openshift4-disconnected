@@ -1,0 +1,40 @@
+---
+# defaults file for vm_hot_plug
+
+# title: Hot Plug Requests
+# required: True
+# description: List of Hot Plug Requests
+vm_hot_plug_request: []
+# -  namespace: <namespace> # Namespace containing VMs to perform operations against. \
+# Optional unless specifying 'names'.
+#    names: # List of VM's within a namespace
+#    label_selectors: # Label Selectors to apply. Cannot be used with list of VM names
+#      - <key>=<value>
+#    compute: # Modify cpu/memory or instance type of the VM
+#      cpu:
+#        cores: <value>
+#      memory: <memory>
+#      instanceType: <instance_type>
+#    storage:
+#      - name: <name>
+#        state: present|absent
+#    restartIfRequired: false
+
+# title: OpenShift Host
+# required: True
+# description: OpenShift Host
+vm_hot_plug_openshift_host: "{{ openshift_host }}"
+# title: OpenShift API Key
+# required: True
+# description: OpenShift API Key
+vm_hot_plug_api_key: "{{ openshift_api_key }}"
+# title: Verify SSL Certificate
+# required: True
+# description: Verify SSL Certificate
+vm_hot_plug_openshift_verify_ssl: "{{ openshift_verify_ssl }}"
+# title: KubeVirt API Version
+# required: True
+# description: KubeVirt API Version
+vm_hot_plug_kubevirt_api_version: kubevirt.io/v1
+
+...

@@ -1,0 +1,49 @@
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: {{ network_mgmt_manual_bridge_name }}-vmbridge-nncp
+  annotations: 
+    infra.openshift-virtualization-migration/provider-type: manual 
+spec:
+  desiredState:
+    interfaces:
+{% if network_mgmt_openshift_node_network_ports != [] %}
+      - ipv4:
+          enabled: false
+        ipv6:
+          enabled: false
+        link-aggregation:
+          mode: {{ network_mgmt_openshift_network_bond_mode }}
+          port: {{ network_mgmt_openshift_node_network_ports }}
+        name: {{ network_mgmt_manual_bond_name }}
+        state: up
+        type: bond
+{% endif %}
+{% if network_mgmt_manual_bond_name != "" %}
+      - bridge:
+          options:
+            stp:
+              enabled: false
+          port:
+            - name: {{ network_mgmt_manual_bond_name }}
+        ipv4:
+          enabled: false
+        ipv6:
+          enabled: false
+        name: {{ network_mgmt_manual_bridge_name }}
+        state: up
+        type: linux-bridge
+{% endif %}
+{% for port in network_mgmt_openshift_node_network_ports %}
+      - ipv4:  
+          enabled: false
+        ipv6:
+          enabled: false
+        name: {{ port }}
+        state: up
+        type: ethernet
+{% endfor %}
+  maxUnavailable: {{ network_mgmt_nncp_max_unavailable }} 
+  nodeSelector:
+    {{ network_mgmt_nncp_nodeselector }}
+

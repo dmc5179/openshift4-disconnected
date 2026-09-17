@@ -1,0 +1,13 @@
+---
+- name: MTV Management
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Include MTV Management Role
+      ansible.builtin.import_role:
+        name: infra.openshift_virtualization_migration.mtv_management
+      vars:
+        mtv_management_migration_targets: "{{ migration_targets | default([]) }}"
+        openshift_api_key: "{{ lookup('ansible.builtin.env', 'K8S_AUTH_API_KEY') }}"
+...

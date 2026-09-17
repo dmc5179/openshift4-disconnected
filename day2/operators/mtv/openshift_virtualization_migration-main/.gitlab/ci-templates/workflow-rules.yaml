@@ -1,0 +1,23 @@
+---
+# yaml-language-server: $schema=https://gitlab.com/gitlab-org/gitlab/-/raw/master/app/assets/javascripts/editor/schema/ci.json
+
+# Workflow rules determine if a pipeline will run at all
+# Variables set at this level have a lower precedence than job template variables
+workflow:
+  rules:
+    # Tagging will publish an image with the specific tag
+    - if: $CI_COMMIT_TAG
+      when: never
+    # Don't run on automatic commits
+    - if: $CI_COMMIT_AUTHOR =~ /semantic-release.*/
+      when: never
+    # Allow runs from the web interface
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    # Run pipelines for merge request events
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    # If branch and merge request pipelines are enabled this prevents duplicates
+    - if: "$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS"
+      when: never
+    # After merging this will be run (update to main branch)
+    - if: '($CI_COMMIT_BRANCH =~ /^main\/*/) && ($CI_PIPELINE_SOURCE == "push")'
+...

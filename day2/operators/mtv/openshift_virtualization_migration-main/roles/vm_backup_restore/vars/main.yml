@@ -1,0 +1,7 @@
+---
+# vars file for vm_backup_restore
+
+vm_backup_restore_valid_vm_backup_restore_operations:
+  - snapshot
+  - snapshot_restore
+...

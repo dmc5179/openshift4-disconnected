@@ -1,0 +1,106 @@
+---
+# title: OpenShift Node Network Ports
+# required: True
+# description: List of Node Network Ports
+network_mgmt_openshift_node_network_ports: []
+
+# title: Define Bond
+# required: True
+# description: Boolean value to check if a bond is defined
+network_mgmt_port_is_existing_bond: false
+
+# This is a list of available ethernet devices to use as bridge ports
+# title: vCenter DVSwitch
+# required: True
+# description: vCenter Distributed Switch
+network_mgmt_vcenter_dvswitch: ''
+
+# title: vCenter Data Center
+# required: True
+# description: vCenter Data Center name
+network_mgmt_vcenter_datacenter: ''
+
+# title: OpenShift Network Bridge Mode
+# required: True
+# description: OpenShift Network Bridge Mode
+network_mgmt_openshift_network_bridge_mode: linux-bridge ## This can be 'linux-bridge' or 'ovs-bridge'
+
+# title: OVN Bridge
+# required: True
+# description: Boolean value defines usage of OVN bridge
+network_mgmt_use_default_ovn_bridge: false
+
+# https://docs.openshift.com/container-platform/4.16/networking/k8s_nmstate/\
+# k8s-nmstate-updating-node-network-config.html
+# virt-example-bond-nncp_k8s_nmstate-updating-node-network-config
+# https://access.redhat.com/solutions/67546
+# title: OpenShift Network Bond Mode
+# required: True
+# description: OpenShift Network Bond Mode
+network_mgmt_openshift_network_bond_mode: 802.3ad # Only supported bond modes are 802.3ad (LACP), balance-xor, \
+# active-backup, based on testing 802.3ad falls back to active-passive if switch not configured
+
+# title: Supported Bond Modes
+# required: True
+# description: List of supported bond modes
+network_mgmt_openshift_network_supported_bond_modes:
+  - 802.3ad
+  - active-backup
+  - balance-xor
+
+# title: NNCP Max Unavailability
+# required: True
+# description: Maximum number of times NNCP can be unavailable
+network_mgmt_nncp_max_unavailable: 3 ## This can be an absolute number or a percentage per \
+# https://docs.openshift.com/container-platform/4.16/networking/k8s_nmstate/\
+# k8s-nmstate-updating-node-network-config.html
+# virt-creating-interface-on-nodes_k8s_nmstate-updating-node-network-config
+
+# title: NNCP NodeSelector
+# required: True
+# description: NNCP NodeSelector on the OpenShift cluster
+network_mgmt_nncp_nodeselector:
+  node-role.kubernetes.io/worker: ""
+
+# title: NNCP Name Prefix
+# required: True
+# description: NNCP Name Prefix
+network_mgmt_nncp_name_prefix: vs-
+
+# title: NAD Namespace
+# required: True
+# description: NAD Namespace
+network_mgmt_nad_namespace: default
+
+# This variable should be defined if the NNCP won't be created in automatic
+# mode but we want to create NAD automatically. This should be the name of
+# the existing OCP bridge we want to use in our NADs.
+network_mgmt_nad_auto_bridge_name: ""
+
+# NAD must start with a lower alpha character
+# use the prefix net- for any migrated portgroup that starts with a number
+# title: NAD Name Prefix
+# required: True
+# description: NAD Name Prefix
+network_mgmt_nad_name_prefix: net-
+
+# title: Bond Name in Manual Mode
+# required: True
+# description: Bond Name in Manual Mode
+network_mgmt_manual_bond_name: ''
+
+# title: Bridge Name in Manual Mode
+# required: True
+# description: Bridge Name in Manual Mode
+network_mgmt_manual_bridge_name: 'vm-bridge'
+
+# title: Local Network Name in Manual Mode
+# required: True
+# description: Local Network Name in Manual Mode
+network_mgmt_manual_localnet_name: ''
+
+# title: NAD List in Manual Mode
+# required: True
+# description: NAD List in Manual Mode
+network_mgmt_manual_nad_list: []
+...

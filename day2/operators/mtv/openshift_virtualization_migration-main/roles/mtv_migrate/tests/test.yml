@@ -1,0 +1,7 @@
+---
+- name: Test play
+  hosts: localhost
+  remote_user: root
+  roles:
+    - mtv_migrate
+...

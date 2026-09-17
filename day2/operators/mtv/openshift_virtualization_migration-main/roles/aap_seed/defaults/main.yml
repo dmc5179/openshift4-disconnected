@@ -1,0 +1,640 @@
+---
+# title: AAP Secure Logging
+# required: True
+# description: Enable Secure Logging
+aap_seed_secure_logging: "{{ secure_logging | default(true) }}"
+
+# title: AAP Migration Hub
+# required: True
+# description: AAP Migration Hub
+aap_seed_migration_hub: []
+
+# title: AAP Namespace in OpenShift
+# required: True
+# description: AAP Namespace in OpenShift
+aap_seed_aap_namespace: "{{ aap_namespace }}"
+
+# title: AAP Subscription Channel
+# required: True
+# description: AAP Subscription Channel
+aap_seed_aap_channel: "{{ aap_channel }}"
+
+# title: AAP Instance Name
+# required: True
+# description: AAP Instance Name
+aap_seed_aap_instance_name: "{{ aap_instance_name }}"
+
+# title: AAP Organization Name
+# required: True
+# description: Name of the organization in AAP
+aap_seed_aap_org_name: "{{ aap_org_name }}"
+
+# title: AAP Controller Username
+# required: True
+# description: AAP Controller Username
+aap_seed_controller_username: >-
+  {{ controller_username | default(aap_username)
+  | default(lookup('ansible.builtin.env', 'CONTROLLER_USERNAME')) }}
+
+# title: AAP Controller Password
+# required: True
+# description: AAP Controller Password
+aap_seed_controller_password: >-
+  {{ controller_password | default(aap_password)
+  | default(lookup('ansible.builtin.env', 'CONTROLLER_PASSWORD')) }}
+# title: AAP token
+# required: False
+# description: AAP token to use for the AAP controller, not required if aap_username and aap_password are set
+aap_seed_controller_token: >-
+  {{ controller_oauthtoken | default(aap_token)
+  | default(lookup('ansible.builtin.env', 'CONTROLLER_TOKEN')) }}
+aap_seed_controller_hostname: >-
+  {{ controller_hostname | default(aap_hostname)
+  | default(lookup('ansible.builtin.env', 'CONTROLLER_HOSTNAME')) }}
+
+# title: Validate AAP Controller Certificate
+# required: True
+# description: Validate AAP Controller Certificate
+aap_seed_controller_validate_certs: >-
+  {{ controller_validate_certs | default(aap_validate_certs)
+  | default(lookup('ansible.builtin.env', 'CONTROLLER_VERIFY_SSL')) }}
+
+# title: AAP CaC Collection Name
+# required: True
+# description: If AAP is 2.5< use infra.controller_configuration otherwise use infra.aap_configuration
+aap_seed_cac_collection: >-
+  {{ 'infra.controller_configuration' if aap_version is defined and aap_version is version('2.5', '<')
+  else 'infra.aap_configuration' }}
+
+# title: AAP Organizations Variable
+# required: True
+# description: If AAP is 2.5< use controller_organizations, otherwise use aap_organizations
+aap_seed_controller_organizations_var: >-
+  {{ 'controller_organizations' if aap_version is defined and aap_version is version('2.5', '<')
+  else 'aap_organizations' }}
+
+# General controller vars
+
+# title: Configuration Async Retries
+# required: True
+# description: Maximum number of of asynchronous retries
+aap_seed_controller_configuration_async_retries: 60
+
+# title: Dependency Check
+# required: True
+# description: Verify availability and configuration of the required dependencies for the EE
+aap_seed_controller_dependency_check: false
+
+# Vars set which are either passed via a custom credential from the Bootstrap AAP, or set from a playbook
+
+# title: AAP Inventory
+# required: True
+# description: AAP Inventory used for the collection
+aap_seed_aap_inventory: openshift_virtualization_migration
+
+# title: AAP Version
+# required: True
+# description: AAP Version
+aap_seed_aap_version: "{{ aap_version | default(2.5) }}"
+
+# title: AAP Execution Environment
+# required: True
+# description: AAP Execution Environment
+aap_seed_aap_execution_environment: "{{ aap_execution_environment }}"
+
+# title: AAP Execution Environment Image
+# required: True
+# description: AAP Execution Environment Image
+aap_seed_aap_execution_environment_image: "{{ aap_execution_environment_image }}"
+
+# title: AAP Project
+# required: True
+# description: AAP Project
+aap_seed_aap_project: "{{ aap_project }}"
+
+# title: AAP Project Branch
+# required: True
+# description: AAP Project Branch in the git repo
+aap_seed_aap_project_branch: "{{ aap_project_branch }}"
+
+# title: AAP Project Repository
+# required: True
+# description: AAP Project Repository that contains the Ansible Collection for OpenShift Virtualization Migration
+aap_seed_aap_project_repo: "{{ aap_project_repo }}"
+
+# title: Automation Hub Certified Name
+# required: True
+# description: Automation Hub Certified Name
+aap_seed_automation_hub_certified_credential_name: >-
+  {{ automation_hub_certified_credential_name | default('Red Hat Automation Hub Certified') }}
+
+# title: Automation Hub Validated Name
+# required: True
+# description: Automation Hub Validated Name
+aap_seed_automation_hub_validated_credential_name: >-
+  {{ automation_hub_validated_credential_name | default('Red Hat Automation Hub Validated') }}
+
+# title: Automation Hub Certified URL
+# required: True
+# description: Automation Hub Certified URL
+aap_seed_automation_hub_certified_url: "{{ automation_hub_certified_url }}"
+
+# title: Automation Hub Certified URL
+# required: True
+# description: Automation Hub Authorization URL
+aap_seed_automation_hub_certified_auth_url: "{{ automation_hub_certified_auth_url }}"
+
+# title: Automation Hub Token
+# required: True
+# description: Automation Hub Token
+aap_seed_automation_hub_certified_token: "{{ automation_hub_certified_token }}"
+
+# title: Automation Hub Validated URL
+# required: True
+# description: Automation Hub Validated URL
+aap_seed_automation_hub_validated_url: "{{ automation_hub_validated_url }}"
+
+# title: Automation Hub Validated Authorization URL
+# required: True
+# description: Automation Hub Validated Authorization URL
+aap_seed_automation_hub_validated_auth_url: "{{ automation_hub_validated_auth_url }}"
+
+# title: Automation Hub Validated Token
+# required: True
+# description: Automation Hub Validated Token
+aap_seed_automation_hub_validated_token: "{{ automation_hub_validated_token }}"
+
+# title: Git Credential Name
+# required: True
+# description: Git Credential Name
+aap_seed_git_credential_name: >-
+  {{ (git_credential_name is defined) | ansible.builtin.ternary(git_credential_name, 'Git') }}
+
+# title: Git Username
+# required: True
+# description: Git Username
+aap_seed_git_username: "{{ (git_username is defined) | ansible.builtin.ternary(git_username, '') }}"
+
+# title: Git Password
+# required: True
+# description: Git Password
+aap_seed_git_password: "{{ (git_password is defined) | ansible.builtin.ternary(git_password, '') }}"
+
+# title: Git SSH Private Key
+# required: True
+# description: Git SSH Private Key
+aap_seed_git_ssh_private_key: >-
+  {{ (git_ssh_private_key is defined)
+  | ansible.builtin.ternary(git_ssh_private_key, '') }}
+
+# title: Git SSH Private Key Passphrase
+# required: True
+# description: Git SSH Private Key Passphrase
+aap_seed_git_ssh_key_passphrase: >-
+  {{ (git_ssh_key_passphrase is defined)
+  | ansible.builtin.ternary(git_ssh_key_passphrase, '') }}
+
+# Some vars are in a separate credential and pulled out of the environment with a lookup
+
+# title: VMware Host
+# required: True
+# description: VMware Host
+aap_seed_vmware_host: "{{ vmware_host }}"
+
+# title: VMware Username
+# required: True
+# description: VMware Username
+aap_seed_vmware_user: "{{ vmware_user }}"
+
+# title: VMware Password
+# required: True
+# description: VMware Password
+aap_seed_vmware_password: "{{ vmware_password }}"
+
+# title: Validate VMware Certificate
+# required: True
+# description: Validate VMware Certificate
+aap_seed_vmware_validate_certs: "{{ vmware_validate_certs }}"
+
+# title: VMware CA Certificate
+# required: True
+# description: VMware CA Certificate
+aap_seed_vmware_cacert: "{{ vmware_cacert }}"
+
+# title: VMware Context Path
+# required: True
+# description: VMware Context Path
+aap_seed_vmware_context_path: "{{ vmware_context_path }}"
+
+# title: AAP Container Credential Name
+# required: True
+# description: AAP Container Credential Name
+aap_seed_container_credential_name: "{{ container_credential_name | default('Container Registry') }}"
+
+# title: AAP Container Host
+# required: True
+# description: AAP Container Host that runs the execution environment
+aap_seed_container_host: "{{ container_host }}"
+
+# title: AAP Container Password
+# required: True
+# description: AAP Container Password
+aap_seed_container_password: "{{ container_password }}"
+
+# title: AAP Container Username
+# required: True
+# description: AAP Container Username
+aap_seed_container_username: "{{ container_username }}"
+
+# title: Container Verify SSL
+# required: True
+# description: Determines whether SSL certificates are verified when pulling EE images
+aap_seed_container_verify_ssl: "{{ container_verify_ssl | default(false) }}"
+
+# title: AAP Job Template Variables
+# required: True
+# description: AAP Job Template Extra Variables
+aap_seed_aap_job_template_extra_vars: "{{ aap_job_template_extra_vars | default('{}') }}"
+
+# title: Migration Targets
+# required: True
+# description: Migration Targets
+aap_seed_migration_targets: "{{ migration_targets | default([]) }}"
+
+# Default Management Hub Operators
+# title: Default Management Hub Operators
+# required: True
+# description: Default Management Hub Operators
+aap_seed_operator_management_hub:
+  - acm
+  - oadp
+  - far
+  - nho
+
+# Default Spoke Operators
+# title: Default Spoke Operators
+# required: True
+# description: Default Spoke Operators
+aap_seed_operator_management_spoke:
+  - mtv
+  - cnv
+  - oadp
+  - far
+  - nmstate
+  - nho
+
+# title: Enable Ansible Galaxy Credential
+# required: True
+# description: Enable Ansible Galaxy Credential in AAP Organization Credentials
+aap_seed_ansible_galaxy_credential_enabled: true
+
+# title: Name of the Ansible Galaxy Credential
+# required: True
+# description: Name of the Ansible Galaxy Credential
+aap_seed_ansible_galaxy_credential_name: "Ansible Galaxy"
+
+# title: Create Automation Hub Credentials
+# required: True
+# description: Create Automation Hub Credentials in AAP Organization Credentials
+aap_seed_automation_hub_credentials_create: true
+
+# title: Automation Hub Credentials
+# required: True
+# description: Defines the Automation Hub credentials to be used by AAP
+aap_seed_automation_hub_credentials:
+  - name: "{{ aap_seed_automation_hub_certified_credential_name }}"
+    description: Red Hat Automation Hub Certified Credential
+    organization: "{{ aap_seed_aap_org_name }}"
+    credential_type: Ansible Galaxy/Automation Hub API Token
+    inputs:
+      url: "{{ aap_seed_automation_hub_certified_url }}"
+      auth_url: "{{ aap_seed_automation_hub_certified_auth_url }}"
+      token: "{{ aap_seed_automation_hub_certified_token }}"
+  - name: "{{ aap_seed_automation_hub_validated_credential_name }}"
+    description: Red Hat Automation Hub Validated Credential
+    organization: "{{ aap_seed_aap_org_name }}"
+    credential_type: Ansible Galaxy/Automation Hub API Token
+    inputs:
+      url: "{{ aap_seed_automation_hub_validated_url }}"
+      auth_url: "{{ aap_seed_automation_hub_validated_auth_url }}"
+      token: "{{ aap_seed_automation_hub_validated_token }}"
+
+# title: Credentials to Seed
+# required: True
+# description: Credentials to Seed
+aap_seed_controller_credentials: []
+
+# title: Credential Types
+# required: True
+# description: Defines the Config as Code Credential Types
+aap_seed_controller_credential_types:
+  - name: openshift_virtualization_migration_cac
+    description: OpenShift Virtualization Migration Config-as-Code Data structure
+    organization: "{{ aap_seed_aap_org_name }}"
+    kind: cloud
+    inputs:
+      fields:
+        - id: aap_version
+          type: string
+          label: AAP Version
+        - id: aap_instance_name
+          type: string
+          label: AAP Instance Name
+        - id: aap_execution_environment
+          type: string
+          label: AAP Execution Environment
+        - id: aap_org_name
+          type: string
+          label: AAP Org Name
+        - id: aap_namespace
+          type: string
+          label: AAP Namespace
+        - id: aap_project
+          type: string
+          label: AAP Project Name
+        - id: aap_inventory
+          type: string
+          label: AAP Inventory
+        - id: aap_job_template_extra_vars
+          type: string
+          label: Job Template Extra Variables
+          secret: true
+        - id: migration_targets
+          type: string
+          label: Migration Targets
+          multiline: true
+          secret: true
+      required:
+        - aap_version
+        - aap_instance_name
+        - aap_execution_environment
+        - aap_org_name
+        - aap_project
+        - aap_inventory
+    injectors:
+      extra_vars:
+        aap_version: "{% raw %}{  { aap_version }}{% endraw %}"
+        aap_instance_name: "{% raw %}{  { aap_instance_name }}{% endraw %}"
+        aap_execution_environment: "{% raw %}{  { aap_execution_environment }}{% endraw %}"
+        aap_org_name: "{% raw %}{  { aap_org_name }}{% endraw %}"
+        aap_project: "{% raw %}{  { aap_project }}{% endraw %}"
+        aap_inventory: "{% raw %}{  { aap_inventory }}{% endraw %}"
+        aap_namespace: "{% raw %}{  { aap_namespace }}{% endraw %}"
+        aap_job_template_extra_vars: "{% raw %}{  { aap_job_template_extra_vars }}{% endraw %}"
+        provided_migration_targets: "{% raw %}{  { migration_targets }}{% endraw %}"
+  - name: VMware Migration Target
+    description: Migration Target for VMware
+    organization: "{{ aap_seed_aap_org_name }}"
+    kind: cloud
+    inputs:
+      fields:
+        - id: name
+          type: string
+          label: Target Name
+        - id: host
+          type: string
+          label: VCenter Host
+        - id: username
+          type: string
+          label: Username
+        - id: password
+          type: string
+          label: Password
+          secret: true
+        - id: insecure_ssl
+          type: boolean
+          label: Skip Validate VMware Certificate Verification
+        - id: cacert
+          type: string
+          label: VMware CA Certificate
+          multiline: true
+        - id: context_path
+          type: string
+          label: VMware Context Path
+        - id: credentials_secret_ref
+          type: string
+          label: Credentials Secret Reference
+        - id: vddk_init_image
+          type: string
+          label: VDDK Init Image
+        - id: vddk_init_image_username
+          type: string
+          label: VDDK Init Image Username
+        - id: vddk_init_image_password
+          type: string
+          label: VDDK Init Image Password
+          secret: true
+        - id: vddk_init_image_credentials_secret
+          type: string
+          label: VDDK Init Image Credentials Secret
+        - id: provider_name
+          type: string
+          label: Provider source
+      required:
+        - name
+        - host
+        - provider_name
+    injectors:
+      extra_vars:
+        vmware_target_name: "{% raw %}{  { name }}{% endraw %}"
+        vmware_insecure_ssl: "{% raw %}{  { insecure_ssl }}{% endraw %}"
+        vmware_cacert: "{% raw %}{  { cacert }}{% endraw %}"
+        vmware_context_path: "{% raw %}{  { context_path }}{% endraw %}"
+        vmware_credentials_secret_ref: "{% raw %}{  { credentials_secret_ref }}{% endraw %}"
+        vmware_vddk_init_image: "{% raw %}{  { vddk_init_image }}{% endraw %}"
+        vmware_vddk_init_image_username: "{% raw %}{  { vddk_init_image_username }}{% endraw %}"
+        vmware_vddk_init_image_password: "{% raw %}{  { vddk_init_image_password }}{% endraw %}"
+        vmware_vddk_init_image_credentials_secret: "{% raw %}{  { vddk_init_image_credentials_secret }}{% endraw %}"
+        provider: "{% raw %}{  { provider_name }}{% endraw %}"
+      env:
+        VMWARE_HOST: "{% raw %}{  { host }}{% endraw %}"
+        VMWARE_USER: "{% raw %}{  { username }}{% endraw %}"
+        VMWARE_PASSWORD: "{% raw %}{  { password }}{% endraw %}"
+  - name: Ovirt Migration Target
+    description: Migration Target for Ovirt
+    organization: "{{ aap_seed_aap_org_name }}"
+    kind: cloud
+    inputs:
+      fields:
+        - id: name
+          type: string
+          label: Target Name
+        - id: host
+          type: string
+          label: Ovirt Host
+        - id: username
+          type: string
+          label: Username
+        - id: password
+          type: string
+          label: Password
+          secret: true
+        - id: insecure_ssl
+          type: boolean
+          label: Skip Validate Ovirt Certificate Verification
+        - id: cacert
+          type: string
+          label: Ovirt CA Certificate
+          multiline: true
+        - id: context_path
+          type: string
+          label: Ovirt Context Path
+        - id: credentials_secret_ref
+          type: string
+          label: Credentials Secret Reference
+        - id: provider_name
+          type: string
+          label: Provider source
+      required:
+        - name
+        - host
+        - provider_name
+    injectors:
+      extra_vars:
+        ovirt_target_name: "{% raw %}{  { name }}{% endraw %}"
+        ovirt_insecure_ssl: "{% raw %}{  { insecure_ssl }}{% endraw %}"
+        ovirt_cacert: "{% raw %}{  { cacert }}{% endraw %}"
+        ovirt_context_path: "{% raw %}{  { context_path }}{% endraw %}"
+        ovirt_credentials_secret_ref: "{% raw %}{  { credentials_secret_ref }}{% endraw %}"
+        provider: "{% raw %}{  { provider_name }}{% endraw %}"
+      env:
+        OVIRT_HOST: "{% raw %}{  { host }}{% endraw %}"
+        OVIRT_USER: "{% raw %}{  { username }}{% endraw %}"
+        OVIRT_PASSWORD: "{% raw %}{  { password }}{% endraw %}"
+# title: Organization
+# required: True
+# description: AAP Organization for OpenShift Virtualization Migration
+aap_seed_controller_organizations:
+  - name: "{{ aap_seed_aap_org_name }}"
+    galaxy_credentials: >-
+      {{ ([aap_seed_ansible_galaxy_credential_name] if aap_seed_ansible_galaxy_credential_enabled else [])
+      + (aap_seed_automation_hub_credentials | map(attribute='name')
+      if aap_seed_automation_hub_credentials_create else []) }}
+
+# title: Project
+# required: The project in AAP where the collection will reside
+aap_seed_controller_projects:
+  - name: "{{ aap_seed_aap_project }}"
+    organization: "{{ aap_seed_aap_org_name }}"
+    scm_branch: "{{ aap_seed_aap_project_branch }}"
+    scm_clean: "no"
+    scm_delete_on_update: "no"
+    scm_type: git
+    scm_update_on_launch: "yes"
+    scm_url: "{{ aap_seed_aap_project_repo }}"
+    credential: "{{ aap_seed_git_credential_name }}"
+    local_path: infra/openshift_virtualization_migration
+
+# title: Execution Environment
+# required: True
+# description: The execution environment where the ansible playbooks for OpenShift Virtualization Migration will run
+aap_seed_controller_execution_environments:
+  - name: "{{ aap_seed_aap_execution_environment }}"
+    image: "{{ aap_seed_aap_execution_environment_image }}"
+    pull: always
+    credential: >-
+      {{ aap_seed_container_credential_name if aap_seed_container_credential_name
+      | default('', true) | length > 0 else '' }}
+
+# title: Inventory
+# required: True
+# description: Target inventory for OpenShift Virtualization Migration
+aap_seed_controller_inventories:
+  - name: "{{ aap_seed_aap_inventory }}"
+    organization: "{{ aap_seed_aap_org_name }}"
+
+# title: Host
+# required: True
+# description: The hosts where the migration will run
+aap_seed_controller_hosts:
+  - name: localhost
+    inventory: "{{ aap_seed_aap_inventory }}"
+    variables:
+      ansible_connection: local
+      ansible_python_interpreter: "{  { ansible_playbook_python }}"
+
+# title: AAP Controller Templates
+# required: True
+# description: AAP controller templates to seed
+aap_seed_controller_templates:
+  - name: OpenShift Virtualization Migration - Migrate
+    organization: "{{ aap_seed_aap_org_name }}"
+    project: "{{ aap_seed_aap_project }}"
+    job_type: run
+    ask_variables_on_launch: true
+    extra_vars: "{{ aap_seed_aap_job_template_extra_vars }}"
+    playbook: playbooks/mtv_migrate.yml
+    inventory: "{{ aap_seed_aap_inventory }}"
+    execution_environment: "{{ aap_seed_aap_execution_environment }}"
+    ask_credential_on_launch: true
+#     credentials:
+#       - Kubeconfig
+#       - aap_seed_cac
+
+# title: Workflow Launch Jobs
+# required: True
+# description:  Workflow Launch Jobs
+aap_seed_controller_workflow_launch_jobs:
+#   - name: Configure OpenShift Virtualization Migration - Deploy OpenShift Operators and Configure Migration Targets
+#     wait: false
+
+# title: Create Organization
+# required: True
+# description: Create Organization
+aap_seed_organization_create: true
+
+# title: Create Projects
+# required: True
+# description: Create Projects
+aap_seed_projects_create: true
+
+# title: Create Execution Environments
+# required: True
+# description: Create Execution Environments
+aap_seed_execution_environments_create: true
+
+# title: Create Credential Types
+# required: True
+# description: Create Credential Types
+aap_seed_credential_types_create: true
+
+# title: Create Inventories
+# required: True
+# description: Create Inventories
+aap_seed_inventories_create: true
+
+# title: Create Hosts
+# required: True
+# description: Create Hosts
+aap_seed_hosts_create: true
+
+# title: Create Job Templates
+# required: True
+# description: Create Job Templates
+aap_seed_job_templates_create: true
+
+# title: Create Workflow Job Templates
+# required: True
+# description: Create Workflow Job Templates
+aap_seed_workflow_job_templates_create: true
+
+# title: Create AAP Credentials
+# required: True
+# description: Create AAP Credentials
+aap_seed_aap_credentials_create: true
+
+# title: Create Project Credentials
+# required: True
+# description: Create Project Credentials
+aap_seed_project_credentials_create: true
+
+# title: Create Migration Target Credentials
+# required: True
+# description: Create Migration Target Credentials
+aap_seed_migration_targets_credentials_create: true
+
+# title: Create Container Registry Credentials
+# required: True
+# description: Create Container Registry Credentials
+aap_seed_container_registry_credentials_create: true
+...

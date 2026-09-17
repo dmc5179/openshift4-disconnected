@@ -1,0 +1,29 @@
+---
+galaxy_info:
+  role_name: mtv_migrate
+  author: Andrew Block
+  description: Migration of Virtual Machines from Source to Destination.
+  company: Red Hat
+
+  license: GPL-3.0-only
+
+  min_ansible_version: 2.15.0
+
+  platforms:
+    - name: EL
+      versions:
+        - all
+
+  galaxy_tags:
+    - openshift
+    - virt
+    - vmware
+    - migrate
+    - mtv
+
+collections:
+  - redhat.openshift
+  - kubernetes.core
+
+dependencies: []
+...

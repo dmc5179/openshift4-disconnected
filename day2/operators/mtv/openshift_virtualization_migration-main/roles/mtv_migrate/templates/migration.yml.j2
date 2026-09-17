@@ -1,0 +1,15 @@
+apiVersion: forklift.konveyor.io/v1beta1
+kind: Migration
+metadata:
+  name: "{{ _mtv_plan_to_migrate.metadata.name + '-' + lookup('community.general.random_string', length=5, special=false, upper=false) | infra.openshift_virtualization_migration.rfc1123 }}"
+  namespace: "{{ _mtv_plan_to_migrate.metadata.namespace }}"
+  ownerReferences:
+    - apiVersion: forklift.konveyor.io/v1beta1
+      kind: Plan
+      name: "{{ _mtv_plan_to_migrate.metadata.name }}"
+      uid: "{{ _mtv_plan_to_migrate.metadata.uid }}"
+spec:
+  plan:
+    name: "{{ _mtv_plan_to_migrate.metadata.name }}"
+    namespace: "{{ _mtv_plan_to_migrate.metadata.namespace }}"
+    uid: "{{ _mtv_plan_to_migrate.metadata.uid }}"

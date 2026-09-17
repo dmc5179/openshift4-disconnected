@@ -1,0 +1,4 @@
+---
+# vars file for vm_patching
+vm_patching_package_list: "*"
+...

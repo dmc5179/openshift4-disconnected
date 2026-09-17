@@ -1,0 +1,13 @@
+name: Configure MTV Provider - {{ _target_name }} - {{ _mf_host }}
+organization: "{{ aap_seed_aap_org_name }}"
+project: "{{ aap_seed_aap_project }}"
+job_type: run
+extra_vars:
+  {{ aap_seed_aap_job_template_extra_vars | ansible.builtin.combine({'mtv_management_source_target': _target_name}) | to_yaml | indent(2) }}
+playbook: playbooks/mtv_provider_ovirt.yml
+inventory: "{{ aap_seed_aap_inventory }}"
+execution_environment: "{{ aap_seed_aap_execution_environment }}"
+credentials:
+  - {{ _kubeconfig_credential }}
+  - {{ _target_credential }}
+  - {{ _mf_cac_credential }}

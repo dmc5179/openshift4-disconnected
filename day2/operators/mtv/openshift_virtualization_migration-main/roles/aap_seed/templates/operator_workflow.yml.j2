@@ -1,0 +1,14 @@
+name: Configure OpenShift Virtualization Migration - Deploy OpenShift Operators
+description: Workflow to configure the OpenShift Virtualization Migration Openshift Operators
+organization: "{{ aap_seed_aap_org_name }}"
+survey_enabled: false
+allow_simultaneous: false
+ask_variables_on_launch: false
+inventory: "{{ aap_seed_aap_inventory }}"
+state: present
+simplified_workflow_nodes:
+{% for _mf_host in  (groups['migration_hub'] + groups['migration_spoke']) | ansible.builtin.unique %}
+  - all_parents_must_converge: false
+    identifier: Configure OpenShift Virtualization Migration Operators - {{ _mf_host }}
+    unified_job_template: OpenShift Virtualization Migration - Configure Operators - {{ _mf_host }}
+{% endfor %}

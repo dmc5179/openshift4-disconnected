@@ -1,0 +1,19 @@
+---
+# This playbook runs the bootstrap config config-as-code preseed
+- name: Run preseed with bootstrap variables
+  hosts: localhost
+  gather_facts: false
+  vars:
+    bootstrap_aap: "{{ true if 'bootstrap' groups and groups['bootstrap'] | length > 0 else false }}"
+  tasks:
+    - name: Read bootstrap vars
+      ansible.builtin.include_vars:
+        file: vars/config_as_code-bootstrap_aap.yml
+
+- name: Generate Service Account Token if not provided
+  ansible.builtin.import_playbook: create_mf_aap_token.yml
+  when: openshift_api_key | default("", true) | length == 0
+
+- name: Call preseed playbook
+  ansible.builtin.import_playbook: preseed.yml
+...

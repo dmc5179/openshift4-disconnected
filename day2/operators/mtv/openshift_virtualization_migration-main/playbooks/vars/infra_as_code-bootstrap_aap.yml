@@ -1,0 +1,55 @@
+---
+# Include this as an extra variable file with: -e @playbooks/vars/infra_as_code-bootstrap_aap_bootstrap.yml \
+# it needs the highest precedence
+
+# Version of AAP to deploy
+aap_setup_down_version: "2.4"
+
+# Which system architecture to dowload for
+aap_setup_arch: x86_64
+
+# Which RHEL version are you using (8 or 9)
+aap_setup_rhel_version: "9"
+
+# Type of installer (setup, setup-bundle)
+aap_setup_down_type: setup
+
+# Download containerized installer
+aap_setup_containerized: false
+
+# For install even if already installed
+aap_setup_inst_force: true
+
+# AAP Inventory
+# Due to https://github.com/ansible/ansible/pull/19664 dictionary keys in Ansible cannot be expanded from a variable.
+# Instead, the playbook that calls this vars file will dynamically \
+# build this dictionary for the variable `aap_setup_prep_inv_nodes`
+
+aap_setup_prep_inv_vars:
+  all:
+    ansible_become: true # Remove this entry if aap_setup_containerized: true
+    ansible_connection: local
+    ansible_user: "{{ bootstrap_user }}"
+    admin_password: "{{ controller_password }}"
+    controller_hostname: "{{ controller_hostname }}"
+    controller_pg_host: "{{ controller_hostname }}"
+    controller_pg_password: "{{ controller_password }}"
+    pg_host: "{{ controller_hostname }}"
+    pg_port: "5432"
+    pg_database: awx
+    pg_username: awx
+    pg_password: "{{ controller_password }}"
+    postgresql_admin_password: "{{ controller_password }}"
+    controller_admin_password: "{{ controller_password }}"
+    pg_sslmode: prefer # set to 'verify-full' for client-side enforced SSL
+    registry_url: registry.redhat.io
+    receptor_listener_port: 27199
+    sso_console_admin_password: "{{ controller_password }}"
+    controller_validate_certs: false
+aap_setup_prep_inv_secrets:
+  all:
+    registry_username: "{{ rh_username }}"
+    registry_password: "{{ rh_password }}"
+aap_setup_inst_extra_vars: # Provide a dictionary of extra vars if needed
+  ANSIBLE_VERBOSITY: "{{ aap_setup_inst_verbosity }}"
+...

@@ -1,0 +1,26 @@
+---
+- name: Initialize Variables
+  ansible.builtin.set_fact:
+    vm_hot_plug_vms: []
+
+- name: Invoke Collect VM Role
+  ansible.builtin.include_role:
+    name: infra.openshift_virtualization_migration.vm_collect
+  vars:
+    vm_collect_openshift_api_key: "{{ vm_hot_plug_api_key }}"
+    vm_collect_openshift_host: "{{ vm_hot_plug_openshift_host }}"
+    vm_collect_verify_ssl: "{{ vm_hot_plug_openshift_verify_ssl }}"
+    vm_collect_vms_var: vm_hot_plug_vms
+  loop: "{{ vm_hot_plug_request | default([]) }}"
+  loop_control:
+    loop_var: "vm_collect_request_instance"
+
+- name: Process Hot Plug VM
+  ansible.builtin.include_tasks:
+    file: _process_vm.yml
+  loop: "{{ vm_hot_plug_vms }}"
+  loop_control:
+    loop_var: vm_hot_plug_vm
+    label: "Namespace: {{ vm_hot_plug_vm.response_obj.metadata.namespace }} - Name: {{ vm_hot_plug_vm.response_obj.metadata.name }}" # noqa: yaml[line-length]
+
+...

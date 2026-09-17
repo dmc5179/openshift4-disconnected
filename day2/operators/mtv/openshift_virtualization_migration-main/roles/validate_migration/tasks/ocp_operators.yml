@@ -1,0 +1,76 @@
+---
+- name: ocp_operators | Verify existence of Project {{ validate_migration_namespace }}
+  block:
+    - name: ocp_operators | Get list of Project named {{ validate_migration_namespace }}
+      kubernetes.core.k8s_info:
+        api_version: project.openshift.io/v1
+        kind: Project
+        name: "{{ validate_migration_namespace }}"
+      register: validate_migration_infra_openshift_virtualization_migration_project
+      failed_when: validate_migration_infra_openshift_virtualization_migration_project.resources | length <= 0
+
+  rescue:
+    - name: ocp_operators | Debug Task (Runs if Project doesn't Exists)
+      ansible.builtin.debug:
+        msg:
+          - >
+            The Project {{ validate_migration_namespace }} needed for
+            'Migration Toolkit for Virtualization Operator' doesn't exists
+          - Please install the Operator first
+
+- name: ocp_operators | Debug Task (Runs if Project Exists)
+  ansible.builtin.debug:
+    msg:
+      - Project {{ validate_migration_namespace }} exists, we shall continue
+
+- name: ocp_operators | Verify OperatorGroup exists
+  block:
+    - name: ocp_operators | Get list of OperatorGroup on Project {{ validate_migration_namespace }}
+      kubernetes.core.k8s_info:
+        api_version: operators.coreos.com/v1
+        kind: OperatorGroup
+        namespace: "{{ validate_migration_namespace }}"
+      register: validate_migration_infra_openshift_virtualization_migration_project
+      failed_when: validate_migration_infra_openshift_virtualization_migration_project.resources | length <= 0
+
+  rescue:
+    - name: ocp_operators | Debug Task (Runs if OperatorGroup doesn't Exists)
+      ansible.builtin.debug:
+        msg: The OperatorGroup doesn't exists
+
+- name: ocp_operators | Debug Task (Runs if OperatorGroup Exists)
+  ansible.builtin.debug: # noqa: jinja[invalid]
+    msg:
+      - >
+        OperatorGroup
+        {{ infra_openshift_virtualization_migration_operatorgroup | json_query(__validate_migration_query) }}
+        is already deployed, we shall continue
+    verbosity: 3
+  vars:
+    # yamllint disable-line rule:line-length
+    __validate_migration_query: resources[?contains(metadata.name, '{{ infra_openshift_virtualization_migration_namespace }}')].metadata.name
+
+- name: ocp_operators | Verify Subscription exists
+  block:
+    - name: ocp_operators | Verify Subscription exists
+      kubernetes.core.k8s_info:
+        api_version: operators.coreos.com/v1alpha1
+        kind: Subscription
+        namespace: "{{ validate_migration_namespace }}"
+      register: validate_migration_ocp_subscription
+      failed_when: infra_openshift_virtualization_migration.resources | length <= 0
+
+  rescue:
+    - name: ocp_operators | Debug Task (Runs if Subscription doesn't Exists)
+      ansible.builtin.debug:
+        msg: The Subscription doesn't exists
+
+- name: ocp_operators | Debug Task (Runs if Subscription Exists)
+  ansible.builtin.debug: # noqa: jinja[invalid]
+    msg: >
+      Subscription {{  validate_migration_ocp_subscription | json_query(operators_query) }}
+      is already deployed, we shall continue
+    verbosity: 3
+  vars:
+    operators_query: resources[?contains(metadata.name, 'mtv-operator')].metadata.name
+...

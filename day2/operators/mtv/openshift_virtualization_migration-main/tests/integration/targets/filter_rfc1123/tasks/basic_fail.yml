@@ -1,0 +1,16 @@
+---
+
+- name: basic_fail | Block rescue to catch expected failures of the plugin
+  block:
+
+    - name: basic_fail | Basic test that expects failure
+      ansible.builtin.debug:
+        msg: "{{ __filter_rfc1123_input | infra.openshift_virtualization_migration.rfc1123 }}"
+      register: __filter_rfc1123_debug_msg
+
+  rescue:
+    - name: basic_fail | Assert that failure message is what we expect
+      ansible.builtin.assert:
+        that: "__filter_rfc1123_debug_msg.msg == __filter_rfc1123_fail_msg"
+
+...

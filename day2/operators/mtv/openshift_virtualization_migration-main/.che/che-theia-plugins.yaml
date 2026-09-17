@@ -1,0 +1,6 @@
+---
+- id: ms-python/python/latest
+- id: redhat/ansible/latest
+- id: redhat/vscode-openshift-connector/latest
+- id: ms-python/black-formatter/latest
+...

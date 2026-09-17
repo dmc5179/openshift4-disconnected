@@ -1,0 +1,70 @@
+---
+
+- name: _collect_vms | Verify Valid VM Operation
+  ansible.builtin.assert:
+    that:
+      - "'operation' in vm_operations_request_instance"
+      - vm_operations_request_instance['operation'] in (vm_lifecycle_valid_vm_operations | dict2items | map(attribute='key') | list) # noqa: yaml[line-length]
+    quiet: true
+    fail_msg: "Invalid VM Operation Specified: {{ '<undefined>' if 'operation' not in vm_operations_request_instance else vm_operations_request_instance['operation'] }}. Must be one of {{ vm_lifecycle_valid_vm_operations | join(',') }}" # noqa: yaml[line-length]
+
+- name: _collect_vms | Verify Namespace Provided When Name Specified
+  ansible.builtin.assert:
+    that:
+      - "'namespace' in vm_operations_request_instance"
+    quiet: true
+    fail_msg: "Must Provide a Namespace for VM Operation"
+  when: "'name' in vm_operations_request_instance"
+
+- name: _collect_vms | Query VM's Without Label Selector
+  when: "'label_selectors' not in vm_operations_request_instance"
+  block:
+    - name: "_collect_vms | Query VM's (Without Label Selector)"
+      kubernetes.core.k8s_info:
+        api_key: "{{ vm_lifecycle_openshift_api_key }}"
+        host: "{{ vm_lifecycle_openshift_host }}"
+        api_version: "{{ vm_lifecycle_kubevirt_api_version }}"
+        kind: VirtualMachine
+        namespace: "{{ vm_operations_request_instance['namespace'] if 'namespace' in vm_operations_request_instance else omit }}" # noqa: yaml[line-length]
+        validate_certs: "{{ vm_lifecycle_openshift_verify_ssl }}"
+      register: vm_lifecycle_vm_no_label_selectors_responses
+
+    - name: _collect_vms | Add VM's (Without Label Selector)
+      when:
+        - "(vm_lifecycle_vm_operations_vms | default([]) | map(attribute='vm') | list) | selectattr('metadata.namespace', 'equalto', vm_no_label_selectors_response.metadata.namespace) | list | selectattr('metadata.name', 'equalto', vm_no_label_selectors_response.metadata.name) | list | length == 0" # noqa: yaml[line-length]
+        - "('namespace' in vm_operations_request_instance and 'names' in vm_operations_request_instance and vm_no_label_selectors_response.metadata.name in vm_operations_request_instance['names']) or ('namespace' in vm_operations_request_instance and 'names' not in vm_operations_request_instance) or ('namespace' not in vm_operations_request_instance)" # noqa: yaml[line-length]
+        - "('idempotent' in vm_lifecycle_valid_vm_operations[vm_operations_request_instance['operation']] and vm_lifecycle_valid_vm_operations[vm_operations_request_instance['operation']].idempotent|bool) or ('status' in vm_no_label_selectors_response and 'printableStatus' in vm_no_label_selectors_response.status and vm_no_label_selectors_response.status.printableStatus != vm_lifecycle_valid_vm_operations[vm_operations_request_instance['operation']].status)" # noqa: yaml[line-length]
+      ansible.builtin.set_fact:
+        vm_lifecycle_vm_operations_vms: "{{ vm_lifecycle_vm_operations_vms | default([]) + [{'operation': vm_operations_request_instance.operation, 'vm': vm_no_label_selectors_response}] }}" # noqa: yaml[line-length]
+      loop: "{{ vm_lifecycle_vm_no_label_selectors_responses['resources'] if 'resources' in vm_lifecycle_vm_no_label_selectors_responses else [] }}" # noqa: yaml[line-length]
+      loop_control:
+        loop_var: vm_no_label_selectors_response
+        label: "Namespace: {{ vm_no_label_selectors_response.metadata.namespace }} - Name: {{ vm_no_label_selectors_response.metadata.name }}" # noqa: yaml[line-length]
+
+- name: _collect_vms | Query VM's Using Label Selector
+  when: "'label_selectors' in vm_operations_request_instance"
+  block:
+    - name: "_collect_vms | Query VM's (With Label Selector)"
+      kubernetes.core.k8s_info:
+        api_key: "{{ vm_lifecycle_openshift_api_key }}"
+        host: "{{ vm_lifecycle_openshift_host }}"
+        api_version: "{{ vm_lifecycle_kubevirt_api_version }}"
+        kind: VirtualMachine
+        namespace: "{{ vm_operations_request_instance['namespace'] if 'namespace' in vm_operations_request_instance else omit }}" # noqa: yaml[line-length]
+        label_selectors: "{{ vm_operations_request_instance['label_selectors'] | default([]) }}"
+        validate_certs: "{{ vm_lifecycle_openshift_verify_ssl }}"
+      register: vm_lifecycle_vm_label_selectors_responses
+
+    - name: _collect_vms | Add VM's (With Label Selector)
+      when:
+        - "(vm_lifecycle_vm_operations_vms | default([]) | map(attribute='vm') | list) | selectattr('metadata.namespace', 'equalto', vm_label_selectors_response.metadata.namespace) | list | selectattr('metadata.name', 'equalto', vm_label_selectors_response.metadata.name) | list | length == 0" # noqa: yaml[line-length]
+        - "('idempotent' in vm_lifecycle_valid_vm_operations[vm_operations_request_instance['operation']] and vm_lifecycle_valid_vm_operations[vm_operations_request_instance['operation']].idempotent|bool) or ('status' in vm_label_selectors_response and 'printableStatus' in vm_label_selectors_response.status and vm_label_selectors_response.status.printableStatus != vm_lifecycle_valid_vm_operations[vm_operations_request_instance['operation']].status)" # noqa: yaml[line-length]
+      ansible.builtin.set_fact:
+        vm_lifecycle_vm_operations_vms: "{{ vm_lifecycle_vm_operations_vms | default([]) + [{'operation': vm_operations_request_instance.operation, 'vm': vm_label_selectors_response}] }}" # noqa: yaml[line-length]
+      loop: >-
+       "{{ vm_lifecycle_vm_label_selectors_responses['resources'] if 'resources'
+       in vm_lifecycle_vm_label_selectors_responses else [] }}"
+      loop_control:
+        loop_var: vm_label_selectors_response
+        label: "Namespace: {{ vm_label_selectors_response.metadata.namespace }} - Name: {{ vm_label_selectors_response.metadata.name }}" # noqa: yaml[line-length]
+...

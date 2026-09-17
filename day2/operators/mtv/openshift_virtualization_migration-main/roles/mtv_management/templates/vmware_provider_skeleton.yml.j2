@@ -1,0 +1,15 @@
+apiVersion: forklift.konveyor.io/v1beta1
+kind: Provider
+metadata:
+  name: "{{ mtv_management_populated_vmware_target['name'] }}"
+  namespace: "{{ mtv_management_provider_namespace }}"
+spec:
+  secret:
+    name: "{{ mtv_management_vmware_provider_secret_name }}"
+    namespace: "{{ mtv_management_vmware_provider_secret_namespace }}"
+  type: vsphere
+  url: "{{ mtv_management_mtv_vmware_url }}"
+{% if 'vddk' in mtv_management_populated_vmware_target and mtv_management_populated_vmware_target['vddk'] is not none and 'image' in mtv_management_populated_vmware_target['vddk'] and (mtv_management_populated_vmware_target['vddk']['image'] | default("", true) | length > 0)  %}
+  settings:
+    vddkInitImage: "{{ mtv_management_populated_vmware_target['vddk']['image'] }}"
+{% endif %}

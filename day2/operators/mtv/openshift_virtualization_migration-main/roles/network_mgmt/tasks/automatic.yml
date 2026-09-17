@@ -1,0 +1,47 @@
+---
+- name: automatic | Include tasks from gather_networks.yml
+  ansible.builtin.include_tasks:
+    file: gather_networks.yml
+
+- name: automatic | Set the switches and portgroups to migrate
+  ansible.builtin.set_fact:
+    network_mgmt_switches_to_migrate: >-
+      {{
+        network_mgmt_dvswitch_info.distributed_virtual_switches |
+        json_query("[].{name: configure.name, mtu: configure.settings.properties.advanced.maxMtu}" )
+      }}
+    network_mgmt_portgroups_to_migrate: >-
+      {{
+        network_mgmt_dvpg_info.dvs_portgroup_info
+        | dict2items(key_name="name", value_name="ports")
+        | map(attribute="ports")
+        | flatten
+        | json_query(
+          "[].{name: portgroup_name, switch: dvswitch_name,vlan: vlan_info,
+          uplinks: sum([length(active_uplinks),length(standby_uplinks)])}"
+          )
+      }}
+
+- name: automatic | Include tasks from automatic_nncp.yml
+  ansible.builtin.include_tasks:
+    file: automatic_nncp.yml
+  when:
+    - (network_mgmt_openshift_node_network_ports | default([]) ) is iterable
+    - (network_mgmt_openshift_node_network_ports | default([]) ) is not string
+    - network_mgmt_openshift_node_network_ports | default([]) | length > 0
+    - network_mgmt_vcenter_dvswitch | default('', true) | trim | length > 0
+    - network_mgmt_vcenter_datacenter | default('', true) | trim | length > 0
+
+- name: automatic | Include tasks from automatic_nad.yml
+  ansible.builtin.include_tasks:
+    file: automatic_nad.yml
+  when:
+    - network_mgmt_vcenter_dvswitch | default('', true) | trim | length > 0
+    - network_mgmt_vcenter_datacenter | default('', true) | trim | length > 0
+    - ((network_mgmt_openshift_node_network_ports | default([]) ) is iterable and
+      (network_mgmt_openshift_node_network_ports | default([]) ) is not string and
+      (network_mgmt_openshift_node_network_ports | default([]) | length > 0))
+      or
+      (network_mgmt_nad_auto_bridge_name is defined and
+      network_mgmt_nad_auto_bridge_name |length > 0)
+...

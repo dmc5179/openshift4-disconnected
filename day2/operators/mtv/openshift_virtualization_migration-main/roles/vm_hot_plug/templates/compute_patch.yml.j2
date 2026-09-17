@@ -1,0 +1,19 @@
+{% if 'instanceType' in vm_hot_plug_vm.compute %}
+- op: replace
+  path: /spec/instancetype
+  value:
+    kind: VirtualMachineClusterInstancetype
+    name: {{ vm_hot_plug_compute['instanceType'] }}
+{% else %}
+{% if 'cpu' in vm_hot_plug_compute and vm_hot_plug_compute['cpu'] is not none  %}
+- op: replace
+  path: /spec/template/spec/domain/cpu
+  value: {{ vm_hot_plug_vm.response_obj.spec.template.spec.domain.cpu | ansible.builtin.combine((vm_hot_plug_compute['cpu']), recursive=true) | from_yaml }}
+{% endif %}
+{% if 'cpu' in vm_hot_plug_compute and vm_hot_plug_compute['cpu'] is not none  %}
+- op: replace
+  path: /spec/template/spec/domain/memory/guest
+  value: {{ vm_hot_plug_compute['memory'] }}
+{% endif %}
+{% endif %}
+

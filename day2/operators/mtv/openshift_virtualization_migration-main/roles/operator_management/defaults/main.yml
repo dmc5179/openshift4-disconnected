@@ -1,0 +1,221 @@
+---
+
+# List of Custom CatalogSources
+# title: CatalogSources
+# required: True
+# description: List of Custom CatalogSources
+operator_management_catalogsources: {}
+# Example of Custom CatalogSource Item
+#   custom_redhat_operators:
+#     metadata:
+#        name: custom-redhat-operators
+#        namespace: openshift-marketplace
+#     spec:
+#       displayName: Custom Red Hat Operators
+#       publisher: My Org
+#       image: myrepo.org/catalogsources/custom-catalog:v1
+
+# Override list of operators to install
+# operator_management_operators: []
+
+# disableDefaultOperatorSources: true
+
+# defaults file for operator_management
+# title: Default Operators for OpenShift Virtualization
+# required: True
+# description: defaults file for operator_management
+operator_management_default_operators:
+  - mtv
+  - cnv
+  - acm
+  - oadp
+  - far
+  - nmstate
+  - nho
+
+# title: Operator Management of MTV
+# required: True
+# description: Operator Management of Migration Toolkit for Virtualization (MTV)
+operator_management_default_mtv:
+  namespace:
+    metadata:
+      name: &operator_management_mtv_namespace openshift-mtv
+  operatorgroup:
+    metadata:
+      name: migration
+    spec:
+      targetNamespaces:
+        - *operator_management_mtv_namespace
+  subscription:
+    spec:
+      name: mtv-operator
+  extra_resources:
+    forkliftcontroller:
+      apiVersion: forklift.konveyor.io/v1beta1
+      kind: ForkliftController
+      metadata:
+        name: forklift-controller
+        namespace: *operator_management_mtv_namespace
+      spec:
+        olm_managed: true
+
+# title: Operator Management of OpenShift Virtualization
+# required: True
+# description: Operator Management of OpenShift Virtualization
+operator_management_default_cnv:
+  namespace:
+    metadata:
+      name: &operator_management_cnv_namespace openshift-cnv
+  operatorgroup:
+    metadata:
+      name: kubevirt-hyperconverged-group
+    spec:
+      targetNamespaces:
+        - *operator_management_cnv_namespace
+  subscription:
+    metadata:
+      name: kubevirt-hyperconverged
+  extra_resources:
+    hyperconverged:
+      apiVersion: hco.kubevirt.io/v1beta1
+      kind: HyperConverged
+      metadata:
+        name: kubevirt-hyperconverged
+        namespace: *operator_management_cnv_namespace
+# title: Operator Management of ACM
+# required: True
+# description: Operator Management of Advanced Cluster Management (ACM)
+operator_management_default_acm:
+  namespace:
+    metadata:
+      name: &operator_management_acm_namespace open-cluster-management
+  operatorgroup:
+    metadata:
+      name: acm-operator
+    spec:
+      targetNamespaces:
+        - *operator_management_acm_namespace
+  subscription:
+    metadata:
+      name: acm-operator
+    spec:
+      name: advanced-cluster-management
+  extra_resources:
+    multiclusterhub:
+      apiVersion: operator.open-cluster-management.io/v1
+      kind: MultiClusterHub
+      metadata:
+        name: multiclusterhub
+        namespace: *operator_management_acm_namespace
+        finalizers:
+          - finalizer.operator.open-cluster-management.io
+      spec:
+        availabilityConfig: High
+        enableClusterBackup: false
+
+# title: Operator Management of OADP
+# required: True
+# description: Operator Management of OADP
+operator_management_default_oadp:
+  namespace:
+    metadata:
+      name: &operator_management_oadp_namespace openshift-adp
+  operatorgroup:
+    metadata:
+      name: redhat-oadp-operator-group
+    spec:
+      targetNamespaces:
+        - *operator_management_oadp_namespace
+  subscription:
+    metadata:
+      name: redhat-oadp-operator-subscription
+    spec:
+      name: redhat-oadp-operator
+
+# title: Operator Management of Workload Availability
+# required: True
+# description: Operator Management of Workload Availability Operator
+operator_management_far:
+  namespace:
+    metadata:
+      name: openshift-workload-availability
+  operatorgroup:
+    metadata:
+      name: openshift-workload-availability-operator-group
+  subscription:
+    metadata:
+      name: fence-agents-remediation
+
+# title: Operator Management of NMState
+# required: True
+# description: Operator Management of NMState Operator
+operator_management_default_nmstate:
+  namespace:
+    metadata:
+      name: &operator_management_nmstate_namespace openshift-nmstate
+  operatorgroup:
+    metadata:
+      name: nmstate-operator-group
+    spec:
+      targetNamespaces:
+        - *operator_management_nmstate_namespace
+  subscription:
+    metadata:
+      name: kubernetes-nmstate-operator
+  extra_resources:
+    nmstate:
+      apiVersion: nmstate.io/v1
+      kind: NMState
+      metadata:
+        name: nmstate
+
+# title: Operator Management of Node Healthcheck Operator
+# required: True
+# description: Operator Management of Node Healthcheck Operator
+operator_management_default_nho:
+  namespace:
+    metadata:
+      name: &operator_management_nho_namespace openshift-workload-availability
+  operatorgroup:
+    metadata:
+      name: openshift-workload-availability-operator-group
+  subscription:
+    metadata:
+      name: node-healthcheck-operator
+    spec:
+      name: node-healthcheck-operator
+
+# title: Operator Management of Red Hat Marketplace
+# required: True
+# description: Operator Management of Red Hat Marketplace
+operator_management_catalog_sources:
+  - name: redhat-marketplace2
+    source_type: grpc
+    display_name: Mirror to Red Hat Marketplace
+    image_path: internal-registry.example.com/operator:v1
+    priority: "-300"
+    icon:
+      base64data: ""
+      mediatype: ""
+    publisher: redhat
+    address: ""
+    grpc_pod_config: |
+      nodeSelector:
+        kubernetes.io/os: linux
+        node-role.kubernetes.io/master: ''
+      priorityClassName: system-cluster-critical
+      securityContextConfig: restricted
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+          operator: Exists
+        - effect: NoExecute
+          key: node.kubernetes.io/unreachable
+          operator: Exists
+          tolerationSeconds: 120
+        - effect: NoExecute
+          key: node.kubernetes.io/not-ready
+          operator: Exists
+          tolerationSeconds: 120
+    registry_poll_interval: 10m
+...

@@ -1,0 +1,29 @@
+---
+- name: workflows | Set workflow variables
+  ansible.builtin.set_fact:
+    aap_seed_controller_workflows: []
+    _aap_seed_mtv_workflow_names: []
+
+- name: workflows | Build Operator Workflows
+  ansible.builtin.set_fact:
+    aap_seed_controller_workflows: >-
+      {{ aap_seed_controller_workflows + [lookup('template', 'operator_workflow.yml.j2') | ansible.builtin.from_yaml] }}
+
+- name: workflows | Build MTV Target Workflows
+  ansible.builtin.include_tasks: _mtv_workflow_job_templates.yml
+  loop: "{{ groups['migration_spoke'] }}"
+  loop_control:
+    loop_var: _mf_host
+
+- name: workflows | Build MTV Worklfow
+  ansible.builtin.set_fact:
+    aap_seed_controller_workflows: >-
+      {{ aap_seed_controller_workflows + [lookup('template', 'mtv_workflow.yml.j2')
+      | ansible.builtin.from_yaml] }}
+
+- name: workflows | Build Migration Factory Worklfow
+  ansible.builtin.set_fact:
+    aap_seed_controller_workflows: >-
+      {{ aap_seed_controller_workflows + [lookup('template', 'migration_factory_configuration_workflow.yml.j2')
+      | ansible.builtin.from_yaml] }}
+...

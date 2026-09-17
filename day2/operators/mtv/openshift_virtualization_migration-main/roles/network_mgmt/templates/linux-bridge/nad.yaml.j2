@@ -1,0 +1,40 @@
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: {{ portgroup.name | infra.openshift_virtualization_migration.rfc1123(network_mgmt_nad_name_prefix, "^[\d]+") }}
+  namespace: {{ network_mgmt_nad_namespace }} 
+  annotations: 
+    infra.openshift-virtualization-migration/source-portgroup: {{ portgroup.name | infra.openshift_virtualization_migration.rfc1123(network_mgmt_nad_name_prefix, "^[\d]+") }}
+    infra.openshift-virtualization-migration/source-switch: {{ portgroup.switch }}
+    infra.openshift-virtualization-migration/provider-hostname: {{ network_mgmt_vcenter_hostname }}
+    infra.openshift-virtualization-migration/provider-type: vmware 
+    k8s.v1.cni.cncf.io/resourceName: bridge.network.kubevirt.io/{{ (portgroup.switch | infra.openshift_virtualization_migration.rfc1123(network_mgmt_nncp_name_prefix))[:15]  }}
+
+spec:
+  config: | 
+    {"name":"{{ portgroup.name | infra.openshift_virtualization_migration.rfc1123(network_mgmt_nad_name_prefix, '^[\d]+')  }}",
+     "type":"cnv-bridge",
+     "cniVersion":"0.3.1",
+{% if (network_mgmt_openshift_node_network_ports | default([]) ) is iterable and (network_mgmt_openshift_node_network_ports | default([]) ) is not string and network_mgmt_openshift_node_network_ports | default([]) | length > 0 %}
+     "bridge": "{{ (portgroup.switch | infra.openshift_virtualization_migration.rfc1123(network_mgmt_nncp_name_prefix))[:15] }}",
+{% else %}
+     "bridge": "{{ (network_mgmt_nad_auto_bridge_name | infra.openshift_virtualization_migration.rfc1123)[:15] }}",
+{% endif %}
+     "macspoofchk":true,
+     "preserveDefaultVlan":false,
+     "ipam":{},
+{% if portgroup.vlan.trunk %}
+     "vlanTrunk":[
+{% for vlan in portgroup.vlan.vlan_id %}
+{% if '-' in vlan %}
+     {"minID": {{ (vlan | split("-"))[0] }}, "maxID": {{ (vlan | split("-"))[1] }} }{{ "," if not loop.last }}
+{% else %}
+     {"id": {{ vlan | int }} }{{ "," if not loop.last }}
+{% endif %}  
+{% endfor %}
+     ]
+{% else %}
+     "vlan": {{ portgroup.vlan.vlan_id | int }}
+{% endif %}
+     }
+

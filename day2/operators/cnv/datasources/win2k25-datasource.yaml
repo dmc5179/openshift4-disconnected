@@ -1,0 +1,19 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataSource
+metadata:
+  annotations:
+    operator-sdk/primary-resource: openshift-cnv/ssp-kubevirt-hyperconverged
+    operator-sdk/primary-resource-type: SSP.ssp.kubevirt.io
+  labels:
+    app.kubernetes.io/component: templating
+    app.kubernetes.io/managed-by: ssp-operator
+    app.kubernetes.io/name: data-sources
+    app.kubernetes.io/part-of: hyperconverged-cluster
+    app.kubernetes.io/version: 4.18.17
+  name: win2k25
+  namespace: openshift-virtualization-os-images
+spec:
+  source:
+    pvc:
+      name: win2k25
+      namespace: openshift-virtualization-os-images

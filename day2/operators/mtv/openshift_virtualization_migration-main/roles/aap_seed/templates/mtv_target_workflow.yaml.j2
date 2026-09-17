@@ -1,0 +1,33 @@
+name: Configure Target - {{ _target_name }} - {{ _mf_host }}
+description: Configuration of {{ _target_name }} Target
+organization: "{{ aap_seed_aap_org_name }}"
+survey_enabled: false
+allow_simultaneous: false
+ask_variables_on_launch: true
+inventory: "{{ aap_seed_aap_inventory }}"
+state: present
+simplified_workflow_nodes:
+{% if 'network' in migration_target and migration_target['network'] is not none %}
+  - all_parents_must_converge: false
+    identifier: Configure OpenShift Networking
+    unified_job_template: Configure Networks - {{ _target_name }} - {{ _mf_host}}
+    success_nodes:
+      - Register MTV Provider
+{% endif %}
+  - all_parents_must_converge: false
+    identifier: Register MTV Provider
+    unified_job_template: Configure MTV Provider - {{ _target_name }} - {{ _mf_host }}
+{% if 'vddk' in migration_target and migration_target['vddk'] is not none %}
+    success_nodes:
+      - MTV VDDK Credentials
+  - all_parents_must_converge: false
+    identifier: MTV VDDK Credentials
+    unified_job_template: Configure MTV VDDK - {{ _target_name }} - {{ _mf_host }}
+{% endif %}
+{% if 'mapping' in migration_target and migration_target['mapping'] is not none %}
+    success_nodes:
+      - MTV Network and Storage Mapping
+  - all_parents_must_converge: false
+    identifier: MTV Network and Storage Mapping
+    unified_job_template: Configure MTV Mapping - {{ _target_name }} - {{ _mf_host }}
+{% endif %}

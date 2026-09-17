@@ -1,0 +1,10 @@
+---
+# yaml-language-server: $schema=https://gitlab.com/gitlab-org/gitlab/-/raw/master/app/assets/javascripts/editor/schema/ci.json
+
+# Default variables available to all jobs unless overridden
+variables:
+  # Disable default secret detection job to use custom version with safe directory fix
+  SECRET_DETECTION_DISABLED: 'true'
+  CUSTOM_SECRET_DETECTION_DISABLED: 'false'
+
+...

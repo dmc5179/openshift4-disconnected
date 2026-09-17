@@ -1,0 +1,51 @@
+---
+- name: ocp_storage_support | Get StorageClass resources
+  kubernetes.core.k8s_info:
+    api_version: storage.k8s.io/v1
+    kind: StorageClass
+  register: validate_migration_ocp_storage_class
+
+- name: ocp_storage_support | Available Storageclasses within OpenShift Cluster and Provisioner Status
+  ansible.builtin.debug:
+    msg: |
+      StorageClass: {{ item.metadata.name }}
+      Provisioner: {{ item.provisioner }}
+      Supported Provisioner: {{ 'Yes' if item.provisioner in validate_migration_expected_provisioners else 'No' }}
+      {{
+        'Note: You must apply the following settings:
+        Filesystem volume mode and' + ' ReadWriteOnce access mode to enable dynamic provisioning and use
+        this provisioner' if item.provisioner not in validate_migration_expected_provisioners else ''
+      }}
+  #  when:
+  #    - "item.metadata.annotations is defined"
+  #    - "'storageclass.kubernetes.io/is-default-class' in item.metadata.annotations"
+  #    - "item.metadata.annotations['storageclass.kubernetes.io/is-default-class'] == 'true'"
+  loop: "{{ validate_migration_ocp_storage_class.resources }}"
+  loop_control:
+    label: "{{ item.metadata.name }}"
+
+- name: ocp_storage_support | Get PersistentVolumes
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: PersistentVolume
+  register: validate_migration_ocp_pvs
+
+- name: ocp_storage_support | Check validate_migration_ocp_pvs for block storage with EXT4
+  ansible.builtin.set_fact:
+    validate_migration_ocp_block_ext4_pvs: >-
+      {{ validate_migration_ocp_block_ext4_pvs | default([]) + [item.metadata.name] }}
+  loop: "{{ validate_migration_ocp_pvs.resources }}"
+  when:
+    #    - item.spec.volumeMode == 'Filesystem'
+    - item.spec.volumeMode == 'Block'
+    - "'ext4' in (item.spec.csi.fsType | default(''))"
+
+- name: ocp_storage_support | Print PVs for block storage with EXT4
+  ansible.builtin.debug:
+    msg: >
+      These persistent volumes created with an EXT4 file system. Increase the
+      filesystem overhead in CDI to be more than 10%. If you do not increase
+      the filesystem overhead in CDI by this amount, your migration will fail.
+      {{ validate_migration_ocp_block_ext4_pvs }}
+  when: validate_migration_ocp_block_ext4_pvs is defined
+...

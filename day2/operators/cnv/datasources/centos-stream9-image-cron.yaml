@@ -1,0 +1,35 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataImportCron
+metadata:
+  annotations:
+    cdi.kubevirt.io/storage.bind.immediate.requested: "true"
+    cdi.kubevirt.io/storage.import.lastCronTime: "2025-10-17T04:51:01Z"
+    cdi.kubevirt.io/storage.import.sourceDesiredDigest: sha256:94c39c7c83a166a1c4efa8b0cce28901e2b605d6d2056fe1a8ece56ad45288c1
+    cdi.kubevirt.io/storage.import.storageClass: ocs-storagecluster-ceph-rbd-virtualization
+    operator-sdk/primary-resource: openshift-cnv/ssp-kubevirt-hyperconverged
+    operator-sdk/primary-resource-type: SSP.ssp.kubevirt.io
+  labels:
+    app.kubernetes.io/component: templating
+    app.kubernetes.io/managed-by: ssp-operator
+    app.kubernetes.io/name: data-sources
+    app.kubernetes.io/part-of: hyperconverged-cluster
+    app.kubernetes.io/version: 4.18.17
+    kubevirt.io/dynamic-credentials-support: "true"
+  name: centos-stream9-image-cron
+  namespace: openshift-virtualization-os-images
+spec:
+  garbageCollect: Outdated
+  managedDataSource: centos-stream9
+  schedule: 51 4/12 * * *
+  template:
+    metadata: {}
+    spec:
+      source:
+        registry:
+          pullMethod: node
+          url: docker://quay.io/containerdisks/centos-stream:9
+      storage:
+        resources:
+          requests:
+            storage: 30Gi
+    status: {}

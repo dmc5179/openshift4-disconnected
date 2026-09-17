@@ -1,0 +1,67 @@
+---
+# defaults file for vm_backup_restore
+
+# title: Backup and restore list
+# required: True
+# description: A list of requests for backup and restore
+vm_backup_restore_request: []
+# -  operation: <operation> # Operation to Perform (snapshot, snapshot_restore)
+#    namespace: <namespace> # Namespace containing VMs to perform operations against. \
+#    Optional unless specifying 'names'.
+#    names: # List of VM's within a namespace
+#    label_selectors: # Label Selectors to apply. Cannot be used with list of VM names
+#      - <key>=<value>
+
+# title: KubeVirt API version
+# required: True
+# description: KubeVirt API version
+vm_backup_restore_kubevirt_api_version: kubevirt.io/v1
+
+# title: KubeVirt API snapshot version
+# required: True
+# description: KubeVirt API snapshot version
+vm_backup_restore_snapshot_kubevirt_api_version: snapshot.kubevirt.io/v1alpha1
+
+# title: Location of the OpenShift host
+# required: True
+# description: name of OpenShift host
+vm_backup_restore_openshift_host: "{{ openshift_host | default(lookup('ansible.builtin.env', 'K8S_AUTH_HOST')) }}"
+
+# title:  OpenShift API key
+# required: True
+# description: OpenShift API key
+vm_backup_restore_openshift_api_key: >-
+  {{ openshift_api_key
+  | default(lookup('ansible.builtin.env', 'K8S_AUTH_API_KEY')) }}
+
+# title: OpenShift SSL certificate verification
+# required: True
+# description: OpenShift SSL certificate verification
+vm_backup_restore_openshift_verify_ssl: >-
+  {{ openshift_verify_ssl | default(lookup('ansible.builtin.env', 'K8S_AUTH_VERIFY_SSL')) | bool }}
+
+# title: KubeVirt API version
+# required: True
+# description: KubeVirt API version
+vm_backup_restore_collect_obj_default_api_version: "{{ vm_backup_restore_kubevirt_api_version }}"
+
+# title: Backup and restore default kind
+# required: True
+# description: Default resource for the backup and restore
+vm_backup_restore_collect_obj_default_kind: VirtualMachine
+
+# title: VM wait timeout
+# required: True
+# description: Amount of time to wait for VM lifecycle actions to complete
+vm_backup_restore_vm_wait_timeout: 300
+
+# title: VM snapshot wait timeout
+# required: True
+# description: Amount of time to wait for VM snapshot to be completed
+vm_backup_restore_vm_snapshot_wait_timeout: 600
+
+# title: VM restore wait timeout
+# required: True
+# description: Amount of time to wait for VM snapshot to be completed
+vm_backup_restore_vm_restore_wait_timeout: 600
+...

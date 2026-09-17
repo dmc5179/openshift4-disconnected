@@ -1,0 +1,14 @@
+---
+
+- name: _process_plans | Set Plan Name
+  ansible.builtin.set_fact:
+    _mtv_migrate_plan_name: "{{ _mtv_migrate_mtv_plan_base_name + ('-' + (_plan_vms_idx | string) if _mtv_split_plans | bool and _mtv_migrate_final_mtv_vms_to_migrate | length > (_mtv_vms_per_plan | int) else '') }}" # noqa: yaml[line-length]
+
+- name: _process_plans | Update Plan Content
+  ansible.builtin.set_fact:
+    _mtv_migrate_plan_content: "{{ _mtv_migrate_mtv_plan_skeleton | ansible.builtin.combine({'metadata': {'name': _plan_name}, 'spec': {'vms': _plan_vms}}, recursive=true) }}" # noqa: yaml[line-length]
+
+- name: _process_plans | Add Plan
+  ansible.builtin.set_fact:
+    _mtv_migrate_mtv_plans: "{{ _mtv_migrate_mtv_plans | default([]) + [_plan_content] }}"
+...

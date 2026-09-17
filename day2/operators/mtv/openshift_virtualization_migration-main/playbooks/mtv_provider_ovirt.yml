@@ -1,0 +1,21 @@
+---
+- name: Configure MTV Ovirt Provider
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: MTV Ovirt Provider
+      ansible.builtin.import_role:
+        name: infra.openshift_virtualization_migration.mtv_management
+        tasks_from: mtv_providers.yml
+      vars:
+        mtv_management_migration_targets:
+          - type: ovirt
+            name: "{{ ovirt_target_name }}"
+            host: "{{ lookup('ansible.builtin.env', 'OVIRT_HOST') }}"
+            username: "{{ lookup('ansible.builtin.env', 'OVIRT_USER') }}"
+            password: "{{ lookup('ansible.builtin.env', 'OVIRT_PASSWORD') }}"
+            certificate: "{{ ovirt_cacert | default(omit, true) }}"
+            insecureSkipTlsVerify: "{{ ovirt_insecure_ssl | default(omit, true) }}"
+            secretRef: "{{ ovirt_credentials_secret_ref | default(omit, true) }}"
+...

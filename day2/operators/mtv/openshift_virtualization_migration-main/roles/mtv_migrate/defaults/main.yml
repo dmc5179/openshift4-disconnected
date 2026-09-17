@@ -1,0 +1,186 @@
+---
+# defaults file for mtv_migrate
+
+# title: Default MTV Namespace
+# required: True
+# description: The default namespace to use if not specified
+mtv_migrate_default_namespace: openshift-mtv
+
+# title: Migration Request
+# required: True
+# description_lines:
+# Data Structure Representing a migration request
+mtv_migrate_migration_request: {
+# mtv_namespace: openshift-mtv # Name of the namespace MTV is deployed within (defaults to 'openshift-mtv')
+# source_type: vsphere # Source MTV Provider type (defaults to 'vsphere')
+# source: vmware # name of the target containing source vm's (defaults to 'vmware')
+# source_namespace: openshift-mtv # Namespace the MTV source provider is located within
+# destination: host # name of the target where vm's will be migrated to (defaults to 'host')
+# destination_namespace: openshift-mtv # Namespace the MTV destination provider is located within
+# destination_type: openshift # Destination MTV Provider type (defaults to 'openshift')
+# vms_per_plan: 10 # Number of vm's to split into multiple plans (defaults to 10)
+# split_plans: false # Determines whether to split plans (defaults to false)
+# plan_overrides: {} # Configuration to apply at the Plan level
+# vm_overrides: {} # Configurations to apply to each VM (Lowest priority)
+# target_namespace: openshift-mtv # Namespace VM's should be created in (defaults to the 'openshift-mtv' Namespace)
+# dry_run: false # Build the plans without applying them to the Target OpenShift cluster. Displays at the end \
+# (defaults to false)
+# network_map: vmware-host # name of the NetworkMap to associate (defaults to <source_name>-<destination_name>)
+# network_map_namespace: openshift-mtv # Namespace containing the NetworkMap (defaults to the 'openshift-mtv' Namespace)
+# storage_map: vmware-host # name of the StorageMap to associate (defaults to <source_name>-<destination_name>)
+# storage_map_namespace: openshift-mtv # Namespace containing the StorageMap (defaults to the 'openshift-mtv' Namespace)
+# start_migration: false # Creates Migration resources for the created Plans (defaults to false)
+# verify_plans_ready: false # Verifies Plans in a Ready state (defaults to false)
+# verify_migrations_complete: false # Waits until migrations are complete (defaults to false)
+# plan_name: mymigration # Name of the plan to create (defaults to <source_name>-<target_name>-yyyyMMdd-HHmm)
+# vms: # Explicit list of vm's to migrate (allows for VM specific configurations when migrating large number of vm's)
+#   - id: <moid> # MOID of the VM
+#     name: <name> # Name of the vm to migrate
+#     path: <path> # VMware path for the VM (Eg: <datacenter>/vm/<folder>/<name>)
+#     overrides: {} # Configurations to apply to the specific virtual machines (Highest priority)
+#     exclude: true # Exclude the VM from the plan (default to false)
+# folders:
+#   - id: <moid> # Required when multiple folders with the same name exists
+#     name: <name> # Name of the folder to migrate
+#     path: <path> # VMware path for the folder
+#     overrides: {} # Configurations to apply to all vm's in the folder and subfolder
+#     exclude: true # Exclude the folder and all subfolders from plans
+}
+
+# title: MTV Migrate Annotation
+# required: True
+# description: Label assigned to the MTV plan name
+mtv_migrate_plan_base_name_annotation: infra.openshift-virtualization-migration/plan-name
+
+# Default Values
+# title: MTV Default Source Type
+# required: True
+# description_lines:
+# Default variable to use when migration request does not include a value for source_type
+# See example variable structure in defaults/main.yml under mtv_migrate_migration_request: {}
+mtv_migrate_default_source_type: "vsphere"
+# title: MTV Default Source Target
+# required: True
+# description_lines:
+# Default variable to use when migration request does not include a value for source
+# See example variable structure in defaults/main.yml under mtv_migrate_migration_request: {}
+mtv_migrate_default_source_target: "vmware"
+# title: MTV Default Source Namespace
+# required: True
+# description_lines:
+# Default variable to use when migration request does not include a value for source_namespace
+# See example variable structure in defaults/main.yml under mtv_migrate_migration_request: {}
+mtv_migrate_default_source_target_namespace: "{{ _mtv_namespace }}"
+# title: MTV Default Destination Type
+# required: True
+# description_lines:
+# Default variable to use when migration request does not include a value for destination_type
+# See example variable structure in defaults/main.yml under mtv_migrate_migration_request: {}
+mtv_migrate_default_destination_type: "openshift"
+# title: MTV Default Destination Target
+# required: True
+# description_lines:
+# Default variable to use when migration request does not include a value for destination
+# See example variable structure in defaults/main.yml under mtv_migrate_migration_request: {}
+mtv_migrate_default_destination_target: "host"
+# title: MTV Default Target Namespace
+# required: True
+# description_lines:
+# Default variable to use when migration request does not include a value for destination_namespace
+# See example variable structure in defaults/main.yml under mtv_migrate_migration_request: {}
+mtv_migrate_default_destination_target_namespace: "{{ _mtv_namespace }}"
+# title: MTV Default Split Plans
+# required: True
+# description_lines:
+# Default variable to use when migration request does not include a value for split_plans
+# See example variable structure in defaults/main.yml under mtv_migrate_migration_request: {}
+mtv_migrate_default_split_plans: false
+# title: MTV Default VMs Per Plan
+# required: True
+# description_lines:
+# Default variable to use when migration request does not include a value for vms_per_plan
+# See example variable structure in defaults/main.yml under mtv_migrate_migration_request: {}
+mtv_migrate_default_vms_per_plan: 10
+# title: MTV Default Start Migration
+# required: True
+# description_lines:
+# Default variable to use when migration request does not include a value for start_migration
+# See example variable structure in defaults/main.yml under mtv_migrate_migration_request: {}
+mtv_migrate_default_start_migration: false
+# title: MTV Default Dry Run
+# required: True
+# description_lines:
+# Default variable to use when migration request does not include a value for dry_run
+# See example variable structure in defaults/main.yml under mtv_migrate_migration_request: {}
+mtv_migrate_default_migrate_dry_run: false
+# title: MTV Default Verify Plans Ready
+# required: True
+# description_lines:
+# Default variable to use when migration request does not include a value for verify_plans_ready
+# See example variable structure in defaults/main.yml under mtv_migrate_migration_request: {}
+mtv_migrate_default_verify_plans_ready: false
+# title: MTV Default Verify Migrations Complete
+# required: True
+# description_lines:
+# Default variable to use when migration request does not include a value for verify_migrations_complete
+# See example variable structure in defaults/main.yml under mtv_migrate_migration_request: {}
+mtv_migrate_default_verify_migrations_complete: false
+# title: MTV Default Target Namespace
+# required: True
+# description_lines:
+# Default variable to use when migration request does not include a value for target_namespace
+# See example variable structure in defaults/main.yml under mtv_migrate_migration_request: {}
+mtv_migrate_default_target_namespace: "{{ _mtv_namespace }}"
+# title: MTV Default Plan Base Name
+# required: True
+# description_lines:
+# Default variable to use when migration request does not include a value for plan_name
+# See example variable structure in defaults/main.yml under mtv_migrate_migration_request: {}
+mtv_migrate_default_plan_base_name: "{{ (_mtv_source_target + '-' + _mtv_destination_target) + '-' + lookup('pipe', 'date +%Y%m%d-%H%M') }}" # noqa: yaml[line-length]
+
+# Maps
+# title: MTV Default Network Map Name
+# required: True
+# description_lines:
+# Default variable to use when migration request does not include a value for network_map
+# See example variable structure in defaults/main.yml under mtv_migrate_migration_request: {}
+mtv_migrate_default_network_map_name: "{{ (_mtv_source_target + '-' + _mtv_destination_target) | infra.openshift_virtualization_migration.rfc1123 }}" # noqa: yaml[line-length]
+# title: MTV Default Network Map Namespace
+# required: True
+# description_lines:
+# Default variable to use when migration request does not include a value for network_map_namespace
+# See example variable structure in defaults/main.yml under mtv_migrate_migration_request: {}
+mtv_migrate_default_network_map_namespace: "{{ _mtv_namespace }}"
+# title: MTV Default Storage Map Name
+# required: True
+# description_lines:
+# Default variable to use when migration request does not include a value for storage_map
+# See example variable structure in defaults/main.yml under mtv_migrate_migration_request: {}
+mtv_migrate_default_storage_map_name: "{{ (_mtv_source_target + '-' + _mtv_destination_target) | infra.openshift_virtualization_migration.rfc1123 }}" # noqa: yaml[line-length]
+# title: MTV Default Storage Map Namespace
+# required: True
+# description_lines:
+# Default variable to use when migration request does not include a value for storage_map_namespace
+# See example variable structure in defaults/main.yml under mtv_migrate_migration_request: {}
+mtv_migrate_default_storage_map_namespace: "{{ _mtv_namespace }}"
+# title: MTV Migration Verify Plans Ready Retries
+# required: True
+# description_lines:
+# Number of retries to verify plans are ready
+mtv_migrate_verify_plans_ready_retries: 180
+# title: MTV Migration Verify Plans Ready Delay
+# required: True
+# description_lines:
+# Amount of time to wait between retries to verify plans are ready
+mtv_migrate_verify_plans_ready_delay: 20
+# title: MTV Migration Verify Migration Complete Retries
+# required: True
+# description_lines:
+# Number of retries to verify migrations are complete
+mtv_migrate_verify_migration_complete_retries: 360
+# title: MTV Migration Verify Migration Complete Delay
+# required: True
+# description_lines:
+# Amount of time to wait between retries to verify migrations are complete
+mtv_migrate_verify_migration_complete_delay: 20
+...

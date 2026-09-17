@@ -1,0 +1,62 @@
+---
+- name: _manage_target | Update VirtualMachine with SSH Configuration
+  redhat.openshift.k8s: # noqa: fqcn[canonical]
+    api_key: "{{ vm_ssh_openshift_api_key }}"
+    host: "{{ vm_ssh_openshift_host }}"
+    validate_certs: "{{ vm_ssh_openshift_verify_ssl }}"
+    definition:
+      apiVersion: kubevirt.io/v1
+      kind: VirtualMachine
+      metadata:
+        namespace: "{{ ssh_target_vm.response_obj.metadata.namespace }}"
+        name: "{{ ssh_target_vm.response_obj.metadata.name }}"
+      spec: "{{ lookup('ansible.builtin.template', 'virtual_machine_access_credentials.yml.j2') | from_yaml }}"
+    apply: true
+
+- name: _manage_target | Query VM for Updated Configuration
+  kubernetes.core.k8s_info:
+    api_key: "{{ vm_ssh_openshift_api_key }}"
+    host: "{{ vm_ssh_openshift_host }}"
+    api_version: "{{ ivm_ssh_kubevirt_api_version }}"
+    kind: VirtualMachine
+    namespace: "{{ ssh_target_vm.response_obj.metadata.namespace }}"
+    name: "{{ ssh_target_vm.response_obj.metadata.name }}"
+    validate_certs: "{{ vm_ssh_openshift_verify_ssl }}"
+  register: vm_ssh_update_response
+
+- name: _manage_target | Restart the machine
+  when: >
+    'resources' in vm_ssh_update_response and
+    vm_ssh_update_response | length > 0  and
+    'status' in vm_ssh_update_response.resources[0] and
+    'conditions' in vm_ssh_update_response.resources[0].status and
+    (
+      vm_ssh_update_response.resources[0].status.conditions
+      | selectattr('type', 'equalto', 'RestartRequired')
+      | list
+      | length > 0
+    )
+  block:
+    - name: _manage_target | Restart the VirtualMachine
+      ansible.builtin.include_role:
+        name: infra.openshift_virtualization_migration.vm_lifecycle
+        tasks_from: _perform_operation.yml
+      vars:
+        vm_lifecycle_openshift_api_key: "{{ vm_ssh_openshift_api_key }}"
+        vm_lifecycle_openshift_host: "{{ vm_ssh_openshift_host }}"
+        vm_lifecycle_openshift_verify_ssl: "{{ vm_ssh_openshift_verify_ssl }}"
+        vm_operations_vm:
+          vm: "{{ ssh_target_vm.response_obj }}"
+          operation: restart
+    - name: _manage_target | Verify the VirtualMachine restarted
+      ansible.builtin.include_role:
+        name: infra.openshift_virtualization_migration.vm_lifecycle
+        tasks_from: _verify_operation.yml
+      vars:
+        vm_lifecycle_openshift_api_key: "{{ vm_ssh_openshift_api_key }}"
+        vm_lifecycle_openshift_host: "{{ vm_ssh_openshift_host }}"
+        vm_lifecycle_openshift_verify_ssl: "{{ vm_ssh_openshift_verify_ssl }}"
+        vm_operations_vm:
+          vm: "{{ ssh_target_vm.response_obj }}"
+          operation: restart
+...

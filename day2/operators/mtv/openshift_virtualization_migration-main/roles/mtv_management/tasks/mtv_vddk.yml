@@ -1,0 +1,86 @@
+---
+
+- name: mtv_vddk | Verify VDDK Secret Parameters Provided
+  ansible.builtin.assert:
+    that:
+      - ((mtv_management_vmware_vddk_init_image_username | default("", true) | length > 0) and (mtv_management_vmware_vddk_init_image_password | default("", true) | length > 0)) or (mtv_management_vmware_vddk_init_image_credentials_secret | default("", true) | length > 0) # noqa: yaml[line-length]
+    quiet: true
+    fail_msg: "VDDK 'username' and 'password' or 'secretRef was not provided"
+
+- name: mtv_vddk | Verify VDDK Image Parameters Provided
+  ansible.builtin.assert:
+    that:
+      - mtv_management_vmware_vddk_init_image | default("", true) | length > 0
+    quiet: true
+    fail_msg: "VDDK Init Image was not provided"
+
+- name: mtv_vddk | Create VDDK Pull Secret
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      type: kubernetes.io/dockerconfigjson
+      metadata:
+        name: "{{ mtv_management_vmware_vddk_secret_name }}"
+        namespace: "{{ mtv_management_migration_namespace }}"
+      data:
+        .dockerconfigjson: "{{ dockerconfigjson | tojson | b64encode }}"
+  vars:
+    dockerconfigjson: >-
+      {"auths": {"{{ '/'.join(mtv_management_vmware_vddk_init_image.split('/')[:
+      ((mtv_management_vmware_vddk_init_image.split('/')
+      | length) - 1)] + [mtv_management_vmware_vddk_init_image.split('/')[-1].split(':')[0].split('@')[0]]) }}":
+      {"auth":
+      "{{ (mtv_management_vmware_vddk_init_image_username + ':' + mtv_management_vmware_vddk_init_image_password)
+      | b64encode }}"}}}
+
+- name: mtv_vddk | Manage VDDK Provided Credentials
+  when: mtv_management_vmware_vddk_init_image_credentials_secret | default("", true) | length > 0
+  block:
+    - name: mtv_vddk | Retrieve Provided VDDK Credentials Secret
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Secret
+        name: "{{ mtv_management_vmware_vddk_init_image_credentials_secret }}"
+        namespace: "{{ mtv_management_migration_namespace }}"
+      register: mtv_management_mtv_vddk_credentials_secret_result
+
+    - name: mtv_vddk | Verify Provided VDDK Credentials Secret
+      ansible.builtin.assert:
+        that:
+          - "'resources' in mtv_management_mtv_vddk_credentials_secret_result"
+          - mtv_management_mtv_vddk_credentials_secret_result.resources is not none
+          - mtv_management_mtv_vddk_credentials_secret_result.resources | length > 0
+          - mtv_management_mtv_vddk_credentials_secret_result.resources[0].type == 'kubernetes.io/dockerconfigjson' or mtv_management_mtv_vddk_credentials_secret_result.resources[0].type == 'kubernetes.io/dockercfg' # noqa: yaml[line-length]
+        quiet: true
+        fail_msg: "Unable to locate valid VDDK Credentials Secret '{{ mtv_management_vmware_vddk_init_image_credentials_secret }}' in namespace '{{ mtv_management_migration_namespace }}" # noqa: yaml[line-length]
+
+    - name: mtv_vddk | Update Pull Secret Name for Provided Credential
+      ansible.builtin.set_fact:
+        mtv_management_vmware_vddk_secret_name: "{{ mtv_management_vmware_vddk_init_image_credentials_secret }}"
+
+- name: mtv_vddk | Retrieve VDDK Service Account
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: ServiceAccount
+    name: "{{ mtv_management_vmware_vddk_init_image_service_account }}"
+    namespace: "{{ mtv_management_migration_namespace }}"
+  register: mtv_management_vmware_vddk_service_account_result
+
+- name: mtv_vddk | Patch Service Account with VDDK pull secret
+  kubernetes.core.k8s_json_patch:
+    kind: ServiceAccount
+    namespace: "{{ mtv_management_migration_namespace }}"
+    name: "{{ mtv_management_vmware_vddk_init_image_service_account }}"
+    patch:
+      - op: add
+        path: /imagePullSecrets
+        value:
+          - name: "{{ mtv_management_vmware_vddk_secret_name }}"
+  when:
+    - "'resources' in mtv_management_vmware_vddk_service_account_result"
+    - mtv_management_vmware_vddk_service_account_result.resources | length > 0
+    - "'imagePullSecrets' in mtv_management_vmware_vddk_service_account_result.resources[0]"
+    - mtv_management_vmware_vddk_service_account_result.resources[0].imagePullSecrets | selectattr('name', 'equalto', mtv_management_vmware_vddk_secret_name) | length == 0 # noqa: yaml[line-length]
+...

@@ -1,0 +1,47 @@
+---
+
+# List of rfc1123 compliant strings that shouldn't be modified
+filter_rfc1123_no_modify:
+  - 'my-world'
+  - 'teststring'
+  - 't'
+  - 'abc123'
+  - '1test'
+  - '11'
+
+# List of non-rfc1123 compliant strings that should be modified
+filter_rfc1123_modified:
+  - input: 'my_world'
+    output: 'my-world'
+  - input: 'My_world'
+    output: 'my-world'
+  - input: '-test'
+    output: 'test'
+  - input: '-'
+    output: ''
+
+# Test adding a prefix in addition to making string rfc1123 compliant
+filter_rfc1123_prefix:
+  - input: 'My_world'
+    prefix: 'prefix-'
+    output: 'prefix-my-world'
+  - input: '123456'
+    prefix: '789'
+    output: '789123456'
+
+# Only add a prefix if the condition is met
+filter_rfc1123_prefix_condition:
+  - input: 'My_world'
+    prefix: 'prefix-'
+    condition: '^[0-9]'
+    output: 'my-world'
+  - input: '123456'
+    prefix: '789'
+    condition: '^[0-9]'
+    output: '789123456'
+
+# Strings that we expect to cause an error
+filter_rfc1123_fail: []
+  # - input: '1test'
+  #   fail_msg: 'Assertion failed'
+...

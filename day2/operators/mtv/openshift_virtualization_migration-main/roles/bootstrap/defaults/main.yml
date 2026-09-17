@@ -1,0 +1,80 @@
+---
+# Customize these vars to deploy the initial AAP bootstrap node
+
+# title: This is the bootstrap user with sudo that should already exist on the bootsrap host
+# required: true
+bootstrap_user: ansible
+
+# title: Add a list of SSH public keys to be added to authorized_keys on the bootstrap VM
+# required: false
+bootstrap_public_keys: []
+
+# title: Working direcotry on the bootstrap host
+# required: true
+bootstrap_aap_setup_working_dir: /home/ansible/bootstrap_dir
+
+# title: Red Hat account login (this is used to attach your subs to controller)
+# required: true
+bootstrap_rh_username: "{{ rh_username }}"
+
+# title: Red Hat account password
+# required: true
+bootstrap_rh_password: "{{ rh_password }}"
+
+# title: Red Hat pool ID
+# required: true
+bootstrap_rh_pool_id: ""
+
+# title: Red Hat subscription product name
+# required: false
+bootstrap_rh_filter_product_name: Red Hat Ansible Automation Platform
+
+# title: Red Hat subscription support level
+# required: false
+bootstrap_rh_filter_support_level: Self-Support
+
+# title: The admin password for the controller
+# required: true
+bootstrap_controller_password: "{{ controller_password }}"
+
+# title: Level from 0 - 5 for verbosity
+# required: false
+bootstrap_aap_setup_inst_verbosity: 1
+
+# title: Location of the AAP license manifest file
+# required: false
+bootstrap_aap_license_manifest: ""
+
+# aap_setup_down_installer_file: # For future offline install
+
+# Controller variables. Note that bootstrap_controller_hostname is used later
+# in this vars file, but for the next section it will not expand properly
+
+# title: Bootstrap controller hostname
+# required: false
+bootstrap_controller_hostname: "{{ controller_hostname | default(ansible_host) }}"
+
+# title: Bootstrap controller username
+# required: false
+bootstrap_controller_username: admin
+
+# title: Bootstrap AAP Version
+# required: false
+bootstrap_aap_version: "{{ aap_version | default(2.5) }}"
+
+# title: Validate Controller SSL certificates
+# required: false
+bootstrap_controller_validate_certs: "{{ controller_validate_certs | default(false) }}"
+
+# title: License File Submission Retries
+# required: True
+# description_lines:
+# Number of retries to submit the license file
+bootstrap_license_file_submission_retries: 25
+
+# title: License File Submission Delay
+# required: True
+# description_lines:
+# Amount of time to wait between retries to submit the license file
+bootstrap_license_file_submission_delay: 10
+...

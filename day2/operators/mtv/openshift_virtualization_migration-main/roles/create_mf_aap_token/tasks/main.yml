@@ -1,0 +1,109 @@
+---
+- name: Initialize auth methods variable
+  ansible.builtin.set_fact:
+    __openshift_enabled_auth_methods: []
+
+- name: Ensure One OpenShift auth method provided
+  when:
+    - openshift_username | default("", true) | length == 0 or openshift_password | default("", true) | length == 0
+    - openshift_api_key | default("", true) | length == 0
+    - openshift_temporary_api_key | default("", true) | length == 0
+  ansible.builtin.fail:
+    msg: No OpenShift auth method provided
+
+- name: Check whether OpenShift User/Password Enabled
+  when:
+    - openshift_username is defined
+    - openshift_username | default("", true) | length > 0
+    - openshift_password is defined
+    - openshift_password | default("", true) | length > 0
+  ansible.builtin.set_fact:
+    __openshift_enabled_auth_methods: >
+      {{ __openshift_enabled_auth_methods + ["Username/Password"] }}
+
+- name: Check whether OpenShift Temporary API Key Enabled
+  when:
+    - openshift_temporary_api_key is defined
+    - openshift_temporary_api_key | default("", true) | length > 0
+  ansible.builtin.set_fact:
+    __openshift_enabled_auth_methods: >
+      {{ __openshift_enabled_auth_methods + ["Temporary API Key"] }}
+
+- name: Check whether OpenShift API Key Provided
+  when:
+    - openshift_api_key is defined
+    - openshift_api_key | default("", true) | length > 0
+  ansible.builtin.set_fact:
+    __openshift_enabled_auth_methods: >
+      {{ __openshift_enabled_auth_methods + ["OpenShift API Key"] }}
+
+- name: Ensure multiple auth methods are not specified
+  ansible.builtin.debug:
+    msg:
+      - "Multiple auth methods are defined:"
+      - "{{ __openshift_enabled_auth_methods }}"
+  failed_when: (__openshift_enabled_auth_methods | length) > 1
+  when: (__openshift_enabled_auth_methods | length) > 1
+
+- name: Use username and password to retrieve temporary API key
+  when:
+    - openshift_username is defined
+    - openshift_username | default("", true) | length > 0
+    - openshift_password is defined
+    - openshift_password | default("", true) | length > 0
+    - openshift_api_key is not defined
+  block:
+    - name: Retrieve temporary API key with username and password
+      redhat.openshift.openshift_auth:
+        host: "{{ openshift_host }}"
+        username: "{{ openshift_username }}"
+        password: "{{ openshift_password }}"
+        validate_certs: "{{ openshift_verify_ssl | default(true) }}"
+      register: create_mf_aap_token_r_openshift_auth
+      no_log: "{{ create_mf_aap_token_secure_logging }}"
+
+    - name: Set fact for temporary API key
+      ansible.builtin.set_fact:
+        _create_mf_aap_token_openshift_temporary_api_key: >-
+          "{{ create_mf_aap_token_r_openshift_auth.openshift_auth.api_key }}"
+      no_log: "{{ create_mf_aap_token_secure_logging }}"
+
+- name: Create Service Account api key
+  when:
+    - openshift_api_key | default("", true) | length == 0
+  block:
+
+    - name: Create API key for Migration Factory AAP # noqa: fqcn[canonical]
+      redhat.openshift.k8s:
+        api_key: "{{ _create_mf_aap_token_openshift_temporary_api_key is defined | ansible.builtin.ternary(_create_mf_aap_token_openshift_temporary_api_key, openshift_temporary_api_key) }}" # noqa: yaml[line-length]
+        host: "{{ openshift_host }}"
+        validate_certs: "{{ openshift_verify_ssl | default(true) }}"
+        state: present
+        src: "{{ __create_mf_aap_token_api_kube_file }}"
+        apply: true
+      no_log: "{{ create_mf_aap_token_secure_logging }}"
+      loop_control:
+        loop_var: __create_mf_aap_token_api_kube_file
+      loop:
+        - "files/sa_migration_factory_aap.yaml"
+        - "files/secret_migration_factory_aap_sa_token.yaml"
+        - "files/crb_migration_factory_aap_cluster_admin.yaml"
+
+    - name: Retrieve Migration Factory AAP Service Account API key
+      kubernetes.core.k8s_info:
+        api_key: "{{ _create_mf_aap_token_openshift_temporary_api_key is defined | ansible.builtin.ternary(_create_mf_aap_token_openshift_temporary_api_key, openshift_temporary_api_key) }}" # noqa: yaml[line-length]
+        host: "{{ openshift_host }}"
+        validate_certs: "{{ openshift_verify_ssl | default(true) }}"
+        api_version: v1
+        kind: Secret
+        name: migration-factory-aap-sa-token
+        namespace: openshift-config
+      register: create_mf_aap_token_migration_factory_aap_sa_token
+      no_log: "{{ create_mf_aap_token_secure_logging }}"
+
+    - name: Set fact with Service Account API key
+      ansible.builtin.set_fact:
+        create_mf_aap_token_openshift_api_key: >-
+          "{{ create_mf_aap_token_migration_factory_aap_sa_token.resources[0].data.token | b64decode }}"
+      no_log: "{{ create_mf_aap_token_secure_logging }}"
+...

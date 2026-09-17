@@ -1,0 +1,35 @@
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataImportCron
+metadata:
+  annotations:
+    cdi.kubevirt.io/storage.bind.immediate.requested: "true"
+    cdi.kubevirt.io/storage.import.lastCronTime: "2025-10-17T04:51:01Z"
+    cdi.kubevirt.io/storage.import.sourceDesiredDigest: sha256:4fcda30051d56b3ccd3071254eddd35bb6d667065539b7791bfd5b0b1a88d589
+    cdi.kubevirt.io/storage.import.storageClass: ocs-storagecluster-ceph-rbd-virtualization
+    operator-sdk/primary-resource: openshift-cnv/ssp-kubevirt-hyperconverged
+    operator-sdk/primary-resource-type: SSP.ssp.kubevirt.io
+  labels:
+    app.kubernetes.io/component: templating
+    app.kubernetes.io/managed-by: ssp-operator
+    app.kubernetes.io/name: data-sources
+    app.kubernetes.io/part-of: hyperconverged-cluster
+    app.kubernetes.io/version: 4.18.17
+    kubevirt.io/dynamic-credentials-support: "true"
+  name: fedora-image-cron
+  namespace: openshift-virtualization-os-images
+spec:
+  garbageCollect: Outdated
+  managedDataSource: fedora
+  schedule: 51 4/12 * * *
+  template:
+    metadata: {}
+    spec:
+      source:
+        registry:
+          pullMethod: node
+          url: docker://quay.io/containerdisks/fedora:latest
+      storage:
+        resources:
+          requests:
+            storage: 30Gi
+    status: {}

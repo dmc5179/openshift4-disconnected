@@ -1,0 +1,28 @@
+---
+
+- name: _manage_targets | Verify Namespace and Secret Name Provided
+  ansible.builtin.assert:
+    that:
+      - ssh_target['namespace'] | default("", true) | length > 0
+      - ssh_target['secret'] | default("", true) | length > 0
+    quiet: true
+    fail_msg: Namespace and Secret Name must be provided
+
+- name: _manage_targets | Invoke Collect VM Role
+  ansible.builtin.include_role:
+    name: infra.openshift_virtualization_migration.vm_collect
+  vars:
+    vm_collect_openshift_api_key: "{{ vm_ssh_openshift_api_key }}"
+    vm_collect_openshift_host: "{{ vm_ssh_openshift_host }}"
+    vm_collect_verify_ssl: "{{ vm_ssh_openshift_verify_ssl }}"
+    vm_collect_vms_var: vm_targets_vms
+    vm_collect_request_instance: "{{ ssh_target }}"
+
+- name: _manage_targets | Update VirtualMachine with SSH Configurations
+  ansible.builtin.include_tasks:
+    file: _manage_target.yml
+  loop: "{{ vm_targets_vms | default([]) }}"
+  loop_control:
+    loop_var: ssh_target_vm
+    label: "Namespace: {{ ssh_target_vm.response_obj.metadata.namespace }} - Name: {{ ssh_target_vm.response_obj.metadata.name }}" # noqa: yaml[line-length]
+...

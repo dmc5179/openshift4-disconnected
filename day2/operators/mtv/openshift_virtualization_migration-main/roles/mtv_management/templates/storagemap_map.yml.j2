@@ -1,0 +1,11 @@
+destination:
+  storageClass: "{{ _mtv_management_storage_map_storage_class }}"
+{% if mtv_vmware_datastore is defined %}
+source:
+  id: "{{ mtv_vmware_datastore.id }}"
+  name: "{{ mtv_vmware_datastore.name }}"
+{% else %}
+source:
+  id: "{{ mtv_ovirt_datastore.id }}"
+  name: "{{ mtv_ovirt_datastore.name }}"
+{% endif %}

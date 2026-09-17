@@ -1,0 +1,48 @@
+---
+
+- name: _process_vm | Initialize Variables
+  ansible.builtin.set_fact:
+    vm_mac_address_interfaces_patch: []
+
+- name: _process_vm | Query for Virtual Machine
+  kubernetes.core.k8s_info:
+    api_key: "{{ vm_mac_address_api_key }}"
+    host: "{{ vm_mac_address_openshift_host }}"
+    api_version: "{{ vm_mac_address_kubevirt_api_version }}"
+    kind: "VirtualMachine"
+    namespace: "{{ _vm_mac_address.namespace }}"
+    validate_certs: "{{ vm_mac_address_openshift_verify_ssl }}"
+  register: _vm_mac_address_query_response
+
+- name: _process_vm | Verify Virtual Machine Exists
+  ansible.builtin.assert:
+    that:
+      - _vm_mac_address_query_response.resources | length > 0
+    fail_msg: "Virtual Machine '{{ _vm_mac_address.namespace }}/{{ _vm_mac_address.name }}' Not Found"
+    quiet: true
+
+- name: _process_vm | Compute Patch for Interface
+  when:
+    - _vm_mac_address_interface.name | default("", true) | length > 0
+    - _vm_mac_address_interface.macAddress | default("", true) | string | length > 0
+  ansible.builtin.include_tasks:
+    file: _compute_patch.yml
+  loop: "{{ _vm_mac_address.interfaces }}"
+  loop_control:
+    loop_var: _vm_mac_address_interface
+  vars:
+    _vm_mac_address_vm_interfaces: >-
+      {{ _vm_mac_address_query_response.resources[0].spec.template.spec.domain.devices.interfaces | default([]) }}
+
+- name: _process_vm | Update VM MAC Address
+  when: vm_mac_address_interfaces_patch | length > 0
+  kubernetes.core.k8s_json_patch:
+    api_key: "{{ vm_mac_address_api_key }}"
+    host: "{{ vm_mac_address_openshift_host }}"
+    api_version: "{{ vm_mac_address_kubevirt_api_version }}"
+    validate_certs: "{{ vm_mac_address_openshift_verify_ssl }}"
+    kind: VirtualMachine
+    namespace: "{{ _vm_mac_address.namespace }}"
+    name: "{{ _vm_mac_address.name }}"
+    patch: "{{ vm_mac_address_interfaces_patch }}"
+...

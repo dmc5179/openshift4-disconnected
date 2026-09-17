@@ -1,0 +1,43 @@
+---
+# This playbook calls the following playbooks and is typically only used when bootstrap AAP is not used.
+# Normally the following playbooks are called automaticaly from Bootstrap AAP
+- name: Install and configure AAP on hub
+  hosts: migration_hub
+  connection: local
+  gather_facts: false
+
+  pre_tasks:
+    - name: Disable aap install when migration_factory_aap group is present
+      when:
+        - "'migration_aap' in groups"
+        - "groups['migration_aap'] | length > 0"
+      ansible.builtin.set_fact:
+        install_aap: false
+
+  roles:
+    - role: infra.openshift_virtualization_migration.create_mf_aap_token
+      when: openshift_api_key | default("", true) | length == 0
+    - role: infra.openshift_virtualization_migration.aap_deploy
+      vars:
+        bootstrap_aap: false
+        aap_deploy_aap_install: "{{ install_aap | default(true) | bool }}"
+
+  post_tasks:
+    - name: Add new AAP instance to inventory
+      ansible.builtin.add_host:
+        hostname: "{{ controller_hostname }}"
+        groups:
+          - migration_aap
+        controller_hostname: "{{ controller_hostname | default(aap_hostname) }}"
+        controller_username: "{{ controller_username | default(aap_username) }}"
+        controller_password: "{{ controller_password | default(aap_password) }}"
+        controller_validate_certs: "{{ controller_validate_certs | default(true) }}"
+        aap_hostname: "{{ controller_hostname | default(aap_hostname) }}"
+        aap_username: "{{ controller_username | default(aap_username) }}"
+        aap_password: "{{ controller_password | default(aap_password) }}"
+        aap_validate_certs: "{{ aap_validate_certs | default(true) }}"
+        secure_logging: "{{ secure_logging | default(true) }}"
+
+- name: Seed AAP content
+  ansible.builtin.import_playbook: migration_factory_seed.yml
+...

@@ -1,0 +1,63 @@
+---
+- name: prep | Register to Red Hat with provided credentials
+  community.general.redhat_subscription:
+    state: present
+    username: "{{ bootstrap_rh_username }}"
+    password: "{{ bootstrap_rh_password }}"
+    auto_attach: true
+
+- name: prep | Setup new user
+  ansible.builtin.user:
+    name: "{{ bootstrap_user }}"
+    comment: Bootstrap user added by Ansible
+    home: /home/{{ bootstrap_user }}
+
+- name: prep | Allow passwordless sudo for '{{ bootstrap_user }}'
+  ansible.builtin.copy:
+    dest: /etc/sudoers.d/99-{{ bootstrap_user }}
+    content: "{{ bootstrap_user }} ALL=(ALL) NOPASSWD:ALL"
+    mode: "0440"
+
+- name: prep | Create SSH folder
+  ansible.builtin.file:
+    path: /home/{{ bootstrap_user }}/.ssh/
+    state: directory
+    owner: "{{ bootstrap_user }}"
+    group: "{{ bootstrap_user }}"
+    mode: "0700"
+
+- name: prep | Generate an OpenSSH keypair with the default values
+  community.crypto.openssh_keypair:
+    path: /home/{{ bootstrap_user }}/.ssh/id_rsa
+    owner: "{{ bootstrap_user }}"
+    group: "{{ bootstrap_user }}"
+  register: _bootstrap_ssh_keypair
+
+- name: prep | Set authorized key taken from file
+  ansible.posix.authorized_key:
+    user: "{{ bootstrap_user }}"
+    state: present
+    key: "{{ public_key }}"
+  loop: "{{ bootstrap_public_keys + [_bootstrap_ssh_keypair['public_key']] }} "
+  loop_control:
+    loop_var: public_key
+
+- name: prep | Set SSH config for this host to enable automated install
+  ansible.builtin.copy:
+    dest: /home/{{ bootstrap_user }}/.ssh/config
+    content: |
+      Host {{ ansible_host }}
+        StrictHostKeyChecking=no
+        UserKnownHostsFile=/dev/null
+    owner: "{{ bootstrap_user }}"
+    group: "{{ bootstrap_user }}"
+    mode: "0700"
+
+- name: prep | Create working directory
+  ansible.builtin.file:
+    path: "{{ bootstrap_aap_setup_working_dir }}"
+    state: directory
+    owner: "{{ bootstrap_user }}"
+    group: "{{ bootstrap_user }}"
+    mode: "0755"
+...

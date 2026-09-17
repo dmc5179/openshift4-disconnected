@@ -1,0 +1,24 @@
+---
+- name: Configure MTV VMware Provider
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: MTV VMware Provider
+      ansible.builtin.import_role:
+        name: infra.openshift_virtualization_migration.mtv_management
+        tasks_from: mtv_providers.yml
+      vars:
+        mtv_management_migration_targets:
+          - type: vmware
+            name: "{{ vmware_target_name }}"
+            host: "{{ lookup('ansible.builtin.env', 'VMWARE_HOST') }}"
+            username: "{{ lookup('ansible.builtin.env', 'VMWARE_USER') }}"
+            password: "{{ lookup('ansible.builtin.env', 'VMWARE_PASSWORD') }}"
+            sdkEndpoint: "{{ vmware_context_path | default(omit, true) }}"
+            certificate: "{{ vmware_cacert | default(omit, true) }}"
+            insecureSkipTlsVerify: "{{ vmware_insecure_ssl | default(omit, true) }}"
+            secretRef: "{{ vmware_credentials_secret_ref | default(omit, true) }}"
+            vddk:
+              image: "{{ vmware_vddk_init_image | default(omit, true) }}"
+...

@@ -1,0 +1,63 @@
+---
+# This collection is initialized by https://github.com/ansible/ansible-creator 24.7.0
+
+# See https://docs.ansible.com/ansible/latest/dev_guide/collections_galaxy_meta.html
+
+namespace: infra
+name: openshift_virtualization_migration
+version: 1.21.2
+readme: README.md
+authors:
+  - Andrew Block <ablock@redhat.com>
+  - Vinny Valdez <vvaldez@redhat.com>
+
+description: "This collection enables the migration journey of Virtual Machine (VM) workloads
+  from existing hypervisors to Red Hat OpenShift Virtualization using Ansible Automation Platform.
+  Additionally it provides content for the management and maintenance of VM workloads within
+  Red Hat OpenShift Virtualization."
+license_file: LICENSE
+tags:
+  - linux
+  - tools
+  - openshift
+  - virtualization
+  - kubevirt
+  - migration
+dependencies:
+  "redhat.openshift_virtualization": ">=2.1.0"
+  "redhat.openshift": ">=4.0.0"
+  "vmware.vmware_rest": ">=4.6.0"
+  # AAP 2.5 can leverage the latest version of the collection. 2.4 must use <=4.5.12
+  "ansible.controller": "*"
+  "ansible.posix": ">=1.6.2"
+  "infra.aap_utilities": ">=2.6.0"
+  "kubernetes.core": ">=5.2.0"
+  "community.crypto": ">=2.26.0"
+  "community.general": ">=10.5.0"
+  "community.vmware": ">=5.5.0"
+  "ansible.utils": ">=6.0.0"
+  ## AAP 2.5 Dependencies
+  # "infra.aap_configuration": ">=3.4.1"
+  ## AAP 2.4 Dependencies
+  # "infra.controller_configuration": ">=3.1.2"
+
+repository: >-
+  https://gitlab.consulting.redhat.com/redhat-cop/openshift-virtualization-migration/openshift_virtualization_migration
+
+manifest:
+  directives:
+    - include meta/*.yml README.md inventory.yml CHANGELOG.md CODEOWNERS LICENSE MANIFEST.json FILES.json
+    - include requirements-dev.yml
+    - recursive-include docs **.rst **.yml **.yaml **.json **.j2 **.txt
+    - recursive-include roles **.yml **.yaml **.json **.j2 **.md
+    - recursive-include playbooks **.yml **.yaml **.json
+    - recursive-include changelogs **.yml **.yaml
+    - recursive-include plugins *
+    - recursive-include tests **.yml **.yaml **.py
+    - exclude infra-openshift_virtualization_migration-*.tar.gz
+    - recursive-exclude tests/output **
+    - global-exclude /.* /__pycache__
+    - include .ansible-lint .yamllint tox* pyproject.toml config.yml
+  omit_default_directives: true
+
+...

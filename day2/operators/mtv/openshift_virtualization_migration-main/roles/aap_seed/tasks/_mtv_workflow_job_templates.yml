@@ -1,0 +1,37 @@
+---
+- name: _mtv_workflow_job_templates | Build MTV Target Workflows for {{ _mf_host }}
+  ansible.builtin.set_fact:
+    aap_seed_controller_workflows: >-
+      {{ aap_seed_controller_workflows + [lookup('template', 'mtv_target_workflow.yaml.j2')
+      | ansible.builtin.from_yaml] }}
+  loop: >-
+    {{ hostvars[_mf_host]['migration_targets']
+    | selectattr('name', 'in', hostvars[_mf_host]['configured_migration_targets']) | list }}
+  loop_control:
+    loop_var: "migration_target"
+  vars:
+    _target_name: "{{ migration_target['name'] | infra.openshift_virtualization_migration.rfc1123 }}"
+    _target_type: "{{ migration_target['type'] }}"
+  no_log: "{{ aap_seed_secure_logging }}"
+
+- name: _mtv_workflow_job_templates | Get list of MTV Target workflow names
+  ansible.builtin.set_fact:
+    _aap_seed_mtv_target_workflow_names: >-
+      {{ (_aap_seed_mtv_target_workflow_names |
+      default([])) + ['Configure Target - ' ~ _target_name  ~ ' - ' ~  _mf_host] }}
+  loop: >-
+    {{ hostvars[_mf_host]['migration_targets']
+    | selectattr('name', 'in', hostvars[_mf_host]['configured_migration_targets']) | list }}
+  loop_control:
+    loop_var: "migration_target"
+  vars:
+    _target_name: "{{ migration_target['name'] | infra.openshift_virtualization_migration.rfc1123 }}"
+  no_log: "{{ aap_seed_secure_logging }}"
+
+- name: _mtv_workflow_job_templates | Build MTV workflow
+  ansible.builtin.set_fact:
+    aap_seed_controller_workflows: >-
+      {{ aap_seed_controller_workflows + [lookup('template', 'mtv_all_targets_workflow.yml.j2')
+      | ansible.builtin.from_yaml] }}
+    _aap_seed_mtv_workflow_names: "{{ _aap_seed_mtv_workflow_names + ['Configure Targets - ' ~ _mf_host ] }}"
+...

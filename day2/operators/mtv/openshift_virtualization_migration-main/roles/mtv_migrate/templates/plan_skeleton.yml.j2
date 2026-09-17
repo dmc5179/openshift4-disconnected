@@ -1,0 +1,24 @@
+apiVersion: forklift.konveyor.io/v1beta1
+kind: Plan
+metadata:
+  name: ""
+  namespace: "{{ _mtv_namespace }}"
+  labels:
+    "{{ mtv_migrate_plan_base_name_annotation }}": "{{ _mtv_migrate_mtv_plan_base_name }}"
+spec:
+  map:
+    network:
+      name: "{{ _mtv_network_map_name }}"
+      namespace: "{{ _mtv_network_map_namespace }}"
+    storage:
+      name: "{{ _mtv_storage_map_name }}"
+      namespace: "{{ _mtv_storage_map_namespace }}"
+  provider:
+    destination:
+      name: "{{ _mtv_destination_target }}"
+      namespace: "{{ _mtv_destination_target_namespace }}"
+    source:
+      name: "{{ _mtv_source_target }}"
+      namespace: "{{ _mtv_source_target_namespace }}"
+  targetNamespace: "{{ _mtv_target_namespace }}"
+  vms: []

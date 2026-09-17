@@ -1,0 +1,36 @@
+---
+- name: create_mf_aap_token | Create API key for Migration Factory AAP
+  redhat.openshift.k8s:
+    api_key: "{{ bootstrap_openshift_api_key }}"
+    host: "{{ bootstrap_openshift_host }}"
+    validate_certs: "{{ bootstrap_openshift_verify_ssl }}"
+    state: present
+    src: "{{ __create_mf_aap_token_api_kube_file }}"
+    apply: true
+    loop_control:
+      loop_var: __create_mf_aap_token_api_kube_file
+    loop:
+      - "files/sa_migration_factory_aap.yaml"
+      - "files/secret_migration_factory_aap_sa_token.yaml"
+      - "files/crb_migration_factory_aap_cluster_admin.yaml"
+
+- name: create_mf_aap_token | Retrieve Migration Factory AAP Service Account API key
+  kubernetes.core.k8s_info:
+    api_key: "{{ bootstrap_openshift_api_key }}"
+    host: "{{ bootstrap_openshift_host }}"
+    validate_certs: "{{ bootstrap_openshift_verify_ssl }}"
+    api_version: v1
+    kind: Secret
+    name: migration-factory-aap-sa-token
+    namespace: openshift-config
+  register: bootstrap_migration_factory_aap_sa_token
+
+- name: create_mf_aap_token | Set fact with Service Account API key
+  ansible.builtin.set_fact:
+    bootstrap_openshift_sa_token: "{{ bootstrap_migration_factory_aap_sa_token.resources[0].data.token | b64decode }}"
+
+- name: create_mf_aap_token | Print Migration Factory AAP Service Account API key
+  ansible.builtin.debug:
+    var: bootstrap_openshift_sa_token
+    verbosity: 1
+...

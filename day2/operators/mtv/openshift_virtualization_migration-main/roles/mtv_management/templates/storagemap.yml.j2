@@ -1,0 +1,19 @@
+apiVersion: forklift.konveyor.io/v1beta1
+kind: StorageMap
+metadata:
+  name: "{{ (mtv_management_source_target + '-' + mtv_management_destination_target) | infra.openshift_virtualization_migration.rfc1123 }}"
+  namespace: "{{ mtv_management_migration_namespace }}"
+spec:
+  provider:
+    destination:
+      name: "{{ (mtv_providers.openshift | selectattr('name', 'equalto', mtv_management_destination_target) | selectattr('namespace', 'equalto', mtv_management_provider_namespace) | list | first).name }}"
+      namespace: "{{ (mtv_providers.openshift | selectattr('name', 'equalto', mtv_management_destination_target) | selectattr('namespace', 'equalto', mtv_management_provider_namespace) | list | first).namespace }}"
+{% if 'vsphere' == provider %}
+    source:
+      name: "{{ (mtv_providers.vsphere | selectattr('name', 'equalto', mtv_management_source_target) | selectattr('namespace', 'equalto', mtv_management_provider_namespace) | list | first).name }}"
+      namespace: "{{ (mtv_providers.vsphere | selectattr('name', 'equalto', mtv_management_source_target) | selectattr('namespace', 'equalto', mtv_management_provider_namespace) | list | first).namespace }}"
+{% elif 'ovirt' == provider %}
+    source:
+      name: "{{ (mtv_providers.ovirt | selectattr('name', 'equalto', mtv_management_source_target) | selectattr('namespace', 'equalto', mtv_management_provider_namespace) | list | first).name }}"
+      namespace: "{{ (mtv_providers.ovirt | selectattr('name', 'equalto', mtv_management_source_target) | selectattr('namespace', 'equalto', mtv_management_provider_namespace) | list | first).namespace }}"
+{% endif %}

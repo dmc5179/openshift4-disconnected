@@ -1,0 +1,10 @@
+---
+- name: Manage OpenShift Operators
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Include operator_management role
+      ansible.builtin.include_role:
+        name: infra.openshift_virtualization_migration.operator_management
+...

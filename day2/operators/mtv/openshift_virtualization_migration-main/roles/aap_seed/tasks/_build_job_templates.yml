@@ -1,0 +1,43 @@
+---
+- name: _build_job_templates | Build list of operators to install
+  block:
+    - name: _build_job_templates | Clear operator list
+      ansible.builtin.set_fact:
+        aap_seed_operator_management_operators: []
+
+    - name: _build_job_templates | Add hub operators
+      when: _mf_host in groups['migration_hub']
+      ansible.builtin.set_fact:
+        aap_seed_operator_management_operators: >-
+          {{ (aap_seed_operator_management_operators + aap_seed_operator_management_hub)
+          | unique }}
+
+    - name: _build_job_templates | Add spoke operators
+      when: _mf_host in groups['migration_spoke']
+      ansible.builtin.set_fact:
+        aap_seed_operator_management_operators: >-
+          {{ (aap_seed_operator_management_operators + aap_seed_operator_management_spoke)
+          | unique }}
+
+- name: _build_job_templates | Build Operator Job Template
+  ansible.builtin.set_fact:
+    aap_seed_controller_templates: >-
+      {{ aap_seed_controller_templates + [lookup('template', 'operator_job_template.yml.j2')
+      | ansible.builtin.from_yaml] }}
+  no_log: "{{ aap_seed_secure_logging }}"
+
+- name: _build_job_templates | Build MTV Job Templates
+  when:
+    - _mf_host in groups['migration_spoke']
+  ansible.builtin.include_tasks:
+    file: _mtv_job_templates.yml
+  loop: >-
+    {{ hostvars[_mf_host]['migration_targets']
+    | selectattr('name', 'in', hostvars[_mf_host]['configured_migration_targets']) | list }}
+  loop_control:
+    loop_var: "migration_target"
+  vars:
+    _target_name: "{{ migration_target['name'] | infra.openshift_virtualization_migration.rfc1123 }}"
+    _target_type: "{{ migration_target['type'] }}"
+  no_log: "{{ aap_seed_secure_logging }}"
+...

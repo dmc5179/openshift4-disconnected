@@ -1,0 +1,15 @@
+---
+- name: automatic_nncp | Validate supported bonding mode
+  ansible.builtin.assert:
+    fail_msg: >-
+      "{{ network_mgmt_openshift_network_bond_mode }} is not a supported bond mode.
+      Supported bond modes: {{  network_mgmt_openshift_network_supported_bond_modes | join(',') }}"
+    that:
+      - network_mgmt_openshift_network_bond_mode in network_mgmt_openshift_network_supported_bond_modes
+  when:
+    - not (network_mgmt_override_openshift_supported_bond_mode | default(false))
+
+- name: automatic_nncp | Include tasks from create_nncp.yml
+  ansible.builtin.include_tasks:
+    file: create_nncp.yml
+...

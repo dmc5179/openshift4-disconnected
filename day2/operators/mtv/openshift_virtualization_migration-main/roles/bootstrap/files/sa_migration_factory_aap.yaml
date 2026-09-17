@@ -1,0 +1,7 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: migration-factory-aap
+  namespace: openshift-config
+...

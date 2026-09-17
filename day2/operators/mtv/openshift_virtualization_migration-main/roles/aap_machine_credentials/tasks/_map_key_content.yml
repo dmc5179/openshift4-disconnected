@@ -1,0 +1,27 @@
+---
+
+- name: _map_key_content | Verify required variables provided
+  ansible.builtin.assert:
+    that:
+      - map_src_var | default('', true) | trim | length > 0
+      - map_dest_var | default('', true) | trim | length > 0
+    quiet: true
+    fail_msg: "Required mapping variables not provided"
+
+- name: _map_key_content | Check source path content
+  ansible.builtin.stat:
+    path: "{{ aap_machine_credential[map_src_var] }}"
+  register: aap_machine_credentials_map_src_stat
+
+- name: _map_key_content | Verify source path exists
+  ansible.builtin.assert:
+    that:
+      - aap_machine_credentials_map_src_stat.stat.exists
+    quiet: true
+    fail_msg: "Mapping content at '{{ aap_machine_credential[map_src_var] }}' does not exist"
+
+- name: _map_key_content | Map Variables
+  ansible.builtin.set_fact:
+    aap_machine_credentials_mapped_vars: "{{ aap_machine_credentials_mapped_vars | ansible.builtin.combine({map_dest_var: lookup('file', aap_machine_credential[map_src_var], recursive=true)}) }}" # noqa: yaml[line-length]
+
+...

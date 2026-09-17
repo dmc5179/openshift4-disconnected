@@ -1,0 +1,11 @@
+---
+# tasks file for validation
+- name: Include ocp_version tasks
+  ansible.builtin.include_tasks: ocp_version.yml
+- name: Include ocp_operators tasks
+  ansible.builtin.include_tasks: ocp_operators.yml
+- name: Include ocp_storage_support tasks
+  ansible.builtin.include_tasks: ocp_storage_support.yml
+- name: Include vmware_firewall_rules tasks
+  ansible.builtin.include_tasks: vmware_firewall_rules.yml
+...

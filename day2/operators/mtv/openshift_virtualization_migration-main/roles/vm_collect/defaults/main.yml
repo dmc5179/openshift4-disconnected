@@ -1,0 +1,6 @@
+---
+# defaults file for vm_collect
+
+vm_collect_obj_default_api_version: kubevirt.io/v1
+vm_collect_obj_default_kind: VirtualMachine
+...
