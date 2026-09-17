@@ -15,6 +15,8 @@ fi
 sgdisk --zap-all "${DISK}"
 
 # Wipe portions of the disk to remove more LVM metadata that may be present
+# TODO: Only do each one if the disk is that big
+# TODO: Possibly check or remove block size value in commands below
 dd if=/dev/zero of="${DISK}" bs=1K count=200 oflag=direct,dsync seek=0 # Clear at offset 0
 dd if=/dev/zero of="${DISK}" bs=1K count=200 oflag=direct,dsync seek=$((1 * 1024**2)) # Clear at offset 1GB
 dd if=/dev/zero of="${DISK}" bs=1K count=200 oflag=direct,dsync seek=$((10 * 1024**2)) # Clear at offset 10GB
@@ -30,3 +32,6 @@ fi
 if [ -e $(which partprobe) ]; then
   partprobe "${DISK}"
 fi
+
+# Remove ceph_bluestore
+wipefs -a -f "${DISK}"

@@ -1,5 +1,5 @@
 variant: openshift
-version: 4.18.0
+version: 4.21.0
 metadata:
   name: 99-set-nonrotational
   labels:
@@ -12,8 +12,8 @@ storage:
         inline: |
           #!/bin/bash
 
-          # Find disks with a size of 120G:
-          target_disks=$(lsblk -dn -o NAME,SIZE | awk '$2 == "2.2T" {print $1}')
+          # Find disks with a size of 7.3TB:
+          target_disks=$(lsblk -dn -o NAME,SIZE | awk '$2 == "7.3T" {print $1}')
 
           # Mark these disks as NonRotational:
           for disk in $target_disks; do
