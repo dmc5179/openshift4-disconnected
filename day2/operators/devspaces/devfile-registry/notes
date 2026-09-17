@@ -1,0 +1,8 @@
+devfileRegistryImage: 
+externalDevfileRegistry:
+server.externalPluginRegistry:
+
+
+disableInternalRegistry
+externalDevfileRegistries
+

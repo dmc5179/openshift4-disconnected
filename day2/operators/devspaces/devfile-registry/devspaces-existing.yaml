@@ -1,0 +1,74 @@
+apiVersion: org.eclipse.che/v2
+kind: CheCluster
+metadata:
+  annotations:
+    che.eclipse.org/checluster-defaults-cleanup: '{"containers.resources":"true","spec.components.dashboard.headerMessage":"true","spec.components.pluginRegistry.openVSXURL":"true","spec.devEnvironments.defaultComponents":"true","spec.devEnvironments.defaultEditor":"true","spec.devEnvironments.disableContainerBuildCapabilities":"true"}'
+  creationTimestamp: "2025-06-04T00:43:07Z"
+  finalizers:
+  - checluster.che.eclipse.org
+  - cluster-resources.finalizers.che.eclipse.org
+  - cheGateway.clusterpermissions.finalizers.che.eclipse.org
+  - oauthclients.finalizers.che.eclipse.org
+  - dashboard.clusterpermissions.finalizers.che.eclipse.org
+  - container-build.finalizers.che.eclipse.org
+  - consolelink.finalizers.che.eclipse.org
+  generation: 4
+  name: devspaces
+  namespace: openshift-operators
+  resourceVersion: "719129149"
+  uid: 94f231a0-5f36-48e9-b8aa-ee5870022802
+spec:
+  components:
+    cheServer:
+      debug: false
+      logLevel: INFO
+    dashboard:
+      logLevel: ERROR
+    devWorkspace: {}
+    devfileRegistry:
+      disableInternalRegistry: true
+    imagePuller:
+      enable: false
+      spec: {}
+    metrics:
+      enable: true
+    pluginRegistry: {}
+  containerRegistry: {}
+  devEnvironments:
+    containerBuildConfiguration:
+      openShiftSecurityContextConstraint: container-build
+    defaultNamespace:
+      autoProvision: true
+      template: <username>-devspaces
+    disableContainerRunCapabilities: true
+    ignoredUnrecoverableEvents:
+    - FailedScheduling
+    maxNumberOfRunningWorkspacesPerUser: 5
+    maxNumberOfWorkspacesPerUser: -1
+    secondsOfInactivityBeforeIdling: -1
+    secondsOfRunBeforeIdling: -1
+    security: {}
+    startTimeoutSeconds: 300
+    storage:
+      pvcStrategy: per-user
+  gitServices: {}
+  networking:
+    auth:
+      gateway:
+        configLabels:
+          app: che
+          component: che-gateway-config
+        kubeRbacProxy:
+          logLevel: 0
+        oAuthProxy:
+          cookieExpireSeconds: 86400
+        traefik:
+          logLevel: INFO
+status:
+  chePhase: Active
+  cheURL: https://devspaces.apps.ocp4.redhat.ten.vibrintlabs.net
+  cheVersion: 3.27.1
+  devfileRegistryURL: ""
+  gatewayPhase: Established
+  pluginRegistryURL: https://devspaces.apps.ocp4.redhat.ten.vibrintlabs.net/plugin-registry/v3
+  workspaceBaseDomain: apps.ocp4.redhat.ten.vibrintlabs.net
