@@ -1,0 +1,10 @@
+"nvcr.io/nvidia/deepstream": [
+    {
+        "type": "sigstoreSigned",
+        "keyPath": "/path/to/nvidia-key.pub",
+        "signedIdentity": {
+            "type":"exactRepository",
+            "dockerRepository": "canary.nvcr.io/nvidia/deepstream"
+        }
+    }
+]
