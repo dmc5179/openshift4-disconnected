@@ -1,0 +1,27 @@
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: nic-myname
+spec:
+  # Optional: Use a nodeSelector to target specific nodes (e.g., all worker nodes)
+  nodeSelector:
+    node-role.kubernetes.io/master: ""
+  
+  # Optional: This controls the rollout and disruption. '3' means a maximum of 3 nodes 
+  # can have the configuration applied concurrently.
+  maxUnavailable: 3 
+
+  desiredState:
+    interfaces:
+      - name: eth1            # <--- REPLACE with the actual NIC name (e.g., ens4f0)
+        type: ethernet        # The interface type
+        mac-address:          # <-- REPLACE with the actual NIC MAC Address
+        state: up             # Ensure the interface is up
+        mtu: 9000             # <--- Sets the Maximum Transmission Unit (Jumbo Frames)
+
+        # Optional: You can include existing IP configuration here to ensure it's maintained.
+        # If omitted, NMState may attempt to reset the IP state depending on the current config.
+        # Example for DHCP:
+        # ipv4:
+        #   enabled: true
+        #   dhcp: true

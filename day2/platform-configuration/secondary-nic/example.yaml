@@ -1,0 +1,17 @@
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: nic-fiber
+spec:
+  nodeSelector:
+    node-role.kubernetes.io/master: ""
+  desiredState:
+    interfaces:
+      - name: ensXXXX
+        type: ethernet
+        state: up
+        mtu: 9216
+      - name: ensYYYY
+        type: ethernet       
+        state: up            
+        mtu: 9216    

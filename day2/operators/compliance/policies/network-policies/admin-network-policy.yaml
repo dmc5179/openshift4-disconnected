@@ -1,0 +1,32 @@
+apiVersion: policy.networking.k8s.io/v1alpha1
+kind: AdminNetworkPolicy
+metadata:
+  name: sample-anp-deny-pass-rules 
+spec:
+  priority: 50 
+  subject:
+    namespaces:
+      matchLabels:
+          kubernetes.io/metadata.name: example.name 
+  ingress: 
+  - name: "deny-all-ingress-tenant-1" 
+    action: "Deny"
+    from:
+    - pods:
+        namespaceSelector:
+          matchLabels:
+            custom-anp: tenant-1
+        podSelector:
+          matchLabels:
+            custom-anp: tenant-1 
+  egress:
+  - name: "pass-all-egress-to-tenant-1"
+    action: "Pass"
+    to:
+    - pods:
+        namespaceSelector:
+          matchLabels:
+            custom-anp: tenant-1
+        podSelector:
+          matchLabels:
+            custom-anp: tenant-1
