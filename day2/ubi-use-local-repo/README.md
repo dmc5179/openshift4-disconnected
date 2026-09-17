@@ -8,11 +8,11 @@
 - For a list of UBI repos: https://access.redhat.com/articles/4238681
 
 - Log into the registry
-```console
+```bash
 podman login -u <username> <registry:port>
 ```
 - Create a working directory
-```console
+```bash
 mkdir local-ubi
 ```
 - Create Dockerfile in local-ubi directory with the following content
@@ -45,11 +45,11 @@ enabled=1
 ```
 
 - Build image from ubi-local directory
-```console
+```bash
 podman build -t <internal registry fqdn:port>/ubi9/local-ubi:latest .
 ```
 
 - Push repo to registry
-```console
+```bash
 podman push <internal registry fqdn:port>/ubi9/local-ubi:latest
 ```

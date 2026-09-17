@@ -5,19 +5,19 @@
 ## Configure profiles on bastion machine
 
 - Set profile names
-```console
+```bash
 export AWS_ACCOUNT_A="<ACCOUNT_A_NAME>"
 export AWS_ACCOUNT_B="<ACCOUNT_B_NAME>"
 ```
 
 ### Interactive Mode
-```console
+```bash
 aws configure --profile "${AWS_ACCOUNT_A}"
 aws configure --profile "${AWS_ACCOUNT_B}"
 ```
 
 ### Non-Interactive Mode
-```console
+```bash
 
 aws configure set aws_access_key_id <AWS Access Key ID> --profile "${AWS_ACCOUNT_A}"
 aws configure set aws_secret_access_key <AWS Sec Key> --profile "${AWS_ACCOUNT_A}"
@@ -36,7 +36,7 @@ aws configure set output json --profile "${AWS_ACCOUNT_B}"
 
 - Need to update to use aws-us-gov for gov cloud ARN
 
-```
+```bash
 🔒 Resource Scoping Notice: Actions like ec2:Describe* do not support resource-level permissions and must use "Resource": "*". However, for production implementations, we recommend narrowing down the "Resource" fields for iam:PutUserPolicy, iam:PutRolePolicy, and ec2:CreateRoute using explicit path prefixes or naming standards matching your cluster nomenclature ${CLUSTER_NAME}-*.
 ```
 
@@ -46,7 +46,7 @@ aws configure set output json --profile "${AWS_ACCOUNT_B}"
 
 - In running outside of AWS commercial, make sure to change the ARN in the policy json
 
-```console
+```bash
 export ARN="aws-us-gov"
 sed -i "s|arn:aws:|arn:${ARN}:|g"  aws-account-a-iam-policy.json
 
@@ -55,7 +55,7 @@ sed -i "s|arn:aws:|arn:${ARN}:|g" aws-account-b-iam-policy.json
 
 - IAM in the AWS account with OpenShift
 
-```console
+```bash
 # 1. Create the IAM User for execution
 aws iam create-user --user-name OpenShift-Deployer-User
 
@@ -76,7 +76,7 @@ aws iam create-access-key --user-name OpenShift-Deployer-User
 
 - IAM in the AWS account with EFS
 
-```console
+```bash
 # 1. Create the IAM User for execution
 aws iam create-user --user-name EFS-Storage-Deployer-User
 

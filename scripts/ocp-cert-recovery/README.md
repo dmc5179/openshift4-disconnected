@@ -25,7 +25,7 @@ OpenShift internal certificates (kubelet, kube-apiserver serving, signers) expir
 
 ## Usage
 
-```
+```bash
 ./ocp-cert-recovery.sh {diagnose|phase1|phase2}
 ```
 

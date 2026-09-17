@@ -8,14 +8,14 @@ In a future realease this will be configurable to add more variable files and sk
 - To mirror the additional images 
 
 
-```
+```bash
 ansible-playbook pull_additional_images.yaml
 ```
 
 - To push the additional images to a registry in the disconnected environment
 
 
-```
+```bash
 ansible-playbook push_additional_images.yaml
 ```
 

@@ -31,7 +31,7 @@ This tool automates the equivalent workaround: it watches for router pod starts 
 
 ## Files
 
-```
+```bash
 fips-ems-watcher/
 ├── manifests.yaml    # Namespace, ServiceAccount, Role, RoleBinding, NetworkPolicy
 ├── deployment.yaml   # Watcher Deployment
@@ -93,7 +93,7 @@ oc logs -f deployment/fips-ems-watcher -n fips-ems-watcher
 
 You should see output like:
 
-```
+```json
 [2026-07-31T14:00:05Z] FIPS EMS Watcher starting
 [2026-07-31T14:00:05Z]   Namespace:      openshift-ingress
 [2026-07-31T14:00:05Z]   Label selector: ingresscontroller.operator.openshift.io/deployment-ingresscontroller=default

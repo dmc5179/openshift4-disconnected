@@ -32,7 +32,7 @@
 
 - Create a podman registry by running the following script. (Note that this script uses sudo for some things)
 
-```
+```bash
 ./install_registry.sh
 ```
 
@@ -40,19 +40,19 @@
 
 - Mirror the OpenShift cluster images to the registry set in env.sh
 
-```
+```bash
 ./mirror_to_registry.sh
 ```
 
 ### Build OpenShift OperatorHub Catalog Source Images
 
-```
+```bash
 
 ```
 
 ### Export OpenShift OperatorHub Catalog Source Images
 
-```
+```bash
 
 ```
 
@@ -60,6 +60,6 @@
 
  - This command will take the images from a local docker registry and mirror them into an ECR registry in AWS
 
- ```
+ ```bash
  oc image mirror -a 'auth.json' --insecure=true '<local registry: port>/ocp4/openshift4:4.5.6*' '123456789.dkr.ecr.us-east-1.amazonaws.com/ocp4/openshift4'
  ```

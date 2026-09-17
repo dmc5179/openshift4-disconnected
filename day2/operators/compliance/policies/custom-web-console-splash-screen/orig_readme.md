@@ -2,7 +2,7 @@
 
 Based on this blog https://www.redhat.com/en/blog/enhancing-the-openshift-web-console-login-experience
 
-```console
+```bash
 oc adm create-login-template > login.html
 
 oc adm create-error-template > errors.html
@@ -23,7 +23,7 @@ oc patch oauth.config.openshift.io cluster --type='json' -p='{"spec":{"templates
 ```
 
 # Remove custom splash page
-```console
+```bash
 oc delete secret -n openshift-config login-template
 oc delete secret -n openshift-config providers-template
 oc delete secret -n openshift-config error-template

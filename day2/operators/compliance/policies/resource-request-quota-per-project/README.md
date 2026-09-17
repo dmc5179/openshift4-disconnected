@@ -5,13 +5,13 @@
 
 - To get all the non-control plane namespaces, you can do the following command 
 
-```console
+```bash
 oc get  namespaces -o json | jq '[.items[] | select((.metadata.name | startswith("openshift") | not) and (.metadata.name | startswith("kube-") | not) and .metadata.name != "default" and .metadata.name != "rhacs-operator" and (true)) | .metadata.name]'
 ```
 
 - To get all the non-control plane namespaces with a ResourceQuota, you can do the following command
 
-```console 
+```bash
 oc get --all-namespaces resourcequota -o json | jq '[.items[] | select((.metadata.namespace | startswith("openshift") | not) and (.metadata.namespace | startswith("kube-") | not) and .metadata.namespace != "default" and .metadata.namespace != "rhacs-operator" and (true)) | .metadata.namespace] | unique'
 ```
 
@@ -21,7 +21,7 @@ oc get --all-namespaces resourcequota -o json | jq '[.items[] | select((.metadat
 
 - In this repo there are example resource quota and limit range yamls, apply them to the needed namespace 
 
-```console
+```bash
 oc create -f limit-range-project-compliance.yaml -n <namespace>
 
 oc create -f resource-quota-project-compliance.yaml -n <namespace>
@@ -29,7 +29,7 @@ oc create -f resource-quota-project-compliance.yaml -n <namespace>
 
 - Verify resource quota nd limit ranges exist in the above namespace 
 
-```console
+```bash
 oc get limitranges -n <namespace>
 
 oc get quota -n <namespace>

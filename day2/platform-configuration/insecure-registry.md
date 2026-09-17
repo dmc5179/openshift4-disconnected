@@ -1,10 +1,10 @@
 # Insecure registries
 
-```console
+```bash
 oc edit image.config.openshift.io/cluster
 ```
 
-```
+```yaml
 spec:
   registrySources:
     allowedRegistries             # 

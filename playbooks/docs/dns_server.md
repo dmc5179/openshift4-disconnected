@@ -9,7 +9,7 @@
 [BIND Role Variables](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/roles/install_bind/README.md)
 
  - Run the Ansible Playbook to install and configure BIND
- ```
+ ```bash
  ansible_playbook dns_server.yaml
  ```
 

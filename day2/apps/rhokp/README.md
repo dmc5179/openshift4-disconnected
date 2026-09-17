@@ -10,7 +10,7 @@ https://docs.redhat.com/en/documentation/red_hat_offline_knowledge_portal/1/html
 
 . Run the container
 
-```console
+```bash
 export RHOKP_KEY="key from RHN"
 
 podman run --rm -p 8080:8080 -p 8443:8443 \
@@ -32,13 +32,13 @@ The deployment creates a dedicated `rhokp-server` ServiceAccount with:
 
 1. Create a new namespace
 
-```console
+```bash
 oc new-project rhokp-server
 ```
 
 2. Deploy RHOKP
 
-```console
+```bash
 export RHOKP_KEY="RHOKP key from RHN"
 
 envsubst < rhokp-deployment.yaml | oc apply -f -
@@ -46,14 +46,14 @@ envsubst < rhokp-deployment.yaml | oc apply -f -
 
 3. Verify the deployment rolled out and pods are running under the service account
 
-```console
+```bash
 oc rollout status deployment/rhokp-server -n rhokp-server
 oc get pods -n rhokp-server -o custom-columns='NAME:.metadata.name,SA:.spec.serviceAccountName,STATUS:.status.phase'
 ```
 
 4. Access the route
 
-```console
+```bash
 oc get route rhokp-server -n rhokp-server -o jsonpath='{.spec.host}'
 ```
 

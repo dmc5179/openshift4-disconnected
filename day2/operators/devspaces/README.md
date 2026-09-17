@@ -10,12 +10,12 @@
   - devspaces and devworkspace-operator
 
 ## Build the plugin repo you will need to have podman, git and yarn installed
-```console
+```bash
 sudo dnf install podman yarn git -y
 ```
 
 - Clone repo and update openvsx-sync.json file and build, depending on the number of plugins it could take several minutes to build
-```console
+```bash
 git clone https://github.com/redhat-developer/che-plugin-registry.git
 
 cd che-plugin-registry 
@@ -26,19 +26,19 @@ vim openvsx-sync.json  #optional if you want to add / remove plugins
 ```
 
 - Image quay.io/eclipse/che-plugin-registry:next will be created
-```console
+```bash
 podman images
 ```
 
 - Save index image to tarball for export to disconnected environment
-```console
+```bash
 podman save quay.io/eclipse/che-plugin-registry:next > che-plugin-registry-next.tar
 ```
 
 ## Build sample template devfiles image 
 - Clone repo, update stack directory and build, depending on the number of sample templates in stack directory it could take a couple minutes to build
 NOTE: We will need to add the image from each devfile.yaml to additionalImages in the imageset-config so the workspace can launch.  Recommendation for the platform and developers to sync on workspaces requried. 
-```console
+```bash
 git clone https://github.com/devfile/registry.git
 
 export USE_PODMAN=true
@@ -49,12 +49,12 @@ bash .ci/build.sh linux/amd64 offline
 ```
 
 - Save index image to tarball for export to disconnected environment
-```console
+```bash
 podman save localhost/devfile-index:latest > devfile-index-latest.tar
 ```
 
 - Copy repo needed to deploy devfile registry
-``` console
+```bash
 git clone https://github.com/devfile/registry-support.git
 
 tar -cvf registry-support-repo.tgz registry-support/*
@@ -91,7 +91,7 @@ tar -cvf registry-support-repo.tgz registry-support/*
 - Deploy the devspaces operator via gui - devworkspace-operator gets installed automatically
 
 - Push the devfile image to local repo 
-```console
+```bash
 podman load --input devfile-index-latest.tar 
 
 podman tag localhost/devfile-index:latest <internal-registry-fqdn>:8443/devfile-index:latest
@@ -100,7 +100,7 @@ podman push <internal-registry-fqdn>:8443/devfile-index:latest
 ```
 
 - Push the plugin registry image to local repo
-```console
+```bash
 podman load --input devfile-index-latest.tar
 
 podman tag quay.io/eclipse/che-plugin-registry:next <internal-registry-fqdn>:8443/eclipse/che-plugin-registry:next
@@ -111,14 +111,14 @@ podman push <internal-registry-fqdn>:8443/eclipse/che-plugin-registry:next
 - Install Devspaces Operator via Gui Ecosystem -> Software Catalog -> Red Hat OpenShift Dev Spaces -> Install (keep defaults).  You should notice that the DevWorkspace Operator gets installed at the sametime Dev Spaces operator is installed
 
 - Create OpenShift project devspaces
-```console
+```bash
 oc new-project devspaces
 ```
 
 - Create CheCluster via GUI, Ecosystem -> Installed Operators -> DevSpaces -> Create instance.   NOTE: Ensure project is set to devspaces namesapce and keep defaults
 
 - Deploy the devfile registry
-```console
+```bash
 tar -xvf registry-support-repo.tgz
 
 cd registry-support-repo
@@ -126,19 +126,19 @@ bash ./helm-openshift-install.sh --set devfileIndex.image=<interal-registry-fqdn
 ```
 
 - Once complete update the cheCluster devspaces CR with the route
-```console
+```bash
 oc get route 
 
 oc patch checluster devspaces --type='merge' -p '{"spec": {"components": {"devfileRegistry": {"externalDevfileRegistries": [{"url": "http://<devfile-registry route>"}]}}}}'
 ```
 
 - Update pluginRegistry repo
-```console
+```bash
 oc patch checluster devspaces --type='merge' -p '{"spec": {"components": {"pluginRegistry": {"deployment": {"containers": [{"image": "<registry-fqdn:port>/eclipse/che-plugin-registry:next"}]}}}}}'
 ```
 
 - VS Code expects the plugins to be from a public repo, developers will not be able to install the plugins due to a signature error.  To resolve this in a once-and-done setting apply the following path to the checluster
-```console
+```bash
 oc patch checluster devspaces -n openshift-devspaces --type='json' -p='[
   {
     "op": "add",
@@ -152,21 +152,21 @@ oc patch checluster devspaces -n openshift-devspaces --type='json' -p='[
 - By default a devuser can have an unlimited number of workspaces but only 1 workspace running at a time.  The following section will help you configure the number of workpsaces and running workspaces allowed per user.
 
 - Get the number of workspaces a user can have.  A -1 indicates unlimited
-```console
+```bash
 oc get checluster/devspaces -n devspaces -o jsonpath='{.spec.devEnvironments.maxNumberOfWorkspacesPerUser}'
 ```
 
 - Get the number of workspaces a user can have, default is 1.  If there no value is returned then 1 running devspace per user
-```console
+```bash
 oc get checluster/devspaces -n devspaces -o jsonpath='{.spec.devEnvironments.maxNumberOfRunningWorkspacesPerUser}'
 ```
 
 - Set the number of workspaces a user can have.
-```console
+```bash
 oc patch checluster/devspaces -n devspaces --type='merge' -p '{"spec":{"devEnvironments":{"maxNumberOfWorkspacesPerUser": 3}}}'
 ```
 
 - Set the number of running workspaces a user can have.
-```console
+```bash
 oc patch checluster/devspaces -n devspaces --type='merge' -p '{"spec":{"devEnvironments":{"maxNumberOfRunningWorkspacesPerUser": 3}}}'
 ```

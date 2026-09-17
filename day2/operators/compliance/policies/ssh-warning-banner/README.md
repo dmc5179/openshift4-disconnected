@@ -8,27 +8,27 @@ https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/butane/latest/butan
 ### Create and apply SSH warning banner machine config to worker nodes
 
 - Use butane to generate the machine config yaml for worker nodes
-```console
+```bash
 butane banner-worker.bu -o banner-worker.yaml
 ```
 
 - Apply machine config to the cluster
-```console
+```bash
 oc apply -f banner-worker.yaml
 ```
 
 - Use butane to generate the machine config yaml for master nodes
-```console
+```bash
 butane banner-master.bu -o banner-master.yaml
 ```
 
 - Apply machine config to the cluster
-```console
+```bash
 oc apply -f banner-master.yaml
 ```
 
 - Check the machine config pool and cluster nodes to wait for machine configs to apply to nodes
-```console
+```bash
 oc get mcp
 oc get nodes
 ```

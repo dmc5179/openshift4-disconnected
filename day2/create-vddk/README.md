@@ -6,19 +6,19 @@
 - RH Docs: https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/2.11/html/planning_your_migration_to_red_hat_openshift_virtualization/assembly_provider-specific-requirements-for-migration_mtv#creating-vddk-image_mtv
 
 # Create a working directory to build the image
-```console
+```bash
 mkdir /tmp/vddk-build && cd /tmp/vddk-build
 ```
 # Extract the contents of the VMware-vix tarball to working directory
 tar -xzf /full/path/VMware-vix-disklib-<version>.x86_64.tar.gz --directory /tmp/vddk-build
 
 # Log into disconnected registry
-```console
+```bash
 podman login <registry_route_or_server_path>
 ```
 
 # Create Dockerfile in working directory. Update the FROM to disconnected registry
-```console
+```bash
 cat > Dockerfile <<EOF
 FROM registry.access.redhat.com/ubi8/ubi-minimal  #change me
 USER 1001
@@ -29,11 +29,11 @@ EOF
 ```
 
 # Build the image
-```console
+```bash
 podman build . -t <registry_route_or_server_path>/vddk:<tag>
 ```
 
 # Push image to disconnected registry
-```console
+```bash
 podman push <registry_route_or_server_path>/vddk:<tag>
 ```

@@ -4,7 +4,7 @@ Enforced software templates for Red Hat Developer Hub (RHDH) where the platform 
 
 ## How It Works
 
-```
+```bash
 ┌─────────────────────────────────────────────────────────────┐
 │  PLATFORM ENGINEERING (controls)                            │
 │                                                             │
@@ -46,7 +46,7 @@ Enforced software templates for Red Hat Developer Hub (RHDH) where the platform 
 
 ## Directory Layout
 
-```
+```bash
 rhdh-platform-templates/
 ├── README.md                          ← You are here
 ├── 01-operator-config/

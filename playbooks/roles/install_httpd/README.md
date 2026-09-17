@@ -65,7 +65,7 @@ By default, the role uses the self-signed certificate that is generated when ins
 
 E.g. you have a server key `acme-inc.key` and certificate file `acme-inc.crt`. The directory structure should look:
 
-```
+```bash
 .
 ├── playbook.yml
 └── files

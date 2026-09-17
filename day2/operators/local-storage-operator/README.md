@@ -8,7 +8,7 @@
 
 If the disk has old software RAID fingerprints, those will need to be removed first as the wipefs command will not clear them out
 
-```console
+```bash
 lsblk
 mdadm --stop /dev/mdX
 mdadm --zero-superblock /dev/sdX
@@ -18,12 +18,12 @@ mdadm --zero-superblock /dev/sdX
 
 Run wipefs command weather or not mdadm commands above were needed or used.
 
-```console
+```bash
 wipefs -a /dev/sdX
 ```
 
 ### Deploy LSO Volume Discover
 
-```console
+```bash
 oc create -f
 ```

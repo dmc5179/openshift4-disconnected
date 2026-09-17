@@ -21,7 +21,7 @@ standalone, reusable artifact that can be mounted into any serving runtime.
 
 ## Architecture
 
-```
+```bash
 ┌─────────────────────────────────────────────────────────────────┐
 │  Connected Side                                                 │
 │                                                                 │
@@ -652,7 +652,7 @@ curl -sk "https://${ROUTE}/v1/completions" \
 For reference, here is the consolidated list of all container images that need to
 be mirrored for transport into the enclave:
 
-```
+```bash
 # Red Hat AI Inference (vLLM) runtime
 registry.redhat.io/rhaii/vllm-cuda-rhel9:3.4.1
 

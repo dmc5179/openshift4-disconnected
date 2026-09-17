@@ -6,7 +6,7 @@
 
 - Create an index, error and providers page based on current console template
 
-```console
+```bash
 POD=$(oc get pods -n openshift-authentication -o name | head -n 1)
 
 oc exec -n openshift-authentication "$POD" -- cat /var/config/system/secrets/v4-0-config-system-ocp-branding-template/errors.html > errors.html
@@ -18,7 +18,7 @@ oc exec -n openshift-authentication "$POD" -- cat /var/config/system/secrets/v4-
 
 - Update each .html files above in the body section.  Depending on the console version it will be either \<div class="pf-c-login__main-body"> or \<div class="pf-v6-c-login__main-body">.  Example below is an example config
 
-```console
+```bash
 <p>
     You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only. By using this IS (which includes any device attached to this IS), you consent to the following conditions:
 </p>
@@ -33,7 +33,7 @@ oc exec -n openshift-authentication "$POD" -- cat /var/config/system/secrets/v4-
 
 - Create a secret for each of the customized .html files
 
-```console
+```bash
 oc create secret generic error-template --from-file=errors.html -n openshift-config
 
 oc create secret generic login-template --from-file=login.html -n openshift-config
@@ -43,13 +43,13 @@ oc create secret generic providers-template --from-file=providers.html -n opensh
 
 - Patch Oauth cluster for the new templates
 
-```console
+```bash
 oc patch oauths cluster --type=json -p='[ { "op": "add", "path": "/spec/templates", "value": { "error": { "name": "error-template" }, "providerSelection": { "name": "providers-template" }, "login": { "name": "login-template" } } } ]'
 ```
 
 - You should see the following when you do oc get oauth cluster -o yaml
 
-```console
+```bash
 spec:
   templates:
     error:
@@ -62,6 +62,6 @@ spec:
 
 - It may take a couple minutes to rollout, monitor progress of the openshift-authentication operator
 
-```console
+```bash
 oc get co 
 ```

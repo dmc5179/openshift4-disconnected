@@ -8,7 +8,7 @@ All steps assume a **disconnected (air-gapped)** hub cluster environment.
 
 ## Architecture
 
-```
+```bash
                            Disconnected Hub Cluster (RHACM)
                           ┌─────────────────────────────────────────────┐
                           │                                             │
@@ -127,7 +127,7 @@ oc -n ${MCH_NAMESPACE} get pods | grep siteconfig
 
 Expected output:
 
-```
+```bash
 siteconfig-controller-manager-<hash>   2/2     Running   0   1m
 ```
 
@@ -287,7 +287,7 @@ ls credreqs/
 
 You should see files like:
 
-```
+```bash
 0000_26_cloud-controller-manager-operator_18_credentialsrequest-aws.yaml
 0000_30_machine-api-operator_00_credentials-request.yaml
 0000_50_cloud-credential-operator_05-iam-ro-credentialsrequest.yaml
@@ -316,7 +316,7 @@ CLUSTER_NAME="govcloud-spoke1"
 
 After successful execution, `ccoctl-output/` contains:
 
-```
+```bash
 ccoctl-output/
 ├── manifests/
 │   ├── cluster-authentication-02-config.yaml    # Authentication CR (OIDC issuer URL)
@@ -457,7 +457,7 @@ oc get configmaps -n ${CLUSTER_NAMESPACE}
 
 Expected:
 
-```
+```bash
 NAME                       DATA   AGE
 sts-credential-manifests   8      1m
 sts-tls-signing-key        1      1m
@@ -793,7 +793,7 @@ KUBECONFIG=spoke-kubeconfig oc get co
 
 ### ClusterInstance API Reference
 
-```
+```yaml
 apiVersion: siteconfig.open-cluster-management.io/v1alpha1
 kind: ClusterInstance
 ```

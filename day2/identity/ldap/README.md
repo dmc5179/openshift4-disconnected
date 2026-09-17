@@ -3,7 +3,7 @@
 - Sometimes ldap search WITHOUT sAMAccountName works but then we need sAMAccountName in the LDAP CR for OpenShift
 
 # without sAMAccountName
-```
+```bash
 ldapsearch -x -H ldap://dc.example.com -D "CN=ldap_user,OU=Users,DC=example,DC=com" -W -b "OU=My Users,DC=example,DC=com" -s sub "(uid=matt)"
 ```
 

@@ -11,7 +11,7 @@ https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/
 - Skip this section if the EFS filesystem already exists
 - Remove the kms and encrypted options of not needed
 
-```console
+```bash
 aws efs create-file-system --encrypted --kms-key-id arn:aws:kms:region:account-id:key/your-kms-key-id --performance-mode generalPurpose --throughput-mode bursting
 ```
 
@@ -21,19 +21,19 @@ aws efs create-file-system --encrypted --kms-key-id arn:aws:kms:region:account-i
 
 ## Install Cluster CSI Driver
 
-```console
+```bash
 oc create -f efs-cluster-csi-driver.yaml
 ```
 
 ## Create EFS Storage Class
 
-```console
+```bash
 oc create -f efs-sc.yaml
 ```
 
 ## Deploy a test pod
 
-```console
+```bash
 oc new-project efs-test-deployment
 oc project efs-test-deployment
 oc create -f efs-test-pod.yaml

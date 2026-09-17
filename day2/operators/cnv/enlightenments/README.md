@@ -5,7 +5,7 @@
 https://access.redhat.com/solutions/7129100
 
 - Ensure all enlightenments are enabled in the VirtualMachine spec for the Windows VM. For example
-```console
+```bash
 oc get vm windows-2022 -o yaml | yq '.spec.template.spec.domain.features.hyperv'
 frequencies: {}
 ipi: {}
@@ -27,7 +27,7 @@ vpindex: {}
 
 
 - Add the evmcs field with oc edit
-```console
+```bash
 oc edit VirtualMachine windows-2022
 
 apiVersion: kubevirt.io/v1

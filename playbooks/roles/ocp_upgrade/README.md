@@ -17,7 +17,7 @@ Commands to upgrade and OpenShift 4 cluster in a disconnected environment
 
 ## Example Playbook
 
-```
+```bash
 oc adm upgrade --allow-explicit-upgrade=true --allow-upgrade-with-warnings=true --to-image='quay.io/openshift-release-dev/ocp-release@sha256:e1ebc7295248a8394afb8d8d918060a7cc3de12c491283b317b80b26deedfe61' --force=true
 
 Updating to release image quay.io/openshift-release-dev/ocp-release@sha256:e1ebc7295248a8394afb8d8d918060a7cc3de12c491283b317b80b26deedfe61

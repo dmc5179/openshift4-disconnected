@@ -17,12 +17,12 @@ helm upgrade --install aws-node-termination-handler \
 
 ## Create machineset Role and Rolebindings
 - Create the roles for node-viewer
-```console
+```bash
 oc create -f node-view-cluster-role.yaml
 ```
 
 - Update the resourceNames section of machineset-admin-cluster-role.yaml and list exact machinesets user/group would be allowed to scale/modify
-```console
+```bash
 vim machineset-admin-cluster-role-binding.yaml
 
   resourceNames:
@@ -33,7 +33,7 @@ vim machineset-admin-cluster-role-binding.yaml
 ```
 
 - Apply the updated machineset-admin-cluster-role.yaml
-```console
+```bash
 oc create -f machineset-admin-cluster-role.yaml
 
 subjects:
@@ -46,7 +46,7 @@ subjects:
 ```
 
 - Establish the role-binding
-```console
+```bash
 oc create -f machineset-admin-cluster-role-binding.yaml
 ```
 

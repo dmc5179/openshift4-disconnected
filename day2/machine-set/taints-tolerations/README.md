@@ -1,25 +1,25 @@
 # Tainting nodes for use by specific teams
 
 ## Define the group name
-```console
+```bash
 export OCP_GROUP_NAME="team-a-dev"
 ```
 
 ## Taint the node
 
-```console
+```bash
 oc adm taint nodes <node-name> dedicated=${OCP_GROUP_NAME}:NoSchedule
 ```
 
 ## Create team namespace
 
-```console
+```bash
 oc new-project ${OCP_GROUP_NAME}-workload
 ```
 
 ## Configure Namespace tolerations
 
-```console
+```bash
 oc annotate namespace ${OCP_GROUP_NAME}-workload \
 openshift.io/node-selector='dedicated=${OCP_GROUP_NAME}' \
 scheduler.alpha.kubernetes.io/defaultTolerations='[{"key": "dedicated", "operator": "Equal", "value": "${OCP_GROUP_NAME}", "effect": "NoSchedule"}]'
@@ -29,6 +29,6 @@ scheduler.alpha.kubernetes.io/defaultTolerations='[{"key": "dedicated", "operato
 
 ## Restrict access to group
 
-```console
+```bash
 oc adm policy add-role-to-group edit ${OCP_GROUP_NAME} -n ${OCP_GROUP_NAME}-workload
 ```

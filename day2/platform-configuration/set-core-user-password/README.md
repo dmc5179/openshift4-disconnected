@@ -1,17 +1,17 @@
 # Setting core user password
 
 - Create hashed password for the core user
-```console
+```bash
 PASS_HASH=$(echo $(printf 'MYPASSWORD' | openssl passwd -6 --stdin))
 ```
 
 - Apply the core user password to control plane nodes
-```console
+```bash
 cat core-user-set-password-master.bu | sed "s|MYPASSWORDHASH|${PASS_HASH}|g" | butane | oc create -f -
 ```
 
 - Apply the core user password to worker nodes
-```console
+```bash
 cat core-user-set-password-worker.bu | sed "s|MYPASSWORDHASH|${PASS_HASH}|g" | butane | oc create -f -
 ```
 

@@ -7,20 +7,20 @@
 
 ## Create 2 containers from the catalog images
 
-```console
+```bash
 podman create --name my-catalog-ver-a myregistry.com:8443/redhat/redhat-operator-index@sha256:f.....a
 
 podman create --name my-catalog-ver-b myregistry.com:8443/redhat/redhat-operator-index@sha256:f.....b
 ```
 
 ## Copy the contents of the catalogs out
-```console
+```bash
 podman cp my-catalog-ver-a ./index-catalog-ver-a
 podman cp my-catalog-ver-b ./index-catalog-ver-b
 ```
 
 ## Stop the containers
-```console
+```bash
 podman stop my-catalog-ver-a
 podman stop my-catalog-ver-b
 podman rm my-catalog-ver-a
@@ -30,20 +30,20 @@ podman rm my-catalog-ver-b
 ## Locally merge the directories
 
 - rsync is safer but use cp if rsync is not available
-```console
+```bash
 rsync -av ./index-catalog-ver-a ./index-catalog-ver-b new_index
 #cp -rn ./index-catalog-ver-a ./index-catalog-ver-b new_index
 ```
 
 ## Rebuild a catalog image
 
-```console
+```bash
 podman build -t myregistry.com:8443/redhat/redhat-operator-index:v4.21 -f Containerfile .
 ```
 
 ## Push the catalog image
 
-```console
+```bash
 podman push myregistry.com:8443/redhat/redhat-operator-index:v4.21
 ```
 

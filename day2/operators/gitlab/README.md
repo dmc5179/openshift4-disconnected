@@ -2,19 +2,19 @@
 
 ## Create KMS backed encrypted EBS storage class if needed
 - Update the file encrypted-aws-sc.yaml with your AWS KMS ARN
-```console
+```bash
 oc create -f encrypted-aws-sc.yaml
 ```
 
 ## Deploy the Operator
-```console
+```bash
 oc create -f 01-gitlab-system-namespace.yaml
 oc create -f 02-gitlab-operator-group.yaml
 oc create -f 03-gitlab-subscription.yaml
 ```
 
 ## Check that the operator is running
-```console
+```bash
 oc -n gitlab-system get deployment gitlab-controller-manager
 ```
 
@@ -22,7 +22,7 @@ oc -n gitlab-system get deployment gitlab-controller-manager
 
 - Precreating the S3 buckets allows for the setting of SSE-KMS
 
-```console
+```bash
 PREFIX=ocp-abc123
 aws s3api create-bucket --region us-east-2 --bucket ${PREFIX}-gitlab-artifacts-storage --create-bucket-configuration LocationConstraint=us-east-2
 aws s3api create-bucket --region us-east-2 --bucket ${PREFIX}-gitlab-backup-storage --create-bucket-configuration LocationConstraint=us-east-2
@@ -39,7 +39,7 @@ aws s3api create-bucket --region us-east-2 --bucket ${PREFIX}-gitlab-registry-st
 ```
 
 - Set SSE-KMS
-```console
+```bash
 KMS_ARN="arn"
 PREFIX=ocp-abc123
 aws s3api put-bucket-encryption --bucket ${PREFIX}-gitlab-artifacts-storage \
@@ -82,13 +82,13 @@ aws s3api put-bucket-encryption --bucket ${PREFIX}-gitlab-registry-storage\
 ## Configure gitlab to use default OpenShift Router certificates
 
 - Export default router cert and key
-```console
+```bash
 oc get -o yaml secrets router-certs-default | yq '.data."tls.crt"' | base64 -d > ocp-default-router-tls.crt
 oc get -o yaml secrets router-certs-default | yq '.data."tls.key"' | base64 -d > ocp-default-router-tls.key
 ```
 
 - Create secret with default router cert and key
-```console
+```bash
 oc create -n gitlab-system secret tls gitlab-wildcard-tls-certs --cert=ocp-default-router-tls.crt --key=ocp-default-router-tls.key
 ```
 
@@ -97,7 +97,7 @@ oc create -n gitlab-system secret tls gitlab-wildcard-tls-certs --cert=ocp-defau
 
 - Update s3cmd-storage.config registry-storage.config gitlab-s3-secrets.yaml with your credentials
 
-```console
+```bash
 oc create -n gitlab-system secret generic gitlab-object-storage --from-file=config=s3cmd-storage.config
 
 oc create -n gitlab-system secret generic registry-storage --from-file=config=registry-storage.config
@@ -106,12 +106,12 @@ oc create -n gitlab-system secret generic gitlab-s3-secrets --from-file=connecti
 ```
 
 ## Get console route
-```console
+```bash
 oc get route -n openshift-console console -ojsonpath='{.status.ingress[0].host}'
 ```
 
 - it goes into the CR here. If console is  console-openshift-console.apps.ecs.sandbox1248.opentlc.com
-```
+```yaml
 spec:
   chart:
     values:
@@ -123,28 +123,28 @@ spec:
 
 
 ## Create the gitlab CR
-```console
+```bash
 oc create -f mygitlab-cr.yaml
 ```
 
 ## POST INSTALL
 
 - Get default credentials. Default user name is 'root'
-```console
+```bash
 oc -n gitlab-system get secrets gitlab-gitlab-initial-root-password -o yaml | yq e '.data.password' - | base64 -d
 ```
 
 ## Patch OCP ingress controller to ignore gitlab's nginx ingress controller if using nginx ingress
 
 - Get the Load Balancer IP
-```console
+```bash
 oc get svc -n gitlab-system gitlab-nginx-ingress-controller -ojsonpath='{.status.loadBalancer.ingress[].ip}'
 ```
 
 - Not required when using OpenShift Ingress Router
 - I have not tested this yet. I use the OCP ingress router for right now. Skip this step unless you want to experiment
 
-```console
+```bash
 oc -n openshift-ingress-operator \
   patch ingresscontroller default \
   --type merge \

@@ -28,7 +28,7 @@ yq --arg image ${OLLAMA_IMAGE} '.spec.template.spec.containers[0].image = $image
 
 ## Pulling AI models using podsman as artifacts
 
-```console
+```bash
 podman artifact pull ai/gpt-oss:20B
 podman artifact pull ai/gpt-oss-vllm
 ```

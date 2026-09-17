@@ -4,7 +4,7 @@ https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/4.18/lat
 
 - Configure bare metal worker nodes and ingress operator such that ingress never moves to a virtual worker node
 #TODO: Update this to only select bare metal worker nodes. This loop assumes there are currently no virtual worker nodes yet
-```console
+```bash
 for n in $(oc get nodes --no-headers=true -o custom-columns=NAME:.metadata.name -lnode-role.kubernetes.io/worker=="")
 do
   oc label node "${n}" ingress-node=dedicated
@@ -12,13 +12,13 @@ done
 ```
 
 - Patch the OpenShift ingress operator to only run on nodes with the label ingress-node:dedicated
-```console
+```bash
 oc patch -n openshift-ingress-operator ingresscontroller default --type=merge \
 -p='{"spec":{"nodePlacement":{"nodeSelector":{"matchLabels":{"ingress-node":"dedicated"}}}}}'
 ```
 
 - Create a project for the VMs
-```console
+```bash
 oc new-project virt-workers
 ```
 
@@ -27,23 +27,23 @@ oc new-project virt-workers
 adm node-image create
 
 - Download worker.ign from cluster
-```console
+```bash
 oc extract -n openshift-machine-api secret/worker-user-data-managed --keys=userData --to=- > worker.ign
 ```
 
 - Create ignition config secret for VM
-```console
+```bash
 oc create -n virt-workers secret generic worker-ignition-payload --from-file=userdata=worker.ign
 ```
 
 - Shold work as a single command but does not
-```console
+```bash
 #oc extract -n openshift-machine-api secret/worker-user-data-managed --keys=userData --to=- 2>&1 | oc create -n virt-workers secret generic ignition-payload --from-file=userdata=-
 ```
 
 - Create VM
 Note: the openshift-install binary version should match the running cluster version under "oc version"
-```console
+```bash
 CONTAINER_IMAGE=$(openshift-install coreos print-stream-json | jq -c -r '.architectures.x86_64.images.kubevirt."digest-ref"')
 DISK=120
 NIC_NAME=nic-$(cat /dev/urandom | tr -dc 'a-z' | head -c 12)
@@ -109,12 +109,12 @@ oc create -n virt-workers -f vm.yaml
 ```
 
 - VM will then enter the provisioning state
-```console
+```bash
 oc wait --timeout=5m --for=jsonpath='{.status.printableStatus}'=Stopped vm/my-rhcos
 ```
 
 - Get the MAC from the new VM and create the node yaml
-```console
+```bash
 RANDOM_DIR=$(mktemp -d)
 NEW_MAC=$(oc get -o json vm my-rhcos | jq -c -r '.spec.template.spec.domain.devices.interfaces[] | select(.name != "default") | .macAddress')
 cat <<END > "${RANDOM_DIR}/nodes-config.yaml"
@@ -151,22 +151,22 @@ END
 ```
 
 - Create node add ISO
-```console
+```bash
 oc adm node-image create "--dir=${RANDOM_DIR}"
 ```
 
 - Get size of ISO file
-```console
+```bash
 stat "${RANDOM_DIR}/node.x86_64.iso"
 ```
 
 - Upload ISO as data source
-```console
+```bash
 virtctl image-upload dv my-rhcos --size=<pvc-size>G "--image-path=${RANDOM_DIR}/node.x86_64.iso" --access-mode=ReadWriteOnce --pvc-namespace=virt-workers
 ```
 
 - Patch VM yaml with new boot data source
-```console
+```bash
 oc patch vm my-rhcos --type merge -p '
 {
   "spec": {
@@ -218,7 +218,7 @@ Note: This is untested and may not be needed
 
 Scheduling will be the hardest part due to upgrades. Both bare metal and virtual nodes will act as worker nodes. When the bare metal node tries to upgrade and reboot it would try to live migrate the worker node VM which might disrupt the VM. It might be easier to just delete the OCP virtual worker nodes and VMs prior to an upgrade and simply add then back post upgrade....
 
-```console
+```bash
 echo "Updating descheduler annotation: $VM"
 oc patch vm "$VM" --type='json' -p="[{'op': 'add', 'path': '/spec/template/metadata/annotations/descheduler.alpha.kubernetes.io~1evict', 'value': '$DESCHEDULER'}]"
 ```

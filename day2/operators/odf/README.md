@@ -13,10 +13,10 @@ The configuration in the next steps contains this line "target_disks=$(lsblk -dn
 which will search for all block devices that are exactly 2.2T in size. The search size can be changed or the list of devices can be set manually to the target_disks variable
 
 
-```console
+```bash
 butane 99-set-nonrotational-mc.bu -o 99-set-nonrotational-mc.yaml
 ```
 
-```console
+```bash
 oc create -f 99-set-nonrotational-mc.yaml
 ```

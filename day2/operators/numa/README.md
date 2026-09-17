@@ -12,7 +12,7 @@ https://access.redhat.com/articles/6994974
 
 ## Deploy the NUMA resource Operator
 
-```console
+```bash
 oc create -f nro-namespace.yaml
 
 sleep 1
@@ -35,33 +35,33 @@ sleep 15
 ```
 
 ## Generate a must gather report
-```console
+```bash
 mkdir must-gather | true
 oc adm must-gather --dest-dir=${PWD}/must-gather/
 ```
 
 ## Compress the must gather report
-```console
+```bash
 tar caf must-gather.tar.gz ${PWD}/must-gather/
 ```
 
 ## Run the wrapper script help command
-```console
+```bash
 ./run-perf-profile-creator.sh -h
 ```
 
 ## Display information about the cluster
-```console
+```bash
 ./run-perf-profile-creator.sh -t ./must-gather.tar.gz info
 ```
 
 ## Create performance profile
-```console
+```bash
 ./run-perf-profile-creator.sh -t ./must-gather.tar.gz -- --mcp-name=worker --topology-manager-policy best-effort --reserved-cpu-count=2 --rt-kernel=true --split-reserved-cpus-across-numa=false --power-consumption-mode=ultra-low-latency --offlined-cpu-count=1 > my-performance-profile.yaml
 ```
 
 ## Apply Performance Profile
-```console
+```bash
 oc apply -f my-performance-profile.yaml
 ```
 
@@ -69,7 +69,7 @@ oc apply -f my-performance-profile.yaml
 ## TODO: Check that the kublet is getting some of these configs from the performance profile process.
 
 - Need to check that the kubelet has some of these fields
-```
+```yaml
 apiVersion: machineconfiguration.openshift.io/v1
 kind: KubeletConfig
 metadata:
@@ -86,7 +86,7 @@ spec:
 
 ## Example OCP VM config for single NUMA node
 
-```
+```yaml
   cpu:
     cores: 24
     sockets: 4
@@ -98,7 +98,7 @@ spec:
 ```
 
 ## Do we need to use the topo aware scheduler in the virt deployment like this
-```
+```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -128,7 +128,7 @@ The numactl and numastat commands are the best tools to monitor process that sho
 OpenShift RHCOS nodes do not have the numactl package installed on them. Below are steps to find what OCP node a virtual machine is running on and then leverage the numastat command to monitor the VM.
 
 ### Set variables for the virtual machine
-```console
+```bash
 export VM_NAME=test-syslog-server
 export NAMESPACE="cluster-vms"
 ```
@@ -137,7 +137,7 @@ export NAMESPACE="cluster-vms"
 
 - Note: The virtual machine must be running for these commands to work
 
-```console
+```bash
 export POD=$(oc get pods -n ${NAMESPACE} -o custom-columns=":metadata.name" --no-headers | grep "${VM_NAME}")
 
 export HOST_IP=$(oc get -o jsonpath='{.status.hostIP}' pod ${POD})
@@ -147,7 +147,7 @@ export NODE=$(oc get -o wide nodes | grep ${HOST_IP} | awk '{print $1}')
 
 ### Find the qemu-kvm PID of the process running the VM on the OCP node
 
-```console
+```bash
 export PID=$(oc debug node/${NODE} -q -- chroot /host ps -eaf | grep "guest=cluster-vms_test-syslog-server" | awk '{print $2}')
 ```
 
@@ -159,7 +159,7 @@ export PID=$(oc debug node/${NODE} -q -- chroot /host ps -eaf | grep "guest=clus
 - If dnf does not work inside the toolbox container, an alternate method to install numactl and numactl-libs will need to be used
 
 ####  Deploy the toolbox container
-```console
+```bash
 yq --arg node "${NODE}" '.spec.nodeName = $node' toolbox-pod.yaml | oc create -f -
 
 oc wait --for=condition=ready pod/host-debug-pod --timeout=60s
@@ -167,7 +167,7 @@ oc wait --for=condition=ready pod/host-debug-pod --timeout=60s
 
 - If deploying the toolbox container using the method above cannot be done, a container can be run directly on the OCP node and the packages installed and used from there like this:
 
-```console
+```bash
 oc debug node/${NODE}
 
 chroot /host
@@ -183,7 +183,7 @@ watch -n 1 numastat -c <pid of qemu-kvm>
 
 - Note: procps-ng is also installed because it contains the "watch" command
 
-```console
+```bash
 oc exec -it host-debug-pod -- dnf install -y numactl procps-ng
 
 oc exec -it host-debug-pod -- watch -n 1 numastat -c ${PID}
@@ -194,12 +194,12 @@ oc exec -it host-debug-pod -- watch -n 1 numastat -c ${PID}
 - These are sample benchmarks that can be run inside the virtual machine while watching the qemu-kvm process with numastat using the previous section
 
 - CPU Execution time
-```console
+```bash
 sysbench cpu --cpu-max-prime=20000 --threads=$(nproc) run
 ```
 
 - Memory Throughput
-```console
+```bash
 sysbench memory --memory-block-size=1M --memory-total-size=10G --threads=$(nproc) run
 ```
 
@@ -210,12 +210,12 @@ Watch the Operations per second (ops/sec) and Average Latency. When the VM is st
 - Note: Since numactl does not exist on the OpenShift nodes, one of the methods describe above for deploying the toolbox container and installing the numactl/numactl-libs must be used. Then the commands below can be run on the nodes.
 
 #### View NUMA layout on the physical server
-```console
+```bash
 numactl --hardware   # Node 0 == Disabled. If you see Node 0 and Node 1 that usually means enabled
 ```
 
 #### View CPU to NUMA Node mapping on the physical server
-```console
+```bash
 lscpu | grep -i numa
 ```
 
@@ -224,7 +224,7 @@ lscpu | grep -i numa
 - The most dramatic difference between a single-node schedule and a "split" schedule is memory access speed. Use Intel Memory Latency Checker (MLC) or PCM. If you want a native RHEL tool, use numademo
 
 - Run a memory bandwidth test across nodes
-```console
+```bash
 numademo -e 128M
 ```
 

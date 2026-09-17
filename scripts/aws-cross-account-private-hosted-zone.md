@@ -4,7 +4,7 @@
 
 - The owner of the PHZ must authorize the VPC in Account B to associate with it.
 
-```console
+```bash
 aws route53 create-vpc-association-authorization --hosted-zone-id <Zone-ID> --vpc VPCRegion=<Region>,VPCId=<VPC-ID-from-Account-B>
 ```
 
@@ -12,7 +12,7 @@ aws route53 create-vpc-association-authorization --hosted-zone-id <Zone-ID> --vp
 
 - Run this command from Account B to complete the link.
 
-```console
+```bash
 aws route53 associate-vpc-with-hosted-zone --hosted-zone-id <Zone-ID-from-Account-A> --vpc VPCRegion=<Region>,VPCId=<VPC-ID>
 ```
 
@@ -20,7 +20,7 @@ aws route53 associate-vpc-with-hosted-zone --hosted-zone-id <Zone-ID-from-Accoun
 
 - After the association is established, you should remove the authorization for security best practices.
 
-```console
+```bash
 aws route53 delete-vpc-association-authorization --hosted-zone-id <Zone-ID> --vpc VPCRegion=<Region>,VPCId=<VPC-ID-from-Account-B>
 ```
 

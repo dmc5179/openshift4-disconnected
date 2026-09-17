@@ -5,7 +5,7 @@
 - Update the req.conf file to match your system
 
 ## Generate the CSR
-```console
+```bash
 openssl req -new -newkey rsa:4096 -nodes -keyout ingress.key -out ingress.csr -config req.conf
 ```
 
@@ -17,7 +17,7 @@ openssl req -new -newkey rsa:4096 -nodes -keyout ingress.key -out ingress.csr -c
 
 - Replacing the ingress router certificat
 
-```console
+```bash
 FULL_CHAIN_PEM="/path/to/fullchain.pem"
 KEY_PEM="/path/to/server/cert/key.pem"
 
@@ -29,7 +29,7 @@ oc patch ingresscontroller default -n openshift-ingress-operator --type=merge --
 
 - Replacing the API certificate
 
-```console
+```bash
 FULL_CHAIN_PEM="/path/to/fullchain.pem"
 KEY_PEM="/path/to/server/cert/key.pem"
 

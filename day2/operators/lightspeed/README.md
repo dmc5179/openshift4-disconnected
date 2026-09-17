@@ -8,7 +8,7 @@
 ## Install OpenShift lightspeed operator from the operator hub
 
 ## Create kube secret with API creds to the model. Even fake creds
-```
+```bash
 oc create -f ols-kubesec.yaml
 ```
 
@@ -16,6 +16,6 @@ oc create -f ols-kubesec.yaml
 
 - ols-config.yaml contains settings for the Model's API URL and type along with resource usage for OLS
 
-```
+```bash
 oc create -f ols-config.yaml
 ```

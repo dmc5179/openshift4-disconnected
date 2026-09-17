@@ -1,26 +1,26 @@
 # Migrating podman containers to OpenShift
 
 ## Generate OpenShift deployment yaml from a podman container or podman pod
-```console
+```bash
 podman generate kube --service --type deployment --replicas 1 --filename ocp-deployment.yaml <container ID or pod ID>
 ```
 
 ### If the podman container or pod has a podman volume, generate yaml for the volume
 
 Note: This does not actually copy the volume or its data. Only generate yaml
-```console
+```bash
 podman kube generate volumeName
 ```
 
 ## Exporting a podman volume into OpenShift storage
 
 ### Export podman volume data
-```console
+```bash
 podman volume export my_local_volume --output my_volume_data.tar
 ```
 
 ### Create a volume in OpenShift
-```console
+```bash
 
 oc create -f
 
@@ -38,22 +38,22 @@ spec:
 ```
 
 ### Deploy a temporary container with the OCP volume attached
-```console
+```bash
 oc run data-loader --image=registry.redhat.io/ubi8/ubi --restart=Never --command -- sleep infinity
 oc volume pod/data-loader --add --name=volume-mount --claim-name=podman-pvc --mount-path=/data
 ```
 
 ### Copy the data into the OCP volume
-```console
+```bash
 oc rsync my_volume_data.tar data-loader:/data/my_volume_data.tar
 ```
 
 ### Extract the data inside the OCP volume
-```console
+```bash
 oc exec data-loader -- tar -xf /data/my_volume_data.tar -C /data
 ```
 
 ### Remove the temporary pod
-```console
+```bash
 oc delete pod data-loader
 ```

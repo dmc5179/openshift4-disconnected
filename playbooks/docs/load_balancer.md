@@ -9,6 +9,6 @@
  - [Role Documentation](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/roles/haproxy/README.md)
 
  - Run the Ansible Playbook to install and configure HAProxy
- ```
+ ```bash
  ansible-playbook load_balancer.yaml
  ```

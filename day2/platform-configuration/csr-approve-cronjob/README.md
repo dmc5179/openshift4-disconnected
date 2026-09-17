@@ -1,26 +1,26 @@
 # Cron job to approve pending CSRs
 
-```console
+```bash
 oc adm new-project openshift-cron-jobs
 oc project openshift-cron-jobs
 ```
 
-```console
+```bash
 oc adm policy add-cluster-role-to-user cluster-admin -z default -n openshift-cron-jobs
 ```
 
-```console
+```bash
 oc create -n openshift-cron-jobs -f csr-approve-job.yaml
 ```
 
-```console
+```bash
 oc create -n openshift-cron-jobs job --from=cronjob/ocp-csr-approver-cronjob csr-approve-12345
 ```
 
-```console
+```bash
 oc create -n openshift-cron-jobs -f csr-job-cleanup.yaml
 ```
 
-```console
+```bash
 oc get -n openshift-cron-jobs cronjob
 ```

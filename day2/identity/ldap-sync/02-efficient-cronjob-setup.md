@@ -235,7 +235,7 @@ oc get groups
 
 ## How the Pieces Fit Together
 
-```
+```bash
 augmented-ad-config.yaml        (your single source file)
         │
         ├──► oc create configmap --from-file=sync.yaml=augmented-ad-config.yaml

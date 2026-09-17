@@ -2,7 +2,7 @@
 
 -  The configuration registrySources.allowedRegistries determines the permitted registries that the OpenShift container runtime can access for builds and pods. This configuration setting ensures that all registries other than those specified are blocked. You can set the allowed repositories by applying the following manifest using
 
-```console
+```bash
   oc patch image.config.openshift.io cluster --patch="$(cat ./default-allowed-registries.yaml)" --type=merge
   oc patch configs.samples.operator.openshift.io cluster --type merge --patch '{"spec": {"samplesRegistry": "registry.redhat.io"}}'
 ```

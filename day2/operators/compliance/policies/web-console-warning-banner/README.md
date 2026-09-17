@@ -16,6 +16,6 @@
 Note: This console notification only appears after a user logs into the cluster. It does not appear on the web console splash screen
 Customizing the web console splash screen is done in another config directory in this repository: custom-web-console-splash-screen
 
-```console
+```bash
 oc create -f classification_banner.yaml
 ```

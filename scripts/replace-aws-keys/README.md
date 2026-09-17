@@ -1,7 +1,7 @@
 # Replace AWS API credentials for some cluster deployments
 
 ## How to find CredentialsRequests if needed
-```console
+```bash
 REQUESTS=$(oc get --no-headers=true -n openshift-cloud-credential-operator -o custom-columns=":metadata.name" CredentialsRequest)
 for r in ${REQUESTS}
 do
@@ -17,13 +17,13 @@ done
 ## For Passthrough mode clusters
 
 - Set your AWS vars in your shell like
-```console
+```bash
 export AWS_ACCESS_KEY_ID=""
 export AWS_DEFAULT_REGION="us-east-2"
 export AWS_SECRET_ACCESS_KEY=
 ```
 
 - Run the script
-```console
+```bash
 ./replace-aws-keys.sh
 ```

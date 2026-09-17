@@ -160,13 +160,13 @@ When installing in an emulator you may require an SSH tunnel to reach the web co
 The DNS names need to be configured because the cluster's pages will redirect so using
 IPs directly won't work.
 
-```
+```bash
 ssh -L 127.0.0.2:8443:<IP Address of the https load balancer>:443 -L 127.0.0.2:8080:<IP Address of the https load balancer>:80 ec2-user@proxyhost
 ```
 
 Inside your local /etc/hosts:
 
-```
+```bash
 127.0.0.2 console-openshift-console.apps.<ocp_cluster_name>.<ocp_base_domain> oauth-openshift.apps.<ocp_cluster_name>.<ocp_base_domain>
 ```
 

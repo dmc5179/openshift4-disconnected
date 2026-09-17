@@ -7,7 +7,7 @@
 IMPORTANT: Each oc-mirror mirror-to-disk MUST use its own cache dir. Use a separate port as well if intending to run multiple oc-mirror mirror-to-disk commands at the same time
 
 ### Example that separates into OCP release, redhat operators, and certified operator`
-```console
+```bash
 umask 0022
 
 TOP_DIR=$(pwd)
@@ -31,7 +31,7 @@ oc-mirror --v2 --authfile "${AUTH_FILE}" --cache-dir "${HOME}/.oc-mirror/certifi
 
 ### Example for a single operator
 
-```console
+```bash
 
 umask 0022
 
@@ -48,7 +48,7 @@ oc-mirror --v2 --authfile "${AUTH_FILE}" --cache-dir "${HOME}/.oc-mirror/rhcas-o
 
 - On the enclave side create a directory structure like that replicates the internet connected side like
 
-```console
+```bash
 mkdir openshift/mirror || true
 mkdir redhat-operators/mirror || true
 mkdir certified-operators/mirror || true
@@ -59,7 +59,7 @@ mkdir -p operators/rhacs/mirror || true
 
 - Push the archives to the private registry like
 
-```console
+```bash
 
 umask 0022
 

@@ -2,14 +2,14 @@
 
 ## Clone repo
 
-```console
+```bash
 git clone https://github.com/redhat-developer/che-plugin-registry.git
 ```
 
 ## modify openvsx-sync.json
 
 ## Build the plugin registry container image
-```console
+```bash
 ./build.sh --registry quay.io --organization danclark --tag latest
 ```
 
@@ -18,6 +18,6 @@ git clone https://github.com/redhat-developer/che-plugin-registry.git
 - bring the container and the "patch-cluster.sh" script or the entire git repo
 
 ## Patch the che cluster
-```console
+```bash
 ./patch-cluster.sh
 ```

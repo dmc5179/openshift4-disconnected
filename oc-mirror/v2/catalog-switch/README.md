@@ -1,7 +1,7 @@
 # Catalog switch
 
 ## Here is the current catalog configured for devspaces.
-```
+```bash
 oc get subs -n openshift-operators
 NAME                                                                              PACKAGE                 SOURCE                           CHANNEL
 devspaces                                                                         devspaces               cs-redhat-operator-index-v4-20   stable
@@ -10,7 +10,7 @@ web-terminal                                                                    
 ```
 
 ## Here is a snippet from the devspaces operator before the catalog change
-```
+```yaml
 
 oc describe operator devspaces.openshift-operators
 
@@ -34,7 +34,7 @@ oc describe operator devspaces.openshift-operators
 
 ## Command to change the catalog source for devspaces to redhat-operators:
 
-```
+```yaml
 oc patch subs -n openshift-operators devspaces -p '{"spec":{"source":"redhat-operators"}}' --type=merge
 
 Updated subs
