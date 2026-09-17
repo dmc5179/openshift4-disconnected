@@ -9,7 +9,7 @@ spec:
   selector:
     name: ollama
   ports:
-  - port: 80
+  - port: 11434
     name: http
-    targetPort: http
+    targetPort: 11434
     protocol: TCP

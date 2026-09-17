@@ -4,8 +4,6 @@
 echo "Script is deprecated. See README.md"
 exit 1
 
-
-
 # This script will build an ollama image with models built into it
 # The image can be saved and moved to an offline container registry
 

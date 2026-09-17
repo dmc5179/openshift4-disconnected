@@ -15,9 +15,15 @@ spec:
       labels:
         name: ollama
     spec:
+      #serviceAccountName: ollama-sa
+      #securityContext:
+      #  runAsNonRoot: true
+      #  seccompProfile:
+      #    type: RuntimeDefault
       containers:
       - name: ollama
-        image: quay.io/danclark/ollama:granite-code-8b
+        #image: quay.io/danclark/ollama:granite-code-8b
+        image: quay.io/danclark/ollama:gpt-oss-120b
         env:
         - name: PATH
           value: /usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
@@ -31,9 +37,25 @@ spec:
         - name: http
           containerPort: 11434
           protocol: TCP
+        #securityContext:
+        #  allowPrivilegeEscalation: false
+        #  capabilities:
+        #    drop:
+        #    - ALL
         resources:
           limits:
             nvidia.com/gpu: 1
+            #cpu: "4"
+            #memory: 8Gi
+          requests:
+            cpu: "2"
+            memory: 4Gi
+        #volumeMounts:
+        #- name: ollama-storage
+        #  mountPath: /.ollama
+      #volumes:
+      #- name: ollama-storage
+      #  emptyDir: {} # Or use a persistentVolumeClaim for persistent storage
       tolerations:
       - key: nvidia.com/gpu
         operator: Exists
