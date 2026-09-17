@@ -15,3 +15,26 @@ https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/
 aws efs create-file-system --encrypted --kms-key-id arn:aws:kms:region:account-id:key/your-kms-key-id --performance-mode generalPurpose --throughput-mode bursting
 ```
 
+## Install the AWS EFS CSI Driver Operator
+
+- Install the operator from the OperatorHub/Ecosystem page in the openshift web UI
+
+## Install Cluster CSI Driver
+
+```console
+oc create -f efs-cluster-csi-driver.yaml
+```
+
+## Create EFS Storage Class
+
+```console
+oc create -f efs-sc.yaml
+```
+
+## Deploy a test pod
+
+```console
+oc new-project efs-test-deployment
+oc project efs-test-deployment
+oc create -f efs-test-pod.yaml
+```

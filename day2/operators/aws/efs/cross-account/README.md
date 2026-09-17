@@ -42,6 +42,8 @@ aws configure set output json --profile "${AWS_ACCOUNT_B}"
 
 ## Create IAM stuff
 
+- Use an Admin account with API keys to create these roles
+
 - In running outside of AWS commercial, make sure to change the ARN in the policy json
 
 ```console

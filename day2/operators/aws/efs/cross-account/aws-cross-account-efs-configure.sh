@@ -73,12 +73,12 @@ cat <<EOF > $SCRATCH_DIR/AssumeRolePolicyInAccountB.json
 }
 EOF
 
-ACCOUNT_B_ROLE_ARN=$(aws --profile "${AWS_ACCOUNT_A}" iam create-role \
+ACCOUNT_B_ROLE_ARN=$(aws --profile "${AWS_ACCOUNT_B}" iam create-role \
   --role-name "${ACCOUNT_B_ROLE_NAME}" \
   --assume-role-policy-document file://$SCRATCH_DIR/AssumeRolePolicyInAccountB.json \
   --query "Role.Arn" --output text)
 
-echo $ACCOUNT_B_ROLE_ARN
+echo "Account B Role ARN: $ACCOUNT_B_ROLE_ARN"
 
 cat << EOF > $SCRATCH_DIR/EfsPolicyInAccountB.json
 {
@@ -113,12 +113,13 @@ cat << EOF > $SCRATCH_DIR/EfsPolicyInAccountB.json
 }
 EOF
 
-ACCOUNT_B_POLICY_ARN=$(aws iam create-policy --policy-name "${CLUSTER_NAME}-efs-csi-policy" \
+ACCOUNT_B_POLICY_ARN=$(aws --profile "${AWS_ACCOUNT_B}" iam create-policy --policy-name "${CLUSTER_NAME}-efs-csi-policy" \
    --policy-document file://$SCRATCH_DIR/EfsPolicyInAccountB.json \
-   --query 'Policy.Arn' --output text) \
-&& echo ${ACCOUNT_B_POLICY_ARN}
+   --query 'Policy.Arn' --output text)
 
-aws iam attach-role-policy \
+echo "Account B Policy ARN: ${ACCOUNT_B_POLICY_ARN}"
+
+aws --profile "${AWS_ACCOUNT_B}" iam attach-role-policy \
    --role-name "${ACCOUNT_B_ROLE_NAME}" \
    --policy-arn "${ACCOUNT_B_POLICY_ARN}"
 
@@ -144,11 +145,11 @@ EOF
 EFS_CLIENT_FULL_ACCESS_BUILTIN_POLICY_ARN=arn:${AWS_ARN}:iam::aws:policy/AmazonElasticFileSystemClientFullAccess
 declare -A ROLE_SEEN
 for NODE in $(oc get nodes --selector="${NODE_SELECTOR}" -o jsonpath='{.items[*].metadata.name}'); do
-    INSTANCE_PROFILE=$(aws ec2 describe-instances \
+    INSTANCE_PROFILE=$(aws --profile "${AWS_ACCOUNT_A}" ec2 describe-instances \
         --filters "Name=private-dns-name,Values=${NODE}" \
         --query 'Reservations[].Instances[].IamInstanceProfile.Arn' \
         --output text | awk -F'/' '{print $NF}' | xargs)
-    MASTER_ROLE_ARN=$(aws iam get-instance-profile \
+    MASTER_ROLE_ARN=$(aws --profile "${AWS_ACCOUNT_A}" iam get-instance-profile \
         --instance-profile-name "${INSTANCE_PROFILE}" \
         --query 'InstanceProfile.Roles[0].Arn' \
         --output text | xargs)
@@ -160,7 +161,7 @@ for NODE in $(oc get nodes --selector="${NODE_SELECTOR}" -o jsonpath='{.items[*]
     fi
     ROLE_SEEN["$MASTER_ROLE_NAME"]=1
     echo "Assigning policy ${EFS_CLIENT_FULL_ACCESS_BUILTIN_POLICY_ARN} to role ${MASTER_ROLE_NAME}"
-    aws iam attach-role-policy --role-name "${MASTER_ROLE_NAME}" --policy-arn "${EFS_CLIENT_FULL_ACCESS_BUILTIN_POLICY_ARN}"
+    aws --profile "${AWS_ACCOUNT_A}" iam attach-role-policy --role-name "${MASTER_ROLE_NAME}" --policy-arn "${EFS_CLIENT_FULL_ACCESS_BUILTIN_POLICY_ARN}"
 done
 
 # CHOICES! Unclear if we do both of these when non-sts mode. Docs update?
@@ -168,16 +169,17 @@ done
 # NON-STS Mode
 EFS_CSI_DRIVER_OPERATOR_USER=$(oc -n openshift-cloud-credential-operator get credentialsrequest/openshift-aws-efs-csi-driver -o json | jq -r '.status.providerStatus.user')
 
-aws iam put-user-policy \
+aws --profile "${AWS_ACCOUNT_A}" iam put-user-policy \
     --user-name "${EFS_CSI_DRIVER_OPERATOR_USER}"  \
     --policy-name efs-cross-account-inline-policy \
     --policy-document file://$SCRATCH_DIR/AssumeRoleInlinePolicyPolicyInAccountA.json
 
 # STS-Mode
 
-EFS_CSI_DRIVER_OPERATOR_ROLE=$(oc -n ${CSI_DRIVER_NAMESPACE} get secret/aws-efs-cloud-credentials -o jsonpath='{.data.credentials}' | base64 -d | grep role_arn | cut -d'/' -f2) && echo ${EFS_CSI_DRIVER_OPERATOR_ROLE}
+EFS_CSI_DRIVER_OPERATOR_ROLE=$(oc -n ${CSI_DRIVER_NAMESPACE} get secret/aws-efs-cloud-credentials -o jsonpath='{.data.credentials}' | base64 -d | grep role_arn | cut -d'/' -f2)
+echo "EFS CSI Driver Operator Role Name: ${EFS_CSI_DRIVER_OPERATOR_ROLE}"
 
-aws iam put-role-policy \
+aws --profile "${AWS_ACCOUNT_A}" iam put-role-policy \
    --role-name "${EFS_CSI_DRIVER_OPERATOR_ROLE}"  \
    --policy-name efs-cross-account-inline-policy \
    --policy-document file://$SCRATCH_DIR/AssumeRoleInlinePolicyPolicyInAccountA.json
@@ -186,34 +188,34 @@ aws iam put-role-policy \
 # VPC Peering
 
 export AWS_DEFAULT_PROFILE=${AWS_ACCOUNT_A}
-PEER_REQUEST_ID=$(aws ec2 create-vpc-peering-connection --vpc-id "${AWS_ACCOUNT_A_VPC_ID}" --peer-vpc-id "${AWS_ACCOUNT_B_VPC_ID}" --peer-owner-id "${AWS_ACCOUNT_B_ID}" --query VpcPeeringConnection.VpcPeeringConnectionId --output text)
+PEER_REQUEST_ID=$(aws --profile "${AWS_ACCOUNT_A}" ec2 create-vpc-peering-connection --vpc-id "${AWS_ACCOUNT_A_VPC_ID}" --peer-vpc-id "${AWS_ACCOUNT_B_VPC_ID}" --peer-owner-id "${AWS_ACCOUNT_B_ID}" --query VpcPeeringConnection.VpcPeeringConnectionId --output text)
 
 export AWS_DEFAULT_PROFILE=${AWS_ACCOUNT_B}
-aws ec2 accept-vpc-peering-connection --vpc-peering-connection-id "${PEER_REQUEST_ID}"
+aws --profile "${AWS_ACCOUNT_B}" ec2 accept-vpc-peering-connection --vpc-peering-connection-id "${PEER_REQUEST_ID}"
 
 export AWS_DEFAULT_PROFILE=${AWS_ACCOUNT_A}
 for NODE in $(oc get nodes --selector=node-role.kubernetes.io/worker | tail -n +2 | awk '{print $1}')
 do
-    SUBNET=$(aws ec2 describe-instances --filters "Name=private-dns-name,Values=$NODE" --query 'Reservations[*].Instances[*].NetworkInterfaces[*].SubnetId' | jq -r '.[0][0][0]')
+    SUBNET=$(aws --profile "${AWS_ACCOUNT_A}" ec2 describe-instances --filters "Name=private-dns-name,Values=$NODE" --query 'Reservations[*].Instances[*].NetworkInterfaces[*].SubnetId' | jq -r '.[0][0][0]')
     echo SUBNET is ${SUBNET}
-    ROUTE_TABLE_ID=$(aws ec2 describe-route-tables --filters "Name=association.subnet-id,Values=${SUBNET}" --query 'RouteTables[*].RouteTableId' | jq -r '.[0]')
+    ROUTE_TABLE_ID=$(aws --profile "${AWS_ACCOUNT_A}" ec2 describe-route-tables --filters "Name=association.subnet-id,Values=${SUBNET}" --query 'RouteTables[*].RouteTableId' | jq -r '.[0]')
     echo Route table ID is $ROUTE_TABLE_ID
-    aws ec2 create-route --route-table-id ${ROUTE_TABLE_ID} --destination-cidr-block ${AWS_ACCOUNT_B_VPC_CIDR} --vpc-peering-connection-id ${PEER_REQUEST_ID}
+    aws --profile "${AWS_ACCOUNT_A}" ec2 create-route --route-table-id ${ROUTE_TABLE_ID} --destination-cidr-block ${AWS_ACCOUNT_B_VPC_CIDR} --vpc-peering-connection-id ${PEER_REQUEST_ID}
 done
 
 export AWS_DEFAULT_PROFILE=${AWS_ACCOUNT_B}
-for ROUTE_TABLE_ID in $(aws ec2 describe-route-tables   --filters "Name=vpc-id,Values=${AWS_ACCOUNT_B_VPC_ID}"   --query "RouteTables[].RouteTableId" | jq -r '.[]')
+for ROUTE_TABLE_ID in $(aws --profile "${AWS_ACCOUNT_B}" ec2 describe-route-tables   --filters "Name=vpc-id,Values=${AWS_ACCOUNT_B_VPC_ID}"   --query "RouteTables[].RouteTableId" | jq -r '.[]')
 do
     echo Route table ID is $ROUTE_TABLE_ID
-    aws ec2 create-route --route-table-id ${ROUTE_TABLE_ID} --destination-cidr-block ${AWS_ACCOUNT_A_VPC_CIDR} --vpc-peering-connection-id ${PEER_REQUEST_ID}
+    aws --profile "${AWS_ACCOUNT_B}" ec2 create-route --route-table-id ${ROUTE_TABLE_ID} --destination-cidr-block ${AWS_ACCOUNT_A_VPC_CIDR} --vpc-peering-connection-id ${PEER_REQUEST_ID}
 done
 
 # Configure Security Groups
 
 export AWS_DEFAULT_PROFILE=${AWS_ACCOUNT_B}
 
-SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --filters Name=vpc-id,Values="${AWS_ACCOUNT_B_VPC_ID}" | jq -r '.SecurityGroups[].GroupId')
-aws ec2 authorize-security-group-ingress \
+SECURITY_GROUP_ID=$(aws --profile "${AWS_ACCOUNT_B}" ec2 describe-security-groups --filters Name=vpc-id,Values="${AWS_ACCOUNT_B_VPC_ID}" | jq -r '.SecurityGroups[].GroupId')
+aws --profile "${AWS_ACCOUNT_B}" ec2 authorize-security-group-ingress \
  --group-id "${SECURITY_GROUP_ID}" \
  --protocol tcp \
  --port 2049 \
@@ -226,13 +228,13 @@ export AWS_DEFAULT_PROFILE=${AWS_ACCOUNT_B}
 # This creates a new EFS file system.....
 if [ -z ${CROSS_ACCOUNT_FS_ID} ]
 then 
-  CROSS_ACCOUNT_FS_ID=$(aws efs create-file-system --creation-token efs-token-1 \
+  CROSS_ACCOUNT_FS_ID=$(aws --profile "${AWS_ACCOUNT_B}" efs create-file-system --creation-token efs-token-1 \
   --region ${AWS_REGION} \
   --encrypted | jq -r '.FileSystemId')
 fi
 echo "Cross account FS ID: $CROSS_ACCOUNT_FS_ID"
 
-for SUBNET in $(aws ec2 describe-subnets \
+for SUBNET in $(aws --profile "${AWS_ACCOUNT_B}" ec2 describe-subnets \
   --filters "Name=vpc-id,Values=${AWS_ACCOUNT_B_VPC_ID}" \
   --region ${AWS_REGION} \
   | jq -r '.Subnets.[].SubnetId'); do \
