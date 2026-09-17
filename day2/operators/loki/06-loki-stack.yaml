@@ -20,7 +20,7 @@ spec:
     global:
       retention:
         days: 20
-    tenants:  1 
+    tenants:
       application:
         retention:
           days: 5
@@ -40,10 +40,11 @@ spec:
   storage:
     schemas:
     - version: v13
-      effectiveDate: "2025-09-16" #Set to yesterday's date to take effect
+      effectiveDate: "2025-09-16" #Set to yesterday's date to take effect on initial deployment.
     secret:
       name: logging-loki-s3 
       type: s3 
+      credentialMode:  # static, token, token-cco
   storageClassName: gp3-csi # block storage
   tenants:
     mode: openshift-logging
