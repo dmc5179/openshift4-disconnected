@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: kube-api-audit-log-reader
+  namespace: default # Choose an appropriate namespace, e.g., openshift-operators-redhat
+  labels:
+    app: audit-log-reader
+spec:
+  selector:
+    matchLabels:
+      app: audit-log-reader
+  template:
+    metadata:
+      labels:
+        app: audit-log-reader
+    spec:
+      # Target only the control plane nodes (where the kube-apiserver runs)
+      nodeSelector:
+        node-role.kubernetes.io/master: "" 
+        # For OpenShift 4.x, the role is typically 'control-plane' or 'master'
+        # Check your cluster with `oc get nodes --show-labels`
+      tolerations:
+      # Allow the pod to be scheduled on the control plane nodes
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - key: node.kubernetes.io/unreachable
+        operator: Exists
+        effect: NoExecute
+        tolerationSeconds: 5
+      - key: node.kubernetes.io/not-ready
+        operator: Exists
+        effect: NoExecute
+        tolerationSeconds: 5
+      serviceAccountName: default # Ensure the service account has appropriate permissions if needed
+      containers:
+      - name: log-reader-container
+        # Use a minimal image with the `tail` command
+        image: quay.io/centos/centos:latest 
+        # Command to continuously read the main audit log file
+        command: ["/bin/sh", "-c"]
+        args: ["tail -F /host/var/log/kube-apiserver/audit.log"]  # use capital F due to rotation
+        volumeMounts:
+        # Mount the host directory containing the audit logs
+        - name: audit-log-volume
+          mountPath: /host/var/log/kube-apiserver
+          readOnly: true
+      volumes:
+      - name: audit-log-volume
+        hostPath:
+          # This is the expected path on the OpenShift control plane node
+          path: /var/log/kube-apiserver 
+          type: DirectoryOrCreate
