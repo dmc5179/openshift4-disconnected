@@ -1,0 +1,194 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS CloudFormation Template: Deploys 1 Public Subnet (with NAT GW) and 3 Private Subnets into an EXISTING VPC'
+
+Parameters:
+  ExistingVPCId:
+    Description: 'The ID of the existing VPC where these subnets will be deployed.'
+    Type: 'AWS::EC2::VPC::Id'
+
+  PublicSubnetCIDR:
+    Description: 'CIDR block for the new Public Subnet'
+    Type: String
+    Default: '10.0.0.0/24'
+
+  PrivateSubnet1CIDR:
+    Description: 'CIDR block for Private Subnet 1'
+    Type: String
+    Default: '10.0.1.0/24'
+
+  PrivateSubnet2CIDR:
+    Description: 'CIDR block for Private Subnet 2'
+    Type: String
+    Default: '10.0.2.0/24'
+
+  PrivateSubnet3CIDR:
+    Description: 'CIDR block for Private Subnet 3'
+    Type: String
+    Default: '10.0.3.0/24'
+
+  SSHLocation:
+    Description: 'The IP address range allowed to SSH into the public subnet (e.g., your home IP).'
+    Type: String
+    MinLength: '9'
+    MaxLength: '18'
+    Default: '0.0.0.0/0'
+    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
+    ConstraintDescription: 'Must be a valid IP CIDR range of the form x.x.x.x/x.'
+
+Resources:
+  # ==========================================
+  # 1. SUBNETS (Bound to Existing VPC)
+  # ==========================================
+  PublicSubnet:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref ExistingVPCId
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: !Ref PublicSubnetCIDR
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-Public-Subnet'
+
+  PrivateSubnet1:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref ExistingVPCId
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: !Ref PrivateSubnet1CIDR
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-Private-Subnet-1'
+
+  PrivateSubnet2:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref ExistingVPCId
+      AvailabilityZone: !Select [ 1, !GetAZs '' ]
+      CidrBlock: !Ref PrivateSubnet2CIDR
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-Private-Subnet-2'
+
+  PrivateSubnet3:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref ExistingVPCId
+      AvailabilityZone: !Select [ 2, !GetAZs '' ]
+      CidrBlock: !Ref PrivateSubnet3CIDR
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-Private-Subnet-3'
+
+  # ==========================================
+  # 2. NAT GATEWAY SETUP
+  # ==========================================
+  NatEIP:
+    Type: 'AWS::EC2::EIP'
+    Properties:
+      Domain: vpc
+
+  NatGateway:
+    Type: 'AWS::EC2::NatGateway'
+    Properties:
+      AllocationId: !GetAtt NatEIP.AllocationId
+      SubnetId: !Ref PublicSubnet
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-NAT-GW'
+
+  # ==========================================
+  # 3. ROUTE TABLES & ROUTES
+  # ==========================================
+  PublicRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref ExistingVPCId
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-Public-RT'
+
+  # NOTE: This assumes your existing VPC already has an Internet Gateway.
+  # You will manually need to add a 0.0.0.0/0 route to your existing IGW 
+  # in the AWS Console for this Public Route Table, or pass the IGW ID as a parameter.
+
+  PublicSubnetAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PublicRouteTable
+
+  PrivateRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref ExistingVPCId
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-Private-RT'
+
+  PrivateRouteToNat:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref NatGateway
+
+  PrivateSubnet1Association:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PrivateSubnet1
+      RouteTableId: !Ref PrivateRouteTable
+
+  PrivateSubnet2Association:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PrivateSubnet2
+      RouteTableId: !Ref PrivateRouteTable
+
+  PrivateSubnet3Association:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PrivateSubnet3
+      RouteTableId: !Ref PrivateRouteTable
+
+  # ==========================================
+  # 4. SECURITY GROUPS (Bound to Existing VPC)
+  # ==========================================
+  PublicBastionSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Allow SSH traffic from the internet to Public Subnet resources'
+      VpcId: !Ref ExistingVPCId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref SSHLocation
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-Public-Bastion-SG'
+
+  PrivateSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Allow SSH ONLY from the Public Bastion Security Group'
+      VpcId: !Ref ExistingVPCId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          SourceSecurityGroupId: !Ref PublicBastionSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-Private-SG'
+
+Outputs:
+  VPCId:
+    Value: !Ref ExistingVPCId
+  PublicSubnetId:
+    Value: !Ref PublicSubnet
+  PrivateSGId:
+    Value: !Ref PrivateSecurityGroup
