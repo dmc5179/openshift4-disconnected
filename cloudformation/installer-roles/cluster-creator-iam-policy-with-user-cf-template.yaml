@@ -194,7 +194,7 @@ Resources:
           - "iam:ListUserPolicies"
           - "s3:DeleteObject"
           - "s3:ListBucketVersions"
-          - "tag:GetResources" # everything after has been added
+          - "tag:GetResources" # everything after was missing from docs
           - "ec2:AllocateAddress"
           - "ec2:AssociateAddress"
           - "ec2:AssociateDhcpOptions"

@@ -40,7 +40,6 @@ Resources:
           Action:
           - "sts:AssumeRole"
       Policies:
-
       - PolicyName: "openshift-installer-policy"
         PolicyDocument:
           Version: "2012-10-17"
