@@ -29,8 +29,6 @@ Note: The AWS EBS CSI Storage driver is not directly supported by Red Hat.
 ## Installing the Image Content Source Policy for Air-gap and disconnected OpenShift clusterversion
 
 
-
-
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
     - hosts: servers

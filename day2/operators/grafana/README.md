@@ -1,6 +1,5 @@
 # Possible multi team grafana
 
-
     auth.generic_oauth:
       enabled: "true"
       name: "OpenShift Login"
@@ -17,8 +16,6 @@
       
       # 2. Map OpenShift Roles/Groups inside those assigned Organizations
       role_attribute_path: "contains(groups, 'ocp-admin-group') && 'Admin' || contains(groups, 'ocp-leads-group') && 'Editor' || 'Viewer'"
-
-
 
 The role_attribute_path cannot be used to assign users directly to Grafana Teams or individual Dashboards. By architectural design, Grafana’s OAuth role_attribute_path engine is strictly restricted to evaluating and assigning the three global Organization Roles: Admin, Editor, or Viewer. ￼
 However, you can achieve your goal using a powerful, native OSS architectural alternative: Dynamic Multi-Organization Routing via org_attribute_path.

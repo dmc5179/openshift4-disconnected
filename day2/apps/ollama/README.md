@@ -2,12 +2,12 @@
 
 ## Build ollama container with embedded model
 
-```code
+```bash
 MODEL="gemma3-12b"
 podman build --build-arg MODEL=${MODEL} -t quay.io/danclark/ollama:${MODEL} -f Containerfile .
 #nohup podman build --build-arg MODEL=${MODEL} -t quay.io/danclark/ollama:${MODEL} -f Containerfile . > build.log 2>&1 &   # Detach from terminal if needed
 ```
-# Depolying ollama on OpenShift
+# Deploying ollama on OpenShift
 
 - ollama runs as root:
 

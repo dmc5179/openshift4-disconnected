@@ -10,7 +10,7 @@
   - [License](#License)
   - [Contributors](#Contributors)
 
-### Purpose
+## Purpose
 
 This repository contains scripts, ansible roles, and other toosl for deploying an OpenShift 4 cluster in an air-gapped environment.
 
@@ -21,11 +21,11 @@ Most things will still work on RHEL 7 but not all.
 
 These tools can also be used in semi-disconnected environments which can be reached through a proxy host from the public internet.
 
-### Requirements
+## Requirements
 
-### Dependencies
+## Dependencies
 
-### Internet Connected Side
+## Internet Connected Side
 
   This section covers getting started on the internet connected helper node. This is where all tools and images will be downloaded to
 
@@ -60,16 +60,11 @@ install_ansible_roles.yaml
 
 
 install_helm.yaml
-
-
 install_openvswitch.yaml
 install_operatorhub.yaml
 install_pip.yaml
 install_roles.yaml
 install_tools.yaml
-
-
-
 mirror_helm.yaml
 mirror_ocp_images.yaml
 mirror_operatorhub.yaml
@@ -82,10 +77,7 @@ pull_roles.yaml
 pull_tools.yaml
 push_additional_images.yaml
 
-
-
-
-### Air Gap Side Infrastructure Prep/Setup
+## Air Gap Side Infrastructure Prep/Setup
 
   This section covers setting up the infrastructure in the air gap environment and install the OpenShift 4 cluster
 
@@ -131,22 +123,13 @@ baremetal_provisioner.yaml
 - pull_tools.yaml
 - push_additional_images.yaml
 
-
-
-
-
-
-
-
-
-
  - [Provision RPM Repo Mirror](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/mirror_rpms.md)
 
  - [Install Tools](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/mirror_tools.md)
 
  - [Post Install](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/post-install.md)
 
-### AWS Specific Instructions
+## AWS Specific Instructions
 
  - [Configure AWS Infrastructure Variable File](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/vars-aws.md) (for AWS only)
 
@@ -154,24 +137,24 @@ baremetal_provisioner.yaml
  - aws_ebs_csi.yaml
  - install_aws.yaml
 
-### VMWare Specific Instructions
+## VMWare Specific Instructions
 
  - powerdown_esxi.yaml
  - poweron_esxi.yaml
  - install_esxi.yaml
 
-### Bare Metal Specific Instructions
+## Bare Metal Specific Instructions
 
-### Storage Documentation
+## Storage Documentation
 
  - [NFS and Local Storage](https://github.com/dmc5179/openshift4-disconnected/blob/master/playbooks/docs/storage.md)
 
-### Check Playbooks
+## Check Playbooks
 
   - check_dns.yaml
   - check_loadbalancer.yaml
 
-### Miscellaneous
+## Miscellaneous
 
 When installing in an emulator you may require an SSH tunnel to reach the web console.
 The DNS names need to be configured because the cluster's pages will redirect so using
@@ -189,9 +172,8 @@ Inside your local /etc/hosts:
 
 Now browse to https://console-openshift-console.apps.<ocp_cluster_name>.<ocp_base_domain>
 
-### License
+## License
 
-
-### Contributors
+## Contributors
 
 - [Dan Clark](https://github.com/dmc5179/) (maintainer)

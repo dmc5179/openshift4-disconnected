@@ -156,7 +156,7 @@ oc patch checluster devspaces -n openshift-devspaces --type='json' -p='[
 oc get checluster/devspaces -n devspaces -o jsonpath='{.spec.devEnvironments.maxNumberOfWorkspacesPerUser}'
 ```
 
-- Get the number of workspaces a user can have, defualt is 1.  If there no value is returned then 1 running devsapce per user
+- Get the number of workspaces a user can have, default is 1.  If there no value is returned then 1 running devspace per user
 ```console
 oc get checluster/devspaces -n devspaces -o jsonpath='{.spec.devEnvironments.maxNumberOfRunningWorkspacesPerUser}'
 ```
