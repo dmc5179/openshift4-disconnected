@@ -1,0 +1,31 @@
+apiVersion: nvidia.com/v1alpha1
+kind: NVIDIADriver
+metadata:
+  name: demo-gold
+spec:
+  driverType: gpu
+  env: []
+  image: driver
+  imagePullPolicy: IfNotPresent
+  imagePullSecrets: []
+  manager: {}
+  nodeSelector:
+    driver.config: "gold"
+  repository: nvcr.io/nvidia
+  version: "535.104.12"
+---
+apiVersion: nvidia.com/v1alpha1
+kind: NVIDIADriver
+metadata:
+  name: demo-silver
+spec:
+  driverType: gpu
+  env: []
+  image: driver
+  imagePullPolicy: IfNotPresent
+  imagePullSecrets: []
+  manager: {}
+  nodeSelector:
+    driver.config: "silver"
+  repository: nvcr.io/nvidia
+  version: "470.141.10"

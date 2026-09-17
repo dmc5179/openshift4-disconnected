@@ -1,0 +1,19 @@
+variant: openshift
+version: 4.21.0 # Match your OpenShift version
+metadata:
+  name: 99-worker-disable-nouveau
+  labels:
+    machineconfiguration.openshift.io/role: worker
+openshift:
+  kernel_arguments:
+    - rd.driver.blacklist=nouveau
+    - nouveau.modeset=0
+#storage:
+#  files:
+#    - path: /etc/modprobe.d/blacklist-nouveau.conf
+#      mode: 0644
+#      overwrite: true
+#      contents:
+#        inline: |
+#          blacklist nouveau
+#          options nouveau modeset=0

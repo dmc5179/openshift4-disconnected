@@ -1,0 +1,35 @@
+apiVersion: nvidia.com/v1alpha1
+kind: NVIDIADriver
+metadata:
+  name: demo-gold
+spec:
+  driverType: gpu
+  gdrcopy:
+    enabled: false
+    repository: nvcr.io/nvidia/cloud-native
+    image: gdrdrv
+    version: v2.4.1
+    imagePullPolicy: IfNotPresent
+    imagePullSecrets: []
+    env: []
+    args: []
+  image: driver
+  imagePullPolicy: IfNotPresent
+  imagePullSecrets: []
+  kernelModuleType: auto
+  manager: {}
+  nodeSelector:
+    driver.config: "gold"
+  rdma:
+    enabled: false
+    useHostMofed: false
+  gds:
+    enabled: false
+  repository: nvcr.io/nvidia
+  startupProbe:
+    failureThreshold: 120
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 60
+  usePrecompiled: false
+  version: 535.104.12
