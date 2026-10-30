@@ -1,7 +1,0 @@
----
-# tasks file for vm_patching
-- name: Running sudo dnf update
-  ansible.builtin.dnf: # noqa: package-latest
-    name: "{{ vm_patching_package_list | default('*') }}"
-    state: latest
-...

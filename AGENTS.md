@@ -99,10 +99,13 @@ priority of items 2, 4 and 5.
        hostnames (`ip-10-0-35-196...compute.internal`). Keep one small, scrubbed
        example of each (IDMS/ITMS + CatalogSource) and delete the rest.
        **Done 2026-10-30:** kept one scrubbed example per resource type in `oc-mirror/v2/sample-output/` and `oc-mirror/v1/sequential-runs/sample-output/` (with READMEs); deleted the raw workspaces. `pinned-ocp-release.sh` and `merge-icsp.sh` now take paths as arguments.
-4. [ ] **Vendored MTV collection.** `day2/operators/mtv/openshift_virtualization_migration-main/`
+4. [x] **Vendored MTV collection.** `day2/operators/mtv/openshift_virtualization_migration-main/`
        is 375 files copied from `gitlab.consulting.redhat.com` (internal) under GPLv3.
        Confirm it may be published publicly. Then replace it with a README that links
        to the upstream source and documents only what's specific to this repo.
+       **Done 2026-10-30:** deleted the 375-file copy (v1.21.2). `day2/operators/mtv/README.md`
+       now links to the public upstream https://github.com/redhat-cop/openshift_virtualization_migration
+       (1.25.0) and covers git and air-gapped installs. Not on public Galaxy as of this date.
 5. [x] **No top-level LICENSE.** The README has an empty `## License` section. People
        can't legally reuse or contribute to a public repo with 18 forks, and the
        vendored GPLv3 code (item 4) complicates the choice. Pick a license (Apache-2.0
@@ -111,8 +114,8 @@ priority of items 2, 4 and 5.
 6. [ ] **Docs are out of date.** The top-level `README.md` still says "tested on 4.3,
        4.4, 4.5", only covers the Ansible workflow, and links into `playbooks/docs`.
        Rewrite it as an index of `day0/`, `day2/`, `oc-mirror/`, `scripts/` and
-       `cloudformation/`. Also add a README to the 13 `day2/operators/*` dirs without
-       one: aws, gpu, ingress, metallb, mtv, nmstate, rhacm, rhads, rhcl, rhoai, rhoso,
+       `cloudformation/`. Also add a README to the 12 `day2/operators/*` dirs without
+       one: aws, gpu, ingress, metallb, nmstate, rhacm, rhads, rhcl, rhoai, rhoso,
        sriov, validated-patterns.
 7. [ ] **Environment-specific values in committed config.** `bastion.danclark.io`,
        `ip-10-0-35-196...compute.internal` and similar hostnames appear in
