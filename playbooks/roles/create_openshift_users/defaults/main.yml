@@ -3,7 +3,7 @@
 mirror_base: '/tmp'
 
 openshift_cluster_admin_username: 'fakeadmin'
-openshift_cluster_admin_password: 'redhat1'
+openshift_cluster_admin_password: 'CHANGEME'
 
 # This will get set by a check on the user
 pip_args: ''
@@ -16,4 +16,4 @@ kube_ssl_enabled: false
 
 openshift_users:
   - name: fakeuser
-    password: 'redhat2020'
+    password: 'CHANGEME'

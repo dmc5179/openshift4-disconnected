@@ -8,6 +8,6 @@
     domain_mode: Win2012R2
     domain_netbios_name: ANSIBLE
     forest_mode: Win2012R2
-    safe_mode_password: password123!
+    safe_mode_password: CHANGEME
     sysvol_path: C:\Windows\SYSVOL
   register: domain_install
