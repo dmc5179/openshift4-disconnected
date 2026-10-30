@@ -157,9 +157,10 @@ Ordered by priority. The repo is **public** (44 stars, 18 forks).
        at the conventions in this file.
 
 Smaller items:
-- [ ] Two YAML files don't parse: `docs/install-config-vmware-ipi.yaml:29` and
-      `oc-mirror/v2/samples/imageset-config-upgrades.yaml:6`.
-- [ ] `scripts/get-ocp-ca.sh` shebang typo (`#!/bin/bahs`); `snowball.sh` misuses `scp -i`/`ssh -i`.
+- [x] 2026-10-30: fixed the two YAML files that didn't parse
+      (`docs/install-config-vmware-ipi.yaml`, `oc-mirror/v2/samples/imageset-config-upgrades.yaml`)
+      and the `#!/bin/bahs` typo in `scripts/get-ocp-ca.sh`.
+- [ ] `scripts/installer/aws/snowball/snowball.sh` misuses `scp -i`/`ssh -i`.
 - [ ] Enable GitHub secret scanning and push protection: repo Settings -> Code security
       (both currently disabled), or
       `gh api -X PATCH repos/dmc5179/openshift4-disconnected -F 'security_and_analysis[secret_scanning][status]=enabled' -F 'security_and_analysis[secret_scanning_push_protection][status]=enabled'`.
@@ -167,7 +168,10 @@ Smaller items:
       replaced with `CHANGEME`. Lab passwords (vCenter, LDAP bind) were replaced in the tree earlier;
       owner chose not to rewrite git history.
 - [ ] `playbooks/roles/quay_operator/defaults/main.yml` still has a `/home/danclark` kubeconfig path. It goes away with item 1.
-- [ ] `day0/force-cert-rotation/ocp-force-initial-cert-rotation.sh` has a hard-coded date (`2025-11-06`).
+- [x] 2026-10-30: `day0/force-cert-rotation/ocp-force-initial-cert-rotation.sh` no longer hard-codes
+      a date. It derives the csr-signer and csr-signer-signer expiry dates from the cluster (dates can be
+      passed as arguments to override). Verified on OCP 4.22.18: it matches exactly the five
+      install-time secrets.
 - [ ] About 30 inline `TODO` comments, mostly in `playbooks/`. Most go away with item 1.
 
 ### Repo hygiene: done
