@@ -109,8 +109,8 @@ Ordered by priority. The repo is **public** (44 stars, 18 forks).
        and `*.mine`, and 15 more are scattered in subdirectories. Consolidate into the
        root: `*.log`, `icsp-file*`, `idms-file`, `oc-mirror-workspace/`, `working-dir/`,
        `auth/`, `kubeconfig`. Then sort the 23 untracked files: commit, ignore, or delete.
-       **Careful:** untracked `day0/agent-based-installer/install-config.yaml` contains a live
-       OCM pull secret. Never commit it; ignore or delete it.
+       The live pull secret in untracked `day0/agent-based-installer/install-config.yaml`
+       was replaced with a placeholder on 2026-10-30 (owner holds a private backup outside the repo).
 4. [x] **No linting, CI or secret scanning.** There is no `.github/` directory.
        95 of 109 non-playbook shell scripts lack `set -e`, 5 aren't executable
        (`scripts/operators/path-checker.sh`, `ztp/setup/enable-siteconfig-operator.sh`,
@@ -120,7 +120,7 @@ Ordered by priority. The repo is **public** (44 stars, 18 forks).
        and `day2/operators/odf/ceph_zap.sh` has no shebang. Add `pre-commit` and a
        GitHub Action running `shellcheck`, `yamllint` and `gitleaks`, and enable GitHub
        secret scanning and push protection.
-       **Done 2026-10-30:** added `.pre-commit-config.yaml`, `.yamllint`, `.gitleaks.toml`, `.github/workflows/lint.yml` (changed-files-only), chmod +x five scripts, shebang on `ceph_zap.sh`. Backlog excluding `playbooks/`: shellcheck 89 warning+ findings in 40 files, yamllint 51 errors in 19 files. Still to do by hand: enable GitHub secret scanning and push protection in repo Settings.
+       **Done 2026-10-30:** added `.pre-commit-config.yaml`, `.yamllint`, `.gitleaks.toml`, `.github/workflows/lint.yml` (changed-files-only), chmod +x five scripts, shebang on `ceph_zap.sh`. Backlog excluding `playbooks/`: shellcheck 89 warning+ findings in 40 files, yamllint 51 errors in 19 files. GitHub secret scanning is tracked separately below.
 5. [ ] **Docs are out of date.** The top-level `README.md` says "tested on 4.3, 4.4, 4.5",
        only covers the Ansible workflow, and links into `playbooks/docs`. Rewrite it as
        an index of `day0/`, `day2/`, `oc-mirror/`, `scripts/` and `cloudformation/`.
@@ -160,8 +160,13 @@ Smaller items:
 - [ ] Two YAML files don't parse: `docs/install-config-vmware-ipi.yaml:29` and
       `oc-mirror/v2/samples/imageset-config-upgrades.yaml:6`.
 - [ ] `scripts/get-ocp-ca.sh` shebang typo (`#!/bin/bahs`); `snowball.sh` misuses `scp -i`/`ssh -i`.
-- [ ] `playbooks/roles/quay*` still has hard-coded MySQL/registry default passwords and
-      `/home/danclark` paths. They go away with item 1.
+- [ ] Enable GitHub secret scanning and push protection: repo Settings -> Code security
+      (both currently disabled), or
+      `gh api -X PATCH repos/dmc5179/openshift4-disconnected -F 'security_and_analysis[secret_scanning][status]=enabled' -F 'security_and_analysis[secret_scanning_push_protection][status]=enabled'`.
+- [x] 2026-10-30: hard-coded default passwords in `playbooks/roles/{quay,quay_operator,create_openshift_users,ipa,podman_registry,active_directory}`
+      replaced with `CHANGEME`. Lab passwords (vCenter, LDAP bind) were replaced in the tree earlier;
+      owner chose not to rewrite git history.
+- [ ] `playbooks/roles/quay_operator/defaults/main.yml` still has a `/home/danclark` kubeconfig path. It goes away with item 1.
 - [ ] `day0/force-cert-rotation/ocp-force-initial-cert-rotation.sh` has a hard-coded date (`2025-11-06`).
 - [ ] About 30 inline `TODO` comments, mostly in `playbooks/`. Most go away with item 1.
 
