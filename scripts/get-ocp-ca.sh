@@ -1,4 +1,4 @@
-#!/bin/bahs
+#!/bin/bash
 
 # Method 1, get from kubeconfig
 #

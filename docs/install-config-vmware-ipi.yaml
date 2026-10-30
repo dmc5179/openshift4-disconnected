@@ -25,4 +25,6 @@ fips: false
 pullSecret: '{"auths"}'
 sshKey: 'ssh-ed25519 ...'
 additionalTrustBundle: |
-< Insert vCenter Certificate Here>
+  -----BEGIN CERTIFICATE-----
+  <insert vCenter CA certificate here>
+  -----END CERTIFICATE-----
