@@ -68,10 +68,10 @@ imageContentSources:
 # creates pre-install
 imageDigestSources:
 - mirrors:
-  - bastion.danclark.io:5000/openshift
-  source: quay.io/openshift-release-dev/ocp-release
+  - bastion.danclark.io:8443/openshift/release
+  source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
   #mirrorSourcePolicy: NeverContactSource
 - mirrors:
-  - bastion.danclark.io:5000/openshift
-  source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+  - bastion.danclark.io:8443/openshift/release-images
+  source: quay.io/openshift-release-dev/ocp-release
   #mirrorSourcePolicy: NeverContactSource
