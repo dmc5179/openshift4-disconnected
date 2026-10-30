@@ -34,3 +34,15 @@ do
 
 done
 
+
+# Point Dev Spaces at the offline registry
+
+CheCluster fields noted while setting this up (see `devspaces-existing.yaml`).
+Some are older CheCluster v1 names, so check the current schema with
+`oc explain checluster.spec.components.devfileRegistry` and
+`oc explain checluster.spec.components.pluginRegistry`:
+
+- `disableInternalRegistry`
+- `externalDevfileRegistries`
+- `devfileRegistryImage` / `externalDevfileRegistry` (v1)
+- `server.externalPluginRegistry` (v1)

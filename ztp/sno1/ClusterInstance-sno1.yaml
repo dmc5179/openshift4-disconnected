@@ -9,7 +9,7 @@ spec:
     - 10.100.144.53
   apiVIPs:
     - 10.150.50.201
-  baseDomain: "redhat.ten.vibrintlabs.net"
+  baseDomain: "example.com"
   #caBundleRef:
   clusterImageSetNameRef: img4.18.9-x86-64-appsub # From oc get -A ClusterImageSet
   clusterName: "sno1"

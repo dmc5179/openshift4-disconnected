@@ -8,11 +8,11 @@ imageDigestSources:
   # TODO: The openshift installer will fail if "allowMirrorByTags" is set. CRD shows it should be allowed. Need to look into why.
   #allowMirrorByTags: false #Defaults to false according to CRD.
 - mirrors:
-  - bastion.io:8443/openshift
+  - registry.example.com:8443/openshift
   source: quay.io/openshift-release-dev/ocp-release
   mirrorSourcePolicy: NeverContactSource # OCP installer does not parse this field but does not fail if present. Bug already submitted
 - mirrors:
-  - bastion.io:8443/openshift
+  - registry.example.com:8443/openshift
   source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
   mirrorSourcePolicy: NeverContactSource # OCP installer does not parse this field but does not fail if present. Bug already submitted
 # additionalTrustBundle should have the CA for your private registry and any SSL endpoint

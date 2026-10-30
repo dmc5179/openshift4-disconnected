@@ -1,6 +1,6 @@
 additionalTrustBundlePolicy: Always
 apiVersion: v1
-baseDomain: dota-lab.iad.redhat.com
+baseDomain: example.com
 compute:
 - architecture: amd64
   hyperthreading: Enabled
@@ -32,15 +32,15 @@ platform:
     failureDomains:
     - name: generated-failure-domain
       region: generated-region
-      server: vcenter.dota-lab.iad.redhat.com
+      server: vcenter.example.com
       topology:
         computeCluster: /Datacenter/host/Cluster
         datacenter: Datacenter
-        datastore: /Datacenter/datastore/rhsvc5-ssd
+        datastore: /Datacenter/datastore/datastore1
         networks:
         - labnet-10.15.168.x
         resourcePool: /Datacenter/host/Cluster/Resources
-        folder: /Datacenter/datastore/rhsvc5-ssd/danclark # Field added for agent based installer
+        folder: /Datacenter/datastore/datastore1/ocp-vmware # Field added for agent based installer
       zone: generated-zone
     ingressVIPs:
     - 10.15.168.161
@@ -49,9 +49,9 @@ platform:
       - Datacenter
       password: "removed"
       port: 443
-      server: vcenter.dota-lab.iad.redhat.com
+      server: vcenter.example.com
       user: Administrator@vsphere.local
-    #clusterOSImage: http://lenovo-se350.dota-lab.iad.redhat.com/rhcos-4.18.1-x86_64-vmware.x86_64.ova # Field not used for agent based installer
+    #clusterOSImage: http://webserver.example.com/rhcos-4.18.1-x86_64-vmware.x86_64.ova # Field not used for agent based installer
 publish: External
 pullSecret: '{}'
 sshKey: |

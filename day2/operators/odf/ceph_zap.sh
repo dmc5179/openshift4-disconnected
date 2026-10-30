@@ -1,3 +1,4 @@
+#!/bin/bash
 # one liner but need to know these vars like REGISTRY_AUTHFILE and CEPHTOOLS_IMAGE
 # This podman command can be run against each disk like /dev/sdX
 #/usr/bin/podman run --authfile ${REGISTRY_AUTHFILE} --rm -ti --privileged --device ${DEVICE} --entrypoint ceph-bluestore-tool ${CEPHTOOLS_IMAGE} zap-device --dev ${DEVICE} --yes-i-really-really-mean-it

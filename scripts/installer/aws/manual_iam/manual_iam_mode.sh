@@ -7,7 +7,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 # Source the environment file with the default settings
 #source "${SCRIPT_DIR}/../../env.sh"
 
-CLUSTER_DIR='/home/ec2-user/workspace/openshift4-disconnected/scripts/installer/aws/govcloud/cluster'
+CLUSTER_DIR="${SCRIPT_DIR}/../govcloud/cluster"
 rm -rf "${CLUSTER_DIR}"
 mkdir "${CLUSTER_DIR}"
 
@@ -59,4 +59,4 @@ EOF
 done
 
 
-echo "Run the following command: openshift-install create cluster --dir /home/ec2-user/workspace/openshift4-disconnected/scripts/installer/aws/govcloud/cluster/ --log-level=debug"
+echo "Run the following command: openshift-install create cluster --dir ${CLUSTER_DIR}/ --log-level=debug"

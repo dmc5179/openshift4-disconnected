@@ -30,7 +30,7 @@ podman stop ollama
 # Things to do after building the image
 
 # Push the container image to a repository
-#podman push --authfile /home/danclark/quay-pull-secret.json quay.io/danclark/ollama:granite-code-8b
+#podman push --authfile ${HOME}/quay-pull-secret.json quay.io/danclark/ollama:granite-code-8b
 
 # Run the container
 #podman run -d -p 11434:11434 --name new_ollama quay.io/danclark/ollama:granite-code-8b

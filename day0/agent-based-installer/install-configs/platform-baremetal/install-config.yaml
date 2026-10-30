@@ -1,6 +1,6 @@
 apiVersion: v1
 additionalTrustBundlePolicy: Always
-baseDomain: danclark.io  # Change this to your base domain
+baseDomain: example.com  # Change this to your base domain
 compute:
 - architecture: amd64
   hyperthreading: Enabled
@@ -13,7 +13,7 @@ controlPlane:
   replicas: 3
 metadata:
   creationTimestamp: null
-  name: ocp4  # cluster name is prepended to basedomain for DNS; i.e api-int.ocp4.danclark.io in this example file
+  name: ocp4  # cluster name is prepended to basedomain for DNS; i.e api-int.ocp4.example.com in this example file
 networking:
   clusterNetwork:
   - cidr: 10.128.0.0/14  # Only change these if there are conflicts with the machineNetwork
@@ -68,10 +68,10 @@ imageContentSources:
 # creates pre-install
 imageDigestSources:
 - mirrors:
-  - bastion.danclark.io:8443/openshift/release
+  - registry.example.com:8443/openshift/release
   source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
   #mirrorSourcePolicy: NeverContactSource
 - mirrors:
-  - bastion.danclark.io:8443/openshift/release-images
+  - registry.example.com:8443/openshift/release-images
   source: quay.io/openshift-release-dev/ocp-release
   #mirrorSourcePolicy: NeverContactSource

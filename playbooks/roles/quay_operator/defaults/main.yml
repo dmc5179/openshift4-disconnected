@@ -22,3 +22,7 @@ ocp_base_domain: 'example.com'
 
 kubeconfig: '/home/danclark/icsa-kubeconfig'
 kube_ssl_enabled: false
+
+# Pull secret (dict, as in a dockerconfigjson "auths" map) used to pull Quay
+# images from quay.io. Supply your own, for example from the Red Hat Quay docs.
+quay_redhat_pull_secret: {}

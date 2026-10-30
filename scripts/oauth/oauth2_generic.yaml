@@ -4,16 +4,16 @@ app_id: "gitlab-oauth-client"
 app_secret: "CHANGEME-OAUTH-CLIENT-SECRET"
 args:
   client_options:
-    #site: "oauth-openshift.apps.ecs.sandbox1248.opentlc.com"
+    #site: "oauth-openshift.apps.cluster.example.com"
     #user_info_url: "/oauth2/v1/userinfo"
     #authorize_url: "/oauth2/v1/authorize"
     #token_url: "/oauth2/v1/token"
-    site: "https://oauth-openshift.apps.ecs.sandbox1248.opentlc.com"
-    #user_info_url: "https://oauth-openshift.apps.ecs.sandbox1248.opentlc.com/oauth/userinfo"
+    site: "https://oauth-openshift.apps.cluster.example.com"
+    #user_info_url: "https://oauth-openshift.apps.cluster.example.com/oauth/userinfo"
     user_info_url: "/oauth/userinfo"
-    #authorize_url: "https://oauth-openshift.apps.ecs.sandbox1248.opentlc.com/oauth/authorize"
+    #authorize_url: "https://oauth-openshift.apps.cluster.example.com/oauth/authorize"
     authorize_url: "/oauth/authorize"
-    #token_url: "https://oauth-openshift.apps.ecs.sandbox1248.opentlc.com/oauth/token"
+    #token_url: "https://oauth-openshift.apps.cluster.example.com/oauth/token"
     token_url: "/oauth/token"
   user_response_structure:
     root_path: []

@@ -17,5 +17,5 @@ manual_iam_mode.sh
 
 - Run the openshift-install command as normal:
 ```bash
-openshift-install create cluster --dir /home/ec2-user/workspace/openshift4-disconnected/scripts/installer/aws/govcloud/cluster/ --log-level=debug
+openshift-install create cluster --dir <path-to-repo>/scripts/installer/aws/govcloud/cluster/ --log-level=debug
 ```

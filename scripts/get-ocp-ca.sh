@@ -4,8 +4,9 @@
 #
 
 # There are 2 CA bundles in the kubeconfig
-yq '.clusters[0].cluster.certificate-authority-data' /home/danclark/workspace/nga_ecs/cluster/auth/kubeconfig | base64 -d > ecs.crt
-yq '.clusters[1].cluster.certificate-authority-data' /home/danclark/workspace/nga_ecs/cluster/auth/kubeconfig | base64 -d > api.crt
+KUBECONFIG_FILE="${KUBECONFIG_FILE:-${HOME}/cluster/auth/kubeconfig}"
+yq '.clusters[0].cluster.certificate-authority-data' "${KUBECONFIG_FILE}" | base64 -d > ecs.crt
+yq '.clusters[1].cluster.certificate-authority-data' "${KUBECONFIG_FILE}" | base64 -d > api.crt
 
 # Method 2, get from OpenShift itself
 #

@@ -13,7 +13,7 @@ GATEWAY_NAME=openshift-ai-inference
 
 # WASM configuration for disconnected clusters
 # NOTE: Update these variables to match your mirror registry
-MIRROR_REGISTRY="bastion.ods-dis-psi-03.osp.rh-ods.com:8443"
+MIRROR_REGISTRY="${MIRROR_REGISTRY:-registry.example.com:8443}"
 WASM_IMAGE_DIGEST="sha256:aa524e9278976aa3ef0f2d3aeb981e28d2ea6ed6fc5fede05a5dd33db0bb3de2"
 # The WASM module is: registry.access.redhat.com/rhcl-1/wasm-shim-rhel9@${WASM_IMAGE_DIGEST}
 # It must be mirrored to: ${MIRROR_REGISTRY}/rhcl-1/wasm-shim-rhel9@${WASM_IMAGE_DIGEST}

@@ -4,7 +4,7 @@ metadata:
   name: dc1-cs-ocp
   namespace: dc1-cs-ocp
 spec:
-  baseDomain: "rtrpayments.internal"
+  baseDomain: "example.com"
   pullSecretRef:
     name: "dc1-cs-ocp-assisted-deployment-pull-secret"
   clusterImageSetNameRef: "img4.17.16-x86-64-appsub"

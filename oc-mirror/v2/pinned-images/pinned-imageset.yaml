@@ -178,7 +178,7 @@ spec:
     - name: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:5b305e8bbf0d4ef0a4250cd0fb721180a8f7bc8b7742baf80b29abbd2e6916bf
     - name: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:05e0292f71325147d5b9009f660b1b533a00f757d57251e26cfa5527429dc79b
     - name: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:d143a05ab50e1b464ac4de4d58fc9a87c6c04bcf6621d31ea92f07dbd589f544
-    - name: ip-10-0-112-216.us-east-2.compute.internal:8443/openshift/graph-image:latest
+    - name: registry.example.com:8443/openshift/graph-image:latest
     - name: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6ab2897d43e5ea39a218ab4cbbb35bc92f792d56031b2a9ac25e211d1dfb513c
     - name: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:18883326c49451d045dc41894131b1cdf790d221923ee14a85dc965c3ec792c1
     - name: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:2c2dbd7c4200ceac113e1556e425ae885b349240f4583090622384a2573b23ac

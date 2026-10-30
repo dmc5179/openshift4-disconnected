@@ -341,8 +341,8 @@ EOF
 
 # Wouldn't have to do this if we just ran this from the helper node but I already had my aws cli setup
 scp -i /tmp/haproxy.cfg ec2-user@${HELPER_NODE}:
-ssh -i ec2-user@${HELPER_NODE} sudo mv /home/ec2-user/haproxy.cfg /etc/haproxy/haproxy.cfg
+ssh -i ec2-user@${HELPER_NODE} sudo mv haproxy.cfg /etc/haproxy/haproxy.cfg
 ssh -i ec2-user@${HELPER_NODE} sudo chown root.root /etc/haproxy/haproxy.cfg
 ssh -i ec2-user@${HELPER_NODE} sudo systemctl restart haproxy
-scp -i ${IGN_CONFIGS}/auth/kubeconfig ec2-user@${HELPER_NODE}:/home/ec2-user/.kube/config
+scp -i ${IGN_CONFIGS}/auth/kubeconfig ec2-user@${HELPER_NODE}:.kube/config
 

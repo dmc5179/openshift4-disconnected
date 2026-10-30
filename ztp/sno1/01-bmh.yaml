@@ -16,7 +16,7 @@ apiVersion: metal3.io/v1alpha1
 kind: BareMetalHost
 metadata:
   annotations:
-    bmac.agent-install.openshift.io/hostname: ab05ru15.redhat.ten.vibrintlabs.net
+    bmac.agent-install.openshift.io/hostname: ab05ru15.example.com
     apps.open-cluster-management.io/do-not-delete: 'true'  
   labels:
     infraenvs.agent-install.openshift.io: sno1

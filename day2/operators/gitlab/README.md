@@ -110,7 +110,7 @@ oc create -n gitlab-system secret generic gitlab-s3-secrets --from-file=connecti
 oc get route -n openshift-console console -ojsonpath='{.status.ingress[0].host}'
 ```
 
-- it goes into the CR here. If console is  console-openshift-console.apps.ecs.sandbox1248.opentlc.com
+- it goes into the CR here. If console is  console-openshift-console.apps.cluster.example.com
 ```yaml
 spec:
   chart:
@@ -118,7 +118,7 @@ spec:
       global:
         # Configure the domain from the previous step.
         hosts:
-          domain: apps.ecs.sandbox1248.opentlc.com
+          domain: apps.cluster.example.com
 ```
 
 

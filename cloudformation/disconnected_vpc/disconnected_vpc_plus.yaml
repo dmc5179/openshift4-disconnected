@@ -612,9 +612,9 @@ Resources:
             region=${AWS::Region}
 
             echo '${pull_secret}' > /tmp/pull-secret.json
-            echo '${pull_secret}' > /home/ec2-user/pull-secret.json
+            echo '${pull_secret}' > ~ec2-user/pull-secret.json
 
-            chown ec2-user:ec2-user /home/ec2-user/pull-secret.json
+            chown ec2-user:ec2-user ~ec2-user/pull-secret.json
 
             wget -q https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${ocp_ver}/openshift-client-linux-amd64-rhel9-${ocp_ver}.tar.gz
             wget -q https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${ocp_ver}/openshift-install-rhel9-amd64.tar.gz
@@ -802,8 +802,8 @@ Resources:
             #sudo firewall-cmd --add-service=http  --permanent
             #sudo firewall-cmd --reload
 
-            sudo -u ec2-user mkdir /home/ec2-user/.docker
-            sudo -u ec2-user podman login --compat-auth-file /home/ec2-user/.docker/auth.json --username=init --password= ip-10-0-57-54.us-east-2.compute.internal:8443 
+            sudo -u ec2-user mkdir ~ec2-user/.docker
+            sudo -u ec2-user podman login --compat-auth-file ~ec2-user/.docker/auth.json --username=init --password= $(hostname -f):8443 
 
             # Configure SELinux to allow containers in systemd services
             #setsebool -P container_manage_cgroup on

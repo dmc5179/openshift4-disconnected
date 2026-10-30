@@ -17,7 +17,7 @@ if [ "$#" -ne 1 ]; then
 fi
 
 VPC_ID="$1"
-TEMPLATE_URL="https://raw.githubusercontent.com/dmc5179/openshift4-disconnected/refs/heads/master/day0/install-config-examples/install-config.yaml.existingvpc"
+TEMPLATE_URL="https://raw.githubusercontent.com/dmc5179/openshift4-disconnected/refs/heads/master/day0/install-config-examples/install-config-existing-vpc.yaml"
 OUTPUT_FILE="install-config.yaml"
 
 echo "Step 1: Fetching the base install-config template..."

@@ -72,12 +72,12 @@ Parameters:
   InternalApiTargetGroupArn:
     Description: ARN for internal API load balancer target group.
     Type: String
-    Default: "arn:aws:elasticloadbalancing:us-east-1:485015763915:targetgroup/abc123-aint/b8684ecd670f3d6b"
+    Default: "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/<infra-id>-aint/<target-group-id>"
 
   InternalServiceTargetGroupArn:
     Description: ARN for internal service load balancer target group.
     Type: String
-    Default: "arn:aws:elasticloadbalancing:us-east-1:485015763915:targetgroup/abc123-sint/bc6e26819f263837"
+    Default: "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/<infra-id>-sint/<target-group-id>"
 
 Metadata:
   AWS::CloudFormation::Interface:

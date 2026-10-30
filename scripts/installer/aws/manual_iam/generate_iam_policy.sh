@@ -13,7 +13,7 @@ rm -rf ./release-image
 mkdir ./release-image
 
 OCP_RELEASE=4.19.7
-PULL_SECRET=/home/danclark/pull-secret
+PULL_SECRET="${PULL_SECRET:-${HOME}/pull-secret}"
 REPO="quay.io/openshift-release-dev/ocp-release:${OCP_RELEASE}-x86_64"
 
 # This command pulls all the manifests from a release which we don't need for this script

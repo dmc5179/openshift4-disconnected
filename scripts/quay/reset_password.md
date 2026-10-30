@@ -24,7 +24,7 @@ podman unshare
 
 ## Within the podman unshare shell, change directories to the location of the sqlite db file
 ```console
-cd /home/ec2-user/quay-install/sqlite-storage
+cd ~/quay-install/sqlite-storage
 
 sqlite3	quay_sqlite.db
 sqlite3 /sqlite-storage/quay_sqlite.db

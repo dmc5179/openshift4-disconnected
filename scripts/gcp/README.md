@@ -43,7 +43,7 @@ for role in ${ROLES}; do
     --role ${role}
 done
 
-gcloud iam service-accounts add-iam-policy-binding ocp-admin@${PROJECT_NAME}.iam.gserviceaccount.com --member='user:danclark@redhat.com' --role='roles/owner'
+gcloud iam service-accounts add-iam-policy-binding ocp-admin@${PROJECT_NAME}.iam.gserviceaccount.com --member='user:<your-email>' --role='roles/owner'
 `
 
 1. Create service account key

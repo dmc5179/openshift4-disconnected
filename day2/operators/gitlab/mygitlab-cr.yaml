@@ -127,7 +127,7 @@ spec:
             secret: gitlab-object-storage
             key: "config"
         hosts:
-          domain: apps.ecs.sandbox1248.opentlc.com # Part after console-openshift-console
+          domain: apps.cluster.example.com # Part after console-openshift-console
         edition: ce
         ingress:
           #enabled: false

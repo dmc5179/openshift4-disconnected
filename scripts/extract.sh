@@ -1,17 +1,17 @@
 #!/bin/bash -xe
 
 # Pull secret with auth to the offline registry
-PULL_SECRET=/home/ec2-user/quay-mirror-auth.json
+PULL_SECRET="${PULL_SECRET:-${HOME}/quay-mirror-auth.json}"
 OCP_VERSION=4.19.13
 ARCH=x86_64
-PRIVATE_REGISTRY="ip-10-0-104-9.us-east-2.compute.internal:8443"
+PRIVATE_REGISTRY="${PRIVATE_REGISTRY:-registry.example.com:8443}"
 
 MODE="v2"  # Replace with v1 for oc-mirror v1 mode
 
 # V1 Example
-OC_MIRROR_WORKING_DIR="/home/ec2-user/oc-mirror-workspace"
+#OC_MIRROR_WORKING_DIR="${HOME}/oc-mirror-workspace"
 # V2 Example
-OC_MIRROR_WORKING_DIR="/home/ec2-user/download1/working-dir"
+OC_MIRROR_WORKING_DIR="${OC_MIRROR_WORKING_DIR:-${HOME}/download1/working-dir}"
 
 idms_location="cluster-resources/idms-oc-mirror.yaml"
 icsp_location="results-1757018271/imageContentSourcePolicy.yaml"

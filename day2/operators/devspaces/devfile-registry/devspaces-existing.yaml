@@ -66,9 +66,9 @@ spec:
           logLevel: INFO
 status:
   chePhase: Active
-  cheURL: https://devspaces.apps.ocp4.redhat.ten.vibrintlabs.net
+  cheURL: https://devspaces.apps.ocp4.example.com
   cheVersion: 3.27.1
   devfileRegistryURL: ""
   gatewayPhase: Established
-  pluginRegistryURL: https://devspaces.apps.ocp4.redhat.ten.vibrintlabs.net/plugin-registry/v3
-  workspaceBaseDomain: apps.ocp4.redhat.ten.vibrintlabs.net
+  pluginRegistryURL: https://devspaces.apps.ocp4.example.com/plugin-registry/v3
+  workspaceBaseDomain: apps.ocp4.example.com

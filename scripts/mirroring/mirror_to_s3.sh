@@ -5,7 +5,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 # Source the environment file with the default settings
 source "${SCRIPT_DIR}/../env.sh"
 
-S3_BUCKET='danclark-podman-registry'
+S3_BUCKET='my-podman-registry'
 
 
 # There appears to be a bug in how oc uploads to S3. You may see errors like this:
