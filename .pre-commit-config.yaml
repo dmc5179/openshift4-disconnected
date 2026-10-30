@@ -1,0 +1,41 @@
+# pre-commit hooks. See the "Linting" section in AGENTS.md.
+#   pipx install pre-commit        # or: pip install --user pre-commit
+#   pre-commit install             # optional: run on every commit
+#   pre-commit run --files <file>...
+# Don't run `pre-commit run --all-files`: the existing backlog is not
+# lint-clean, and the whitespace hooks would rewrite hundreds of files.
+# CI (.github/workflows/lint.yml) lints only the files changed in a push/PR.
+
+# playbooks/ is being retired (AGENTS.md repo hygiene item 1); don't lint it.
+exclude: ^playbooks/
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: [--allow-multiple-documents, --unsafe]  # --unsafe: syntax only, so CloudFormation !Ref etc. parse
+        exclude: /skeleton/
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+      - id: check-merge-conflict
+      - id: check-added-large-files
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1
+    hooks:
+      - id: shellcheck
+        args: [--severity=warning]
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.38.0
+    hooks:
+      - id: yamllint
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks

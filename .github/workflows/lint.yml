@@ -1,0 +1,119 @@
+# Lint and secret-scan only what changed in a push or PR.
+# The existing repo is not lint-clean (see AGENTS.md); linting only changed
+# files keeps the backlog from turning every run red, while new or edited
+# files are held to the standard. Tool versions match .pre-commit-config.yaml.
+name: lint
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+env:
+  YAMLLINT_VERSION: "1.38.0"
+  SHELLCHECK_PY_VERSION: "0.11.0.1"
+  GITLEAKS_VERSION: "8.30.1"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Work out commit range and changed files
+        id: range
+        env:
+          EVENT: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          PUSH_AFTER: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" = "pull_request" ]; then
+            head="$PR_HEAD"
+            base="$(git merge-base "$PR_BASE" "$PR_HEAD")"
+          else
+            head="$PUSH_AFTER"
+            if [ -z "$PUSH_BEFORE" ] || [ "$PUSH_BEFORE" = "0000000000000000000000000000000000000000" ] \
+               || ! git cat-file -e "${PUSH_BEFORE}^{commit}" 2>/dev/null; then
+              # New branch or force-push to unknown commit: lint just the last commit.
+              base="$(git rev-parse "${head}~1" 2>/dev/null || git hash-object -t tree /dev/null)"
+            else
+              base="$(git merge-base "$PUSH_BEFORE" "$head")"
+            fi
+          fi
+          echo "Range: ${base}..${head}"
+          echo "base=$base" >> "$GITHUB_OUTPUT"
+          echo "head=$head" >> "$GITHUB_OUTPUT"
+
+          # Added/copied/modified/renamed files, excluding playbooks/ (being retired).
+          git diff --name-only -z --diff-filter=ACMR "$base" "$head" -- . ':!playbooks/' > "$RUNNER_TEMP/changed"
+
+          : > "$RUNNER_TEMP/shell"
+          : > "$RUNNER_TEMP/yaml"
+          while IFS= read -r -d '' f; do
+            [ -f "$f" ] || continue
+            case "$f" in
+              *.sh|*.bash) printf '%s\0' "$f" >> "$RUNNER_TEMP/shell" ;;
+              *.yaml|*.yml) printf '%s\0' "$f" >> "$RUNNER_TEMP/yaml" ;;
+              *) if head -n1 "$f" | grep -Eq '^#!.*(/|env )(ba|k|da)?sh\b'; then
+                   printf '%s\0' "$f" >> "$RUNNER_TEMP/shell"
+                 fi ;;
+            esac
+          done < "$RUNNER_TEMP/changed"
+          echo "Shell files changed: $(tr -cd '\0' < "$RUNNER_TEMP/shell" | wc -c)"
+          echo "YAML files changed:  $(tr -cd '\0' < "$RUNNER_TEMP/yaml" | wc -c)"
+
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: "3.x"
+
+      - name: Install linters
+        run: |
+          set -euo pipefail
+          pip install "yamllint==${YAMLLINT_VERSION}" "shellcheck-py==${SHELLCHECK_PY_VERSION}"
+          cd "$RUNNER_TEMP"
+          tarball="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          base_url="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}"
+          curl -fsSLO "${base_url}/${tarball}"
+          curl -fsSLO "${base_url}/gitleaks_${GITLEAKS_VERSION}_checksums.txt"
+          sha256sum -c --ignore-missing "gitleaks_${GITLEAKS_VERSION}_checksums.txt"
+          tar xzf "$tarball" gitleaks
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+
+      - name: shellcheck (changed files)
+        if: ${{ !cancelled() }}
+        run: |
+          set -euo pipefail
+          if [ ! -s "$RUNNER_TEMP/shell" ]; then echo "No shell scripts changed."; exit 0; fi
+          xargs -0 shellcheck --severity=warning --format=gcc < "$RUNNER_TEMP/shell"
+
+      - name: yamllint (changed files)
+        if: ${{ !cancelled() }}
+        run: |
+          set -euo pipefail
+          if [ ! -s "$RUNNER_TEMP/yaml" ]; then echo "No YAML files changed."; exit 0; fi
+          xargs -0 yamllint --format github < "$RUNNER_TEMP/yaml"
+
+      - name: gitleaks (commit range only)
+        if: ${{ !cancelled() }}
+        env:
+          BASE: ${{ steps.range.outputs.base }}
+          HEAD: ${{ steps.range.outputs.head }}
+        run: |
+          set -euo pipefail
+          if git cat-file -e "${BASE}^{commit}" 2>/dev/null; then
+            log_opts="${BASE}..${HEAD}"
+          else
+            log_opts="-1 ${HEAD}"   # first commit on a new branch with no parent
+          fi
+          gitleaks git --no-banner --redact --verbose \
+            --config .gitleaks.toml --log-opts="$log_opts" .

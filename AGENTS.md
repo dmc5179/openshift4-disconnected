@@ -43,6 +43,23 @@ of date (see TODO).
 - **Per-component README:** each `day2/operators/<name>/` dir should have a
   README that someone else could follow from a link.
 
+### Linting
+
+Config lives at the repo root: `.pre-commit-config.yaml` (shellcheck, yamllint,
+gitleaks, whitespace/shebang checks), `.yamllint`, and `.gitleaks.toml`.
+
+- Install: `pipx install pre-commit` (or `pip install --user pre-commit`).
+  Hooks download their own linters on first run.
+- Run on the files you touched: `pre-commit run --files <file>...`.
+  Optionally `pre-commit install` to run it on every commit.
+- **Don't run `pre-commit run --all-files`.** The existing repo isn't lint-clean,
+  and the whitespace hooks would rewrite hundreds of files. Fix scripts as you touch them.
+- CI (`.github/workflows/lint.yml`) runs shellcheck, yamllint and gitleaks on
+  push/PR to `master`, but **only on files changed in that push/PR**, and gitleaks
+  scans only that commit range. `playbooks/` is excluded.
+- Placeholders such as `CHANGEME`, `YOUR_...`, `<access_key>` and `example.com`
+  are allowlisted in `.gitleaks.toml`. Use them in examples instead of real values.
+
 ## Safety rules
 
 - **Don't commit environment-specific values:** real hostnames, IPs, pull
@@ -71,77 +88,89 @@ Code-level TODOs are tracked inline in the code; `grep -rn TODO --exclude-dir=.g
 - [ ] Triage the 19 failed checks with no automated remediation; map them to
       `policies/` items or document them as accepted risk.
 
-### Repo hygiene: top 10 (from full-repo scan, 2026-10-30)
-Ordered by priority. The repo is **public** (44 stars, 18 forks), which raises the
-priority of items 2, 4 and 5.
+### Repo hygiene: top 10 (rescanned 2026-10-30, after items 2-5 below were done)
+Ordered by priority. The repo is **public** (44 stars, 18 forks).
 
-1. [ ] **`playbooks/`: retire it.** It holds 798 of 1,720 tracked files (46%) and
-       59 roles from the OCP 4.3-4.5 era. Much of it is ansible-galaxy skeleton
-       boilerplate (38 `.travis.yml` for a CI service no longer used, plus identical
-       `meta/`, `tests/inventory`, `.yamllint` files). Several roles are marked
-       "not complete" or "broken". It also contains a real quay.io credential (see 2).
-       Tag the current state (for example `archive/playbooks-ansible`), then delete the
-       directory and point the README at the tag. Port anything still useful into
-       `scripts/` or `day2/` first.
-2. [x] **Credentials in a public repo.** `playbooks/roles/quay/files/auth.json` and
-       `playbooks/roles/quay_operator/templates/quay_auth.json` contain a base64
-       `redhat+quay` robot token for quay.io. It is probably the pull token from
-       old public Quay docs, but treat it as a real secret: remove it with item 1.
-       It stays in git history either way, so confirm it's revoked or public.
-       Run `gitleaks` or `trufflehog` over the full history, and enable GitHub secret
-       scanning and push protection. (The other `*secret*.yaml` files hold only
-       placeholders and are fine.)
-       **Done 2026-10-30:** both auth.json files deleted. Not rotated or purged from history (owner confirmed not needed). History scan + GitHub secret scanning still worth doing under item 9.
-3. [x] **Committed generated oc-mirror output.**
-       `oc-mirror/v1/sequential-runs/oc-mirror-workspace/` (results-*, `mapping.txt`,
-       and a 952 KB `publish/.metadata.json`, the largest file in the repo) and
-       `oc-mirror/v2/sample-output/working-dir/` are raw run output full of internal
-       hostnames (`ip-10-0-35-196...compute.internal`). Keep one small, scrubbed
-       example of each (IDMS/ITMS + CatalogSource) and delete the rest.
-       **Done 2026-10-30:** kept one scrubbed example per resource type in `oc-mirror/v2/sample-output/` and `oc-mirror/v1/sequential-runs/sample-output/` (with READMEs); deleted the raw workspaces. `pinned-ocp-release.sh` and `merge-icsp.sh` now take paths as arguments.
-4. [x] **Vendored MTV collection.** `day2/operators/mtv/openshift_virtualization_migration-main/`
-       is 375 files copied from `gitlab.consulting.redhat.com` (internal) under GPLv3.
-       Confirm it may be published publicly. Then replace it with a README that links
-       to the upstream source and documents only what's specific to this repo.
-       **Done 2026-10-30:** deleted the 375-file copy (v1.21.2). `day2/operators/mtv/README.md`
-       now links to the public upstream https://github.com/redhat-cop/openshift_virtualization_migration
-       (1.25.0) and covers git and air-gapped installs. Not on public Galaxy as of this date.
-5. [x] **No top-level LICENSE.** The README has an empty `## License` section. People
-       can't legally reuse or contribute to a public repo with 18 forks, and the
-       vendored GPLv3 code (item 4) complicates the choice. Pick a license (Apache-2.0
-       matches most Red Hat community repos) and add `LICENSE`.
-       **Done 2026-10-30:** added Apache License 2.0 (`LICENSE`) and filled in the README License section.
-6. [ ] **Docs are out of date.** The top-level `README.md` still says "tested on 4.3,
-       4.4, 4.5", only covers the Ansible workflow, and links into `playbooks/docs`.
-       Rewrite it as an index of `day0/`, `day2/`, `oc-mirror/`, `scripts/` and
-       `cloudformation/`. Also add a README to the 12 `day2/operators/*` dirs without
-       one: aws, gpu, ingress, metallb, nmstate, rhacm, rhads, rhcl, rhoai, rhoso,
-       sriov, validated-patterns.
-7. [ ] **Environment-specific values in committed config.** `bastion.danclark.io`,
-       `ip-10-0-35-196...compute.internal` and similar hostnames appear in
-       `day0/agent-based-installer/install-configs/*/install-config.yaml`,
-       `scripts/oauth/oauth2_generic.yaml`, `scripts/config/custom_api_certs.sh`,
-       `day2/baremetal-controlplane-replacement/README.adoc` and
-       `day2/operators/gitlab/README.md`. Replace them with `example.com` placeholders.
-8. [ ] **`.gitignore` and the working tree.** The root `.gitignore` only ignores `*.swp`
+1. [ ] **`playbooks/`: retire it.** It is now 796 of 1,321 tracked files (60%):
+       59 roles from the OCP 4.3-4.5 era, 38 `.travis.yml` files, ansible-galaxy
+       skeleton boilerplate, and several roles marked "not complete" or "broken".
+       Tag the current state (for example `archive/playbooks-ansible`), port anything
+       still useful, delete the directory, and point the README at the tag.
+2. [x] **Environment-specific values in a public repo** (22 files outside `playbooks/`):
+       `danclark.io` (4 files), `sandbox*.opentlc.com` (4), AWS internal hostnames
+       `ip-10-*.compute.internal` (6), hard-coded `/home/ec2-user` (6) and
+       `/home/danclark` (5) paths, and an AWS account ID in the ARN defaults of
+       `cloudformation/c2s/04_cluster_bootstrap.yaml`. Worst offenders:
+       `day0/agent-based-installer/install-configs/*`, `scripts/installer/aws/*`,
+       `scripts/extract.sh`, `scripts/oauth/*`, `day2/operators/gitlab/*`.
+       Replace them with `example.com`, `${HOME}` and parameters.
+       **Done 2026-10-30:** scrubbed 35 files (example.com, ${HOME}/overridable vars, 123456789012, password placeholders). Deliberately kept `quay.io/danclark/...` image refs (real published images) and RFC1918 lab topology in `ztp/sno1/*` and vmware configs. Removed lab passwords (vCenter, LDAP bind) are still in history; rotate them if they're still in use.
+3. [ ] **`.gitignore` and the working tree.** The root `.gitignore` only ignores `*.swp`
        and `*.mine`, and 15 more are scattered in subdirectories. Consolidate into the
-       root file: `oc-agent.log`, `icsp-file*`, `idms-file`, `*.log`,
-       `oc-mirror-workspace/`, `working-dir/`, `auth/`, `kubeconfig`. Then sort the
-       untracked files (agent-installer configs, force-cert-rotation notes,
-       CNV/GitLab/Loki YAMLs, `day2/unmanaged.bu`): commit, ignore, or delete.
-9. [ ] **No linting or CI for scripts and YAML.** 97 of 112 non-playbook shell scripts
-       lack `set -e`, 6 aren't executable (for example `scripts/operators/path-checker.sh`,
-       `ztp/setup/enable-siteconfig-operator.sh`), and 2 have no shebang
-       (`day2/operators/odf/ceph_zap.sh`). Add a `pre-commit` config and a GitHub
-       Action that runs `shellcheck`, `yamllint` and `gitleaks`. Fix scripts as they're
-       touched instead of all at once.
-10. [ ] **Superseded mirroring workflows.** `scripts/mirroring/` (last real change in
+       root: `*.log`, `icsp-file*`, `idms-file`, `oc-mirror-workspace/`, `working-dir/`,
+       `auth/`, `kubeconfig`. Then sort the 23 untracked files: commit, ignore, or delete.
+       **Careful:** untracked `day0/agent-based-installer/install-config.yaml` contains a live
+       OCM pull secret. Never commit it; ignore or delete it.
+4. [x] **No linting, CI or secret scanning.** There is no `.github/` directory.
+       95 of 109 non-playbook shell scripts lack `set -e`, 5 aren't executable
+       (`scripts/operators/path-checker.sh`, `ztp/setup/enable-siteconfig-operator.sh`,
+       `day2/operators/lightspeed/rag-container.sh`,
+       `oc-mirror/v1/sequential-runs/merge-icsp.sh`,
+       `day2/operators/compliance/policies/rate-limit-connections/rate-limit-patch-routes.sh`),
+       and `day2/operators/odf/ceph_zap.sh` has no shebang. Add `pre-commit` and a
+       GitHub Action running `shellcheck`, `yamllint` and `gitleaks`, and enable GitHub
+       secret scanning and push protection.
+       **Done 2026-10-30:** added `.pre-commit-config.yaml`, `.yamllint`, `.gitleaks.toml`, `.github/workflows/lint.yml` (changed-files-only), chmod +x five scripts, shebang on `ceph_zap.sh`. Backlog excluding `playbooks/`: shellcheck 89 warning+ findings in 40 files, yamllint 51 errors in 19 files. Still to do by hand: enable GitHub secret scanning and push protection in repo Settings.
+5. [ ] **Docs are out of date.** The top-level `README.md` says "tested on 4.3, 4.4, 4.5",
+       only covers the Ansible workflow, and links into `playbooks/docs`. Rewrite it as
+       an index of `day0/`, `day2/`, `oc-mirror/`, `scripts/` and `cloudformation/`.
+       12 `day2/operators/*` dirs have no README: aws, gpu, ingress, metallb, nmstate,
+       rhacm, rhads, rhcl, rhoai, rhoso, sriov, validated-patterns.
+6. [ ] **Superseded mirroring workflows.** `scripts/mirroring/` (last real change in
        2021), `scripts/legacy/` (2020) and `scripts/operators/` use the pre-oc-mirror
-       workflow: `oc adm catalog mirror`, `opm index`, and ImageContentSourcePolicy,
-       which is deprecated in favor of IDMS/ITMS. `oc-mirror/v1/` is also deprecated
-       (OCP 4.20 release notes). Delete these, or move them to `archive/` with a note
-       pointing to `oc-mirror/v2/`.
+       workflow (`oc adm catalog mirror`, `opm index`, ICSP). `oc-mirror/v1/` is
+       deprecated. Delete them, or move them to `archive/` pointing to `oc-mirror/v2/`.
+7. [ ] **Deprecated `imageContentSources` / ICSP in example configs** (10 files).
+       install-config uses `imageDigestSources` (4.14+), and clusters use IDMS/ITMS.
+       Still on the old form: `day0/vmware/install-config.yaml`,
+       `day0/agent-based-installer/vmware/install-config.yaml`,
+       `day0/agent-based-installer/install-configs/{platform-baremetal,platform-none}/install-config.yaml`,
+       `scripts/installer/install-config.yaml.example`,
+       `oc-mirror/install-config/install-config-icsp.yaml`,
+       `day2/llm-on-openshift/vllm/vllm-standalone-disconnected.md`. Convert them,
+       or label them clearly as pre-4.14.
+8. [x] **Scratch files and duplicates committed.**
+       `oc-mirror/v2/samples/imageset-config-ocp-virt.txt` is identical to the `.yaml`
+       next to it. Also notes and output dumps (`ztp/baremetal-host-postinstall/{notes,output}.txt`,
+       `day2/operators/devspaces/devfile-registry/notes`, `scripts/oauth/{create,ldap_group_sync}.txt`)
+       and odd suffixes (`day0/install-config-examples/install-config.yaml.existingvpc`).
+       Fold useful notes into READMEs, rename variants to `*-<variant>.yaml`, delete the rest.
+       **Done 2026-10-30:** deleted the duplicate and scratch files, folded `scripts/oauth/create.txt` and `devfile-registry/notes` into READMEs, renamed `install-config.yaml.existingvpc` -> `install-config-existing-vpc.yaml`.
+9. [ ] **No "tested on" version labels.** 31 non-playbook files reference end-of-life
+       OCP versions (4.13 or earlier), with nothing marking which content is still
+       valid. Add a "Tested on OCP x.y" line to each README (as the compliance README
+       does) and prune content that only applies to EOL releases.
+10. [ ] **GitHub repo metadata.** The description ("Tools for disconnected installs of
+       OCP 4") is fine but there are no topics, no CONTRIBUTING or issue templates, and
+       no releases or tags. Add topics (`openshift`, `disconnected`, `air-gapped`,
+       `oc-mirror`, `compliance-operator`), plus a short CONTRIBUTING.md that points
+       at the conventions in this file.
 
 Smaller items:
+- [ ] Two YAML files don't parse: `docs/install-config-vmware-ipi.yaml:29` and
+      `oc-mirror/v2/samples/imageset-config-upgrades.yaml:6`.
+- [ ] `scripts/get-ocp-ca.sh` shebang typo (`#!/bin/bahs`); `snowball.sh` misuses `scp -i`/`ssh -i`.
+- [ ] `playbooks/roles/quay*` still has hard-coded MySQL/registry default passwords and
+      `/home/danclark` paths. They go away with item 1.
 - [ ] `day0/force-cert-rotation/ocp-force-initial-cert-rotation.sh` has a hard-coded date (`2025-11-06`).
 - [ ] About 30 inline `TODO` comments, mostly in `playbooks/`. Most go away with item 1.
+
+### Repo hygiene: done
+- [x] 2026-10-30: **Credentials deleted.** Removed both quay.io `auth.json` files from
+      `playbooks/roles/quay*`. Not rotated or purged from history (owner confirmed not needed).
+- [x] 2026-10-30: **Generated oc-mirror output trimmed** to one scrubbed example per
+      resource type in `oc-mirror/v2/sample-output/` and
+      `oc-mirror/v1/sequential-runs/sample-output/`, with READMEs.
+- [x] 2026-10-30: **Vendored MTV collection removed** (375 files, v1.21.2).
+      `day2/operators/mtv/README.md` links to https://github.com/redhat-cop/openshift_virtualization_migration.
+- [x] 2026-10-30: **Apache License 2.0 added** (`LICENSE` plus the README License section).

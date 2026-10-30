@@ -1,0 +1,39 @@
+# gitleaks config: default rules plus an allowlist for placeholders used in
+# this repo's docs and examples. Run locally with:
+#   gitleaks dir .                     # current tree
+#   gitleaks git --log-opts="A..B" .   # a commit range (what CI does)
+#
+# Known and accepted:
+#   - Git history contains a quay.io "redhat+quay" robot token in
+#     playbooks/roles/quay*/.../auth.json (files deleted 2026-10-30). The owner
+#     confirmed it doesn't need rotating or purging from history. CI scans only
+#     the commit range of each push/PR, so it is not re-flagged.
+#   - The same robot token is still in the tree in
+#     playbooks/roles/quay_operator/templates/quay-enterprise-redhat-pull-secret.yaml.j2.
+#     It is not allowlisted here; it goes away when playbooks/ is retired
+#     (AGENTS.md repo hygiene item 1).
+#
+# Prefer fixing a finding over allowlisting it. For a one-off false positive,
+# add a `gitleaks:allow` comment on the line instead of widening these rules.
+
+title = "openshift4-disconnected gitleaks config"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Obvious placeholders in docs and example configs"
+regexTarget = "match"
+regexes = [
+  '''(?i)CHANGE_?ME''',
+  '''(?i)REPLACE_?ME''',
+  '''(?i)YOUR_[A-Z0-9_]+''',
+  '''(?i)your[_-]?(real[_-]?)?(token|secret|key|password)''',
+  '''(?i)glpat-your''',
+  '''<[A-Za-z0-9_.-]+>''',            # <access_key>, <secret>, <password>
+  '''\$\{[A-Za-z_][A-Za-z0-9_]*\}''',  # ${VAR} references
+  '''\{\{[^}]*\}\}''',                # Jinja/Helm templating
+  '''(?i)example\.(com|org|net)''',
+  '''(?i)x{8,}''',                    # xxxxxxxx
+  '''Q0hBTkdFTUU''',                  # base64("CHANGEME")
+]

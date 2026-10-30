@@ -1,0 +1,40 @@
+# yamllint config for Kubernetes/OpenShift manifests, install-configs,
+# ImageSetConfigs and Ansible. Deliberately relaxed: it catches syntax errors,
+# duplicate keys, and broken indentation, and doesn't argue about style.
+# Run locally with: yamllint <file>  (or via pre-commit, see AGENTS.md)
+extends: default
+
+ignore: |
+  .git/
+  # Backstage/Scaffolder skeletons contain ${{ }} template syntax, not plain YAML.
+  **/skeleton/**
+
+rules:
+  # Manifests often carry long image digests, URLs, certs and pull secrets.
+  line-length: disable
+  # Most manifests omit the leading '---'; multi-doc files use it as a separator.
+  document-start: disable
+  # Accept both list styles found in the repo:
+  #   key:            key:
+  #   - item            - item
+  indentation:
+    spaces: consistent
+    indent-sequences: whatever
+    check-multi-line-strings: false
+  # Kubernetes uses true/false; Ansible and older YAML use yes/no/on/off.
+  # Don't flag keys (e.g. GitHub Actions' `on:`).
+  truthy:
+    allowed-values: ['true', 'false', 'True', 'False', 'yes', 'no', 'on', 'off']
+    check-keys: false
+  comments:
+    min-spaces-from-content: 1
+    require-starting-space: false
+  comments-indentation: disable
+  empty-lines: {max: 3, level: warning}
+  brackets:
+    max-spaces-inside: 1
+  braces:
+    max-spaces-inside: 1
+  # Warn instead of fail on cosmetic issues.
+  trailing-spaces: {level: warning}
+  new-line-at-end-of-file: {level: warning}
