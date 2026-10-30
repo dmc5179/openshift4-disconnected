@@ -4,13 +4,17 @@ metadata:
   name: stig-compliance
   namespace: openshift-compliance
 profiles:
-  - name: rhcos4-stig-v2r1
+  - name: rhcos4-stig-v2r6-with-sshd-enabled
+    kind: TailoredProfile
+    apiGroup: compliance.openshift.io/v1alpha1
+  - name: ocp4-stig-v2r6
     kind: Profile
     apiGroup: compliance.openshift.io/v1alpha1
-  - name: ocp4-stig-v2r1
+  - name: ocp4-stig-node-v2r6
     kind: Profile
     apiGroup: compliance.openshift.io/v1alpha1
 settingsRef:
-  name: default
+  name: default-auto-apply
   kind: ScanSetting
   apiGroup: compliance.openshift.io/v1alpha1
+

@@ -6,10 +6,13 @@ metadata:
 profiles:
 - apiGroup: compliance.openshift.io/v1alpha1
   kind: Profile
-  name: rhcos4-stig-v2r1
+  name: rhcos4-stig-v2r6
 - apiGroup: compliance.openshift.io/v1alpha1
   kind: Profile
-  name: ocp4-stig-v2r1
+  name: ocp4-stig-v2r6
+- apiGroup: compliance.openshift.io/v1alpha1
+  kind: Profile
+  name: ocp4-stig-node-v2r6
 settingsRef:
   apiGroup: compliance.openshift.io/v1alpha1
   kind: ScanSetting
