@@ -1,6 +1,8 @@
 #!/bin/bash
 
-MAPPING_FILE="../../v1/sequential-runs/oc-mirror-workspace/results-1757018271/mapping.txt"
+# Usage: pinned-ocp-release.sh <mapping.txt>
+# mapping.txt comes from an oc-mirror v1 run (oc-mirror-workspace/results-*/mapping.txt).
+MAPPING_FILE="${1:?Usage: $0 <oc-mirror v1 mapping.txt>}"
 
 RELEASE_IMAGES=$(cat "${MAPPING_FILE}" | awk -F\= '{print $1}')
 

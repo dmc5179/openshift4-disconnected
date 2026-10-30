@@ -8,6 +8,6 @@ metadata:
   name: cs-redhat-operator-index-v4-19
   namespace: openshift-marketplace
 spec:
-  image: ip-10-0-35-196.us-east-2.compute.internal:8443/redhat/redhat-operator-index:v4.19
+  image: registry.example.com:8443/redhat/redhat-operator-index:v4.19
   sourceType: grpc
 status: {}

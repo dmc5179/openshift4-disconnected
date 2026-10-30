@@ -174,6 +174,10 @@ Now browse to https://console-openshift-console.apps.<ocp_cluster_name>.<ocp_bas
 
 ## License
 
+Licensed under the [Apache License 2.0](LICENSE). The vendored collection in
+`day2/operators/mtv/openshift_virtualization_migration-main/` keeps its own
+GPLv3 license.
+
 ## Contributors
 
 - [Dan Clark](https://github.com/dmc5179/) (maintainer)

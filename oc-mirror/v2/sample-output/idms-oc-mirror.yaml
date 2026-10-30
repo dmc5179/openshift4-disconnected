@@ -10,11 +10,11 @@ metadata:
 spec:
   imageDigestMirrors:
   - mirrors:
-    - ip-10-0-35-196.us-east-2.compute.internal:8443/openshift/release
+    - registry.example.com:8443/openshift/release
     source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
     #mirrorSourcePolicy: NeverContactSource
   - mirrors:
-    - ip-10-0-35-196.us-east-2.compute.internal:8443/openshift/release-images
+    - registry.example.com:8443/openshift/release-images
     source: quay.io/openshift-release-dev/ocp-release
     #mirrorSourcePolicy: NeverContactSource
 status: {}
@@ -30,6 +30,6 @@ metadata:
 spec:
   imageDigestMirrors:
   - mirrors:
-    - ip-10-0-35-196.us-east-2.compute.internal:8443/openshift-update-service
+    - registry.example.com:8443/openshift-update-service
     source: registry.redhat.io/openshift-update-service
 status: {}

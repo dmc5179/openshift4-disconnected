@@ -10,6 +10,6 @@ spec:
   priority: 0
   source:
     image:
-      ref: ip-10-0-35-196.us-east-2.compute.internal:8443/redhat/redhat-operator-index:v4.19
+      ref: registry.example.com:8443/redhat/redhat-operator-index:v4.19
     type: Image
 status: {}

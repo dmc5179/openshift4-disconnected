@@ -71,11 +71,74 @@ Code-level TODOs are tracked inline in the code; `grep -rn TODO --exclude-dir=.g
 - [ ] Triage the 19 failed checks with no automated remediation; map them to
       `policies/` items or document them as accepted risk.
 
-### Repo hygiene
-- [ ] Sort the untracked files in the working tree: commit, gitignore, or delete
-      (agent-installer configs, `oc-agent.log`, `icsp-file*`, `idms-file`,
-      force-cert-rotation notes, CNV/GitLab/Loki YAMLs, `day2/unmanaged.bu`).
-- [ ] Add `.gitignore` entries for generated files (`oc-agent.log`, `icsp-file*`, `idms-file`).
-- [ ] Rewrite the top-level `README.md`: it still says "tested on 4.3, 4.4, 4.5"
-      and only covers the Ansible workflow.
+### Repo hygiene: top 10 (from full-repo scan, 2026-10-30)
+Ordered by priority. The repo is **public** (44 stars, 18 forks), which raises the
+priority of items 2, 4 and 5.
+
+1. [ ] **`playbooks/`: retire it.** It holds 798 of 1,720 tracked files (46%) and
+       59 roles from the OCP 4.3-4.5 era. Much of it is ansible-galaxy skeleton
+       boilerplate (38 `.travis.yml` for a CI service no longer used, plus identical
+       `meta/`, `tests/inventory`, `.yamllint` files). Several roles are marked
+       "not complete" or "broken". It also contains a real quay.io credential (see 2).
+       Tag the current state (for example `archive/playbooks-ansible`), then delete the
+       directory and point the README at the tag. Port anything still useful into
+       `scripts/` or `day2/` first.
+2. [x] **Credentials in a public repo.** `playbooks/roles/quay/files/auth.json` and
+       `playbooks/roles/quay_operator/templates/quay_auth.json` contain a base64
+       `redhat+quay` robot token for quay.io. It is probably the pull token from
+       old public Quay docs, but treat it as a real secret: remove it with item 1.
+       It stays in git history either way, so confirm it's revoked or public.
+       Run `gitleaks` or `trufflehog` over the full history, and enable GitHub secret
+       scanning and push protection. (The other `*secret*.yaml` files hold only
+       placeholders and are fine.)
+       **Done 2026-10-30:** both auth.json files deleted. Not rotated or purged from history (owner confirmed not needed). History scan + GitHub secret scanning still worth doing under item 9.
+3. [x] **Committed generated oc-mirror output.**
+       `oc-mirror/v1/sequential-runs/oc-mirror-workspace/` (results-*, `mapping.txt`,
+       and a 952 KB `publish/.metadata.json`, the largest file in the repo) and
+       `oc-mirror/v2/sample-output/working-dir/` are raw run output full of internal
+       hostnames (`ip-10-0-35-196...compute.internal`). Keep one small, scrubbed
+       example of each (IDMS/ITMS + CatalogSource) and delete the rest.
+       **Done 2026-10-30:** kept one scrubbed example per resource type in `oc-mirror/v2/sample-output/` and `oc-mirror/v1/sequential-runs/sample-output/` (with READMEs); deleted the raw workspaces. `pinned-ocp-release.sh` and `merge-icsp.sh` now take paths as arguments.
+4. [ ] **Vendored MTV collection.** `day2/operators/mtv/openshift_virtualization_migration-main/`
+       is 375 files copied from `gitlab.consulting.redhat.com` (internal) under GPLv3.
+       Confirm it may be published publicly. Then replace it with a README that links
+       to the upstream source and documents only what's specific to this repo.
+5. [x] **No top-level LICENSE.** The README has an empty `## License` section. People
+       can't legally reuse or contribute to a public repo with 18 forks, and the
+       vendored GPLv3 code (item 4) complicates the choice. Pick a license (Apache-2.0
+       matches most Red Hat community repos) and add `LICENSE`.
+       **Done 2026-10-30:** added Apache License 2.0 (`LICENSE`) and filled in the README License section.
+6. [ ] **Docs are out of date.** The top-level `README.md` still says "tested on 4.3,
+       4.4, 4.5", only covers the Ansible workflow, and links into `playbooks/docs`.
+       Rewrite it as an index of `day0/`, `day2/`, `oc-mirror/`, `scripts/` and
+       `cloudformation/`. Also add a README to the 13 `day2/operators/*` dirs without
+       one: aws, gpu, ingress, metallb, mtv, nmstate, rhacm, rhads, rhcl, rhoai, rhoso,
+       sriov, validated-patterns.
+7. [ ] **Environment-specific values in committed config.** `bastion.danclark.io`,
+       `ip-10-0-35-196...compute.internal` and similar hostnames appear in
+       `day0/agent-based-installer/install-configs/*/install-config.yaml`,
+       `scripts/oauth/oauth2_generic.yaml`, `scripts/config/custom_api_certs.sh`,
+       `day2/baremetal-controlplane-replacement/README.adoc` and
+       `day2/operators/gitlab/README.md`. Replace them with `example.com` placeholders.
+8. [ ] **`.gitignore` and the working tree.** The root `.gitignore` only ignores `*.swp`
+       and `*.mine`, and 15 more are scattered in subdirectories. Consolidate into the
+       root file: `oc-agent.log`, `icsp-file*`, `idms-file`, `*.log`,
+       `oc-mirror-workspace/`, `working-dir/`, `auth/`, `kubeconfig`. Then sort the
+       untracked files (agent-installer configs, force-cert-rotation notes,
+       CNV/GitLab/Loki YAMLs, `day2/unmanaged.bu`): commit, ignore, or delete.
+9. [ ] **No linting or CI for scripts and YAML.** 97 of 112 non-playbook shell scripts
+       lack `set -e`, 6 aren't executable (for example `scripts/operators/path-checker.sh`,
+       `ztp/setup/enable-siteconfig-operator.sh`), and 2 have no shebang
+       (`day2/operators/odf/ceph_zap.sh`). Add a `pre-commit` config and a GitHub
+       Action that runs `shellcheck`, `yamllint` and `gitleaks`. Fix scripts as they're
+       touched instead of all at once.
+10. [ ] **Superseded mirroring workflows.** `scripts/mirroring/` (last real change in
+       2021), `scripts/legacy/` (2020) and `scripts/operators/` use the pre-oc-mirror
+       workflow: `oc adm catalog mirror`, `opm index`, and ImageContentSourcePolicy,
+       which is deprecated in favor of IDMS/ITMS. `oc-mirror/v1/` is also deprecated
+       (OCP 4.20 release notes). Delete these, or move them to `archive/` with a note
+       pointing to `oc-mirror/v2/`.
+
+Smaller items:
 - [ ] `day0/force-cert-rotation/ocp-force-initial-cert-rotation.sh` has a hard-coded date (`2025-11-06`).
+- [ ] About 30 inline `TODO` comments, mostly in `playbooks/`. Most go away with item 1.
